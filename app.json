@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Astrub Slash",
+    "slug": "astrub-slash",
+    "version": "0.1.0",
+    "android": {
+      "package": "com.fan.astrubslash"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "840ba944-56d2-4342-9f03-3f9a60924f8f"
+      }
+    }
+  }
+}

@@ -52,17 +52,31 @@ npm run serve        # abre http://localhost:8080 (en el móvil o con el modo m�
 
 ## Obtener el APK
 
-**Sin instalar nada:** cada push a GitHub ejecuta el workflow *Android APK*. En la pestaña **Actions** del repositorio, abre la última ejecución y descarga el artefacto `astrub-slash-apk` (un zip con `astrub-slash.apk`). Si creas un tag `v*` (por ejemplo `v0.1.0`), el APK también se publica en *Releases*.
+### Con EAS (recomendado)
 
-Para instalarlo en el móvil hay que permitir la instalación desde *orígenes desconocidos*.
-
-**Compilando en local** (requiere Android Studio / Android SDK y JDK 21):
+El proyecto está enlazado a EAS (`@zafiadom14/astrub-slash`). EAS compila el proyecto Android nativo de Capacitor; antes de compilar ejecuta `npx cap sync android` (hook `eas-build-post-install`) para copiar `www/` dentro de la app.
 
 ```bash
 npm install
-npm run apk          # genera android/app/build/outputs/apk/debug/app-debug.apk
+npx eas-cli build -p android --profile preview    # o: npm run eas:apk
 ```
 
-O bien `npx cap open android` para abrirlo en Android Studio.
+Al terminar, EAS da un enlace/QR para descargar el `.apk` directamente en el móvil.
 
-Si cambias algo dentro de `www/`, ejecuta `npx cap sync android` antes de compilar.
+- `preview`: APK debug, sin firma de producción (ideal para probar).
+- `production`: APK release firmado con las credenciales de EAS.
+
+### Con Android Studio
+
+Requiere JDK 17 (el que trae Android Studio sirve).
+
+```bash
+npm install
+npx cap sync android
+npx cap open android      # abre el proyecto en Android Studio
+```
+
+En Android Studio: *Build → Build App Bundle(s) / APK(s) → Build APK(s)*, o pulsa ▶ con el móvil conectado por USB.
+También desde terminal: `npm run apk` → `android/app/build/outputs/apk/debug/app-debug.apk`.
+
+Si cambias algo dentro de `www/`, vuelve a ejecutar `npx cap sync android` antes de compilar.

@@ -1,9 +1,7 @@
 name: Android APK
 
+# Solo manual (la compilación principal se hace con EAS, ver README)
 on:
-  push:
-    branches: ['**']
-    tags: ['v*']
   workflow_dispatch:
 
 permissions:
@@ -23,7 +21,7 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: 17
 
       - name: Instalar dependencias
         run: npm ci
