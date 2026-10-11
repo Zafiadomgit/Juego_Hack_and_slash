@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#1b2e12" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Astrub Slash</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Selección de personaje -->
+  <div id="menu" class="overlay">
+    <div class="panel wide">
+      <h1 class="title">Astrub <span>Slash</span></h1>
+      <p class="subtitle">Un hack &amp; slash fan inspirado en el mundo de Dofus</p>
+      <div id="classList" class="cards"></div>
+      <button id="btnStart" class="btn big" disabled>Elige un personaje</button>
+      <p id="menuHint" class="small"></p>
+    </div>
+  </div>
+
+  <!-- Astrub (hub) -->
+  <div id="hub" class="overlay side">
+    <div class="panel hubpanel">
+      <h2 class="gold">Astrub</h2>
+      <div id="hubChar"></div>
+      <div class="faille">
+        <button id="fMinus" class="btn round">−</button>
+        <div id="fLabel"></div>
+        <button id="fPlus" class="btn round">+</button>
+      </div>
+      <button id="btnZaap" class="btn big">🌀 Entrar por el Zaap</button>
+      <div class="row2">
+        <button id="btnInv" class="btn">🎒 Personaje</button>
+        <button id="btnBakery" class="btn">🍞 Pan · 40 K</button>
+      </div>
+      <button id="btnChange" class="btn ghost">Cambiar de personaje</button>
+    </div>
+  </div>
+
+  <!-- Inventario y características -->
+  <div id="inv" class="overlay">
+    <div class="panel invpanel">
+      <div class="invhead">
+        <h2 class="gold">Personaje</h2>
+        <button id="btnInvClose" class="btn round">✕</button>
+      </div>
+      <div class="invbody">
+        <div class="invcol">
+          <div id="equipGrid" class="equipGrid"></div>
+          <div id="charStats" class="charStats"></div>
+        </div>
+        <div class="invcol">
+          <div class="baghead"><span id="bagTitle"></span><button id="btnSellCommons" class="btn mini2">Vender comunes</button></div>
+          <div id="bagGrid" class="bagGrid"></div>
+          <div id="itemDetail" class="itemDetail"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pausa -->
+  <div id="pause" class="overlay">
+    <div class="panel">
+      <h2>Pausa</h2>
+      <div id="pauseStats" class="stats"></div>
+      <button id="btnResume" class="btn big">Continuar</button>
+      <button id="btnPauseInv" class="btn">🎒 Personaje</button>
+      <button id="btnMute" class="btn">Sonido: ON</button>
+      <button id="btnQuit" class="btn ghost">Abandonar la Faille (conservas el botín)</button>
+    </div>
+  </div>
+
+  <!-- Faille terminada -->
+  <div id="end" class="overlay">
+    <div class="panel">
+      <h2 id="endTitle" class="gold">Faille terminada</h2>
+      <div id="endStats" class="stats"></div>
+      <button id="btnEndHub" class="btn big">Volver a Astrub</button>
+    </div>
+  </div>
+
+  <!-- Muerte -->
+  <div id="dead" class="overlay">
+    <div class="panel">
+      <h2 class="red">Has caído...</h2>
+      <p class="small">Tu alma vuela hacia el Fénix más cercano. Conservas el botín y la experiencia.</p>
+      <div id="deadStats" class="stats"></div>
+      <button id="btnDeadHub" class="btn big">Volver a Astrub</button>
+    </div>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
