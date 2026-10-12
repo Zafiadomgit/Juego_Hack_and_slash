@@ -76,6 +76,60 @@ const HERO_PX = {};
   img.onload = () => { HERO_PX[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
   img.src = 'img/heroes/px/' + id + '.png';
 });
+// Animaciones dibujadas fotograma a fotograma (img/heroes/anim, ver tools/art/build_anims.py)
+const HERO_ANIM_IMG = {};
+const HERO_ANIM_FR = new Map(); // fotograma recortado en su propio canvas (para pixelImage)
+Object.keys(typeof HERO_ANIM !== 'undefined' ? HERO_ANIM : {}).forEach((id) => {
+  const img = new Image();
+  img.onload = () => { HERO_ANIM_IMG[id] = img; };
+  img.src = 'img/heroes/anim/' + id + '.png';
+});
+function heroAnimFrame(cls, pose, f) {
+  const A = HERO_ANIM[cls], list = A[pose] || A.idle, fr = list[f % list.length], key = cls + '|' + pose + '|' + (f % list.length);
+  let c = HERO_ANIM_FR.get(key);
+  if (!c) {
+    c = document.createElement('canvas'); c.width = fr[2]; c.height = fr[3];
+    c.getContext('2d').drawImage(HERO_ANIM_IMG[cls], fr[0], fr[1], fr[2], fr[3], 0, 0, fr[2], fr[3]);
+    c.ax = fr[4]; c.ay = fr[5]; c.key = key;
+    HERO_ANIM_FR.set(key, c);
+  }
+  return c;
+}
+// Elige pose y fotograma según lo que hace el héroe
+function heroAnimPose(cls, o) {
+  const A = HERO_ANIM[cls];
+  if (o.hurt > 0) return ['hurt', 0];
+  const atk = o.swing > 0 ? 1 - o.swing / 0.2 : o.shot > 0 ? 1 - o.shot / 0.15 : -1;
+  if (atk >= 0) return ['attack', Math.min(A.attack.length - 1, Math.floor(atk * A.attack.length))];
+  if (o.moving) return ['walk', Math.floor(o.walkT * 11) % A.walk.length];
+  return ['idle', Math.floor(o.t * 4) % A.idle.length];
+}
+// Dibuja un fotograma con los pies en (o.x, o.y); true si se ha podido
+function drawHeroAnim(g, o) {
+  const cls = o.cls;
+  if (!cls || typeof HERO_ANIM === 'undefined' || !HERO_ANIM[cls] || !HERO_ANIM_IMG[cls]) return false;
+  const [pose, f] = heroAnimPose(cls, o);
+  const c = heroAnimFrame(cls, pose, f);
+  const k = HERO_H * 0.95 / HERO_ANIM[cls].bh; // unidades de mundo por píxel del atlas
+  const face = Math.cos(o.dir) >= 0 ? 1 : -1;
+  g.save();
+  g.translate(o.x, o.y);
+  g.globalAlpha = o.alpha ?? 1;
+  g.scale(face, 1);
+  if (HD2D.active && g === ctx) {
+    const hpx = Math.max(8, Math.round(c.height * k * SPR.scale));
+    const pi = pixelImage(c, hpx, c.key + '|' + hpx);
+    const kk = (c.height * k) / hpx; // mundo por píxel pixelado
+    g.drawImage(pi, -c.ax * k - kk, -c.ay * k - kk, pi.width * kk, pi.height * kk);
+  } else {
+    const sm = g.imageSmoothingEnabled; g.imageSmoothingEnabled = false;
+    g.drawImage(c, -c.ax * k, -c.ay * k, c.width * k, c.height * k);
+    g.imageSmoothingEnabled = sm;
+  }
+  g.restore();
+  return true;
+}
+
 // Arte del héroe a usar: pixel art en HD-2D; si no, el pintado (o el pixel art si no hay pintado)
 function heroArt(cls) {
   const px = HERO_PX[cls], pa = HERO_ART[cls];
@@ -199,7 +253,9 @@ function drawHeroImage(g, img, o, right = false) {
 // Dibuja al personaje (también usado en las tarjetas del menú y el retrato)
 function drawHero(g, clsId, o) {
   const art = heroArt(clsId);
-  if (art) { o.cls = clsId; drawHeroImage(g, art.img, o, art.right); return; }
+  o.cls = clsId;
+  if (drawHeroAnim(g, o)) return;
+  if (art) { drawHeroImage(g, art.img, o, art.right); return; }
   // o: {x, y, dir, walkT, moving, swing, swingSide, shot, t, alpha}
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   const run = o.moving ? o.walkT * 12 : 0;
