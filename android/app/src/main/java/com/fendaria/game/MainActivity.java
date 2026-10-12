@@ -15,6 +15,8 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // el video de presentación puede sonar sin tocar antes la pantalla
+        getBridge().getWebView().getSettings().setMediaPlaybackRequiresUserGesture(false);
         hideSystemBars();
     }
 

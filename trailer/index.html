@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1280, height=720" />
+<script src="assets/gsap.min.js"></script>
+<style>
+@font-face { font-family: Cinzel; font-weight: 900; src: url(assets/cinzel-latin-900-normal.woff2); }
+@font-face { font-family: Cinzel; font-weight: 700; src: url(assets/cinzel-latin-700-normal.woff2); }
+@font-face { font-family: Garamond; font-weight: 700; src: url(assets/eb-garamond-latin-700-normal.woff2); }
+@font-face { font-family: Garamond; font-weight: 800; src: url(assets/eb-garamond-latin-800-normal.woff2); }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1280px; height: 720px; overflow: hidden; background: #000; }
+#root { position: relative; width: 1280px; height: 720px; overflow: hidden; background: #000; }
+.clip { position: absolute; inset: 0; }
+.center { display: flex; align-items: center; justify-content: center; }
+.serif { font-family: Garamond, Georgia, serif; }
+.cinzel { font-family: Cinzel, serif; }
+.gold { background: linear-gradient(180deg, #fffaf0 0%, #f3e2b0 40%, #c9a24a 60%, #fff0c4 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+#stage { position: absolute; inset: 0; }
+/* escena 1: texto de apertura */
+#s1 .line { font: 800 54px Garamond, serif; color: #e8e2d4; letter-spacing: 2px; text-shadow: 0 0 24px rgba(120, 180, 255, .45); }
+.ember { position: absolute; width: 4px; height: 4px; border-radius: 50%; background: #ffcf8a; box-shadow: 0 0 10px 3px rgba(255, 150, 60, .7); }
+/* escena 2: portal */
+#s2 { background: radial-gradient(circle at 50% 50%, #12305e 0%, #060a18 60%, #000 100%); }
+#emb { position: absolute; left: 290px; top: 10px; width: 700px; height: 700px; -webkit-mask-image: radial-gradient(circle, #000 55%, transparent 71%); mask-image: radial-gradient(circle, #000 55%, transparent 71%); }
+#s2 .caption { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; font: 800 40px Garamond, serif; color: #f0e6cc; text-shadow: 0 2px 0 #000, 0 0 20px rgba(0,0,0,.8); }
+svg.speed { position: absolute; left: -320px; top: -640px; width: 1920px; height: 2000px; }
+/* clips de juego */
+.game { position: absolute; inset: 0; overflow: hidden; }
+.gv { width: 1280px; height: 720px; object-fit: cover; }
+.bars::before, .bars::after { content: ''; position: absolute; left: 0; right: 0; height: 64px; background: #000; z-index: 3; }
+.bars::before { top: 0; } .bars::after { bottom: 0; }
+.grade { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,10,.55) 100%); z-index: 2; }
+.slam { position: absolute; left: 0; right: 0; top: 270px; text-align: center; font: 900 110px Cinzel, serif; letter-spacing: 10px; z-index: 4;
+  background: linear-gradient(180deg, #ffffff 0%, #f3ecd8 35%, #d8b86a 58%, #8a6a32 62%, #f0dca0 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 6px 0 #0a0a14) drop-shadow(0 0 30px rgba(0,0,0,.9)); }
+.slam small { display: block; font: 800 34px Garamond, serif; letter-spacing: 4px; margin-top: 8px; color: #fff; -webkit-text-fill-color: #f2e6c8; }
+.wipe { position: absolute; left: 0; top: 340px; height: 4px; width: 1280px; background: linear-gradient(90deg, transparent, #f0dca0, transparent); z-index: 4; }
+/* cortes de héroe estilo anime */
+.cut { position: absolute; inset: 0; overflow: hidden; }
+.cut .band { position: absolute; inset: -40px; clip-path: polygon(0 18%, 100% 0, 100% 82%, 0 100%); }
+.cut .tone { position: absolute; inset: 0; background-image: radial-gradient(rgba(0,0,0,.35) 30%, transparent 32%); background-size: 14px 14px; mix-blend-mode: multiply; }
+.cut .num { position: absolute; right: 40px; top: 30px; font: 900 360px Cinzel, serif; color: rgba(255,255,255,.10); }
+.cut .hero { position: absolute; bottom: 30px; image-rendering: pixelated; filter: drop-shadow(0 12px 0 rgba(0,0,0,.45)) drop-shadow(0 0 30px rgba(255,255,255,.25)); }
+.cut .name { position: absolute; top: 220px; font: 900 76px Cinzel, serif; letter-spacing: 4px; white-space: nowrap; color: #fff; text-shadow: 0 6px 0 #0a0a14, 0 0 30px rgba(0,0,0,.7); transform: skewX(-8deg); }
+.cut .role { position: absolute; top: 318px; white-space: nowrap; font: 800 36px Garamond, serif; color: #fff3d0; letter-spacing: 3px; text-shadow: 0 3px 0 #0a0a14; }
+.cut .stripe { position: absolute; left: 0; right: 0; height: 10px; background: #fff; }
+/* tensión */
+#s6 { background: #000; }
+#s6 .glow { position: absolute; inset: 0; background: radial-gradient(circle at 50% 55%, rgba(200, 20, 20, .55), rgba(0,0,0,0) 55%); }
+#s6 .q { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font: 800 60px Garamond, serif; color: #f5e8d8; letter-spacing: 2px; text-shadow: 0 0 30px rgba(255, 60, 40, .6); }
+/* logo */
+#s7 { background: radial-gradient(circle at 50% 46%, #1c3a70 0%, #0a1024 55%, #03050c 100%); }
+#rays { position: absolute; left: 140px; top: -140px; width: 1000px; height: 1000px; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(180, 220, 255, .16) 0deg 6deg, rgba(0,0,0,0) 6deg 18deg); mask-image: radial-gradient(circle, #000 20%, transparent 70%); -webkit-mask-image: radial-gradient(circle, #000 20%, transparent 70%); }
+#logo { position: absolute; left: 165px; top: 120px; width: 950px; }
+#shine { position: absolute; left: 165px; top: 120px; width: 950px; height: 451px; -webkit-mask: url(assets/logo.png) center / contain no-repeat; mask: url(assets/logo.png) center / contain no-repeat; overflow: hidden; }
+#shine i { position: absolute; top: 0; bottom: 0; width: 160px; left: -200px; background: linear-gradient(100deg, transparent, rgba(255,255,255,.9), transparent); }
+#tag { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font: 700 30px Cinzel, serif; letter-spacing: 10px; color: #cfe6ff; text-shadow: 0 0 18px rgba(120,190,255,.7); }
+#flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 50; pointer-events: none; }
+#fadeout { position: absolute; inset: 0; background: #000; opacity: 0; z-index: 60; }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1280" data-height="720">
+  <audio id="music" src="assets/music.m4a" data-start="0" data-duration="30" data-volume="1"></audio>
+
+  <!-- 1. Apertura -->
+  <div id="s1" class="clip center" data-start="0" data-duration="2.7">
+    <div id="embers"></div>
+    <div class="line" id="l1">Las Grietas se abrieron…</div>
+  </div>
+
+  <!-- 2. El Portal -->
+  <div id="s2" class="clip" data-start="2.6" data-duration="2.5">
+    <svg class="speed" id="speed2" viewBox="0 0 1920 2000"></svg>
+    <img id="emb" src="assets/emblem.png" alt="" />
+    <div class="caption" id="c2">…y los monstruos cruzaron a nuestro mundo.</div>
+  </div>
+
+  <!-- 3. Primer combate -->
+  <video id="v3" class="clip gv" src="assets/glaciar.mp4" muted playsinline data-start="5.0" data-duration="1.7" data-media-start="0.6"></video>
+  <div id="s3" class="clip game bars" data-start="5.0" data-duration="1.7">
+    <div class="grade"></div>
+    <div class="slam" id="t3" style="font-size: 86px">¡DEFIENDE FENDARIA!</div>
+  </div>
+
+  <!-- 4. Héroes -->
+  <div id="h1" class="clip cut" data-start="6.6" data-duration="2.05">
+    <div class="band" style="background: linear-gradient(120deg, #6a120c, #c0392b 55%, #ff7a45)"></div>
+    <svg class="speed" id="speedh1" viewBox="0 0 1920 2000"></svg>
+    <div class="tone"></div>
+    <div class="num">I</div>
+    <img class="hero" id="h1img" src="assets/iop.png" style="left: 90px; height: 640px" alt="" />
+    <div class="name" id="h1n" style="left: 560px">ROMPEYELMOS</div>
+    <div class="role" id="h1r" style="left: 580px">Guerrera del hacha · Cuerpo a cuerpo</div>
+  </div>
+  <div id="h2" class="clip cut" data-start="8.6" data-duration="2.05">
+    <div class="band" style="background: linear-gradient(120deg, #0e3a1a, #2e7d32 55%, #8bc34a)"></div>
+    <svg class="speed" id="speedh2" viewBox="0 0 1920 2000"></svg>
+    <div class="tone"></div>
+    <div class="num">II</div>
+    <img class="hero" id="h2img" src="assets/cra.png" style="right: 90px; height: 600px" alt="" />
+    <div class="name" id="h2n" style="left: 70px">OJO DE HALCÓN</div>
+    <div class="role" id="h2r" style="left: 90px">Arquero explorador · A distancia</div>
+  </div>
+  <div id="h3" class="clip cut" data-start="10.6" data-duration="2.05">
+    <div class="band" style="background: linear-gradient(120deg, #0a1a5a, #2a4aa0 55%, #7cc4ff)"></div>
+    <svg class="speed" id="speedh3" viewBox="0 0 1920 2000"></svg>
+    <div class="tone"></div>
+    <div class="num">III</div>
+    <img class="hero" id="h3img" src="assets/feca.png" style="left: 110px; height: 640px" alt="" />
+    <div class="name" id="h3n" style="left: 640px">RUNISTA</div>
+    <div class="role" id="h3r" style="left: 660px">Arcanista de las runas · Magia</div>
+  </div>
+
+  <!-- 5. Montaje -->
+  <video id="vm1" class="clip gv" src="assets/pantano.mp4" muted playsinline data-start="12.6" data-duration="2.05" data-media-start="0.4"></video>
+  <div id="m1" class="clip game bars" data-start="12.6" data-duration="2.05">
+    <div class="grade"></div><div class="wipe" id="w1"></div>
+    <div class="slam" id="t4">5 MUNDOS<small>Bosques, pantanos, glaciares, desiertos y abismos</small></div>
+  </div>
+  <video id="vm2" class="clip gv" src="assets/mago.mp4" muted playsinline data-start="14.6" data-duration="2.05" data-media-start="1.4"></video>
+  <div id="m2" class="clip game bars" data-start="14.6" data-duration="2.05">
+    <div class="grade"></div><div class="wipe" id="w2"></div>
+    <div class="slam" id="t5">GUARDIANES<small>Cada Grieta esconde un jefe</small></div>
+  </div>
+  <video id="vm3" class="clip gv" src="assets/super.mp4" muted playsinline data-start="16.6" data-duration="2.05" data-media-start="2.2"></video>
+  <div id="m3" class="clip game bars" data-start="16.6" data-duration="2.05">
+    <div class="grade"></div><div class="wipe" id="w3"></div>
+    <div class="slam" id="t6">SÚPER JEFES<small>Fácil · Medio · Difícil</small></div>
+  </div>
+  <video id="vm4" class="clip gv" src="assets/pueblo.mp4" muted playsinline data-start="18.6" data-duration="2.05" data-media-start="1.6"></video>
+  <div id="m4" class="clip game bars" data-start="18.6" data-duration="2.05">
+    <div class="grade"></div><div class="wipe" id="w4"></div>
+    <div class="slam" id="t7">BOTÍN LEGENDARIO<small>Equípate en Villa Candela</small></div>
+  </div>
+
+  <!-- 6. Tensión -->
+  <div id="s6" class="clip" data-start="20.6" data-duration="3.1">
+    <div class="glow" id="g6"></div>
+    <div class="q" id="q6">¿Podrás cerrar las Grietas?</div>
+  </div>
+
+  <!-- 7. Logo -->
+  <div id="s7" class="clip" data-start="23.6" data-duration="6.4">
+    <div id="rays"></div>
+    <div id="embers2"></div>
+    <img id="logo" src="assets/logo.png" alt="Fendaria" />
+    <div id="shine"><i id="shineBar"></i></div>
+    <div id="tag">DISPONIBLE EN ANDROID</div>
+  </div>
+
+  <div id="flash"></div>
+  <div id="fadeout"></div>
+</div>
+
+<script>
+  // Aleatoriedad determinista (el render busca fotograma a fotograma)
+  let seed = 1337;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+
+  // líneas de velocidad radiales (anime)
+  function speedLines(id, color, n) {
+    const svg = document.getElementById(id);
+    let html = '';
+    for (let i = 0; i < n; i++) {
+      const a = rnd() * Math.PI * 2, r0 = 260 + rnd() * 260, r1 = 1100;
+      const w = 2 + rnd() * 10;
+      const x0 = 960 + Math.cos(a) * r0, y0 = 1000 + Math.sin(a) * r0, x1 = 960 + Math.cos(a) * r1, y1 = 1000 + Math.sin(a) * r1;
+      html += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" opacity="${0.25 + rnd() * 0.6}"/>`;
+    }
+    svg.innerHTML = html;
+  }
+  speedLines('speed2', '#bfe6ff', 90);
+  speedLines('speedh1', '#fff', 70);
+  speedLines('speedh2', '#fff', 70);
+  speedLines('speedh3', '#fff', 70);
+
+  // brasas
+  function embers(id, n, y0, y1) {
+    const box = document.getElementById(id);
+    for (let i = 0; i < n; i++) {
+      const e = document.createElement('div');
+      e.className = 'ember';
+      e.style.left = (rnd() * 1280) + 'px';
+      e.style.top = (y0 + rnd() * (y1 - y0)) + 'px';
+      const s = 2 + rnd() * 4; e.style.width = e.style.height = s + 'px';
+      e.dataset.dy = String(-(150 + rnd() * 300));
+      e.dataset.dx = String((rnd() - 0.5) * 120);
+      box.appendChild(e);
+    }
+    return [...box.children];
+  }
+  const em1 = embers('embers', 50, 300, 760);
+  const em2 = embers('embers2', 60, 400, 780);
+
+  const tl = gsap.timeline({ paused: true });
+  const flash = (t, a = 1, d = 0.35) => { tl.set('#flash', { opacity: a }, t); tl.to('#flash', { opacity: 0, duration: d, ease: 'power2.out' }, t + 0.02); };
+  const shake = (sel, t, m = 14, n = 6) => { for (let i = 0; i < n; i++) tl.to(sel, { x: (i % 2 ? -1 : 1) * m * (1 - i / n), y: (i % 3 - 1) * m * 0.5 * (1 - i / n), duration: 0.04, ease: 'none' }, t + i * 0.04); tl.to(sel, { x: 0, y: 0, duration: 0.05 }, t + n * 0.04); };
+
+  // 1. apertura
+  em1.forEach((e, i) => tl.fromTo(e, { opacity: 0, x: 0, y: 0 }, { opacity: 1, x: +e.dataset.dx, y: +e.dataset.dy, duration: 2.6, ease: 'none' }, (i % 10) * 0.05));
+  tl.fromTo('#l1', { opacity: 0, scale: 1.2, filter: 'blur(8px)' }, { opacity: 1, scale: 1, filter: 'blur(0px)', duration: 1.4, ease: 'power3.out' }, 0.2);
+  tl.to('#l1', { scale: 1.06, duration: 1.0, ease: 'none' }, 1.6);
+  // 2. portal
+  flash(2.6, 1, 0.5);
+  tl.fromTo('#emb', { scale: 0.35, rotation: -40, opacity: 0 }, { scale: 1.0, rotation: 0, opacity: 1, duration: 1.1, ease: 'expo.out' }, 2.6);
+  tl.to('#emb', { scale: 2.8, rotation: 25, duration: 1.3, ease: 'power3.in' }, 3.7);
+  tl.fromTo('#speed2', { scale: 0.6, opacity: 0 }, { scale: 1.6, opacity: 1, duration: 2.4, ease: 'power1.in' }, 2.6);
+  tl.to('#speed2', { rotation: 30, duration: 2.4, ease: 'none' }, 2.6);
+  tl.fromTo('#c2', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 3.0);
+  tl.to('#c2', { opacity: 0, duration: 0.3 }, 4.5);
+  flash(4.95, 0.9, 0.3);
+  // 3. primer combate
+  tl.fromTo('#v3', { scale: 1.0 }, { scale: 1.12, duration: 1.7, ease: 'none' }, 5.0);
+  tl.fromTo('#t3', { scale: 2.4, opacity: 0, skewX: -12 }, { scale: 1, opacity: 1, skewX: -6, duration: 0.25, ease: 'back.out(2)' }, 5.15);
+  shake('#s3', 5.4, 12);
+  // 4. héroes
+  [['h1', 6.6, -1], ['h2', 8.6, 1], ['h3', 10.6, -1]].forEach(([id, t, side]) => {
+    flash(t, 1, 0.25);
+    tl.fromTo(`#${id} .band`, { xPercent: side * -100 }, { xPercent: 0, duration: 0.22, ease: 'power4.out' }, t);
+    tl.fromTo(`#speed${id}`, { scale: 1.6, opacity: 0 }, { scale: 1, opacity: 0.8, duration: 0.3 }, t);
+    tl.to(`#speed${id}`, { rotation: side * 8, duration: 2, ease: 'none' }, t);
+    tl.fromTo(`#${id}img`, { x: side * 520, scale: 1.25, opacity: 0 }, { x: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'expo.out' }, t + 0.05);
+    tl.to(`#${id}img`, { scale: 1.06, duration: 1.6, ease: 'none' }, t + 0.4);
+    tl.fromTo(`#${id}n`, { x: -side * 600, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: 'power4.out' }, t + 0.18);
+    tl.fromTo(`#${id}r`, { x: -side * 400, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, ease: 'power4.out' }, t + 0.32);
+    tl.to(`#${id}n`, { x: side * -30, duration: 1.5, ease: 'none' }, t + 0.5);
+    shake(`#${id}`, t + 0.08, 16);
+  });
+  // 5. montaje
+  [['m1', 't4', 'w1', 12.6], ['m2', 't5', 'w2', 14.6], ['m3', 't6', 'w3', 16.6], ['m4', 't7', 'w4', 18.6]].forEach(([m, txt, w, t]) => {
+    flash(t, 0.85, 0.22);
+    tl.fromTo(`#v${m}`, { scale: 1.18 }, { scale: 1.04, duration: 2.05, ease: 'power1.out' }, t);
+    tl.fromTo(`#${w}`, { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: 'power3.out' }, t + 0.1);
+    tl.fromTo(`#${txt}`, { scale: 2.2, opacity: 0, skewX: -14 }, { scale: 1, opacity: 1, skewX: -5, duration: 0.25, ease: 'back.out(2.2)' }, t + 0.12);
+    tl.to(`#${txt}`, { scale: 1.08, duration: 1.6, ease: 'none' }, t + 0.4);
+    shake(`#${m}`, t + 0.3, 10, 5);
+  });
+  // 6. tensión
+  [21.0, 21.85, 22.6, 23.15].forEach((t) => { tl.fromTo('#g6', { opacity: 1, scale: 1.08 }, { opacity: 0.25, scale: 1, duration: 0.5, ease: 'power2.out' }, t); });
+  tl.set('#g6', { opacity: 0.2 }, 20.6);
+  tl.fromTo('#q6', { opacity: 0, y: 10, scale: 1.15, filter: 'blur(6px)' }, { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)', duration: 1.2, ease: 'power2.out' }, 20.9);
+  tl.to('#q6', { scale: 1.05, duration: 1.4, ease: 'none' }, 22.1);
+  // 7. logo
+  flash(23.6, 1, 0.9);
+  tl.fromTo('#rays', { rotation: 0, opacity: 0, scale: 0.6 }, { rotation: 60, opacity: 1, scale: 1.1, duration: 6.4, ease: 'none' }, 23.6);
+  tl.fromTo('#logo', { scale: 1.25, opacity: 0, filter: 'blur(10px)' }, { scale: 1, opacity: 1, filter: 'blur(0px)', duration: 1.4, ease: 'expo.out' }, 23.6);
+  tl.to('#logo', { scale: 1.04, duration: 4.8, ease: 'none' }, 25.0);
+  tl.fromTo('#shineBar', { x: 0 }, { x: 1300, duration: 1.1, ease: 'power2.inOut' }, 25.0);
+  tl.fromTo('#shineBar', { x: 0 }, { x: 1300, duration: 1.1, ease: 'power2.inOut' }, 27.6);
+  em2.forEach((e, i) => tl.fromTo(e, { opacity: 0, x: 0, y: 0 }, { opacity: 0.9, x: +e.dataset.dx, y: +e.dataset.dy * 1.4, duration: 5.5, ease: 'none' }, 24.0 + (i % 12) * 0.05));
+  tl.fromTo('#tag', { opacity: 0, scale: 1.2 }, { opacity: 1, scale: 1, duration: 1.2, ease: 'power2.out' }, 26.2);
+  tl.to('#fadeout', { opacity: 1, duration: 0.8, ease: 'power1.in' }, 29.2);
+
+  window.__timelines = window.__timelines || {};
+  window.__timelines['main'] = tl;
+  tl.seek(0);
+</script>
+</body>
+</html>

@@ -509,7 +509,7 @@ function updateVillage(dt) {
 function renderVillage() {
   buildVillage();
   const hz = zoom;
-  if (state === 'menu') { vCam.x = lerp(vCam.x, Math.sin(now * 0.05) * 200, 0.02); vCam.y = lerp(vCam.y, -60, 0.02); }
+  if (state === 'menu' || state === 'title' || state === 'start' || state === 'intro') { vCam.x = lerp(vCam.x, Math.sin(now * 0.05) * 220, 0.02); vCam.y = lerp(vCam.y, -70 + Math.sin(now * 0.07) * 40, 0.02); } // cámara lenta de fondo en los menús
   ctx.save();
   ctx.translate(W / 2, H / 2);
   ctx.scale(hz, hz);

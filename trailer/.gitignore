@@ -1,0 +1,4 @@
+# clips de juego, música y renders: se regeneran (ver README)
+assets/*.mp4
+assets/music.*
+*.mp4

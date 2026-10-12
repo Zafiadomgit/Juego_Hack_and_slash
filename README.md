@@ -6,6 +6,8 @@ Todo el arte del juego se dibuja por código (sin assets de terceros).
 
 Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja como pixel art en baja resolución y encima se aplican luz dinámica, bloom y desenfoque tipo maqueta. Se puede cambiar al estilo clásico desde la villa o el menú de pausa.
 
+Al abrir el juego por primera vez se reproduce un **video de presentación** (se puede saltar tocando). Después aparece la pantalla de título con el logotipo (**Toca para empezar**) y el menú principal: *Continuar*, *Nuevo juego* (eligiendo clase), *Ver presentación* y el estilo visual. El tráiler se genera con HyperFrames desde `trailer/`.
+
 ## Cómo se juega
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.

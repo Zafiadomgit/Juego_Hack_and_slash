@@ -2110,7 +2110,7 @@ function renderRift() {
   drawVignette(P.hp / P.maxHp < 0.3);
   hd2dFlushText();
 
-  drawHUD();
+  if (!window.TRAILER) drawHUD(); // TRAILER: sin interfaz para grabar el video de presentación
 }
 
 // césped pintado de Villa Candela (ruido, sin rombos)
@@ -2270,7 +2270,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['menu', 'hub', 'map', 'inv', 'shop', 'pause', 'end', 'dead'];
+const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -2303,7 +2303,8 @@ function buildMenu() {
       selectedClass = id;
       for (const c of list.children) c.classList.toggle('selected', c === el);
       $('btnStart').disabled = false;
-      $('btnStart').textContent = SAVE.slots[id] ? `Continuar con ${C.name}` : `Crear ${C.name}`;
+      confirmNew = false;
+      $('btnStart').textContent = SAVE.slots[id] ? (menuMode === 'new' ? `Empezar de nuevo con ${C.name}` : `Continuar con ${C.name}`) : `Comenzar con ${C.name}`;
     });
     list.appendChild(el);
   }
@@ -2344,6 +2345,12 @@ function buildHub() {
 
 $('btnStart').addEventListener('click', () => {
   if (!selectedClass) return;
+  // "Nuevo juego" sobre un héroe con partida: pide confirmación antes de borrarla
+  if (menuMode === 'new' && SAVE.slots[selectedClass]) {
+    if (!confirmNew) { confirmNew = true; $('btnStart').textContent = `¿Seguro? Se perderá el progreso de ${CLASSES[selectedClass].name} · Pulsa otra vez`; SFX.play('hurt'); return; }
+    SAVE.slots[selectedClass] = null;
+  }
+  confirmNew = false;
   if (!SAVE.slots[selectedClass]) SAVE.slots[selectedClass] = newSlot(selectedClass);
   SAVE.last = selectedClass;
   S = migrateSlot(SAVE.slots[selectedClass]);
@@ -2539,7 +2546,7 @@ $('mapInfo').addEventListener('click', (ev) => {
   if (ev.target.closest('#btnMapGo')) { const s2 = mapSel(); persist(); startNode(s2.b, s2.n, s2.d); }
 });
 $('btnInv').addEventListener('click', () => openInventory('hub'));
-$('btnChange').addEventListener('click', () => { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); });
+$('btnChange').addEventListener('click', () => { persist(); S = null; openClassMenu('switch'); });
 
 // ---------- Inventario / características ----------
 let invSel = null; // objeto abierto en la ficha: {from:'bag'|'equip', idx|slot}
@@ -3154,8 +3161,11 @@ try {
       else if (state === 'inv') closeInventory();
       else if (state === 'shop') closeShop();
       else if (state === 'map') closeMap();
-      else if (state === 'hub') { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); }
-      else if (state === 'menu') App.exitApp();
+      else if (state === 'hub') { persist(); S = null; showStart(); }
+      else if (state === 'menu') showStart();
+      else if (state === 'start') showTitle();
+      else if (state === 'intro') endIntro();
+      else if (state === 'title') App.exitApp();
     });
   }
 } catch (e) { /* entorno web */ }
@@ -3163,10 +3173,74 @@ try {
 // Arranque
 if (document.fonts && document.fonts.load) ['900 20px Cinzel', '800 20px Garamond', '700 20px Garamond'].forEach((f) => document.fonts.load(f).catch(() => {}));
 function onHeroArtLoaded() { if (state === 'menu') buildMenu(); }
-selectedClass = SAVE.last;
-buildMenu();
-if (selectedClass) $('btnStart').textContent = `Continuar con ${CLASSES[selectedClass].name}`;
-showOverlay('menu');
+
+// ---------- Presentación → Toca para empezar → Menú principal → Elegir héroe ----------
+let menuMode = 'new', confirmNew = false;
+function playIntro() {
+  state = 'intro'; scene = 'hub'; S = null;
+  showOverlay('intro');
+  const v = $('introVid');
+  v.currentTime = 0; v.muted = false;
+  $('introSound').classList.remove('show');
+  const p = v.play();
+  // si el navegador no deja reproducir con sonido, se reproduce en silencio y se ofrece activarlo
+  if (p && p.catch) p.catch(() => { v.muted = true; $('introSound').classList.add('show'); v.play().catch(() => endIntro()); });
+}
+function endIntro() {
+  const v = $('introVid');
+  v.pause();
+  try { localStorage.setItem('fendaria.introSeen', '1'); } catch (e) { /* ignorar */ }
+  showTitle();
+}
+function showTitle() { state = 'title'; scene = 'hub'; S = null; showOverlay('title'); }
+function showStart() {
+  state = 'start'; scene = 'hub'; S = null;
+  const last = SAVE.last && SAVE.slots[SAVE.last];
+  $('stContinue').disabled = !last;
+  $('stContinueSub').textContent = last ? `${CLASSES[SAVE.last].name} · nivel ${last.level}` : 'Aún no hay partidas';
+  $('stStyle').textContent = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico');
+  for (const b of document.querySelectorAll('.s-menu button')) b.classList.remove('sel');
+  (last ? $('stContinue') : $('stNew')).classList.add('sel');
+  showOverlay('start');
+}
+function openClassMenu(mode) {
+  menuMode = mode; confirmNew = false;
+  state = 'menu'; scene = 'hub';
+  selectedClass = mode === 'switch' ? SAVE.last : null;
+  $('menuTitle').textContent = mode === 'new' ? 'Nuevo juego · Elige tu héroe' : 'Elige con quién jugar';
+  $('menuSub').textContent = mode === 'new' ? 'Cada héroe tiene su propia partida.' : 'Cambia de héroe; cada uno conserva su progreso.';
+  buildMenu();
+  if (selectedClass) $('btnStart').textContent = `Continuar con ${CLASSES[selectedClass].name}`;
+  showOverlay('menu');
+}
+$('introVid').addEventListener('ended', endIntro);
+$('intro').addEventListener('click', (ev) => { if (ev.target.id === 'introSound') return; endIntro(); });
+$('introSound').addEventListener('click', () => { const v = $('introVid'); v.muted = false; $('introSound').classList.remove('show'); });
+$('title').addEventListener('click', () => { SFX.init(); SFX.play('zaap'); enterFullscreen(); showStart(); });
+$('stContinue').addEventListener('click', () => { if (!SAVE.last || !SAVE.slots[SAVE.last]) return; SFX.init(); SFX.play('click'); S = migrateSlot(SAVE.slots[SAVE.last]); goHub(); });
+$('stNew').addEventListener('click', () => { SFX.init(); SFX.play('click'); openClassMenu('new'); });
+$('stIntro').addEventListener('click', () => { SFX.play('click'); playIntro(); });
+$('stStyle').addEventListener('click', () => { toggleStyle(); $('stStyle').textContent = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico'); });
+$('btnMenuBack').addEventListener('click', () => { SFX.play('click'); showStart(); });
+window.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (state === 'intro' && (k === 'escape' || k === 'enter' || k === ' ')) endIntro();
+  else if (state === 'title' && (k === 'enter' || k === ' ')) $('title').click();
+  else if (state === 'start') {
+    const btns = [...document.querySelectorAll('.s-menu button')].filter((b) => !b.disabled);
+    let i = btns.findIndex((b) => b.classList.contains('sel'));
+    if (k === 'arrowdown' || k === 'arrowup') { btns.forEach((b) => b.classList.remove('sel')); i = (i + (k === 'arrowdown' ? 1 : btns.length - 1)) % btns.length; btns[i].classList.add('sel'); }
+    else if (k === 'enter' && btns[i]) btns[i].click();
+    else if (k === 'escape') showTitle();
+  } else if (state === 'menu' && k === 'escape') showStart();
+});
+
+// Arranque: la presentación solo se reproduce sola la primera vez (luego está en el menú)
+let introSeen = false;
+try { introSeen = localStorage.getItem('fendaria.introSeen') === '1'; } catch (e) { /* ignorar */ }
+if (location.hash === '#test') openClassMenu('switch');
+else if (!introSeen) playIntro();
+else showTitle();
 requestAnimationFrame(frame);
 
 // Gancho para pruebas automatizadas

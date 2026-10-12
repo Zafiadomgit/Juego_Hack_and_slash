@@ -11,11 +11,38 @@
 <body>
   <canvas id="game"></canvas>
 
+  <!-- Video de presentación -->
+  <div id="intro" class="overlay intro">
+    <video id="introVid" src="video/intro.webm" playsinline preload="auto"></video>
+    <button id="introSound" class="intro-sound">🔇 Activar sonido</button>
+    <div class="intro-skip">Toca para saltar ›</div>
+  </div>
+
+  <!-- Pantalla de título: toca para empezar -->
+  <div id="title" class="overlay titlescr">
+    <div class="t-rays"></div>
+    <img class="t-logo" src="img/logo.png" alt="Fendaria · Las Grietas Rúnicas" />
+    <div class="t-tap">Toca para empezar</div>
+    <div class="t-ver">v1.0</div>
+  </div>
+
+  <!-- Menú principal -->
+  <div id="start" class="overlay startscr">
+    <img class="s-logo" src="img/logo.png" alt="Fendaria" />
+    <nav class="s-menu">
+      <button id="stContinue">Continuar<small id="stContinueSub"></small></button>
+      <button id="stNew">Nuevo juego</button>
+      <button id="stIntro">Ver presentación</button>
+      <button id="stStyle">Estilo: HD-2D</button>
+    </nav>
+  </div>
+
   <!-- Selección de personaje -->
   <div id="menu" class="overlay">
     <div class="panel wide">
-      <h1 class="title">Fen<span>daria</span></h1>
-      <p class="subtitle">Cierra las Grietas. Reclama el ámbar.</p>
+      <button id="btnMenuBack" class="menu-back">‹ Volver</button>
+      <h2 id="menuTitle" class="gold">Elige tu héroe</h2>
+      <p id="menuSub" class="subtitle">Cierra las Grietas. Reclama el ámbar.</p>
       <div id="classList" class="cards"></div>
       <button id="btnStart" class="btn big" disabled>Elige un personaje</button>
       <p id="menuHint" class="small"></p>
