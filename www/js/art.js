@@ -25,7 +25,7 @@ const OUTLINE = '#2a1a0c';
 // ============================================================
 const SPR = { cache: new Map(), scale: 1.5 };
 function spriteScaleUpdate(s) {
-  const ns = Math.max(1, Math.min(2.5, s));
+  const ns = Math.max(HD2D.on ? 0.25 : 1, Math.min(2.5, s));
   if (Math.abs(ns - SPR.scale) > 0.01) { SPR.scale = ns; SPR.cache.clear(); }
 }
 // Dibuja (o crea) el sprite `key` con el origen en la posición actual de ctx.
@@ -42,6 +42,7 @@ function sprite(key, w, h, ax, ay, fn) {
     const saved = ctx;
     ctx = g;
     try { fn(g); } finally { ctx = saved; }
+    if (HD2D.on) pixelize(c);
     if (SPR.cache.size > 2500) SPR.cache.clear();
     SPR.cache.set(key, c);
   }
@@ -89,6 +90,14 @@ function drawHeroImage(g, img, o) {
   g.save();
   g.translate(o.x + Math.cos(o.dir) * lunge, o.y + Math.sin(o.dir) * lunge * 0.5 - hop);
   g.globalAlpha = o.alpha ?? 1;
+  if (HD2D.active && g === ctx) {
+    // HD-2D: sprite pixelado, sin rotación (los píxeles se mantienen rectos)
+    const pi = pixelImage(img, Math.max(8, Math.round(h * SPR.scale)));
+    g.scale(-face * (sx > 1.03 ? 1.08 : 1), sy < 0.97 ? 0.94 : 1);
+    g.drawImage(pi, -w / 2 - 1 / SPR.scale, -h - 1 / SPR.scale, pi.width / SPR.scale, pi.height / SPR.scale);
+    g.restore();
+    return;
+  }
   g.rotate(tilt);
   g.scale(sx * -face, sy); // la imagen mira a su izquierda
   g.drawImage(img, -w / 2, -h, w, h);

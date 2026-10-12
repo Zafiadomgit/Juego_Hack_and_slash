@@ -38,7 +38,8 @@ function resize() {
   canvas.height = Math.floor(H * DPR);
   zoom = Math.min(W, H) / 420; // ~420 unidades de mundo en el lado corto
   ui = clamp(Math.min(W, H) / 400, 0.8, 1.6);
-  spriteScaleUpdate(zoom * DPR);
+  spriteScaleUpdate(HD2D.on ? zoom / hd2dPixSize() : zoom * DPR);
+  SPR.cache.clear();
   groundChunks.clear();
   vignetteCache = null;
 }
@@ -133,12 +134,13 @@ function migrateSlot(s) {
 }
 const boostOn = (k) => !!(rift && rift.boost && rift.boost[k]);
 let SAVE = loadSave();
+if (!HD2D.on) resize();
 let S = null; // personaje activo
 
 function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-    if (s && s.slots) return s;
+    if (s && s.slots) { if (s.hd2d === false) HD2D.on = false; return s; }
   } catch (e) { /* ignorar */ }
   return { slots: {}, last: null };
 }
@@ -1776,6 +1778,7 @@ function drawHeart(x, y, r, fill) {
 }
 
 function text(str, x, y, size, color, align = 'left', weight = 800, stroke = true, family = 'Nunito, "Trebuchet MS", sans-serif') {
+  if (HD2D.active && ctx === HD2D.g) { hd2dDeferText([str, x, y, size, color, align, weight, stroke, family]); return; }
   ctx.font = `${weight} ${size}px ${family}`;
   ctx.textAlign = align;
   ctx.textBaseline = 'middle';
@@ -1865,7 +1868,7 @@ function drawHUD() {
   const rx = W - pad, ry = 66 * s;
   text(rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#f3ead2' : '#ff8a80';
-  text(rift.bossSpawned ? (rift.bossDead ? '✔' : 'GUARDIÁN') : fmtTime(rift.time), rx, ry, 12 * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
+  text(rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
   roundRect(rx - pw, ry + 9 * s, pw, 8 * s, 4 * s, 'rgba(0,0,0,0.6)', '#6b5228', 1.5);
   const pk = rift.progress / rift.goal;
@@ -1984,7 +1987,9 @@ function renderRift() {
   ctx.save();
   ctx.translate(W / 2, H / 2);
   ctx.scale(zr, zr);
-  ctx.translate(-cam.x + sx, -cam.y + sy);
+  // HD-2D: la cámara se ajusta a la rejilla de píxeles para que el pixel art no "tiemble"
+  const snap = HD2D.active ? HD2D.pix / zr : 0;
+  ctx.translate(snap ? -Math.round((cam.x - sx) / snap) * snap : -cam.x + sx, snap ? -Math.round((cam.y - sy) / snap) * snap : -cam.y + sy);
 
   const vw = W / zr / 2 + 80, vh = H / zr / 2 + 100;
   const vl = cam.x - vw, vr = cam.x + vw, vt = cam.y - vh, vb = cam.y + vh;
@@ -2083,6 +2088,7 @@ function renderRift() {
   }
   ctx.globalAlpha = 1;
   ctx.restore();
+  hd2dEndWorld(B.id === 'glaciar' || B.id === 'desierto' ? 0.14 : 0.32);
 
   // luz: la escena se oscurece salvo alrededor del héroe y de las fuentes de luz
   const toS = (x, y) => ({ x: (x - cam.x + sx) * zr + W / 2, y: (y - cam.y + sy) * zr + H / 2 });
@@ -2121,6 +2127,7 @@ function renderRift() {
   // atmósfera: motas flotantes y viñeta
   drawMotes(B.mote);
   drawVignette(P.hp / P.maxHp < 0.3);
+  hd2dFlushText();
 
   drawHUD();
 }
@@ -2163,6 +2170,7 @@ function renderHub() {
     drawMonsterBody(e);
   }
   ctx.restore();
+  hd2dEndWorld(0.18);
   const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.max(W, H) * 0.8);
   g.addColorStop(0, 'rgba(0,0,0,0)');
   g.addColorStop(1, 'rgba(0,0,0,0.45)');
@@ -2171,10 +2179,15 @@ function renderHub() {
 
 function render() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  ctx.fillStyle = scene === 'rift' && rift ? 'rgb(' + rift.biome.ground[2].join(',') + ')' : '#3d6b25';
+  const bg = scene === 'rift' && rift ? 'rgb(' + rift.biome.ground[2].join(',') + ')' : '#3d6b25';
+  ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
+  // HD-2D: el mundo va a un búfer pixelado; luces, interfaz y textos se pintan nítidos encima
+  if (hd2dBegin()) { ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H); }
   if (scene === 'rift' && P && rift) renderRift();
   else renderHub();
+  if (HD2D.active) hd2dEndWorld();
+  hd2dFlushText();
 }
 
 // ============================================================
@@ -2233,7 +2246,7 @@ function groundChunk(cx, cy) {
   const key = cx + ',' + cy;
   let c = groundChunks.get(key);
   if (c) return c;
-  const gs = Math.min(1.4, Math.max(0.8, zoom * DPR));
+  const gs = HD2D.on ? zoom / hd2dPixSize() : Math.min(1.4, Math.max(0.8, zoom * DPR));
   c = document.createElement('canvas');
   c.width = c.height = Math.ceil(CHUNK * gs);
   const g = c.getContext('2d', { alpha: false });
@@ -3131,6 +3144,12 @@ function playerDied() {
 }
 
 $('btnResume').addEventListener('click', resumeGame);
+// Estilo visual: HD-2D (pixel art con luces modernas) o clásico (vectorial suave)
+function styleLabel() { const t = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico'); $('btnStyle').textContent = t; $('btnStyleHub').textContent = '🎨 ' + t; }
+function toggleStyle() { setHd2d(!HD2D.on); SAVE.hd2d = HD2D.on; persist(); styleLabel(); SFX.play('click'); }
+$('btnStyle').addEventListener('click', toggleStyle);
+$('btnStyleHub').addEventListener('click', toggleStyle);
+styleLabel();
 $('btnPauseInv').addEventListener('click', () => { state = 'play'; openInventory('pause'); });
 $('btnQuit').addEventListener('click', () => { persist(); goHub(); });
 $('btnEndHub').addEventListener('click', goHub);

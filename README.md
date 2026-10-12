@@ -4,6 +4,8 @@ Un hack & slash (ARPG) para Android: cruza el Portal Rúnico de Villa Candela, c
 
 Todo el arte del juego se dibuja por código (sin assets de terceros).
 
+Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja como pixel art en baja resolución y encima se aplican luz dinámica, bloom y desenfoque tipo maqueta. Se puede cambiar al estilo clásico desde la villa o el menú de pausa.
+
 ## Cómo se juega
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
@@ -34,6 +36,7 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/art.js           Arte procedural + caché de sprites
   js/biomes.js        Mundos de las Grietas (terreno, vegetación, clima)
   js/progress.js      Mapa, dificultades, conjuntos y Súper Jefes
+  js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
 android/              Proyecto Android (Capacitor)
 eas.json / app.json   Compilación del APK con EAS
