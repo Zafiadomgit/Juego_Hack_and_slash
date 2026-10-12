@@ -18,8 +18,8 @@ Object.assign(CLASSES, {
   },
   domadora: {
     name: 'Domadora', role: 'Invocadora de bestias', color: '#4a6a2a', hair: '#7a4a24',
-    desc: 'Látigo de cuero y silbato de hueso. Sus lobos luchan a su lado y enloquecen con su rugido.',
-    hp: 112, speed: 168, basicMul: 1.15, refK: 1.05, weapon: { icon: '🪢', names: ['Látigo', 'Fusta', 'Látigo de espinas'] },
+    desc: 'Cayado de cristal espiritual y pieles de lobo. Sus lobos luchan a su lado y enloquecen con su rugido.',
+    hp: 112, speed: 168, basicMul: 1.15, refK: 1.05, weapon: { icon: '🪄', names: ['Cayado tribal', 'Vara de espíritus', 'Cayado de hueso'] },
     skills: [
       { name: 'Llamada del Lobo', icon: '🐺', cost: 3, cd: 5, desc: 'Invoca un lobo que caza enemigos durante 16 s (hasta 3)' },
       { name: 'Rugido Salvaje', icon: '⚡', cost: 4, cd: 8, desc: 'Empuja a los enemigos y enfurece a tus bestias (+70% daño)' },
@@ -36,8 +36,8 @@ Object.assign(CLASSES, {
   },
   berserker: {
     name: 'Berserker', role: 'Furia cuerpo a cuerpo', color: '#8a1c1c', hair: '#b8322a',
-    desc: 'Martillo enorme y pieles de oso. Cuanto menos vida tiene, más fuerte golpea, y se cura al pegar.',
-    hp: 150, speed: 160, basicMul: 1.8, refK: 0.95, weapon: { icon: '🔨', names: ['Martillo', 'Gran martillo', 'Maza de guerra'] },
+    desc: 'Espadón enorme y tatuajes de guerra. Cuanto menos vida tiene, más fuerte golpea, y se cura al pegar.',
+    hp: 150, speed: 160, basicMul: 1.8, refK: 0.95, weapon: { icon: '⚔', names: ['Espadón', 'Mandoble', 'Gran espada'] },
     skills: [
       { name: 'Golpe Sangriento', icon: '🩸', cost: 3, cd: 3, desc: 'Sacrifica un 8% de vida por un golpe brutal que te cura' },
       { name: 'Grito de Guerra', icon: '📯', cost: 4, cd: 10, desc: 'Atacas un 40% más rápido y recibes un 25% menos de daño 7 s' },
@@ -55,7 +55,7 @@ Object.assign(CLASS_LORE, {
   },
   domadora: {
     hero: 'Ayla', epithet: 'la Domadora',
-    summary: 'Invocadora de lobos. Su látigo mantiene a raya a los enemigos mientras su manada los caza, y su rugido los vuelve imparables.',
+    summary: 'Invocadora de lobos. Su cayado de espíritus mantiene a raya a los enemigos mientras su manada los caza, y su rugido los vuelve imparables.',
     playstyle: 'Juego tranquilo y estratégico: mantén lobos en el campo y deja que ellos hagan el trabajo sucio.',
     stats: { Vida: 3, Daño: 3, Alcance: 3, Defensa: 3, Movilidad: 3 }, difficulty: 1,
     story: 'Ayla cuidaba los perros pastores de las granjas del sur. Cuando las bestias de la Grieta atacaron el rebaño, una loba gris salió del bosque ceniciento y se puso de su lado. Desde entonces la manada crece cada temporada: lobos que nacieron cerca de las Grietas y que solo obedecen el silbido de hueso de Ayla.',
@@ -68,17 +68,17 @@ Object.assign(CLASS_LORE, {
     story: 'Brina desmontó el reloj de la torre de Villa Candela a los nueve años solo para ver cómo funcionaba (y lo volvió a montar con una pieza de más). Hoy dirige el único taller de la villa que fabrica pólvora con ámbar de las Grietas. Sus bombas brillan como pequeños soles, y ella jura que algún día cerrará una Grieta con la explosión adecuada.',
   },
   berserker: {
-    hero: 'Ragna', epithet: 'la Berserker',
-    summary: 'Guerrera salvaje. Cuanto más herida está, más fuerte golpea, y cada golpe le devuelve vida. Su martillo aplasta lo que toca.',
+    hero: 'Brann', epithet: 'el Berserker',
+    summary: 'Guerrero salvaje. Cuanto más herido está, más fuerte golpea, y cada golpe le devuelve vida. Su espadón parte lo que toca.',
     playstyle: 'Arriesgado y explosivo: juega con poca vida para pegar más fuerte, pero no te pases.',
     stats: { Vida: 5, Daño: 5, Alcance: 1, Defensa: 2, Movilidad: 2 }, difficulty: 2,
-    story: 'Ragna llegó del norte helado siguiendo el rastro de un Coloso de Escarcha que destruyó su clan. Lo encontró en el Glaciar Rúnico, al otro lado de una Grieta, y lo partió con el martillo de su padre. Desde aquel día una furia roja le corre por las venas cuando pelea: no siente el dolor, solo la sed de la siguiente pelea.',
+    story: 'Brann llegó del norte helado siguiendo el rastro de un Coloso de Escarcha que destruyó su clan. Lo encontró en el Glaciar Rúnico, al otro lado de una Grieta, y lo partió con el espadón de su padre. Cada cicatriz roja de su piel es una runa de su pueblo. Desde aquel día una furia roja le corre por las venas cuando pelea: no siente el dolor, solo la sed de la siguiente pelea.',
   },
 });
 Object.assign(STAT_REC, { sombra: ['agi', 'sue'], domadora: ['int', 'vit'], artificiera: ['int', 'sue'], berserker: ['fue', 'vit'] });
-Object.assign(WEAPON_KIND, { sombra: 'dagger', domadora: 'whip', artificiera: 'launcher', berserker: 'hammer' });
+Object.assign(WEAPON_KIND, { sombra: 'dagger', domadora: 'staff', artificiera: 'launcher', berserker: 'greatsword' });
 Object.assign(HERO_RIG, {
-  sombra: { hip: 0.6, cx: 0.52, stride: 0.24 }, domadora: { hip: 0.72, cx: 0.5, stride: 0.16 },
+  sombra: { hip: 0.6, cx: 0.52, stride: 0.24 }, domadora: { hip: 0.62, cx: 0.5, stride: 0.2 },
   artificiera: { hip: 0.6, cx: 0.52, stride: 0.22 }, berserker: { hip: 0.6, cx: 0.5, stride: 0.24 },
 });
 ['sombra', 'domadora', 'artificiera', 'berserker'].forEach((id) => {
@@ -92,7 +92,7 @@ Object.assign(ULTIMATES, {
   artificiera: { name: 'Bombardeo', icon: '☄', desc: 'Una lluvia de explosiones cae sobre toda la pantalla' },
   berserker: { name: 'Frenesí Rojo', icon: '♨', desc: '10 s de furia: +50% daño, +30% velocidad de ataque, robo de vida y curación inmediata' },
 });
-const ATK_ICON = { iop: '⚔', cra: '➶', feca: '✦', sombra: '🗡', domadora: '〰', artificiera: '💣', berserker: '🔨' };
+const ATK_ICON = { iop: '⚔', cra: '➶', feca: '✦', sombra: '🗡', domadora: '🪄', artificiera: '💣', berserker: '⚔' };
 
 // ============================================================
 // Estado propio de las clases nuevas (bestias, torretas, venenos…)
@@ -216,7 +216,7 @@ const CLASS_KIT = {
       const a = aimAt(200);
       P.dir = a; P.aimHold = 0.3;
       P.swingT = 0.2; P.swingSide *= -1;
-      slashes.push({ x: P.x, y: P.y, dir: a, arc: 0.9, range: 128, life: 0.2, max: 0.2, color: '#d8b080', side: P.swingSide, width: 8, follow: true });
+      slashes.push({ x: P.x, y: P.y, dir: a, arc: 0.9, range: 128, life: 0.2, max: 0.2, color: '#9fd8ff', side: P.swingSide, width: 10, follow: true });
       meleeArc(P.x, P.y, a, 128, 0.42, basicDmg(), 150);
       P.atkCd = 0.5 / (P.atkSpeed * classAtkSpeed());
       SFX.play('swing');

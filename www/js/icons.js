@@ -47,6 +47,11 @@ function iconBody(kind, p) {
         <path d="M12 30 L10 40 L17 40 L19 30" fill="${p.l}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
         <path d="M9 21 L33 21" stroke="${p.ml}" stroke-width="1.6" opacity="0.8"/></g>
         <circle cx="12" cy="10" r="5" fill="#3a3440" stroke="${OL}" stroke-width="1.6"/><path d="M15 6 Q18 2 21 4" stroke="#ffb040" stroke-width="2" fill="none"/>`;
+    case 'greatsword':
+      return `<g transform="rotate(40 24 24)"><path d="M24 2 L30 8 L30 32 L18 32 L18 8 Z" fill="${p.m}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 5 L24 30" stroke="${p.ml}" stroke-width="2" opacity="0.8"/>
+        <rect x="11" y="32" width="26" height="5" rx="2" fill="${p.g}" stroke="${OL}" stroke-width="1.6"/>
+        <path d="M24 37 L24 46" stroke="${OL}" stroke-width="6.5" stroke-linecap="round"/><path d="M24 37 L24 46" stroke="${p.l}" stroke-width="3.4" stroke-linecap="round"/></g>`;
     case 'hammer':
       return `<g transform="rotate(-30 24 24)"><path d="M24 46 L24 16" stroke="${OL}" stroke-width="6.5" stroke-linecap="round"/>
         <path d="M24 46 L24 16" stroke="${p.l}" stroke-width="3.6" stroke-linecap="round"/>
