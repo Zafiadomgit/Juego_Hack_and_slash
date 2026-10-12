@@ -9,9 +9,12 @@ const LEVELS_PER_BIOME = 7;
 
 const DIFFS = [
   // rar: calidades que pueden caer (la baja y la alta); hi: probabilidad base de la alta
-  { id: 'facil',   name: 'Fácil',   color: '#7cc457', hp: 1,   dmg: 1,   lvl: 0, threat: 0, reward: 1,   rarity: 0,  rar: [0, 1], hi: 0.25, set: 0.10, eliteSet: 0 },
-  { id: 'medio',   name: 'Medio',   color: '#f0b030', hp: 2.1, dmg: 1.5, lvl: 3, threat: 2, reward: 1.6, rarity: 8,  rar: [1, 2], hi: 0.25, set: 0.30, eliteSet: 0.01 },
-  { id: 'dificil', name: 'Difícil', color: '#ff4a3d', hp: 4.2, dmg: 2.2, lvl: 6, threat: 4, reward: 2.5, rarity: 18, rar: [2, 3], hi: 0.25, set: 0.60, eliteSet: 0.03 },
+  // Los monstruos se ajustan al equipo de referencia de cada dificultad (ref = calidad, fill = huecos equipados):
+  //   hits = golpes básicos que aguanta un Jabalí, die = golpes de Jabalí que aguanta el héroe con ese equipo.
+  // En Difícil la referencia es equipo Legendario: incluso con él sigue siendo duro.
+  { id: 'facil',   name: 'Fácil',   color: '#7cc457', hp: 1,   dmg: 1,   lvl: 0, threat: 0, reward: 1,   rarity: 0,  rar: [0, 1], hi: 0.25, set: 0.10, eliteSet: 0,    ref: 0.3, fill: 0.5, hits: 3,   die: 16 },
+  { id: 'medio',   name: 'Medio',   color: '#f0b030', hp: 2.1, dmg: 1.5, lvl: 3, threat: 2, reward: 1.6, rarity: 8,  rar: [1, 2], hi: 0.25, set: 0.30, eliteSet: 0.01, ref: 1.4, fill: 0.9, hits: 5,   die: 9  },
+  { id: 'dificil', name: 'Difícil', color: '#ff4a3d', hp: 4.2, dmg: 2.2, lvl: 6, threat: 4, reward: 2.5, rarity: 18, rar: [2, 3], hi: 0.25, set: 0.60, eliteSet: 0.03, ref: 3,   fill: 1,   hits: 6,   die: 6   },
 ];
 
 // Calidad del botín según la dificultad: Fácil = Común/Raro, Medio = Raro/Épico, Difícil = Épico/Legendario
@@ -113,4 +116,39 @@ function makeSetItem(cls, level, setId) {
   for (const k of Object.keys(it.stats)) it.stats[k] = Math.round(it.stats[k] * 1.1);
   it.value = Math.round(it.value * 1.5);
   return it;
+}
+
+// ---------- Héroe de referencia ----------
+// Simula a un aventurero del nivel recomendado con el equipo que se consigue en esa dificultad
+// (misma fórmula que derived(), sin gemas, mejoras ni conjuntos) y devuelve su golpe medio y su vida efectiva.
+const REF_CACHE = new Map();
+function refPlayer(cls, L, d) {
+  const key = cls + '|' + L + '|' + d;
+  if (REF_CACHE.has(key)) return REF_CACHE.get(key);
+  const DF = DIFFS[d], C = CLASSES[cls];
+  const plvl = Math.max(1, 1 + (L - 1) * 2 + DF.lvl);
+  const il = Math.max(1, (L - 1) * 2 + 3 + DF.lvl);
+  const r0 = Math.floor(DF.ref), r1 = Math.min(3, r0 + 1), fr = DF.ref - r0;
+  const mul = RARITY[r0].mul + (RARITY[r1].mul - RARITY[r0].mul) * fr;
+  const nAff = Math.round(RARITY[r0].affixes + (RARITY[r1].affixes - RARITY[r0].affixes) * fr);
+  // valor medio de un afijo por estadística (el reparto del AFFIX_POOL)
+  const t = { vit: 0, fue: 0, sue: 0, agi: 0, dmg: 0, crit: 0, res: 0, int: 0 };
+  const slots = 1 + (SLOTS.length - 1) * DF.fill;
+  t.dmg += (3 + il * 1.6) * mul; // arma
+  for (const k of AFFIX_POOL) {
+    if (!(k in t)) continue;
+    const v = STAT_INFO[k].base * (1 + il * 0.45) * mul * 0.975;
+    t[k] += (k === 'crit' || k === 'res' ? Math.min(v, 12) : v) * (nAff / AFFIX_POOL.length) * slots;
+  }
+  // puntos de característica repartidos en las dos recomendadas
+  const pts = (plvl - 1) * 5, rec = STAT_REC[cls];
+  t[rec[0]] = (t[rec[0]] || 0) + pts * 0.6; t[rec[1]] = (t[rec[1]] || 0) + pts * 0.4;
+  const maxHp = C.hp + (plvl - 1) * 8 + t.vit * 2;
+  const power = 8 + plvl * 1.2 + t.dmg;
+  const dmgMul = 1 + t.fue * 0.01;
+  const crit = Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01);
+  const armor = Math.min(0.75, t.res * 0.01);
+  const out = { hit: power * C.basicMul * dmgMul * (1 + crit * 0.8), ehp: maxHp / (1 - armor), plvl };
+  REF_CACHE.set(key, out);
+  return out;
 }

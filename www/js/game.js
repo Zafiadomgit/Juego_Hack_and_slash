@@ -744,9 +744,11 @@ function spawnEnemy(type, x, y, o = {}) {
   let lvl = o.lvl ?? ((D.boss ? (F - 1) * 2 + 4 : D.lvl + (F - 1) * 2) + DF.lvl + (sup ? 3 : 0));
   const elite = o.elite ? pick(ELITES.filter((x) => !x.minF || threat >= x.minF)) : null;
   if (elite) lvl += 2;
-  // dificultad: lineal por nivel, exponencial por Grieta y multiplicador de la dificultad elegida
-  const hpMul = (1 + (lvl - 1) * 0.2) * Math.pow(1.045, F - 1) * DF.hp * (sup ? 3.2 : 1);
-  const dmgMul = (1 + (lvl - 1) * 0.09) * Math.pow(1.03, F - 1) * DF.dmg * (sup ? 1.3 : 1);
+  // dificultad ajustada al equipo que se consigue en esa dificultad: un Jabalí aguanta DF.hits golpes
+  // del héroe de referencia y el héroe aguanta DF.die golpes de Jabalí (ver refPlayer)
+  const ref = refPlayer(S ? S.cls : 'iop', F, rift ? rift.d : 0);
+  const hpMul = (DF.hits * ref.hit / ENEMIES.bouftou.hp) * (sup ? 3.2 : 1) * rand(0.95, 1.05);
+  const dmgMul = (ref.ehp / DF.die / ENEMIES.bouftou.dmg) * (sup ? 1.3 : 1);
   const hp = Math.round(D.hp * hpMul * (elite ? 3.5 : 1));
   const e = {
     type, D, x, y, r: D.r * (elite ? elite.size || 1.15 : 1) * (sup ? 1.45 : 1),
@@ -2530,7 +2532,7 @@ function buildMapInfo() {
       <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
       <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
-      <span>Fuerza enemiga</span><b>×${(DF.hp * (isS ? 3.2 : 1)).toFixed(1)} / ×${(DF.dmg * (isS ? 1.3 : 1)).toFixed(1)}</b>
+      <span>Pensada para equipo</span><b>${['<span style="color:' + RARITY[0].color + '">Común</span>', '<span style="color:' + RARITY[1].color + '">Raro</span> o mejor', '<span style="color:' + RARITY[3].color + '">Legendario</span>'][d]}</b>
       <span>Ámbar y XP</span><b>×${DF.reward}</b>
       <span>Calidad del botín</span><b>${rarityRangeText(DF)}</b>
       <span>Pieza de conjunto</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
