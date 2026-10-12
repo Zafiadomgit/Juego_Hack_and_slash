@@ -489,6 +489,8 @@ function updateVillage(dt) {
     vHero.x += mx * sp * dt; vHero.y += my * sp * dt;
     vHero.walkT += dt;
     vHero.dir = Math.atan2(my, mx);
+    vHero.stepT = (vHero.stepT || 0) - dt;
+    if (vHero.stepT <= 0) { vHero.stepT = 0.3; SFX.play('step'); }
     for (const s of VILLAGE.solids) {
       const dx = vHero.x - s.x, dy = vHero.y - s.y, rr = s.r + 12, d2 = dx * dx + dy * dy;
       if (d2 < rr * rr) { const d = Math.sqrt(d2) || 0.01; vHero.x = s.x + (dx / d) * rr; vHero.y = s.y + (dy / d) * rr; }

@@ -8,6 +8,8 @@ Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja com
 
 Al abrir el juego por primera vez se reproduce un **video de presentación** (se puede saltar tocando). Después aparece la pantalla de título con el logotipo (**Toca para empezar**) y el menú principal: *Continuar*, *Nuevo juego* (con una ficha de cada héroe: resumen, atributos, habilidades e historia) y *Ver presentación*. El tráiler se genera con HyperFrames desde `trailer/`.
 
+**Música y sonido**: banda sonora original sintetizada por código (`tools/audio/compose.py`): tema de título, Villa Candela, una pista por mundo, Guardianes, Súper Jefes, fanfarria de victoria y lamento de derrota; los efectos (`tools/audio/sfx.py`) son muestras generadas igual. Todo está en `www/audio/`.
+
 ## Cómo se juega
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
@@ -40,6 +42,8 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/progress.js      Mapa, dificultades, conjuntos y Súper Jefes
   js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
   js/village.js       Villa Candela: pueblo caminable, vecinos y tiendas
+audio/ (en www)       Música (.ogg en bucle) y efectos de sonido
+tools/audio/          Sintetizador y compositor de la banda sonora (Python)
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
 android/              Proyecto Android (Capacitor)
 eas.json / app.json   Compilación del APK con EAS

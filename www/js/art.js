@@ -85,6 +85,68 @@ function heroArt(cls) {
 }
 const HERO_H = 64; // altura en unidades de mundo
 
+// ---------- "Rig" de los héroes: torso + dos piernas, para animar a partir de una sola imagen ----------
+// hip: altura de la cadera (fracción de la imagen); cx: separación entre piernas
+const HERO_RIG = { iop: { hip: 0.6, cx: 0.5, stride: 0.24 }, cra: { hip: 0.6, cx: 0.52, stride: 0.22 }, feca: { hip: 0.72, cx: 0.5, stride: 0.16 } };
+const POSE_FRAMES = { walk: 8, idle: 4, attack: 4, hurt: 1 };
+const POSE_SRC = new Map();
+// Compone una pose a resolución original: las piernas giran desde la cadera y el torso se inclina/rebota
+function heroPoseSource(cls, img, pose, f) {
+  const key = cls + '|' + pose + '|' + f;
+  let c = POSE_SRC.get(key);
+  if (c) return c;
+  const W0 = img.width, H0 = img.height, R = HERO_RIG[cls] || HERO_RIG.iop;
+  const pad = Math.round(H0 * 0.1);
+  c = document.createElement('canvas');
+  c.width = W0 + pad * 2; c.height = H0 + pad;
+  const g = c.getContext('2d');
+  const hipY = H0 * R.hip, cx = W0 * R.cx;
+  let legL = 0, legR = 0, liftL = 0, liftR = 0, upY = 0, upRot = 0, upX = 0;
+  const ph = (f / (POSE_FRAMES[pose] || 1)) * TAU;
+  if (pose === 'walk') {
+    const s = Math.sin(ph);
+    legL = s * R.stride; legR = -s * R.stride;
+    liftL = Math.max(0, -s) * H0 * 0.035; liftR = Math.max(0, s) * H0 * 0.035;
+    upY = -Math.abs(Math.cos(ph)) * H0 * 0.025; upRot = 0.04;
+  } else if (pose === 'idle') {
+    upY = [0, 1, 2, 1][f] * H0 * 0.006;
+  } else if (pose === 'attack') {
+    upRot = [-0.14, 0.3, 0.2, 0.06][f]; upX = [-0.025, 0.06, 0.04, 0.01][f] * H0;
+    legL = -0.1; legR = 0.12;
+  } else if (pose === 'hurt') {
+    upRot = -0.2; upX = -0.035 * H0; legL = 0.06; legR = -0.04;
+  }
+  // piernas (cada una gira desde su cadera; el recorte gira con ella)
+  for (const [side, ang, lift] of [[-1, legL, liftL], [1, legR, liftR]]) {
+    g.save();
+    const px = pad + cx + side * W0 * 0.1, py = pad + hipY;
+    g.translate(px, py - lift); g.rotate(ang); g.translate(-px, -py);
+    g.beginPath();
+    if (side < 0) g.rect(pad, pad + hipY, cx, H0 - hipY + 2); else g.rect(pad + cx, pad + hipY, W0 - cx, H0 - hipY + 2);
+    g.clip();
+    g.drawImage(img, pad, pad);
+    g.restore();
+  }
+  // torso (se solapa un poco con la cadera para no dejar huecos)
+  g.save();
+  const px = pad + cx, py = pad + hipY;
+  g.translate(px + upX, py + upY); g.rotate(upRot); g.translate(-px, -py);
+  g.beginPath(); g.rect(0, 0, c.width, pad + hipY + H0 * 0.04); g.clip();
+  g.drawImage(img, pad, pad);
+  g.restore();
+  c.pad = pad; c.H0 = H0; c.W0 = W0;
+  POSE_SRC.set(key, c);
+  return c;
+}
+// Elige la pose y el fotograma según lo que hace el héroe
+function heroPoseFor(o) {
+  if (o.hurt > 0) return ['hurt', 0];
+  const atk = o.swing > 0 ? 1 - o.swing / 0.2 : o.shot > 0 ? 1 - o.shot / 0.15 : -1;
+  if (atk >= 0) return ['attack', Math.min(3, Math.floor(atk * 4))];
+  if (o.moving) return ['walk', Math.floor((o.walkT * 9) % 8)];
+  return ['idle', Math.floor((o.t * 2.5) % 4)];
+}
+
 function drawHeroImage(g, img, o, right = false) {
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   const flip = right ? face : -face;
@@ -106,7 +168,19 @@ function drawHeroImage(g, img, o, right = false) {
   g.translate(o.x + Math.cos(o.dir) * lunge, o.y + Math.sin(o.dir) * lunge * 0.5 - hop);
   g.globalAlpha = o.alpha ?? 1;
   if (HD2D.active && g === ctx) {
-    // HD-2D: sprite pixelado, sin rotación (los píxeles se mantienen rectos)
+    // HD-2D: sprite pixelado y animado por poses (caminar, respirar, atacar, recibir daño)
+    if (right && o.cls) {
+      const [pose, f] = heroPoseFor(o);
+      const src = heroPoseSource(o.cls, img, pose, f);
+      const hpx = Math.max(8, Math.round(h * SPR.scale * src.height / src.H0));
+      const pi = pixelImage(src, hpx, o.cls + '|' + pose + '|' + f + '|' + hpx);
+      const k = h / src.H0; // unidades de mundo por píxel de la imagen original
+      g.translate(-Math.cos(o.dir) * lunge, -Math.sin(o.dir) * lunge * 0.5 + hop); // la pose ya incluye el movimiento
+      g.scale(flip, 1);
+      g.drawImage(pi, -(src.W0 / 2 + src.pad) * k - 1 / SPR.scale, -src.height * k - 1 / SPR.scale, pi.width / SPR.scale, pi.height / SPR.scale);
+      g.restore();
+      return;
+    }
     const pi = pixelImage(img, Math.max(8, Math.round(h * SPR.scale)));
     g.scale(flip * (sx > 1.03 ? 1.08 : 1), sy < 0.97 ? 0.94 : 1);
     g.drawImage(pi, -w / 2 - 1 / SPR.scale, -h - 1 / SPR.scale, pi.width / SPR.scale, pi.height / SPR.scale);
@@ -125,7 +199,7 @@ function drawHeroImage(g, img, o, right = false) {
 // Dibuja al personaje (también usado en las tarjetas del menú y el retrato)
 function drawHero(g, clsId, o) {
   const art = heroArt(clsId);
-  if (art) { drawHeroImage(g, art.img, o, art.right); return; }
+  if (art) { o.cls = clsId; drawHeroImage(g, art.img, o, art.right); return; }
   // o: {x, y, dir, walkT, moving, swing, swingSide, shot, t, alpha}
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   const run = o.moving ? o.walkT * 12 : 0;
@@ -386,7 +460,7 @@ function drawPlayer() {
   ctx.scale(1 + sq * 0.16, 1 - sq * 0.14);
   drawHero(ctx, P.cls, {
     x: 0, y: 0, dir: P.dir, walkT: P.walkT, moving: P.moving && P.lock <= 0,
-    swing: P.swingT, swingSide: P.swingSide, shot: P.shotT, t: now, alpha: blink ? 0.45 : 1,
+    swing: P.swingT, swingSide: P.swingSide, shot: P.shotT, hurt: P.hurtFlash, t: now, alpha: blink ? 0.45 : 1,
   });
   ctx.restore();
   if (P.hurtFlash > 0) {

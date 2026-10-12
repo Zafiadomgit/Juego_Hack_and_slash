@@ -119,8 +119,7 @@ function pixelize(c) {
 
 // Versión pixelada (y en caché) de una imagen pintada, como el retrato del Rompeyelmos
 const PIX_IMG = new Map();
-function pixelImage(img, hpx) {
-  const key = img.src + '|' + hpx;
+function pixelImage(img, hpx, key = img.src + '|' + hpx) {
   let c = PIX_IMG.get(key);
   if (c) return c;
   const wpx = Math.max(1, Math.round(hpx * img.width / img.height));

@@ -52,13 +52,38 @@ resize();
 // ============================================================
 // Sonido (sintetizado con WebAudio)
 // ============================================================
+// Efectos grabados (www/audio/sfx/*.ogg, generados con tools/audio/sfx.py). Si un archivo aún no ha cargado
+// se usa el sonido sintetizado de respaldo.
+const SFX_FILES = ['swing', 'hit', 'crit', 'boom', 'coin', 'xp', 'hurt', 'level', 'dash', 'shield', 'baa', 'piou', 'boss', 'die', 'heal', 'click', 'loot', 'legend', 'zaap', 'shoot', 'magic', 'step'];
+const SFX_GAIN = { swing: 0.5, hit: 0.55, crit: 0.8, boom: 0.85, coin: 0.35, xp: 0.25, hurt: 0.8, level: 0.8, dash: 0.45, shield: 0.6, baa: 0.45, piou: 0.35, boss: 0.9, die: 0.8, heal: 0.6, click: 0.4, loot: 0.55, legend: 0.85, zaap: 0.7, shoot: 0.5, magic: 0.45, step: 0.18 };
 const SFX = {
   ac: null,
   muted: false,
   budget: 0,
+  bufs: {},
+  master: null, sfxGain: null,
   init() {
     if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
-    try { this.ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { this.ac = null; }
+    try { this.ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { this.ac = null; return; }
+    this.master = this.ac.createGain(); this.master.connect(this.ac.destination);
+    this.master.gain.value = this.muted ? 0 : 1;
+    this.sfxGain = this.ac.createGain(); this.sfxGain.gain.value = 0.9; this.sfxGain.connect(this.master);
+    for (const n of SFX_FILES) loadAudio('audio/sfx/' + n + '.ogg').then((b) => { this.bufs[n] = b; }).catch(() => {});
+    MUSIC.attach(this.ac, this.master);
+  },
+  setMuted(m) {
+    this.muted = m;
+    if (this.master) this.master.gain.setTargetAtTime(m ? 0 : 1, this.ac.currentTime, 0.05);
+  },
+  sample(name, rate = 1, vol = 1) {
+    const b = this.bufs[name];
+    if (!b) return false;
+    const c = this.ac, src = c.createBufferSource(), g = c.createGain();
+    src.buffer = b; src.playbackRate.value = rate;
+    g.gain.value = (SFX_GAIN[name] || 0.6) * vol;
+    src.connect(g); g.connect(this.sfxGain);
+    src.start();
+    return true;
   },
   tone(freq, dur, type = 'square', vol = 0.06, slide = 0, delay = 0) {
     const c = this.ac;
@@ -93,6 +118,8 @@ const SFX = {
     if (!this.ac || this.muted) return;
     if (this.budget > 6) return;
     this.budget++;
+    // muestra grabada con una ligera variación de tono para que los golpes no suenen idénticos
+    if (this.sample(name, name === 'click' || name === 'level' || name === 'legend' ? 1 : 0.93 + Math.random() * 0.14)) return;
     switch (name) {
       case 'swing': this.noise(0.09, 0.07, 2600, 0.8); break;
       case 'shoot': this.tone(700, 0.08, 'triangle', 0.04, 400); break;
@@ -119,6 +146,56 @@ const SFX = {
   },
 };
 
+// Carga y decodifica un archivo de audio (Capacitor sirve www/ como archivos locales)
+const AUDIO_CACHE = new Map();
+function loadAudio(url) {
+  if (AUDIO_CACHE.has(url)) return AUDIO_CACHE.get(url);
+  const p = fetch(url).then((r) => r.arrayBuffer()).then((ab) => new Promise((res, rej) => SFX.ac.decodeAudioData(ab, res, rej)));
+  AUDIO_CACHE.set(url, p);
+  return p;
+}
+
+// ============================================================
+// Música: pistas en bucle con fundido cruzado (www/audio/music, generadas con tools/audio/compose.py)
+// ============================================================
+const MUSIC = {
+  ac: null, out: null, cur: null, want: null, vol: 0.55, duck: 1,
+  attach(ac, master) {
+    this.ac = ac;
+    this.out = ac.createGain(); this.out.gain.value = this.vol; this.out.connect(master);
+    if (this.want) { const w = this.want; this.want = null; this.play(w.name, w.opts); }
+  },
+  play(name, opts = {}) {
+    if (!this.ac) { this.want = { name, opts }; return; }
+    if (this.cur && this.cur.name === name && !opts.restart) return;
+    const token = {};
+    this.token = token;
+    loadAudio('audio/music/' + name + '.ogg').then((buf) => {
+      if (this.token !== token) return; // llegó otra petición mientras cargaba
+      const c = this.ac, fade = opts.fade ?? 1.2, now = c.currentTime;
+      const src = c.createBufferSource(), g = c.createGain();
+      src.buffer = buf; src.loop = opts.loop !== false;
+      g.gain.setValueAtTime(0.0001, now); g.gain.exponentialRampToValueAtTime(1, now + fade);
+      src.connect(g); g.connect(this.out); src.start();
+      this.fadeOut(fade);
+      this.cur = { name, src, g };
+      if (opts.loop === false && opts.then) src.onended = () => { if (this.cur && this.cur.src === src) this.play(opts.then, { fade: 2 }); };
+    }).catch(() => {});
+  },
+  fadeOut(t = 1) {
+    const c = this.cur;
+    if (!c) return;
+    const now = this.ac.currentTime;
+    c.g.gain.cancelScheduledValues(now);
+    c.g.gain.setValueAtTime(Math.max(0.0001, c.g.gain.value), now);
+    c.g.gain.exponentialRampToValueAtTime(0.0001, now + t);
+    try { c.src.stop(now + t + 0.05); } catch (e) { /* ya parada */ }
+    this.cur = null;
+  },
+  stop(t = 0.8) { this.token = {}; this.want = null; if (this.ac) this.fadeOut(t); },
+  setDuck(k) { this.duck = k; if (this.out) this.out.gain.setTargetAtTime(this.vol * k, this.ac.currentTime, 0.2); },
+};
+
 // ============================================================
 // Guardado (localStorage)
 // ============================================================
@@ -140,7 +217,7 @@ let S = null; // personaje activo
 function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-    if (s && s.slots) return s;
+    if (s && s.slots) { if (s.muted) SFX.muted = true; return s; }
   } catch (e) { /* ignorar */ }
   return { slots: {}, last: null };
 }
@@ -664,6 +741,7 @@ function updatePlayer(dt) {
     P.stepT -= dt;
     if (P.stepT <= 0) {
       P.stepT = 0.24;
+      SFX.play('step');
       for (let i = 0; i < 2; i++) particles.push({ x: P.x + rand(-5, 5), y: P.y + 2, vx: -input.mx * rand(20, 50) + rand(-15, 15), vy: rand(-25, -8), life: 0.4, max: 0.4, color: curBiome().id === 'glaciar' ? 'rgba(240,248,255,0.7)' : 'rgba(200,180,140,0.55)', size: rand(3, 5), grav: 0 });
     }
     if (P.aimHold <= 0) P.dir = Math.atan2(input.my, input.mx);
@@ -1377,6 +1455,8 @@ function startNode(b, n, d) {
   genRift();
   groundChunks.clear();
   resetFx();
+  MUSIC.setDuck(1);
+  MUSIC.play(rift.biome.id, { fade: 1.5 });
   // los elixires comprados se beben al entrar
   for (const k of Object.keys(ELIXIRS)) if (S.boosts[k] > 0) { S.boosts[k]--; rift.boost[k] = true; }
   createPlayer();
@@ -1399,6 +1479,7 @@ function startNode(b, n, d) {
 
 function spawnSuperBoss() {
   const sd = SUPER_BOSSES[rift.biome.id];
+  MUSIC.play('superboss', { fade: 0.6 });
   const p = spawnPos();
   const b = spawnEnemy(sd.base, p.x, p.y, { super: sd });
   b.sCd = 4; b.phase = 0;
@@ -1445,6 +1526,7 @@ function updateSuper(e, dt) {
 }
 
 function spawnGuardian() {
+  MUSIC.play('boss', { fade: 0.8 });
   rift.bossSpawned = true;
   const type = curBiome().boss;
   const p = spawnPos();
@@ -1492,6 +1574,7 @@ function guardianDefeated(e) {
   for (const o of obstacles) if (dist(o.x, o.y, zx, zy) < 90) o.gone = true;
   obstacles = obstacles.filter((o) => !o.gone);
   later(1.2, () => { rift.zaap = { x: zx, y: zy }; poof(zx, zy - 30); SFX.play('zaap'); });
+  MUSIC.play('victory', { loop: false, fade: 0.3, then: rift.biome.id });
   markCleared(rift.b, rift.n, rift.d);
   S.maxFaille = Math.max(S.maxFaille, highestLevel());
   autoAdvance();
@@ -2323,6 +2406,8 @@ function goHub() {
   enemies = []; projectiles = []; pickups = []; glyphs = []; hazards = []; corpses = []; ghosts = [];
   createPlayer();
   villageReset();
+  MUSIC.setDuck(1);
+  MUSIC.play('village');
   clearInput();
   persist();
   buildHub();
@@ -3091,12 +3176,14 @@ function pauseGame() {
   clearInput();
   buildPause();
   showOverlay('pause');
+  MUSIC.setDuck(0.35);
 }
 function resumeGame() {
   if (state !== 'pause') return;
   state = 'play';
   last = performance.now();
   showOverlay(null);
+  MUSIC.setDuck(1);
 }
 
 function finishRift() {
@@ -3118,6 +3205,7 @@ function playerDied() {
   if (state !== 'play') return;
   state = 'dead';
   SFX.play('die');
+  MUSIC.play('defeat', { loop: false, fade: 0.6 });
   persist();
   setTimeout(() => {
     $('deadStats').innerHTML = riftRows();
@@ -3131,7 +3219,7 @@ $('btnQuit').addEventListener('click', () => { persist(); goHub(); });
 $('btnEndHub').addEventListener('click', goHub);
 $('btnDeadHub').addEventListener('click', goHub);
 $('btnMute').addEventListener('click', () => {
-  SFX.muted = !SFX.muted;
+  SFX.setMuted(!SFX.muted); SAVE.muted = SFX.muted; persist();
   $('btnMute').textContent = 'Sonido: ' + (SFX.muted ? 'OFF' : 'ON');
 });
 
@@ -3146,7 +3234,8 @@ function enterFullscreen() {
 }
 
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) { pauseGame(); persist(); }
+  if (document.hidden) { pauseGame(); persist(); if (SFX.ac) SFX.ac.suspend(); }
+  else if (SFX.ac && state !== 'title' && state !== 'intro') SFX.ac.resume();
 });
 
 // Botón "atrás" de Android (Capacitor)
@@ -3177,6 +3266,7 @@ let menuMode = 'new', confirmNew = false;
 function playIntro() {
   state = 'intro'; scene = 'hub'; S = null;
   showOverlay('intro');
+  MUSIC.stop(0.5);
   const v = $('introVid');
   v.currentTime = 0; v.muted = false;
   $('introSound').classList.remove('show');
@@ -3190,7 +3280,7 @@ function endIntro() {
   try { localStorage.setItem('fendaria.introSeen', '1'); } catch (e) { /* ignorar */ }
   showTitle();
 }
-function showTitle() { state = 'title'; scene = 'hub'; S = null; showOverlay('title'); }
+function showTitle() { state = 'title'; scene = 'hub'; S = null; showOverlay('title'); MUSIC.play('title'); }
 function showStart() {
   state = 'start'; scene = 'hub'; S = null;
   const last = SAVE.last && SAVE.slots[SAVE.last];
@@ -3199,6 +3289,7 @@ function showStart() {
   for (const b of document.querySelectorAll('.s-menu button')) b.classList.remove('sel');
   (last ? $('stContinue') : $('stNew')).classList.add('sel');
   showOverlay('start');
+  MUSIC.play('title');
 }
 function openClassMenu(mode) {
   menuMode = mode; confirmNew = false;
@@ -3237,10 +3328,11 @@ if (location.hash === '#test') openClassMenu('switch');
 else if (!introSeen) playIntro();
 else showTitle();
 requestAnimationFrame(frame);
+$('btnMute').textContent = 'Sonido: ' + (SFX.muted ? 'OFF' : 'ON');
 
 // Gancho para pruebas automatizadas
 window.__game = {
   get state() { return state; }, get P() { return P; }, get S() { return S; }, get rift() { return rift; }, get enemies() { return enemies; },
   input, startRift, startNode, useSkill, spawnGuardian, goHub, openInventory, spawnEnemy,
-  get fps() { return QUALITY; },
+  get fps() { return QUALITY; }, get music() { return MUSIC.cur ? MUSIC.cur.name : null; },
 };
