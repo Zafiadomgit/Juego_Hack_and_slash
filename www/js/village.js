@@ -13,6 +13,7 @@ let vNear = null, vNearShown = undefined, vCam = { x: 0, y: 0 };
 const NPCS = [
   { id: 'merchant', name: 'Brunilda', title: 'Mercader', x: -212, y: 132, prompt: '💬 Hablar con Brunilda · Equipo', color: '#ffcf7a' },
   { id: 'alchemist', name: 'Maese Ivo', title: 'Alquimista', x: 214, y: 132, prompt: '💬 Hablar con Maese Ivo · Elixires y mejoras', color: '#d9a8ff' },
+  { id: 'board', name: 'Tablón', title: 'Misiones diarias', x: -86, y: 226, prompt: '📜 Leer el tablón · Misiones diarias', color: '#ecd18a' },
 ];
 const PORTAL = { x: 0, y: -80 };
 
@@ -433,7 +434,32 @@ function drawVillageProp(o) {
   if (o.kind === 'lamp') glow(o.x + 11, o.y - 57, 34, '255,200,110', 0.55 + Math.sin(now * 5 + o.x) * 0.05);
 }
 
+// Tablón de misiones: postes de madera con pergaminos clavados
+function artBoard(g) {
+  g.fillStyle = '#4a2e18'; g.fillRect(-26, -64, 6, 64); g.fillRect(20, -64, 6, 64);
+  g.fillStyle = '#7a5030'; g.fillRect(-30, -70, 60, 40);
+  g.fillStyle = '#5c3a1e'; g.fillRect(-30, -70, 60, 4); g.fillRect(-30, -34, 60, 4);
+  g.fillStyle = '#3a2412'; g.beginPath(); g.moveTo(-36, -70); g.lineTo(0, -84); g.lineTo(36, -70); g.closePath(); g.fill();
+  const notes = [[-24, -64, 15, 20, '#efe2bf'], [-5, -62, 13, 17, '#e8d6a8'], [12, -65, 14, 21, '#f3e8cc']];
+  for (const [x, y, w, h, c] of notes) {
+    g.fillStyle = c; g.fillRect(x, y, w, h);
+    g.fillStyle = '#8a6a4a'; for (let k = 4; k < h - 2; k += 4) g.fillRect(x + 2, y + k, w - 4, 1);
+    g.fillStyle = '#b03a2e'; g.fillRect(x + w / 2 - 1, y + 1, 2, 2);
+  }
+}
+
 function drawNpc(n) {
+  if (n.id === 'board') {
+    shadow(n.x, n.y + 1, 30);
+    ctx.save(); ctx.translate(n.x, n.y);
+    sprite('vboard', 80, 92, 40, 88, artBoard);
+    ctx.restore();
+    const bob = Math.sin(now * 3) * 3, near = vNear === n, ready = typeof dailyReady === 'function' ? dailyReady() : 0;
+    text(n.name, n.x, n.y - 98 + bob, near ? 13 : 11, n.color, 'center', 800);
+    text(n.title, n.x, n.y - 86 + bob, 9, '#efece2', 'center', 700);
+    if (ready && !near) { glow(n.x, n.y - 114 + bob, 22, '255,214,80', 0.6); ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(n.x, n.y - 114 + bob, 7, 0, TAU); ctx.fill(); text(String(ready), n.x, n.y - 114 + bob, 10, '#2a1a0c', 'center', 900, false); }
+    return;
+  }
   const fi = Math.floor(((now * 0.35 + n.x * 0.01) % 1 + 1) % 1 * 8);
   shadow(n.x, n.y + 1, 15);
   ctx.save();
@@ -468,6 +494,7 @@ function villageInteract(what) {
   if (!what) return;
   vHero.target = null; vHero.pending = null;
   if (what === 'portal') { const s2 = mapSel(); persist(); startNode(s2.b, s2.n, s2.d); return; }
+  if (what.id === 'board') { openQuests(); return; }
   openShop(what.id);
 }
 

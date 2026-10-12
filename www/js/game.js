@@ -323,7 +323,7 @@ function genRift() {
 const input = {
   mx: 0, my: 0,
   attack: false,
-  pressed: { s0: false, s1: false, dash: false, pan: false },
+  pressed: { s0: false, s1: false, dash: false, pan: false, ult: false },
   joy: null,
   touches: new Map(),
   keys: new Set(),
@@ -339,6 +339,7 @@ function buttonLayout() {
     s1: { x: ax - 82 * s, y: ay - 86 * s, r: 34 * s },
     dash: { x: ax + 6 * s, y: ay - 118 * s, r: 28 * s },
     pan: { x: ax - 182 * s, y: ay + 24 * s, r: 24 * s },
+    ult: { x: ax - 172 * s, y: ay - 64 * s, r: 30 * s },
     pause: { x: W - 30 * s, y: 30 * s, r: 22 * s },
     bag: { x: W - 82 * s, y: 30 * s, r: 22 * s },
   };
@@ -346,7 +347,7 @@ function buttonLayout() {
 
 function hitButton(x, y) {
   const L = buttonLayout();
-  for (const k of ['attack', 's0', 's1', 'dash', 'pan', 'pause', 'bag']) {
+  for (const k of ['attack', 's0', 's1', 'dash', 'pan', 'ult', 'pause', 'bag']) {
     const b = L[k];
     if (dist(x, y, b.x, b.y) < b.r * 1.25) return k;
   }
@@ -355,7 +356,7 @@ function hitButton(x, y) {
 
 function clearInput() {
   input.attack = false; input.joy = null; input.mx = input.my = 0; input.touches.clear();
-  input.pressed.s0 = input.pressed.s1 = input.pressed.dash = input.pressed.pan = false;
+  input.pressed.s0 = input.pressed.s1 = input.pressed.dash = input.pressed.pan = input.pressed.ult = false;
 }
 
 canvas.addEventListener('pointerdown', (ev) => {
@@ -431,11 +432,13 @@ window.addEventListener('keydown', (e) => {
     if (k === 'l' || k === '2') input.pressed.s1 = true;
     if (k === 'shift' || k === 'i') input.pressed.dash = true;
     if (k === 'h' || k === '3') input.pressed.pan = true;
+    if (k === 'u' || k === '4') input.pressed.ult = true;
     if (k === 'b' || k === 'c') openInventory('play');
     if (k === 'escape' || k === 'p') pauseGame();
   } else if (state === 'pause' && (k === 'escape' || k === 'p')) resumeGame();
   else if (state === 'inv' && (k === 'escape' || k === 'b' || k === 'c')) closeInventory();
   else if (state === 'shop' && k === 'escape') closeShop();
+  else if (state === 'quests' && k === 'escape') closeQuests();
   else if (state === 'hub' && (k === 'e' || k === 'enter')) villageInteract(vNear);
 });
 window.addEventListener('keyup', (e) => input.keys.delete(e.key.toLowerCase()));
@@ -476,11 +479,11 @@ function derived() {
   return {
     maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0)) * (1 + (sb.hpP || 0))),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: 1 + t.int * 0.015,
     crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
-    speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)),
+    speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
     paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)),
     armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0)),
@@ -514,6 +517,7 @@ function createPlayer() {
     walkT: 0, moving: false, hurtFlash: 0,
     swingT: 0, swingSide: 1, shotT: 0,
     slowT: 0, sq: 0, lean: 0, recoil: 0, stepT: 0, ghostT: 0,
+    ult: 0, spinT: 0, spinTick: 0, altarT: 0,
   };
   recalc();
   P.hp = P.maxHp;
@@ -756,7 +760,8 @@ function updatePlayer(dt) {
   if (input.pressed.s1) useSkill(1);
   if (input.pressed.dash) dash();
   if (input.pressed.pan) eatBread();
-  input.pressed.s0 = input.pressed.s1 = input.pressed.dash = input.pressed.pan = false;
+  if (input.pressed.ult) useUltimate();
+  input.pressed.s0 = input.pressed.s1 = input.pressed.dash = input.pressed.pan = input.pressed.ult = false;
 }
 
 function heal(n) {
@@ -862,6 +867,9 @@ function killEnemy(e) {
   e.dead = true;
   rift.kills++;
   S.kills++;
+  gainUlt(e.boss ? ULT_GAIN.boss : e.elite ? ULT_GAIN.elite : ULT_GAIN.normal);
+  trackDaily('kill');
+  if (e.elite) trackDaily('elite');
   const D = e.D;
   // racha de masacre
   streak.n = gameTime - streak.t < 1.6 ? streak.n + 1 : 1;
@@ -1478,6 +1486,7 @@ function startNode(b, n, d) {
   cam.x = P.x; cam.y = P.y;
   bossRef = null; banner = null; subBanner = null;
   streak = { n: 0, t: -10 };
+  resetRiftEvents();
   clearInput();
   state = 'play';
   showOverlay(null);
@@ -1553,6 +1562,7 @@ function spawnGuardian() {
 const BOSS_LOOT_NAME = { bouftouRoyal: 'del Colmillo Ancestral', tofuRoyal: 'de la Garra Ígnea', reinaTeje: 'de la Reina Tejeceniza', colosoHielo: 'del Coloso de Escarcha', hechicero: 'del Hechicero del Abismo' };
 function guardianDefeated(e) {
   bossRef = null;
+  trackDaily('boss');
   rift.bossDead = true;
   shake(20); hitStop(0.2);
   SFX.play('boom');
@@ -1597,6 +1607,7 @@ function guardianDefeated(e) {
 
 function updateRift(dt) {
   rift.elapsed += dt;
+  updateRiftEvents(dt);
   if (!rift.bossDead) rift.time -= dt;
   if (!rift.bossSpawned) {
     rift.spawnT -= dt;
@@ -1680,7 +1691,7 @@ function updateGlyphs(dt) {
     g.life -= dt;
     g.tick -= dt;
     for (const e of enemies) if (!e.dead && dist(g.x, g.y, e.x, e.y) < g.r + e.r * 0.5) e.slowT = 0.2;
-    if (g.tick <= 0) { g.tick = 0.35; aoe(g.x, g.y, g.r, skillDmg(0.75), 0); }
+    if (g.tick <= 0) { g.tick = 0.35; aoe(g.x, g.y, g.r, skillDmg(0.75 * (g.mul || 1)), 0); }
     if (Math.random() < 0.7) {
       const a = rand(0, Math.PI * 2), r = Math.sqrt(Math.random()) * g.r;
       particles.push({ x: g.x + Math.cos(a) * r, y: g.y + Math.sin(a) * r, vx: 0, vy: rand(-60, -20), life: 0.5, max: 0.5, color: pick(['#ff7043', '#ffca28', '#ff3d00']), size: rand(2, 4), grav: 0 });
@@ -1716,7 +1727,7 @@ function updatePickups(dt) {
 }
 
 function collect(k) {
-  if (k.type === 'kama') { S.kamas += k.val; SFX.play('coin'); }
+  if (k.type === 'kama') { S.kamas += k.val; trackDaily('amber', k.val); SFX.play('coin'); }
   else if (k.type === 'xp') { gainXp(k.val); SFX.play('xp'); }
   else if (k.type === 'pain') {
     if (P.hp >= P.maxHp && S.pan < panMax()) { S.pan++; addText(P.x, P.y - 40, '+1 🧪', '#b5f28a', 0.9); }
@@ -1964,6 +1975,7 @@ function drawHUD() {
   }
   for (const k of pickups) if (k.type === 'item' || k.type === 'dofus') circle(mx + (k.x - P.x) * ms, my + (k.y - P.y) * ms, 2 * s, k.type === 'dofus' ? '#26c6da' : RARITY[k.item.rarity].color);
   if (rift.zaap) { const zx = mx + (rift.zaap.x - P.x) * ms, zy = my + (rift.zaap.y - P.y) * ms; circle(clamp(zx, mx - mr + 5, mx + mr - 5), clamp(zy, my - mr + 5, my + mr - 5), 4 * s, '#4fc3f7', '#fff', 1.5); }
+  if (riftEvent && !riftEvent.done && (riftEvent.kind === 'chest' || riftEvent.kind === 'altar')) { const ex = mx + (riftEvent.x - P.x) * ms, ey = my + (riftEvent.y - P.y) * ms; circle(clamp(ex, mx - mr + 5, mx + mr - 5), clamp(ey, my - mr + 5, my + mr - 5), 3.5 * s, RIFT_EVENTS[riftEvent.kind].color, '#fff', 1.5); }
   ctx.restore();
   drawStar(mx, my, 3.5 * s, '#fff');
   text(S.kamas + ' ámbar', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ecd18a', 'right', 900);
@@ -2051,6 +2063,10 @@ function drawControls() {
   const pmk = P.pm >= 1 ? 0 : 1 - (P.pm % 1);
   btn(L.dash, '»', String(Math.floor(P.pm)), '#66bb6a', pmk, P.pm >= 1, false);
   btn(L.pan, '🧪', String(S.pan), '#7cc457', 0, S.pan > 0, false);
+  // definitiva: anillo de carga y brillo cuando está lista
+  const uk = clamp((P.ult || 0) / 100, 0, 1), ub = L.ult;
+  if (uk >= 1) { ctx.save(); ctx.globalAlpha = 0.35 + Math.sin(now * 6) * 0.2; circle(ub.x, ub.y, ub.r + 7 * s, 'rgba(255,214,110,0.5)'); ctx.restore(); }
+  btn(ub, ULTIMATES[P.cls].icon, uk >= 1 ? '¡YA!' : Math.floor(uk * 100) + '%', uk >= 1 ? '#ffd54f' : '#b08a3a', 1 - uk, uk >= 1, false);
 }
 
 // ============================================================
@@ -2099,10 +2115,12 @@ function renderRift() {
   for (const o of obstacles) if (inView(o.x, o.y, 60)) drawList.push(o);
   for (const e of enemies) if (inView(e.x, e.y, 60)) drawList.push(e);
   for (const c of corpses) if (inView(c.x, c.y, 60)) drawList.push(c);
+  if (riftEvent) drawList.push({ kind: 'riftEvent', y: riftEvent.y });
   drawList.push(P);
   drawList.sort((a, b) => a.y - b.y);
   for (const o of drawList) {
     if (o === P) { drawGhosts(); drawPlayer(); }
+    else if (o.kind === 'riftEvent') drawRiftEvents();
     else if (o.kind === 'tree') drawTree(o);
     else if (o.kind === 'rock') drawRock(o);
     else if (o.kind === 'pillar') drawPillar(o);
@@ -2239,6 +2257,8 @@ function update(dt) {
   enemies = enemies.filter((e) => !e.dead);
   updateProjectiles(dt);
   updateGlyphs(dt);
+  updateUltimates(dt);
+  updateAltarBuff(dt);
   updateHazards(dt);
   updatePickups(dt);
   updateEffects(dt);
@@ -2371,7 +2391,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'pause', 'end', 'dead'];
+const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'quests', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -2407,7 +2427,7 @@ function showClassInfo(id) {
     <p class="hs-story">${L.story}</p>
     <p class="ps">${L.playstyle}</p>
     <div class="hs-stats">${Object.entries(L.stats).map(([k, v]) => `<span>${k}</span>${bar(v)}`).join('')}</div>
-    <div class="hs-skills">${C.skills.map((sk) => `<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energía — ${sk.desc}</span></div>`).join('')}</div>`;
+    <div class="hs-skills">${C.skills.map((sk) => `<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energía — ${sk.desc}</span></div>`).join('')}<div><b>${ULTIMATES[id].icon} ${ULTIMATES[id].name}</b> <span>· definitiva — ${ULTIMATES[id].desc}</span></div></div>`;
   $('btnStart').disabled = false;
   $('btnStart').textContent = slot ? (menuMode === 'new' ? `Empezar de nuevo con ${C.name}` : `Continuar con ${C.name}`) : `Comenzar con ${C.name}`;
 }
@@ -3162,6 +3182,8 @@ function shopAction(act) {
 }
 
 $('btnShopClose').addEventListener('click', closeShop);
+$('btnQuestClose').addEventListener('click', closeQuests);
+$('questList').addEventListener('click', (ev) => { const b = ev.target.closest('button[data-q]'); if (b && !b.disabled) claimQuest(+b.dataset.q); });
 $('btnRestock').addEventListener('click', () => {
   if (!pay(restockPrice())) return;
   genStock();
@@ -3203,6 +3225,8 @@ function finishRift() {
   if (state !== 'play') return;
   state = 'end';
   S.rifts++;
+  trackDaily('rift');
+  if (rift.d >= 1) trackDaily('hard');
   SFX.play('zaap');
   persist();
   $('endTitle').textContent = rift.isSuper ? `¡${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} derrotado!` : `Grieta ${rift.n} (${rift.D.name}) cerrada`;
@@ -3260,6 +3284,7 @@ try {
       else if (state === 'pause') resumeGame();
       else if (state === 'inv') closeInventory();
       else if (state === 'shop') closeShop();
+      else if (state === 'quests') closeQuests();
       else if (state === 'map') closeMap();
       else if (state === 'hub') { persist(); S = null; showStart(); }
       else if (state === 'menu') showStart();

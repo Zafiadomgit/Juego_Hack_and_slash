@@ -19,7 +19,10 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
    La dificultad sube con cada Grieta: más vida y daño, más élites (Acorazado, Explosivo…) y ataques nuevos (doble embestida, abanicos de 5 proyectiles, suelo en llamas, Chispines que estallan).
 4. **Botín** con rareza (Común, Raro, Épico, Legendario). Los Guardianes pueden soltar una **Gema Ancestral** (bonus permanente).
 5. Al vencer al Guardián se abre un **Portal**: crúzalo para volver a Villa Candela y desbloquear la siguiente Grieta.
-6. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
+6. **Habilidad definitiva**: matar monstruos carga el botón dorado (élites y Guardianes cargan mucho más). Al 100% se desata: **Torbellino de Acero** (Rompeyelmos gira golpeando todo a su alrededor), **Lluvia de Halcones** (Ojo de Halcón dispara tres oleadas de flechas y hace caer halcones sobre los enemigos cercanos) o **Gran Runa Ancestral** (Runista crea una runa enorme que quema y frena, y un escudo de la mitad de su vida).
+7. **Eventos de Grieta**: de vez en cuando ocurre algo dentro de la Grieta: un **Cofre del Tesoro** que hay que encontrar (aparece en el radar), una **Lluvia de Ámbar**, una **Emboscada** de élites con recompensa, o un **Altar de Poder** (+50% daño y más velocidad durante 30 s).
+8. **Misiones diarias**: el **Tablón** de la plaza de Villa Candela tiene 3 misiones nuevas cada día (por héroe): derrotar monstruos o élites, vencer Guardianes, cerrar Grietas, recoger ámbar, usar la definitiva, completar eventos… Cobra la recompensa en el tablón (ámbar y, a veces, un elixir).
+9. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
 
 ### Controles
 
@@ -30,6 +33,7 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
 | Botones azules | K / L | Hechizos (cuestan energía ★) |
 | Botón verde | Shift | Esquiva (gasta impulso) |
 | 🧪 | H | Poción (cura un 40%) |
+| Botón dorado | U | Habilidad definitiva (al 100%) |
 | 🎒 | B | Equipo, bolsa y características |
 
 ## Estructura
@@ -42,6 +46,7 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/progress.js      Mapa, dificultades, conjuntos y Súper Jefes
   js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
   js/village.js       Villa Candela: pueblo caminable, vecinos y tiendas
+  js/content.js       Definitivas, misiones diarias y eventos de Grieta
 audio/ (en www)       Música (.ogg en bucle) y efectos de sonido
 tools/audio/          Sintetizador y compositor de la banda sonora (Python)
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz

@@ -121,6 +121,21 @@
     <div id="shopToast" class="sh-toast"></div>
   </div>
 
+  <!-- Tablón de misiones diarias -->
+  <div id="quests" class="overlay sheet-ov">
+    <div class="sheet quest-sheet">
+      <header class="sh-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="3" width="16" height="18" rx="1" fill="#efe2bf" stroke="#2a1a0c" stroke-width="1.5"/><path d="M7 8 H17 M7 12 H17 M7 16 H13" stroke="#8a6a4a" stroke-width="1.5"/><circle cx="12" cy="4" r="1.6" fill="#b03a2e"/></svg>
+        <span class="sh-name">Tablón de misiones</span>
+        <span id="questAmber" class="sh-amber" style="margin-left:auto"></span>
+        <button id="btnQuestClose" class="sh-close" aria-label="Cerrar">✕</button>
+      </header>
+      <div id="questList" class="quest-list"></div>
+      <footer class="shop-foot"><span id="questNote"></span></footer>
+    </div>
+    <div id="questToast" class="sh-toast"></div>
+  </div>
+
   <!-- Pausa -->
   <!-- Mapa de Grietas -->
   <div id="map" class="overlay sheet-ov">
@@ -175,6 +190,7 @@
   <script src="js/biomes.js"></script>
   <script src="js/progress.js"></script>
   <script src="js/village.js"></script>
+  <script src="js/content.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>
