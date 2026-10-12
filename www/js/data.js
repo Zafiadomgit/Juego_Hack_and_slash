@@ -40,6 +40,9 @@ const ENEMIES = {
   craqueleur:  { name: 'Gólem de Basalto',hp: 150, speed: 42,  dmg: 18, r: 25, xp: 16,  kamas: [6, 12],  ai: 'slammer', blood: '#ff8a3d', kbRes: 0.25, lvl: 5, prog: 5 },
   bouftouRoyal:{ name: 'Colmillo Ancestral', hp: 900, speed: 68,  dmg: 16, r: 38, xp: 150, kamas: [60, 90], ai: 'boss',    blood: '#8a5a3a', kbRes: 0.08, lvl: 4, prog: 0, boss: true },
   tofuRoyal:   { name: 'Garra Ígnea',     hp: 750, speed: 120, dmg: 14, r: 30, xp: 150, kamas: [60, 90], ai: 'bossTofu',blood: '#ff7a2a', kbRes: 0.1,  lvl: 4, prog: 0, boss: true },
+  reinaTeje:   { name: 'Reina Tejeceniza', hp: 820, speed: 95, dmg: 15, r: 34, xp: 160, kamas: [60, 90], ai: 'bossSpider', blood: '#9be05a', kbRes: 0.08, lvl: 4, prog: 0, boss: true },
+  colosoHielo: { name: 'Coloso de Escarcha', hp: 1100, speed: 52, dmg: 20, r: 40, xp: 170, kamas: [70, 100], ai: 'bossGolem', blood: '#bfe4ff', kbRes: 0.03, lvl: 4, prog: 0, boss: true },
+  hechicero:   { name: 'Hechicero del Abismo', hp: 760, speed: 85, dmg: 15, r: 26, xp: 180, kamas: [70, 110], ai: 'bossMage', blood: '#c07cf0', kbRes: 0.12, lvl: 4, prog: 0, boss: true },
 };
 
 const ELITES = [
@@ -47,6 +50,8 @@ const ELITES = [
   { suffix: 'Dorado',        color: '#ffca28', kamas: 4 },
   { suffix: 'Furioso',       color: '#ff5722', speed: 1.4 },
   { suffix: 'Ancestral',     color: '#26c6da', size: 1.3 },
+  { suffix: 'Acorazado',     color: '#b0bec5', armor: 0.45, minF: 3 },
+  { suffix: 'Explosivo',     color: '#ff9100', explode: true, minF: 4 },
 ];
 
 // ---------- Objetos ----------

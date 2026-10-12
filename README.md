@@ -8,7 +8,8 @@ Todo el arte del juego se dibuja por código (sin assets de terceros).
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
 2. **Villa Candela** es el hub: elige el nivel de Grieta, gestiona tu equipo y visita al **Mercader** (equipo nuevo tras cada Grieta, elixires para la siguiente Grieta y mejoras permanentes; todo se paga con ámbar).
-3. **La Grieta**: los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos. Cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** (Colmillo Ancestral o Garra Ígnea), que entra en furia al 50% de vida.
+3. **La Grieta**: cada nivel de Grieta te lleva a uno de 5 mundos (Bosque Ceniciento, Pantano Sombrío, Glaciar Rúnico, Desierto de Ámbar y Abismo Volcánico), cada uno con su terreno, clima, monstruos favoritos y Guardián propio. Los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos y cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** del mundo (Colmillo Ancestral, Reina Tejeceniza, Coloso de Escarcha, Garra Ígnea o Hechicero del Abismo), que entra en furia al 50% de vida.
+   La dificultad sube con cada Grieta: más vida y daño, más élites (Acorazado, Explosivo…) y ataques nuevos (doble embestida, abanicos de 5 proyectiles, suelo en llamas, Chispines que estallan).
 4. **Botín** con rareza (Común, Raro, Épico, Legendario). Los Guardianes pueden soltar una **Gema Ancestral** (bonus permanente).
 5. Al vencer al Guardián se abre un **Portal**: crúzalo para volver a Villa Candela y desbloquear la siguiente Grieta.
 6. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
@@ -30,6 +31,7 @@ Todo el arte del juego se dibuja por código (sin assets de terceros).
 www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/data.js          Clases, monstruos, objetos, gemas
   js/art.js           Arte procedural + caché de sprites
+  js/biomes.js        Mundos de las Grietas (terreno, vegetación, clima)
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
 android/              Proyecto Android (Capacitor)
 eas.json / app.json   Compilación del APK con EAS

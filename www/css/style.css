@@ -309,3 +309,4 @@ button.slot, button.cell { padding: 0; font: inherit; color: inherit; }
 #shPoints, .shop-foot .sh-sell, .sh-sub h2 { white-space: nowrap; }
 .stat .rec { font-size: 12px; font-style: normal; }
 .stat { min-height: 35px; }
+#fLabel small.warn{color:#ff8a65;font-weight:800}
