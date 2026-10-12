@@ -63,3 +63,26 @@ def frames(path, drop=()):
     hs = np.median([o['img'].height for o in out])
     out.sort(key=lambda o: (round(o['y'] / (hs * 0.6)), o['x']))
     return [o for k, o in enumerate(out) if k not in drop]
+
+
+def frames_grid(path, cols, rows=1):
+    """Para hojas con fotogramas pegados: divide el contenido en una rejilla regular."""
+    a = np.asarray(Image.open(path).convert('RGB'))
+    fg = ndimage.binary_opening(key_mask(a), iterations=1)
+    ys, xs = np.where(fg)
+    y0, y1, x0, x1 = ys.min(), ys.max() + 1, xs.min(), xs.max() + 1
+    out = []
+    for r in range(rows):
+        for c in range(cols):
+            cy0 = y0 + (y1 - y0) * r // rows; cy1 = y0 + (y1 - y0) * (r + 1) // rows
+            cx0 = x0 + (x1 - x0) * c // cols; cx1 = x0 + (x1 - x0) * (c + 1) // cols
+            m = fg[cy0:cy1, cx0:cx1]
+            if m.sum() < 50: continue
+            yy, xx = np.where(m)
+            sy0, sy1, sx0, sx1 = yy.min(), yy.max() + 1, xx.min(), xx.max() + 1
+            mm = m[sy0:sy1, sx0:sx1]
+            crop = np.dstack([a[cy0 + sy0:cy0 + sy1, cx0 + sx0:cx0 + sx1], (mm * 255).astype(np.uint8)])
+            rws = np.where(mm.any(1))[0]; foot = rws.max(); h = mm.shape[0]
+            legs = mm[int(foot - h * 0.22):foot + 1]
+            out.append({'img': Image.fromarray(crop), 'ax': float(np.where(legs)[1].mean()), 'ay': float(foot), 'bh': float(foot - rws.min()), 'x': 0, 'y': 0})
+    return out

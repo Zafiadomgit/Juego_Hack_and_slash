@@ -1099,6 +1099,68 @@ function drawHazard(h) {
 }
 
 // Cuerpo animado del monstruo (desde la caché de sprites)
+// ---------- Monstruos con animación pintada (img/monsters, ver tools/art/build_monsters.py) ----------
+const MON_IMG = {};
+Object.keys(typeof MON_ANIM !== 'undefined' ? MON_ANIM : {}).forEach((id) => {
+  const img = new Image();
+  img.onload = () => { MON_IMG[id] = img; };
+  img.src = 'img/monsters/' + id + '.png';
+});
+const MON_FR = new Map();
+const monAnimId = (e) => (e.superDef ? 'S_' + Object.keys(SUPER_BOSSES).find((k) => SUPER_BOSSES[k] === e.superDef) : e.type);
+const ATTACK_STATES = { wind: 1, charge: 1, cast: 1, spiral: 1, summon: 1, throw: 1, volley: 1, web: 1, leap: 1 };
+function monPose(e, A) {
+  if (e.flash > 0.04 && A.hurt) return ['hurt', 0];
+  if (ATTACK_STATES[e.state] || e.atkT > 0 || e.slamT > 0) {
+    const n = A.attack.length;
+    const k = e.atkT > 0 ? 1 - e.atkT / 0.25 : e.slamT > 0 ? 0.75 + (1 - e.slamT / 0.3) * 0.25 : e.max ? clamp(1 - e.st / e.max, 0, 0.7) : (e.t * 1.6) % 1;
+    return ['attack', Math.min(n - 1, Math.floor(k * n))];
+  }
+  if (e.state === 'rest' && A.idle) return ['idle', Math.floor(e.t * 5) % A.idle.length];
+  return ['move', Math.floor(e.t * (e.boss ? 9 : 11) + e.seed * 3) % A.move.length];
+}
+// Fotograma recortado (con el filtro del bioma horneado) para pixelar y cachear
+function monFrame(id, pose, i, filt, bid) {
+  const A = MON_ANIM[id], list = A[pose] || A.move, fr = list[i % list.length];
+  const key = id + '|' + pose + '|' + (i % list.length) + '|' + (filt ? bid : '');
+  let c = MON_FR.get(key);
+  if (!c) {
+    c = document.createElement('canvas'); c.width = fr[2]; c.height = fr[3];
+    const g = c.getContext('2d');
+    if (filt) g.filter = filt;
+    g.drawImage(MON_IMG[id], fr[0], fr[1], fr[2], fr[3], 0, 0, fr[2], fr[3]);
+    c.ax = fr[4]; c.ay = fr[5]; c.key = key;
+    MON_FR.set(key, c);
+  }
+  return c;
+}
+function drawMonsterAnim(e, A0, k, ox, oy) {
+  const id = monAnimId(e), A = MON_ANIM[id];
+  const [pose, i] = monPose(e, A);
+  const B = scene === 'rift' && rift ? rift.biome : null;
+  const filt = !e.boss && !e.superDef && B && B.mfilter ? B.mfilter : null;
+  const c = monFrame(id, pose, i, filt, B && B.id);
+  const hw = A0.h * k * (e.boss ? 1.25 : 1.1); // altura en mundo similar a la del dibujo procedural
+  const s = hw / A.bh;
+  ctx.save();
+  ctx.scale(e.face || 1, 1);
+  if (HD2D.active) {
+    const hpx = Math.max(8, Math.round(c.height * s * SPR.scale));
+    const pi = pixelImage(c, hpx, c.key + '|' + hpx);
+    const kk = (c.height * s) / hpx;
+    ctx.drawImage(pi, -c.ax * s - kk, -c.ay * s - kk, pi.width * kk, pi.height * kk);
+  } else ctx.drawImage(c, -c.ax * s, -c.ay * s, c.width * s, c.height * s);
+  // destello al recibir daño y brillo rojo en furia
+  if (e.flash > 0 || e.enraged) {
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha *= e.flash > 0 ? 0.55 : 0.18 + Math.sin(now * 8) * 0.08;
+    ctx.filter = e.flash > 0 ? 'brightness(2.2) saturate(0)' : 'sepia(1) saturate(6) hue-rotate(-30deg)';
+    ctx.drawImage(c, -c.ax * s, -c.ay * s, c.width * s, c.height * s);
+    ctx.filter = 'none';
+  }
+  ctx.restore();
+}
+
 function drawMonsterBody(e) {
   const A = MONSTER_ART[e.type];
   const k = (e.r / A.r0) * 1.15;
@@ -1134,6 +1196,7 @@ function drawMonsterBody(e) {
   else if (e.state === 'wind' && e.ct === undefined) { const kw = clamp(1 - e.st / (e.max || 0.6), 0, 1); ctx.scale(1 + kw * 0.1, 1 - kw * 0.12); }
   else if (e.state === 'charge') ctx.scale(1.12, 0.9);
   else if (e.state === 'move' && !e.boss && e.ai === 'chase') { const b = Math.sin(e.t * 14); ctx.scale(1 - b * 0.04, 1 + b * 0.05); }
+  if (typeof MON_ANIM !== 'undefined' && MON_IMG[monAnimId(e)]) { drawMonsterAnim(e, A, k); ctx.restore(); return; }
   sprite(key, w, h, ax, ay, (g) => {
     g.scale(k, k);
     if (filt) g.filter = filt;
