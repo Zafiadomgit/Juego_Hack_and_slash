@@ -27,11 +27,7 @@
     <div class="panel hubpanel">
       <h2 class="gold">Villa Candela</h2>
       <div id="hubChar"></div>
-      <div class="faille">
-        <button id="fMinus" class="btn round">−</button>
-        <div id="fLabel"></div>
-        <button id="fPlus" class="btn round">+</button>
-      </div>
+      <button id="btnMap" class="mapsel"><span class="ms-ico">🗺</span><span id="fLabel"></span><span class="ms-go">Mapa ›</span></button>
       <button id="btnZaap" class="btn big">🌀 Cruzar el Portal Rúnico</button>
       <div class="row2">
         <button id="btnInv" class="btn">🎒 Personaje</button>
@@ -91,6 +87,21 @@
   </div>
 
   <!-- Pausa -->
+  <!-- Mapa de Grietas -->
+  <div id="map" class="overlay sheet-ov">
+    <div class="sheet mapsheet">
+      <header class="sh-head">
+        <span class="sh-name">Mapa de Grietas</span>
+        <div id="mapTabs" class="sh-tabs map-tabs"></div>
+        <button id="btnMapClose" class="sh-close" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="map-body">
+        <div id="mapField" class="map-field"></div>
+        <aside id="mapInfo" class="map-info"></aside>
+      </div>
+    </div>
+  </div>
+
   <div id="pause" class="overlay">
     <div class="panel">
       <h2>Pausa</h2>
@@ -126,6 +137,7 @@
   <script src="js/fx.js"></script>
   <script src="js/art.js"></script>
   <script src="js/biomes.js"></script>
+  <script src="js/progress.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

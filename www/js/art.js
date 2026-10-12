@@ -782,7 +782,22 @@ function drawEnemy(e) {
 
   shadow(e.x, e.y + 1, e.r * (1 - Math.min(0.6, e.z / 200)));
   if (e.elite) glow(e.x, e.y - e.r * 0.8 - e.z, e.r * 2.6, hexRgb(e.elite.color), 0.45 + Math.sin(now * 5) * 0.12);
-  if (e.boss) glow(e.x, e.y - e.r - e.z, e.r * 3, e.enraged ? '255,60,20' : '255,170,80', 0.4 + Math.sin(now * 3) * 0.1);
+  if (e.superDef) {
+    // aura del Súper Jefe: anillos que giran y chispas oscuras
+    const au = e.superDef.aura;
+    glow(e.x, e.y - e.r - e.z, e.r * 4, au, 0.55 + Math.sin(now * 3) * 0.15);
+    ctx.save();
+    ctx.translate(e.x, e.y); ctx.scale(1, 0.4);
+    ctx.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 2; i++) {
+      ctx.rotate(now * (i ? -1.3 : 0.9));
+      ctx.setLineDash([e.r * 0.5, e.r * 0.35]);
+      circle(0, 0, e.r * (1.5 + i * 0.35), null, `rgba(${au},0.7)`, 3);
+    }
+    ctx.setLineDash([]);
+    ctx.restore();
+    if (Math.random() < 0.5) particles.push({ kind: 'glowdot', x: e.x + rand(-e.r, e.r), y: e.y - rand(0, e.r * 2), vx: 0, vy: -70, life: 0.7, max: 0.7, rgb: au, size: 5, grav: 0 });
+  } else if (e.boss) glow(e.x, e.y - e.r - e.z, e.r * 3, e.enraged ? '255,60,20' : '255,170,80', 0.4 + Math.sin(now * 3) * 0.1);
   drawMonsterBody(e);
   if (e.enraged && e.flash <= 0 && Math.random() < 0.3) particles.push({ x: e.x + rand(-e.r, e.r), y: e.y - rand(0, e.r * 2), vx: 0, vy: -60, life: 0.4, max: 0.4, color: '#ff3d00', size: rand(3, 5), grav: 0 });
   if (e.slowT > 0) circle(e.x, e.y - e.r, 3, '#ff7043');
@@ -888,8 +903,8 @@ function drawMonsterBody(e) {
   const v = A.vary(e);
   const tint = e.flash > 0 ? 'f' : e.enraged ? 'e' : 'n';
   const B = scene === 'rift' && rift ? rift.biome : null;
-  const filt = B && B.mfilter && !e.boss ? B.mfilter : null;
-  const key = e.type + '|' + fi + '|' + e.face + '|' + v + '|' + Math.round(k * 20) + '|' + tint + (filt ? '|' + B.id : '');
+  const filt = e.superDef ? e.superDef.filter : B && B.mfilter && !e.boss ? B.mfilter : null;
+  const key = e.type + '|' + fi + '|' + e.face + '|' + v + '|' + Math.round(k * 20) + '|' + tint + (e.superDef ? '|S' + e.superDef.name.length : filt ? '|' + B.id : '');
   const w = A.w * k, h = A.h * k, ax = A.ax * k, ay = A.ay * k;
   const jitter = e.state === 'wind' ? rand(-1.5, 1.5) : 0;
   ctx.save();

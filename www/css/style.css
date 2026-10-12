@@ -310,3 +310,55 @@ button.slot, button.cell { padding: 0; font: inherit; color: inherit; }
 .stat .rec { font-size: 12px; font-style: normal; }
 .stat { min-height: 35px; }
 #fLabel small.warn{color:#ff8a65;font-weight:800}
+
+/* ---------- Selector de Grieta en la villa ---------- */
+.mapsel { width: 100%; display: flex; align-items: center; gap: 10px; margin: 10px 0 6px; padding: 8px 10px; border-radius: 12px; border: 2px solid #8a6424; background: linear-gradient(#3a2716, #2a1b10); color: #f3ead2; cursor: pointer; text-align: left; font: inherit; }
+.mapsel .ms-ico { font-size: 26px; }
+.mapsel #fLabel { flex: 1; font-weight: 800; font-size: 15px; color: #ffd76a; line-height: 1.15; }
+.mapsel #fLabel small { display: block; font-size: 11px; font-weight: 600; color: #e9dcc0; opacity: .85; }
+.mapsel #fLabel small.warn { color: #ff8a65; opacity: 1; }
+.mapsel .ms-go { flex: none; padding: 4px 9px; border-radius: 9px; background: #e8b64c; color: #2a1a0c; font-weight: 900; font-size: 12px; }
+
+/* ---------- Mapa ---------- */
+.mapsheet { max-width: 1100px; max-height: 620px; }
+.map-tabs { flex: 1; overflow-x: auto; scrollbar-width: none; }
+.map-tabs button { white-space: nowrap; }
+.map-tabs button.lock { opacity: .5; }
+.map-body { flex: 1; min-height: 0; display: flex; }
+.map-field { position: relative; flex: 1; min-width: 0; overflow: hidden; background: var(--mbg, #2a1a10); }
+.map-field svg.mf-bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map-field .mf-title { position: absolute; left: 12px; top: 8px; font: 900 16px Cinzel, serif; color: #fff3d0; text-shadow: 0 2px 4px #000; letter-spacing: 1px; }
+.map-field .mf-set { position: absolute; left: 12px; bottom: 8px; font-size: 11.5px; font-weight: 800; color: #f1e2c2; text-shadow: 0 1px 3px #000; }
+.mnode { position: absolute; transform: translate(-50%, -50%); width: 46px; height: 46px; border-radius: 50%; border: 3px solid #e8b64c; background: radial-gradient(circle at 40% 35%, #6b4a26, #2a1a0c); color: #ffe2a0; font: 900 17px Nunito, sans-serif; cursor: pointer; padding: 0; box-shadow: 0 4px 10px rgba(0,0,0,.6); }
+.mnode .pips { position: absolute; left: 50%; bottom: -13px; transform: translateX(-50%); display: flex; gap: 3px; }
+.mnode .pips i { width: 9px; height: 9px; border-radius: 50%; background: #1a0f08; border: 1.5px solid #6b5228; }
+.mnode.lock { border-color: #5a4a3a; color: #8a7a6a; background: #2a221c; cursor: default; filter: grayscale(.6); }
+.mnode.sel { box-shadow: 0 0 0 4px rgba(255,215,106,.45), 0 0 22px rgba(255,200,90,.8); animation: breathe 1.6s ease-in-out infinite; }
+.mnode.boss { width: 62px; height: 62px; font-size: 28px; border-color: #ff4a3d; background: radial-gradient(circle at 40% 35%, #7a1c14, #1a0604); }
+.mnode.boss.done { border-color: #ffd76a; }
+.map-info { width: 270px; flex: none; padding: 10px 12px; box-sizing: border-box; overflow-y: auto; background: linear-gradient(#2a1b10, #1e140c); border-left: 2px solid #6b4e24; display: flex; flex-direction: column; gap: 7px; }
+.map-info h3 { margin: 0; font: 900 17px Cinzel, serif; color: #ffd76a; }
+.map-info .mi-sub { font-size: 12px; color: #cdb58a; margin-top: -4px; }
+.map-info .diffs { display: flex; gap: 5px; }
+.map-info .diffs button { flex: 1; padding: 7px 2px; border-radius: 9px; border: 2px solid #5a4126; background: #2a1c12; color: #f1e2c2; font: 900 12.5px Nunito, sans-serif; cursor: pointer; }
+.map-info .diffs button.on { border-color: var(--dc); background: color-mix(in srgb, var(--dc) 30%, #2a1c12); color: #fff; }
+.map-info .diffs button:disabled { opacity: .4; cursor: default; }
+.map-info .diffs button .ck { color: #7cff8a; }
+.map-info .mi-rows { font-size: 12.5px; display: grid; grid-template-columns: 1fr auto; gap: 3px 8px; }
+.map-info .mi-rows b { color: #ffe2a0; text-align: right; }
+.map-info .mi-rows .bad { color: #ff8a65; }
+.map-info .mi-set { padding: 6px 8px; border-radius: 9px; border: 1.5px solid var(--sc); background: rgba(0,0,0,.3); font-size: 11.5px; line-height: 1.35; }
+.map-info .mi-set .t { color: var(--sc); font-weight: 900; font-size: 12.5px; }
+.map-info .mi-set .on { color: #9dff9d; }
+.map-info .mi-set .off { opacity: .6; }
+.map-info .mi-lock { font-size: 12px; color: #ff8a65; font-weight: 800; }
+.map-info .btn.big { margin-top: auto; font-size: 16px; padding: 10px; }
+@media (max-height: 430px) { .mapsheet { max-height: none; } .map-info { width: 240px; padding: 8px 10px; gap: 5px; } .map-info .mi-rows { font-size: 11.5px; } }
+
+/* objetos de conjunto */
+.cell.set { box-shadow: inset 0 0 0 2px var(--sc), 0 0 10px var(--sc); }
+.cell.set::after { content: 'SET'; position: absolute; right: 2px; bottom: 1px; font: 900 8px Nunito, sans-serif; color: var(--sc); text-shadow: 0 1px 2px #000; }
+.icard .setbox { margin-top: 6px; padding: 6px 8px; border-radius: 8px; border: 1.5px solid var(--sc); background: rgba(0,0,0,.25); font-size: 11.5px; line-height: 1.35; }
+.icard .setbox .t { color: var(--sc); font-weight: 900; }
+.icard .setbox .on { color: #9dff9d; }
+.icard .setbox .off { opacity: .55; }

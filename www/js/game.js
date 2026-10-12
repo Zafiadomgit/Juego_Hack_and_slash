@@ -128,6 +128,7 @@ function migrateSlot(s) {
   s.up = Object.assign({ bolsa: 0, cinto: 0, afilador: 0, vigor: 0 }, s.up || {});
   s.boosts = Object.assign({ furia: 0, piedra: 0, sabio: 0, fortuna: 0 }, s.boosts || {});
   if (!s.shop) s.shop = null;
+  migrateMap(s);
   return s;
 }
 const boostOn = (k) => !!(rift && rift.boost && rift.boost[k]);
@@ -414,18 +415,19 @@ function derived() {
   const t = totalStats();
   const C = CLASSES[S.cls];
   const has = (d) => S.dofus.includes(d);
+  const sb = activeSetBonus();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0))),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0)) * (1 + (sb.hpP || 0))),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)),
     skillMul: 1 + t.int * 0.015,
-    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0)),
-    atkSpeed: 1 + t.agi * 0.006,
+    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0)),
+    atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)),
-    xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1),
-    paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1),
-    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0)),
-    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1),
+    xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
+    paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)),
+    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0)),
+    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)),
     magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)),
     t,
   };
@@ -736,18 +738,21 @@ function hurtPlayer(dmg, sx, sy, src) {
 function spawnEnemy(type, x, y, o = {}) {
   const D = ENEMIES[type];
   const F = rift ? rift.level : 1;
-  let lvl = o.lvl ?? (D.boss ? F * 3 + 2 : D.lvl + (F - 1) * 3);
-  const elite = o.elite ? pick(ELITES.filter((x) => !x.minF || F >= x.minF)) : null;
+  const DF = rift ? rift.D : DIFFS[0];
+  const threat = rift ? rift.threat : 0;
+  const sup = o.super || null;
+  let lvl = o.lvl ?? ((D.boss ? (F - 1) * 2 + 4 : D.lvl + (F - 1) * 2) + DF.lvl + (sup ? 3 : 0));
+  const elite = o.elite ? pick(ELITES.filter((x) => !x.minF || threat >= x.minF)) : null;
   if (elite) lvl += 2;
-  // dificultad: lineal por nivel y además exponencial por Grieta
-  const hpMul = (1 + (lvl - 1) * 0.2) * Math.pow(1.1, F - 1);
-  const dmgMul = (1 + (lvl - 1) * 0.09) * Math.pow(1.06, F - 1);
+  // dificultad: lineal por nivel, exponencial por Grieta y multiplicador de la dificultad elegida
+  const hpMul = (1 + (lvl - 1) * 0.2) * Math.pow(1.045, F - 1) * DF.hp * (sup ? 3.2 : 1);
+  const dmgMul = (1 + (lvl - 1) * 0.09) * Math.pow(1.03, F - 1) * DF.dmg * (sup ? 1.3 : 1);
   const hp = Math.round(D.hp * hpMul * (elite ? 3.5 : 1));
   const e = {
-    type, D, x, y, r: D.r * (elite ? elite.size || 1.15 : 1),
-    hp, maxHp: hp, lvl, elite, boss: !!D.boss,
-    name: elite ? `${D.name} ${elite.suffix}` : D.name,
-    speed: D.speed * rand(0.92, 1.08) * (elite && elite.speed ? elite.speed : 1) * (1 + Math.min(0.3, (F - 1) * 0.03)),
+    type, D, x, y, r: D.r * (elite ? elite.size || 1.15 : 1) * (sup ? 1.45 : 1),
+    hp, maxHp: hp, lvl, elite, boss: !!D.boss, superDef: sup,
+    name: sup ? sup.name : elite ? `${D.name} ${elite.suffix}` : D.name,
+    speed: D.speed * rand(0.92, 1.08) * (elite && elite.speed ? elite.speed : 1) * (1 + Math.min(0.3, threat * 0.03)) * (sup ? 1.1 : 1),
     dmg: D.dmg * dmgMul * (elite ? 1.4 : 1),
     ai: D.ai, state: 'move', st: D.boss ? 1.5 : 0, cd: rand(0.5, 2), t: rand(0, 10), seed: rand(0, 10),
     kvx: 0, kvy: 0, flash: 0, hitCd: 0, slowT: 0, z: 0, face: 1, spawnT: 0.35,
@@ -785,13 +790,13 @@ function damageEnemy(e, base, o = {}) {
   if (crit || o.heavy) hitStop(o.heavy ? 0.06 : 0.035);
   if (e.boss && !e.enraged && e.hp > 0 && e.hp < e.maxHp * 0.5) {
     e.enraged = true;
-    showBanner(`¡El ${e.D.name} entra en furia!`, '#ff5252');
+    showBanner(`¡${e.name} entra en furia!`, '#ff5252');
     SFX.play('boss');
   }
   if (e.hp <= 0) killEnemy(e);
 }
 
-function itemLevel() { return Math.max(1, rift.level * 3 + randi(-1, 1)); }
+function itemLevel() { return Math.max(1, (rift.level - 1) * 2 + 3 + rift.D.lvl + randi(-1, 1)); }
 
 function killEnemy(e) {
   e.dead = true;
@@ -809,15 +814,17 @@ function killEnemy(e) {
   // botín
   const lvlK = 1 + (e.lvl - 1) * 0.15;
   const eliteK = e.elite ? 3 * (e.elite.kamas || 1) : 1;
-  const nK = Math.max(1, Math.round(randi(D.kamas[0], D.kamas[1]) * lvlK * eliteK * P.kamaMul));
+  const nK = Math.max(1, Math.round(randi(D.kamas[0], D.kamas[1]) * lvlK * eliteK * P.kamaMul * rift.D.reward));
   const coins = Math.min(8, Math.ceil(nK / 4));
   for (let i = 0; i < coins; i++) dropPickup(e.x, e.y, 'kama', { val: Math.max(1, Math.round(nK / coins)) });
-  const xp = D.xp * (1 + (e.lvl - 1) * 0.3) * (e.elite ? 4 : 1);
+  const xp = D.xp * (1 + (e.lvl - 1) * 0.3) * (e.elite ? 4 : 1) * rift.D.reward;
   const orbs = Math.min(10, Math.ceil(xp / 4));
   for (let i = 0; i < orbs; i++) dropPickup(e.x, e.y, 'xp', { val: xp / orbs });
   if (Math.random() < 0.025) dropPickup(e.x, e.y, 'pain', { val: 25 });
-  if (e.elite) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(12))) });
-  else if (!e.boss && Math.random() < 0.035 * (boostOn('fortuna') ? 1.7 : 1)) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity(boostOn('fortuna') ? 10 : 0)) });
+  if (e.elite) {
+    dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(12 + rift.D.rarity))) });
+    if (Math.random() < rift.D.eliteSet) dropPickup(e.x, e.y, 'item', { item: makeSetItem(S.cls, itemLevel(), rift.biome.id) });
+  } else if (!e.boss && Math.random() < 0.035 * (boostOn('fortuna') ? 1.7 : 1)) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity((boostOn('fortuna') ? 10 : 0) + rift.D.rarity)) });
 
   for (let i = 0; i < 12; i++) {
     const a = rand(0, Math.PI * 2), sp = rand(40, 160);
@@ -837,7 +844,7 @@ function killEnemy(e) {
   if (corpses.length > 40) corpses.shift();
   if (e.elite || e.boss) { zoomPunch = Math.max(zoomPunch, e.boss ? 0.12 : 0.04); hitStop(e.boss ? 0.25 : 0.06); }
   // Chispines inestables y élites explosivos estallan al morir
-  if ((e.type === 'tofu' && rift.level >= 3) || (e.elite && e.elite.explode)) {
+  if ((e.type === 'tofu' && rift.threat >= 3) || (e.elite && e.elite.explode)) {
     const big = e.elite && e.elite.explode;
     addHazard('boom', e.x, e.y, big ? 90 : 46, big ? 0.7 : 0.55, e.dmg * (big ? 1.6 : 1.1), { src: e });
   }
@@ -929,7 +936,7 @@ function updateEnemy(e, dt) {
         if (Math.random() < 0.5) dust(e.x, e.y, 1);
         if (e.st <= 0) {
           // en Grietas altas encadenan una segunda embestida
-          if (!e.second && rift.level >= 4) { e.second = true; e.state = 'wind'; e.st = 0.35; }
+          if (!e.second && rift.threat >= 4) { e.second = true; e.state = 'wind'; e.st = 0.35; }
           else { e.second = false; e.state = 'rest'; e.st = 0.7; }
         }
       } else {
@@ -945,8 +952,8 @@ function updateEnemy(e, dt) {
       if (e.cd <= 0 && d < 480) {
         const a = Math.atan2(dy, dx);
         enemyShoot(e, a, 240, e.dmg);
-        if (rift.level >= 3) { enemyShoot(e, a - 0.25, 240, e.dmg); enemyShoot(e, a + 0.25, 240, e.dmg); }
-        if (rift.level >= 6) { enemyShoot(e, a - 0.5, 240, e.dmg); enemyShoot(e, a + 0.5, 240, e.dmg); }
+        if (rift.threat >= 2) { enemyShoot(e, a - 0.25, 240, e.dmg); enemyShoot(e, a + 0.25, 240, e.dmg); }
+        if (rift.threat >= 6) { enemyShoot(e, a - 0.5, 240, e.dmg); enemyShoot(e, a + 0.5, 240, e.dmg); }
         e.cd = rand(1.9, 2.8); e.st = 0.25;
       }
       e.st -= dt;
@@ -965,7 +972,7 @@ function updateEnemy(e, dt) {
           if (dist(P.x, P.y, e.x, e.y) < R + P.r) hurtPlayer(e.dmg * 1.4, e.x, e.y, e);
           addDecal('crack', e.x, e.y, R * 0.9, 2, '255,140,50');
           // desde la Grieta 4 deja el suelo ardiendo
-          if (rift.level >= 4) addHazard('fire', e.x, e.y, 70, 0.01, e.dmg, { linger: 2.5, src: e });
+          if (rift.threat >= 4) addHazard('fire', e.x, e.y, 70, 0.01, e.dmg, { linger: 2.5, src: e });
           e.state = 'rest'; e.st = 0.9;
         }
       } else {
@@ -999,6 +1006,7 @@ function updateEnemy(e, dt) {
       break;
   }
 
+  if (e.superDef) updateSuper(e, dt);
   if (mvx || mvy) e.face = mvx >= 0 ? 1 : -1;
   e.x += (mvx + e.kvx) * dt;
   e.y += (mvy + e.kvy) * dt;
@@ -1353,11 +1361,11 @@ function spawnPos() {
 
 function spawnPack() {
   const p = spawnPos();
-  const n = randi(3 + Math.floor(rift.level / 4), 5 + Math.floor(rift.level / 2));
+  const n = randi(3 + Math.floor(rift.threat / 3), 5 + Math.floor(rift.threat / 2));
   const types = riftTypes(rift.level);
   // los primeros segundos sin crujidores
   const early = rift.elapsed < 20;
-  const eliteIdx = rift.elapsed > 15 && Math.random() < Math.min(0.4, 0.12 + rift.level * 0.025) ? 0 : -1;
+  const eliteIdx = rift.elapsed > 15 && Math.random() < Math.min(0.45, 0.12 + rift.threat * 0.03) ? 0 : -1;
   for (let i = 0; i < n; i++) {
     let type = weightedPick(types);
     if (early && type === 'craqueleur') type = 'bouftou';
@@ -1366,11 +1374,20 @@ function spawnPack() {
   }
 }
 
-function startRift(level) {
+// Atajo (pruebas): nivel global -> nodo del mapa en Fácil
+function startRift(level, d = 0) {
+  const b = Math.min(BIOMES.length - 1, Math.floor((level - 1) / LEVELS_PER_BIOME));
+  startNode(b, Math.min(LEVELS_PER_BIOME, level - b * LEVELS_PER_BIOME), d);
+}
+function startNode(b, n, d) {
   SFX.init();
   scene = 'rift';
+  const level = globalLevel(b, n), isSuper = n === 'S';
+  const DF = DIFFS[isSuper ? 2 : d];
   rift = {
-    level, biome: biomeFor(level), progress: 0, goal: 70 + level * 5, time: RIFT_TIME, elapsed: 0,
+    level, b, n, d: isSuper ? 2 : d, D: DF, isSuper,
+    threat: Math.floor((level - 1) / 3) + DF.threat,
+    biome: BIOMES[b], progress: 0, goal: 70 + level * 2, time: isSuper ? RIFT_TIME + 60 : RIFT_TIME, elapsed: 0,
     bossSpawned: false, bossDead: false, zaap: null, spawnT: 1, kills: 0,
     items: 0, legendaries: 0, kamas0: S.kamas, xp: 0, levels: 0, bonus: 0, dofus: null,
     boost: {},
@@ -1389,9 +1406,60 @@ function startRift(level) {
   clearInput();
   state = 'play';
   showOverlay(null);
-  showBanner(rift.biome.name, '#ffd76a', 'Grieta ' + level + ' · Llena la barra de progreso para invocar al Guardián');
+  if (isSuper) {
+    rift.bossSpawned = true;
+    showBanner(SUPER_BOSSES[rift.biome.id].name, '#ff5a3d', 'Súper Jefe de ' + rift.biome.name + ' · ¡Prepárate!');
+    later(2.2, spawnSuperBoss);
+  } else showBanner(rift.biome.name, DF.color, `Grieta ${n} · ${DF.name} · Llena la barra para invocar al Guardián`);
   SFX.play('zaap');
   enterFullscreen();
+}
+
+function spawnSuperBoss() {
+  const sd = SUPER_BOSSES[rift.biome.id];
+  const p = spawnPos();
+  const b = spawnEnemy(sd.base, p.x, p.y, { super: sd });
+  b.sCd = 4; b.phase = 0;
+  poof(b.x, b.y); embers(b.x, b.y, 30, sd.aura, 60);
+  showBanner('¡' + sd.name + '!', '#ff5a3d', 'niv. ' + b.lvl + ' · Súper Jefe');
+  SFX.play('boss'); shake(16); zoomPunch = 0.1;
+}
+// Mecánicas extra de los Súper Jefes (se suman a las del Guardián base)
+function updateSuper(e, dt) {
+  const sd = e.superDef;
+  const k = e.hp / e.maxHp;
+  const ph = k < 0.33 ? 2 : k < 0.66 ? 1 : 0;
+  if (ph > e.phase) {
+    e.phase = ph;
+    showBanner(ph === 1 ? '¡Segunda fase!' : '¡Fase final!', '#ff5a3d', e.name + ' se vuelve más peligroso');
+    SFX.play('boss'); shake(14); zoomPunch = Math.max(zoomPunch, 0.08);
+    for (let i = 0; i < 2; i++) { const a = rand(0, TAU); const m = spawnEnemy(pick(Object.keys(rift.biome.weights)), e.x + Math.cos(a) * 90, e.y + Math.sin(a) * 90, { elite: true }); poof(m.x, m.y); }
+    e.speed *= 1.12;
+  }
+  e.sCd -= dt;
+  if (e.sCd > 0 || e.spawnT > 0) return;
+  e.sCd = [7, 5.5, 4][e.phase];
+  const n = 5 + e.phase * 3;
+  if (sd.move === 'meteor') {
+    for (let i = 0; i < n; i++) { const a = rand(0, TAU), r = i === 0 ? 0 : rand(60, 220); addHazard('meteor', P.x + Math.cos(a) * r, P.y + Math.sin(a) * r, 64, 1.0 + i * 0.1, e.dmg * 1.2, { src: e }); }
+  } else if (sd.move === 'brood') {
+    for (let i = 0; i < 2 + e.phase; i++) { const a = rand(0, TAU); addHazard('web', P.x + Math.cos(a) * rand(0, 160), P.y + Math.sin(a) * rand(0, 160), 90, 0.4, 0, { linger: 5, src: e }); }
+    for (let i = 0; i < 3 + e.phase * 2; i++) { const a = (i / 5) * TAU; const m = spawnEnemy('arakne', e.x + Math.cos(a) * 70, e.y + Math.sin(a) * 70); poof(m.x, m.y); }
+  } else if (sd.move === 'nova') {
+    for (const [R, t] of [[150, 0.7], [270, 1.0], [390, 1.3]].slice(0, 1 + e.phase)) {
+      const cnt = Math.round(R / 22);
+      for (let i = 0; i < cnt; i++) { const a = (i / cnt) * TAU; addHazard('ice', e.x + Math.cos(a) * R, e.y + Math.sin(a) * R, 32, t, e.dmg, { src: e, post: 0.7 }); }
+    }
+  } else if (sd.move === 'firelines') {
+    const base = Math.atan2(P.y - e.y, P.x - e.x);
+    for (let l = 0; l < 2 + e.phase; l++) {
+      const al = base + (l - (1 + e.phase) / 2) * 0.5;
+      for (let j = 1; j <= 10; j++) addHazard('fire', e.x + Math.cos(al) * j * 46, e.y + Math.sin(al) * j * 46, 30, 0.6 + j * 0.06, e.dmg * 0.9, { src: e, linger: 2.2 });
+    }
+  } else {
+    for (let i = 0; i < 3 + e.phase; i++) { const a = rand(0, TAU), r = rand(40, 200); addHazard('meteor', P.x + Math.cos(a) * r, P.y + Math.sin(a) * r, 70, 1.1 + i * 0.15, e.dmg * 1.3, { src: e }); }
+    for (let i = 0; i < 2 + e.phase; i++) enemyShoot(e, (i / (2 + e.phase)) * TAU, 160, e.dmg * 0.9, 'homing', 10, 5);
+  }
 }
 
 function spawnGuardian() {
@@ -1416,30 +1484,36 @@ function guardianDefeated(e) {
   hazards = [];
   projectiles = projectiles.filter((p) => p.team === 'p');
   // botín del guardián
-  const n = 4 + Math.floor(rift.level / 2);
+  const n = Math.min(10, 4 + Math.floor(rift.level / 5) + rift.d + (rift.isSuper ? 3 : 0));
   for (let i = 0; i < n; i++) {
-    let r = rollRarity(10);
+    let r = rollRarity(10 + rift.D.rarity);
     if (i === 0) r = Math.max(2, r);
-    const named = r === 3 ? { name: BOSS_LOOT_NAME[e.type] } : {};
+    const named = r === 3 ? { name: e.superDef ? 'de ' + e.superDef.name.split(',')[0] : BOSS_LOOT_NAME[e.type] } : {};
     dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel() + 1, r, named) });
   }
   for (let i = 0; i < 3; i++) dropPickup(e.x, e.y, 'pain', { val: 30 });
+  // piezas del conjunto de la zona: más probables cuanto más difícil
+  const setRolls = rift.isSuper ? [1, 0.5] : [rift.D.set];
+  for (const ch of setRolls) if (Math.random() < ch) { dropPickup(e.x, e.y, 'item', { item: makeSetItem(S.cls, itemLevel() + 2, rift.biome.id) }); rift.setDrop = true; }
   // ¿Gema Ancestral?
   const missing = Object.keys(GEMS).filter((k) => !S.dofus.includes(k));
-  if (missing.length && Math.random() < 0.3 + rift.level * 0.07) dropPickup(e.x, e.y, 'dofus', { id: pick(missing) });
+  if (missing.length && Math.random() < (rift.isSuper ? 0.6 : 0.15 + rift.level * 0.01 + rift.d * 0.1)) dropPickup(e.x, e.y, 'dofus', { id: pick(missing) });
   // bonus de tiempo
   if (rift.time > 0) {
-    rift.bonus = Math.round(40 * rift.level * P.kamaMul);
+    rift.bonus = Math.round(40 * rift.level * P.kamaMul * rift.D.reward);
     for (let i = 0; i < 6; i++) dropPickup(e.x, e.y, 'kama', { val: Math.round(rift.bonus / 6) });
     dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(5))) });
   }
-  showBanner(`¡${e.D.name} derrotado!`, '#ffd76a', 'Recoge el botín y cruza el Portal para volver a Villa Candela');
+  showBanner(`¡${e.name} derrotado!`, '#ffd76a', 'Recoge el botín y cruza el Portal para volver a Villa Candela');
   // zaap de salida
   const zx = clamp(e.x + 140, 80, WORLD.w - 80), zy = clamp(e.y - 60, 80, WORLD.h - 80);
   for (const o of obstacles) if (dist(o.x, o.y, zx, zy) < 90) o.gone = true;
   obstacles = obstacles.filter((o) => !o.gone);
   later(1.2, () => { rift.zaap = { x: zx, y: zy }; poof(zx, zy - 30); SFX.play('zaap'); });
-  S.maxFaille = Math.max(S.maxFaille, rift.level + 1);
+  markCleared(rift.b, rift.n, rift.d);
+  S.maxFaille = Math.max(S.maxFaille, highestLevel());
+  autoAdvance();
+  if (rift.isSuper && rift.b + 1 < BIOMES.length) later(3, () => showBanner('¡Nuevo mundo desbloqueado!', '#7cff8a', BIOMES[rift.b + 1].name));
   persist();
 }
 
@@ -1448,10 +1522,10 @@ function updateRift(dt) {
   if (!rift.bossDead) rift.time -= dt;
   if (!rift.bossSpawned) {
     rift.spawnT -= dt;
-    const cap = Math.min(60, 26 + rift.level * 3);
+    const cap = Math.min(60, 26 + rift.threat * 3);
     if (rift.spawnT <= 0 && enemies.length < cap) {
       spawnPack();
-      rift.spawnT = rand(1.3, 2.3) * Math.max(0.45, 1 - rift.level * 0.05);
+      rift.spawnT = rand(1.3, 2.3) * Math.max(0.45, 1 - rift.threat * 0.05);
     }
   }
   if (rift.zaap && dist(P.x, P.y, rift.zaap.x, rift.zaap.y - 10) < 34) finishRift();
@@ -1459,7 +1533,7 @@ function updateRift(dt) {
   if (streak.n >= 10 && gameTime - streak.t > 1.6) {
     const bonus = Math.round(streak.n * 2 * P.kamaMul);
     S.kamas += bonus;
-    gainXp(streak.n * rift.level);
+    gainXp(streak.n * (2 + rift.threat));
     subBanner = { text: `Racha ×${streak.n}  ·  +${bonus} ámbar`, t: 2.5, max: 2.5 };
     SFX.play('coin');
     streak.n = 0;
@@ -1787,7 +1861,7 @@ function drawHUD() {
 
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
-  text('Grieta ' + rift.level, rx - 150 * s, ry, 13 * s, '#ffd76a', 'left', 900);
+  text(rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#f3ead2' : '#ff8a80';
   text(rift.bossSpawned ? (rift.bossDead ? '✔' : 'GUARDIÁN') : fmtTime(rift.time), rx, ry, 12 * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
@@ -1816,7 +1890,7 @@ function drawHUD() {
   // jefe
   if (bossRef && !bossRef.dead) {
     const w = Math.min(W * 0.42, 340 * s), x = W / 2 - w / 2, y = pad + 18 * s;
-    text(bossRef.D.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ffd76a', 'center', 900);
+    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ffd76a', 'center', 900);
     roundRect(x, y + 2 * s, w, 12 * s, 6 * s, 'rgba(0,0,0,0.65)', '#c9a24a', 2);
     roundRect(x + 2, y + 2 * s + 2, (w - 4) * Math.max(0, bossRef.hp / bossRef.maxHp), 12 * s - 4, 4 * s, '#d84315');
   }
@@ -2242,7 +2316,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['menu', 'hub', 'inv', 'shop', 'pause', 'end', 'dead'];
+const overlays = ['menu', 'hub', 'map', 'inv', 'shop', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -2256,7 +2330,7 @@ function buildMenu() {
     const slot = SAVE.slots[id];
     const el = document.createElement('div');
     el.className = 'card' + (selectedClass === id ? ' selected' : '');
-    el.innerHTML = `<div class="head"><canvas width="112" height="112"></canvas><div><div class="name">${C.name}</div><div class="role">${slot ? `Nivel ${slot.level} · Faille ${slot.maxFaille}` : C.role}</div></div></div>
+    el.innerHTML = `<div class="head"><canvas width="112" height="112"></canvas><div><div class="name">${C.name}</div><div class="role">${slot ? `Nivel ${slot.level} · Grieta ${slot.maxFaille}` : C.role}</div></div></div>
       <div class="desc">${C.desc}</div>
       <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} energía)`).join('<br>')}</div>`;
     const g = el.querySelector('canvas').getContext('2d');
@@ -2295,18 +2369,17 @@ function goHub() {
 function buildHub() {
   const C = CLASSES[S.cls];
   const nx = xpNext(S.level);
-  S.faille = clamp(S.faille, 1, S.maxFaille);
   $('hubChar').innerHTML = `
     <div class="hubName">${C.name} <span>nivel ${S.level}</span></div>
     <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
     <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
     ${Object.keys(ELIXIRS).some((k) => S.boosts[k] > 0) ? `<div class="hubBoosts">Elixires para la próxima Grieta: ${Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0).map((k) => `<span style="color:${ELIXIRS[k].hi}">${ELIXIRS[k].name.replace('Elixir ', '')}${S.boosts[k] > 1 ? ' ×' + S.boosts[k] : ''}</span>`).join(', ')}</div>` : ''}
     <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}"></span>`).join('')}</div>`;
-  const fb = biomeFor(S.faille), rec = 1 + (S.faille - 1) * 3;
-  $('fLabel').innerHTML = `Grieta ${S.faille} · ${fb.name}<small>Monstruos nivel ${rec}–${5 + (S.faille - 1) * 3} · Guardián: ${ENEMIES[fb.boss].name}</small>` +
-    (S.level + 2 < rec ? `<small class="warn">⚠ Recomendado nivel ${rec}+ (tú: ${S.level})</small>` : '');
-  $('fMinus').disabled = S.faille <= 1;
-  $('fPlus').disabled = S.faille >= S.maxFaille;
+  const sel = mapSel();
+  const fb = BIOMES[sel.b], rec = recLevel(sel.b, sel.n, sel.d), DF = DIFFS[sel.n === 'S' ? 2 : sel.d];
+  $('fLabel').innerHTML = (sel.n === 'S' ? `☠ ${SUPER_BOSSES[fb.id].name}` : `Grieta ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>`) +
+    `<small>${fb.name} · Recomendado nivel ${rec}</small>` +
+    (S.level + 2 < rec ? `<small class="warn">⚠ Tu nivel (${S.level}) es bajo para esta Grieta</small>` : '');
   $('btnInv').innerHTML = '🎒 Personaje' + (S.points > 0 ? ` <span class="badge">${S.points}</span>` : '');
 }
 
@@ -2317,9 +2390,177 @@ $('btnStart').addEventListener('click', () => {
   S = migrateSlot(SAVE.slots[selectedClass]);
   goHub();
 });
-$('fMinus').addEventListener('click', () => { S.faille--; SFX.play('click'); buildHub(); });
-$('fPlus').addEventListener('click', () => { S.faille++; SFX.play('click'); buildHub(); });
-$('btnZaap').addEventListener('click', () => startRift(S.faille));
+$('btnMap').addEventListener('click', () => openMap());
+$('btnMapClose').addEventListener('click', () => closeMap());
+$('btnZaap').addEventListener('click', () => { const s2 = mapSel(); startNode(s2.b, s2.n, s2.d); });
+
+// ---------- Mapa de Grietas ----------
+const MAP_POS = [[9, 72], [21, 40], [33, 68], [45, 34], [57, 66], [68, 34], [79, 64], [91, 38]];
+let mapView = 0; // bioma que se está mirando
+// Selección guardada, corregida si apunta a algo bloqueado
+function mapSel() {
+  const m = mapProg();
+  let { b, n, d } = m.sel;
+  if (!biomeUnlocked(b)) b = 0;
+  if (!nodeUnlocked(b, n)) n = 1;
+  if (!diffUnlocked(b, n, d)) d = 0;
+  m.sel = { b, n, d };
+  return m.sel;
+}
+// Tras vencer, el mapa apunta a lo siguiente por hacer
+function autoAdvance() {
+  const m = mapProg();
+  const { b, n } = rift;
+  if (n === 'S') { if (b + 1 < BIOMES.length) m.sel = { b: b + 1, n: 1, d: 0 }; }
+  else if (n < LEVELS_PER_BIOME) m.sel = { b, n: n + 1, d: 0 };
+  else m.sel = { b, n: 'S', d: 0 };
+}
+const MAP_BG = new Map();
+function mapBackground(B) {
+  if (MAP_BG.has(B.id)) return MAP_BG.get(B.id);
+  const c = document.createElement('canvas');
+  c.width = 900; c.height = 420;
+  const g = c.getContext('2d');
+  const pat = g.createPattern(biomeGroundTex(B), 'repeat');
+  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(1.6));
+  g.fillStyle = pat; g.fillRect(0, 0, 900, 420);
+  let seed = B.id.length * 777;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  for (let i = 0; i < 10; i++) {
+    const x = rnd() * 900, y = rnd() * 420, r = 80 + rnd() * 160, col = B.patch[i % 2];
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
+    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  }
+  const st = POOL_STYLE[B.pool];
+  const saved = ctx;
+  ctx = g;
+  try {
+    for (let i = 0; i < 6; i++) {
+      const x = rnd() * 900, y = 60 + rnd() * 320, rx = 30 + rnd() * 40;
+      const gr = g.createRadialGradient(x, y, 2, x, y, rx);
+      gr.addColorStop(0, st.stops[0]); gr.addColorStop(0.4, st.stops[1]); gr.addColorStop(0.8, st.stops[2]); gr.addColorStop(1, st.stops[3]);
+      g.fillStyle = st.rim; g.beginPath(); g.ellipse(x, y, rx + 5, rx * 0.45 + 4, 0, 0, TAU); g.fill();
+      g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx, rx * 0.45, 0, 0, TAU); g.fill();
+    }
+    const trees = [];
+    for (let i = 0; i < 46; i++) trees.push([rnd() * 900, rnd() * 440, 0.55 + rnd() * 0.4]);
+    trees.sort((a, b) => a[1] - b[1]);
+    for (const [x, y, sc] of trees) {
+      g.save(); g.translate(x, y); g.scale(sc, sc);
+      g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(0, 2, 22, 8, 0, 0, TAU); g.fill();
+      treeArt(B.tree, rnd() < 0.5 ? 1 : 0, 0);
+      g.restore();
+    }
+  } finally { ctx = saved; }
+  const v = g.createRadialGradient(450, 210, 120, 450, 210, 520);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
+  g.fillStyle = v; g.fillRect(0, 0, 900, 420);
+  const url = c.toDataURL('image/jpeg', 0.85);
+  MAP_BG.set(B.id, url);
+  return url;
+}
+function openMap() {
+  mapView = mapSel().b;
+  buildMap();
+  state = 'map';
+  showOverlay('map');
+  SFX.play('click');
+}
+function closeMap() {
+  state = 'hub';
+  buildHub();
+  showOverlay('hub');
+}
+function buildMap() {
+  const sel = mapSel();
+  const b = mapView, B = BIOMES[b];
+  $('mapTabs').innerHTML = BIOMES.map((x, i) => `<button data-b="${i}" class="${i === b ? 'on' : ''} ${biomeUnlocked(i) ? '' : 'lock'}">${biomeUnlocked(i) ? '' : '🔒 '}${x.name}</button>`).join('');
+  const nodes = [];
+  for (let i = 1; i <= LEVELS_PER_BIOME + 1; i++) nodes.push(i > LEVELS_PER_BIOME ? 'S' : i);
+  const pts = MAP_POS;
+  let d = `M${pts[0][0]},${pts[0][1]}`;
+  for (let i = 1; i < pts.length; i++) {
+    const [x0, y0] = pts[i - 1], [x1, y1] = pts[i];
+    d += ` C${x0 + (x1 - x0) * 0.5},${y0} ${x0 + (x1 - x0) * 0.5},${y1} ${x1},${y1}`;
+  }
+  const html = [`<svg class="mf-bg" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path d="${d}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="11" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="#e8c88a" stroke-width="4" stroke-dasharray="2 9" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+    </svg>`, `<div class="mf-title">${B.name}</div>`];
+  nodes.forEach((n, i) => {
+    const un = nodeUnlocked(b, n), cd = clearedDiffs(b, n), isS = n === 'S';
+    const on = sel.b === b && sel.n === n;
+    const pips = isS ? '' : `<span class="pips">${DIFFS.map((D, k) => `<i style="${cd > k ? `background:${D.color};border-color:${D.color}` : ''}"></i>`).join('')}</span>`;
+    html.push(`<button class="mnode ${isS ? 'boss' : ''} ${un ? '' : 'lock'} ${on ? 'sel' : ''} ${isS && cd ? 'done' : ''}" data-n="${n}" style="left:${pts[i][0]}%;top:${pts[i][1]}%">${un ? (isS ? '☠' : n) : '🔒'}${pips}</button>`);
+  });
+  const cnt = setCounts()[B.id] || 0;
+  html.push(`<div class="mf-set" style="color:${SETS[B.id].color}">Conjunto ${SETS[B.id].name}: ${cnt}/${SLOTS.length} equipadas</div>`);
+  const field = $('mapField');
+  field.style.setProperty('--mbg', `rgb(${B.ground[2].join(',')})`);
+  field.style.backgroundImage = `url(${mapBackground(B)})`;
+  field.style.backgroundSize = 'cover';
+  field.innerHTML = html.join('');
+  buildMapInfo();
+}
+function buildMapInfo() {
+  const sel = mapSel(), b = mapView, B = BIOMES[b];
+  const box = $('mapInfo');
+  if (!biomeUnlocked(b)) {
+    box.innerHTML = `<h3>${B.name}</h3><div class="mi-lock">🔒 Derrota al Súper Jefe de ${BIOMES[b - 1].name} para abrir este mundo.</div>`;
+    return;
+  }
+  if (sel.b !== b) { box.innerHTML = `<h3>${B.name}</h3><div class="mi-sub">Elige una Grieta en el mapa.</div>`; return; }
+  const n = sel.n, isS = n === 'S', d = isS ? 2 : sel.d, DF = DIFFS[d], SD = SETS[B.id];
+  const L = globalLevel(b, n), rec = recLevel(b, n, isS ? 2 : sel.d);
+  const mlo = 1 + (L - 1) * 2 + DF.lvl;
+  const boss = isS ? SUPER_BOSSES[B.id].name : ENEMIES[B.boss].name;
+  const setCh = isS ? 100 : Math.round(DF.set * 100);
+  const cnt = setCounts()[B.id] || 0;
+  const diffs = isS ? '' : `<div class="diffs">${DIFFS.map((D, k) => {
+    const un = diffUnlocked(b, n, k), done = clearedDiffs(b, n) > k;
+    return `<button data-d="${k}" style="--dc:${D.color}" class="${k === d ? 'on' : ''}" ${un ? '' : 'disabled'}>${un ? '' : '🔒 '}${D.name}${done ? ' <span class="ck">✔</span>' : ''}</button>`;
+  }).join('')}</div>`;
+  box.innerHTML = `
+    <h3>${isS ? '☠ Súper Jefe' : 'Grieta ' + n}</h3>
+    <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
+    ${diffs}
+    ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
+    <div class="mi-rows">
+      <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
+      <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
+      <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
+      <span>Vida / daño enemigo</span><b>×${(DF.hp * (isS ? 3.2 : 1)).toFixed(1)} / ×${(DF.dmg * (isS ? 1.3 : 1)).toFixed(1)}</b>
+      <span>Ámbar y XP</span><b>×${DF.reward}</b>
+      <span>Pieza de conjunto</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
+    </div>
+    <div class="mi-set" style="--sc:${SD.color}"><div class="t">Conjunto ${SD.name} (${cnt}/${SLOTS.length})</div>
+      ${[2, 4, 6].map((k) => `<div class="${cnt >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
+    <button id="btnMapGo" class="btn big">${isS ? '☠ Desafiar al Súper Jefe' : '🌀 Entrar en la Grieta'}</button>`;
+}
+$('mapTabs').addEventListener('click', (ev) => {
+  const t = ev.target.closest('button[data-b]');
+  if (!t) return;
+  mapView = +t.dataset.b;
+  SFX.play('click');
+  buildMap();
+});
+$('mapField').addEventListener('click', (ev) => {
+  const t = ev.target.closest('.mnode');
+  if (!t || t.classList.contains('lock')) return;
+  const n = t.dataset.n === 'S' ? 'S' : +t.dataset.n;
+  const m = mapProg();
+  // al cambiar de Grieta se propone la dificultad más alta disponible
+  const best = n === 'S' ? 0 : Math.min(2, clearedDiffs(mapView, n));
+  m.sel = { b: mapView, n, d: m.sel.b === mapView && m.sel.n === n ? m.sel.d : best };
+  SFX.play('click');
+  buildMap();
+});
+$('mapInfo').addEventListener('click', (ev) => {
+  const db = ev.target.closest('button[data-d]');
+  if (db && !db.disabled) { mapProg().sel.d = +db.dataset.d; SFX.play('click'); buildMap(); return; }
+  if (ev.target.closest('#btnMapGo')) { const s2 = mapSel(); persist(); startNode(s2.b, s2.n, s2.d); }
+});
 $('btnInv').addEventListener('click', () => openInventory('hub'));
 $('btnShop').addEventListener('click', () => openShop());
 $('btnChange').addEventListener('click', () => { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); });
@@ -2490,7 +2731,7 @@ function buildInventory(justEquipped) {
   S.bag.forEach((it, i) => {
     if (!tabMatch(invTab, it)) return;
     const better = itemPower(it) > itemPower(S.equip[it.slot]);
-    cells.push(`<button class="cell r${it.rarity}" data-i="${i}" aria-label="${it.name}">${itemSVG(it, 36)}${better ? '<i class="up">▲</i>' : ''}</button>`);
+    cells.push(`<button class="cell r${it.rarity}${it.set ? ' set' : ''}" ${it.set ? `style="--sc:${SETS[it.set].color}"` : ''} data-i="${i}" aria-label="${it.name}">${itemSVG(it, 36)}${better ? '<i class="up">▲</i>' : ''}</button>`);
   });
   const fill = invTab === 'all' ? bagMax() - S.bag.length : Math.max(0, 10 - cells.length);
   for (let i = 0; i < fill; i++) cells.push('<div class="cell empty"></div>');
@@ -2610,18 +2851,22 @@ $('btnSellCommons').addEventListener('click', () => {
 function itemCardHTML(it, eq, priBtn, secBtn, lines) {
   const R = RARITY[it.rarity];
   const rgb = RARITY_RGB[it.rarity];
-  return `<article class="icard" style="--rc:${R.color};--rg:rgba(${rgb},.5);--rt:${it.rarity === 3 ? '#ffc37a' : R.color}">
+  const SD = it.set ? SETS[it.set] : null;
+  const nSet = SD ? setCounts()[it.set] || 0 : 0;
+  const setBox = SD ? `<div class="setbox" style="--sc:${SD.color}"><div class="t">Conjunto ${SD.name} (${nSet}/${SLOTS.length} equipadas)</div>${[2, 4, 6].map((k) => `<div class="${nSet >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>` : '';
+  return `<article class="icard" style="--rc:${SD ? SD.color : R.color};--rg:rgba(${rgb},.5);--rt:${SD ? SD.color : it.rarity === 3 ? '#ffc37a' : R.color}">
     <div class="bar"></div>
     <div class="top">
       <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 52)}</div>
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
         <h2>${it.name}</h2>
-        <span class="rar">${R.name}</span>
+        <span class="rar">${SD ? 'Pieza de conjunto' : R.name}</span>
         <span class="meta">${SLOT_INFO[it.slot].name} · Nivel ${it.level}</span>
       </div>
     </div>
     <div class="sep"></div>
     <ul>${lines}</ul>
+    ${setBox}
     ${eq ? `<p class="cmp">Comparado con <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipado)</p>` : ''}
     <div class="btns">${priBtn}${secBtn}</div>
   </article>`;
@@ -2860,10 +3105,11 @@ function finishRift() {
   S.rifts++;
   SFX.play('zaap');
   persist();
-  $('endTitle').textContent = `Grieta ${rift.level} cerrada`;
+  $('endTitle').textContent = rift.isSuper ? `¡${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} derrotado!` : `Grieta ${rift.n} (${rift.D.name}) cerrada`;
   $('endStats').innerHTML = riftRows([
     ['Bonus de tiempo', rift.bonus ? '+' + rift.bonus + ' ámbar' : '—'],
     ...(rift.dofus ? [[GEMS[rift.dofus].name, '★']] : []),
+    ...(rift.setDrop ? [['Pieza de conjunto', SETS[rift.biome.id].name]] : []),
   ]);
   showOverlay('end');
 }
@@ -2912,6 +3158,7 @@ try {
       else if (state === 'pause') resumeGame();
       else if (state === 'inv') closeInventory();
       else if (state === 'shop') closeShop();
+      else if (state === 'map') closeMap();
       else if (state === 'hub') { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); }
       else if (state === 'menu') App.exitApp();
     });
@@ -2930,6 +3177,6 @@ requestAnimationFrame(frame);
 // Gancho para pruebas automatizadas
 window.__game = {
   get state() { return state; }, get P() { return P; }, get S() { return S; }, get rift() { return rift; }, get enemies() { return enemies; },
-  input, startRift, useSkill, spawnGuardian, goHub, openInventory, spawnEnemy,
+  input, startRift, startNode, useSkill, spawnGuardian, goHub, openInventory, spawnEnemy,
   get fps() { return QUALITY; },
 };
