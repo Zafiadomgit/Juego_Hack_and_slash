@@ -679,6 +679,7 @@ function useSkill(i) {
     rings.push({ x: P.x, y: P.y, r0: 20, r1: 120, life: 0.35, max: 0.35, color: 'rgba(130,200,255,' });
     aoe(P.x, P.y, 110, skillDmg(1.3), 480);
     addDecal('rune', P.x, P.y, 95, 1.3, '130,200,255');
+    spawnVfx('runeBlue', P.x, P.y, 250, { dur: 1.1, flat: true, layer: 'ground' });
     hitFlash(P.x, P.y - 20, 34, '140,210,255');
     sparks(P.x, P.y - 16, 14, '#bfe8ff', 320);
     SFX.play('shield');
@@ -785,6 +786,7 @@ function heal(n) {
   P.hp = Math.min(P.maxHp, P.hp + n);
   const got = Math.round(P.hp - before);
   if (got > 0) addText(P.x, P.y - 34, '+' + got, '#5cff6b', 1);
+  if (got > 0 && scene === 'rift') spawnVfx('heal', P.x, P.y - 34, 84, { dur: 0.9, follow: () => ({ x: P.x, y: P.y - 34 }) });
 }
 
 function hurtPlayer(dmg, sx, sy, src) {
@@ -971,6 +973,7 @@ function triggerHazard(h) {
   const inside = dist(P.x, P.y, h.x, h.y) < h.r + P.r * 0.6;
   const col = HAZ_COL[h.kind];
   if (h.kind === 'ice') {
+    spawnVfx('ice', h.x, h.y - 14, h.r * 1.9, { dur: 0.5 });
     sparks(h.x, h.y - 10, 6, '#e6f6ff', 260, -Math.PI / 2, 1.2, 600);
     if (Math.random() < 0.5) SFX.play('hit');
   } else if (h.kind === 'web') {
@@ -1497,7 +1500,7 @@ function startNode(b, n, d) {
   };
   genRift();
   groundChunks.clear();
-  resetFx();
+  resetFx(); resetVfx();
   MUSIC.setDuck(1);
   MUSIC.play(rift.biome.id, { fade: 1.5 });
   // los elixires comprados se beben al entrar
@@ -1700,6 +1703,7 @@ function updateProjectiles(dt) {
 
 function explode(p) {
   p.exploded = true;
+  spawnVfx('explosion', p.x, p.y - 20, 160, { dur: 0.45 });
   const R = 88;
   aoe(p.x, p.y, R, p.dmg, 300, true);
   rings.push({ x: p.x, y: p.y, r0: 10, r1: R, life: 0.3, max: 0.3, color: 'rgba(255,160,40,' });
@@ -1853,6 +1857,7 @@ function dust(x, y, n) {
   }
 }
 function poof(x, y) {
+  spawnVfx('smoke', x, y - 22, 66, { dur: 0.6 });
   for (let i = 0; i < 10; i++) {
     const a = rand(0, Math.PI * 2), sp = rand(30, 90);
     particles.push({ x, y: y - 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0.45, max: 0.45, color: 'rgba(255,255,255,0.85)', size: rand(4, 8), grav: 0 });
@@ -2128,6 +2133,7 @@ function renderRift() {
   drawDecals();
   for (const h of hazards) if (inView(h.x, h.y, h.r + 40)) drawHazard(h);
   for (const g of glyphs) drawGlyph(g);
+  drawVfxState('ground'); drawVfxLayer('ground');
   for (const r of rings) {
     if (!r.fill) continue;
     const k = r.life / r.max;
@@ -2168,7 +2174,8 @@ function renderRift() {
     else if (p.kind === 'web') glow(p.x, p.y, 20, '210,255,190', 0.4);
     drawProjectile(p);
   }
-  for (const s of slashes) drawSlash(s);
+  for (const s of slashes) { drawSlash(s); drawVfxSlash(s); }
+  drawVfxLayer('top'); drawVfxState('top');
   drawFlashes();
   for (const r of rings) {
     if (r.fill) continue;
@@ -2296,6 +2303,7 @@ function update(dt) {
   updatePickups(dt);
   updateEffects(dt);
   updateFx(dt);
+  updateVfx(dt);
   if (state === 'play') updateRift(dt);
   cam.x = lerp(cam.x, P.x, 1 - Math.exp(-8 * dt));
   cam.y = lerp(cam.y, P.y - 10, 1 - Math.exp(-8 * dt));

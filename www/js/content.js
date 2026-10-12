@@ -49,6 +49,7 @@ function useUltimate() {
   } else {
     glyphs.push({ x: P.x, y: P.y, r: 230, life: 5, max: 5, tick: 0, mul: 1.6 * ultMul() });
     addDecal('rune', P.x, P.y, 235, 5, '120,200,255');
+    spawnVfx('runeBlue', P.x, P.y, 480, { loop: true, life: 5, fps: 10, flat: true, layer: 'ground' });
     P.shield = Math.max(P.shield, Math.round(P.maxHp * 0.5)); P.shieldT = 8;
     rings.push({ x: P.x, y: P.y, r0: 20, r1: 240, life: 0.5, max: 0.5, color: 'rgba(140,210,255,' });
   }

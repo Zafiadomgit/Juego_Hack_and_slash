@@ -130,6 +130,7 @@ function crowdDir(range) {
 
 // Explosión con radio propio (bombas de la Artificiera)
 function blast(x, y, R, dmg, big = false) {
+  spawnVfx('explosion', x, y - R * 0.25, R * 1.8, { dur: big ? 0.45 : 0.35 });
   aoe(x, y, R, dmg, big ? 300 : 160, big);
   rings.push({ x, y, r0: 8, r1: R, life: 0.3, max: 0.3, color: 'rgba(255,170,50,' });
   for (let i = 0; i < (big ? 18 : 8); i++) {
@@ -441,6 +442,10 @@ function artWolf(g, f, spirit) {
 }
 
 function drawMinion(m) {
+  if (m.kind === 'spirit' && VFX_IMG.img) {
+    blitVfx('wolf', m.x, m.y - 18, 92, Math.floor(m.walkT * 14), Math.min(1, m.life * 3), false, 0, Math.cos(m.dir) < 0);
+    return;
+  }
   if (m.kind === 'wolf' || m.kind === 'spirit') {
     const face = Math.cos(m.dir) >= 0 ? 1 : -1, f = Math.floor(((m.walkT || 0) * 8) % 4) / 4;
     if (m.kind === 'wolf') shadow(m.x, m.y + 1, 16);

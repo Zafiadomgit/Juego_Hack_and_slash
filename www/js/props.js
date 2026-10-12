@@ -31,11 +31,11 @@ function propFrame(kind, x, y) {
 }
 
 // Dibuja el sprite apoyado en (x, y) con la escala indicada
-function blitProp(fr, x, y, scale) {
+function blitProp(fr, x, y, scale, sink = 0) {
   const [sx, sy, sw, sh] = fr.f;
   const w = sw * PROP_WU_PER_PX * scale, h = sh * PROP_WU_PER_PX * scale;
   ctx.save();
-  ctx.translate(x, y);
+  ctx.translate(x, y + h * sink);
   if (fr.flip) ctx.scale(-1, 1);
   ctx.drawImage(fr.img, sx, sy, sw, sh, -w / 2, -h + 2 * scale, w, h);
   ctx.restore();
@@ -81,6 +81,8 @@ function villaFrame(kind, x, y) {
   const h = propHash(x, y);
   return { img, f: list[Math.floor(h * list.length) % list.length], flip: kind !== 'sign' && kind !== 'board' && ((h * 7919) % 1) < 0.5 };
 }
+// fracción de la altura del sprite que queda por debajo del punto de apoyo (mitad del rombo de la base)
+const VILLA_SINK = { house: 0.13, stall: 0.13, alchemy: 0.12, well: 0.05, oak: 0.05 };
 const VILLA_KIND = { house: 'house', stall: 'stall', alchemy: 'alchemy', well: 'well', lamp: 'lamp', barrel: 'barrel', bush: 'bush', sign: 'sign', cauldron: 'cauldron' };
 // Dibuja un elemento del pueblo con sprite pintado; devuelve false si no hay sprite
 function drawVillaSprite(o) {
@@ -90,8 +92,17 @@ function drawVillaSprite(o) {
   if (!fr) return false;
   const scale = kind === 'oak' ? o.s || 1 : 1;
   const sw = fr.f[2] * PROP_WU_PER_PX * scale;
-  shadow(o.x, o.y + 1, Math.min(sw * 0.38, 70));
-  blitProp(fr, o.x, o.y, scale);
+  // los edificios tienen una base isométrica (rombo): se apoyan por el centro de esa base
+  const sink = VILLA_SINK[kind] || 0;
+  if (sink) {
+    // sombra de contacto con la forma del rombo de la base
+    ctx.save();
+    ctx.translate(o.x, o.y);
+    ctx.fillStyle = 'rgba(10,8,20,0.38)';
+    ctx.beginPath(); ctx.ellipse(0, 4, sw * 0.5, sw * 0.24, 0, 0, TAU); ctx.fill();
+    ctx.restore();
+  } else shadow(o.x, o.y + 1, Math.min(sw * 0.38, 70));
+  blitProp(fr, o.x, o.y, scale, sink);
   return true;
 }
 
