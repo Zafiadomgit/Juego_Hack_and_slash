@@ -2161,6 +2161,7 @@ function frame(t) {
     if (hitStopT > 0) hitStopT -= raw;
     else update(raw);
   } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
+  else if (scene === 'hub') villageLife(raw);
   shakeMag = Math.max(0, shakeMag - raw * 40);
   zoomPunch *= Math.exp(-7 * raw);
   render();
@@ -2350,17 +2351,22 @@ $('btnStart').addEventListener('click', () => {
 });
 $('btnMap').addEventListener('click', () => openMap());
 $('btnMapClose').addEventListener('click', () => closeMap());
-$('btnMapIco').addEventListener('click', () => openMap());
+$('btnPortalGo').addEventListener('click', () => villageInteract('portal'));
 $('hubPrompt').addEventListener('click', () => villageInteract(vNear));
 // Botón contextual de la villa: hablar con un vecino o cruzar el Portal
+// junto a un vecino: botón para hablar; junto al Portal: panel para elegir Grieta y entrar
 function updateHubPrompt() {
-  const b = $('hubPrompt');
+  const b = $('hubPrompt'), pp = $('portalPanel');
   if (!b || !S) return;
-  if (!vNear) { b.classList.remove('show'); return; }
-  if (vNear === 'portal') {
-    const s2 = mapSel(), DF = DIFFS[s2.n === 'S' ? 2 : s2.d];
-    b.innerHTML = s2.n === 'S' ? `☠ Desafiar a ${SUPER_BOSSES[BIOMES[s2.b].id].name.split(',')[0]}` : `🌀 Entrar · Grieta ${s2.n} <span style="color:${DF.color}">${DF.name}</span>`;
-  } else b.textContent = vNear.prompt;
+  const atPortal = vNear === 'portal';
+  pp.classList.toggle('show', atPortal);
+  $('hubHint').classList.toggle('hide', !!vNear);
+  if (atPortal) {
+    const s2 = mapSel();
+    $('btnPortalGo').textContent = s2.n === 'S' ? '☠ Desafiar' : '⚔ Entrar';
+  }
+  if (!vNear || atPortal) { b.classList.remove('show'); return; }
+  b.textContent = vNear.prompt;
   b.classList.add('show');
 }
 

@@ -502,15 +502,7 @@ function updateVillage(dt) {
   if (vNear !== vNearShown) { vNearShown = vNear; updateHubPrompt(); }
   vCam.x = lerp(vCam.x, clamp(vHero.x, VB.x0 + 200, VB.x1 - 200), 1 - Math.exp(-6 * dt));
   vCam.y = lerp(vCam.y, clamp(vHero.y - 30, VB.y0 + 80, VB.y1 - 120), 1 - Math.exp(-6 * dt));
-  // humo de chimeneas y luciérnagas
-  for (const s of VILLAGE.smoke) {
-    s.t -= dt;
-    if (s.t <= 0) { s.t = 0.35 + Math.random() * 0.3; VILLAGE.fx.push({ k: 'smoke', x: s.x + rand(-3, 3), y: s.y, vx: rand(4, 14), vy: rand(-26, -18), life: 3, max: 3, r: rand(5, 8) }); }
-  }
-  if (Math.random() < dt * 3) VILLAGE.fx.push({ k: 'fly', x: rand(VB.x0, VB.x1), y: rand(VB.y0, VB.y1), vx: rand(-12, 12), vy: rand(-12, 12), life: 4, max: 4, r: 3 });
-  for (const f of VILLAGE.fx) { f.life -= dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.k === 'smoke') f.r += dt * 6; else { f.vx += rand(-30, 30) * dt; f.vy += rand(-30, 30) * dt; } }
-  VILLAGE.fx = VILLAGE.fx.filter((f) => f.life > 0);
-  if (VILLAGE.fx.length > 160) VILLAGE.fx.splice(0, VILLAGE.fx.length - 160);
+  villageLife(dt);
 }
 
 // ---------- Render ----------
@@ -525,9 +517,11 @@ function renderVillage() {
   const cx = snap ? Math.round(vCam.x / snap) * snap : vCam.x, cy = snap ? Math.round(vCam.y / snap) * snap : vCam.y;
   ctx.translate(-cx, -cy);
   ctx.drawImage(villageGround(), VG.x0, VG.y0, VG.w, VG.h);
+  drawCloudShadows();
   const vw = W / hz / 2 + 120, vh = H / hz / 2 + 200;
   const list = [];
   for (const o of VILLAGE.props) if (Math.abs(o.x - cx) < vw && Math.abs(o.y - cy) < vh) list.push(o);
+  villageLifeProps(list);
   const heroO = { kind: 'hero', y: vHero.y };
   const portalO = { kind: 'portal', y: PORTAL.y + 4 };
   if (S) list.push(heroO);
@@ -538,6 +532,8 @@ function renderVillage() {
       shadow(vHero.x, vHero.y + 1, 13);
       drawHero(ctx, S.cls, { x: vHero.x, y: vHero.y, dir: vHero.dir, walkT: vHero.walkT, moving: vHero.moving, swing: 0, swingSide: 1, shot: 0, t: now });
     } else if (o === portalO) drawPortal(PORTAL.x, PORTAL.y, now);
+    else if (o.kind === 'walker') drawWalker(o.w);
+    else if (o.kind === 'hen') drawHen(o.h);
     else drawVillageProp(o);
   }
   // ventanas encendidas y chispas del portal
@@ -546,9 +542,11 @@ function renderVillage() {
   for (const f of VILLAGE.fx) {
     const a = f.life / f.max;
     if (f.k === 'smoke') { ctx.globalAlpha = 0.35 * a; circle(f.x, f.y, f.r, '#c8c4c0'); }
+    else if (f.k === 'spark') glow(f.x, f.y, 9, '140,210,255', a);
     else glow(f.x, f.y, 10, '255,240,140', Math.min(1, a * 2) * (0.5 + Math.sin(now * 6 + f.x) * 0.3));
   }
   ctx.globalAlpha = 1;
+  drawSkyLife();
   ctx.restore();
   hd2dEndWorld(0.26);
   // luz de atardecer: faroles, ventanas, portal y caldero iluminan
@@ -570,5 +568,169 @@ function renderVillage() {
     const j = input.joy;
     circle(j.ox, j.oy, 52 * ui, 'rgba(10,14,28,0.35)', 'rgba(236,209,138,0.5)', 2);
     circle(j.x, j.y, 22 * ui, 'rgba(236,209,138,0.45)');
+  }
+}
+
+// ============================================================
+// Vida del pueblo: aldeanos que pasean, gallinas, pájaros, mariposas y sombras de nubes
+// ============================================================
+const VPATH = [[0, 60], [10, 220], [-10, 380], [-300, 175], [-520, 150], [300, 175], [520, 160], [-200, -60], [200, -60],
+  [-150, 60], [150, 60], [-200, -250], [-470, -170], [215, -255], [480, -170], [0, -190], [-120, -120], [120, -120]];
+const VILLAGERS = [
+  { skin: '#f0c8a0', hair: '#3a2416', shirt: '#4a6aa0', pants: '#5a4630', hat: 'straw', item: 'hoe', speed: 46 },
+  { skin: '#e8b890', hair: '#c8a050', shirt: '#b04a4a', pants: '#3a3a4a', hat: null, item: 'basket', speed: 40 },
+  { skin: '#d8a880', hair: '#2a2a2a', shirt: '#6a7480', pants: '#3a3a44', hat: 'helm', item: 'spear', speed: 34 },
+  { skin: '#f4d0b0', hair: '#8a4a2a', shirt: '#7cc457', pants: '#5a4630', hat: null, item: null, speed: 70, kid: true },
+];
+const LIFE = { built: false, walkers: [], hens: [], birds: [], flies: [], clouds: [], birdT: 4 };
+
+function buildLife() {
+  if (LIFE.built) return;
+  LIFE.built = true;
+  VILLAGERS.forEach((v, i) => { const p = VPATH[(i * 5) % VPATH.length]; LIFE.walkers.push({ v, id: i, x: p[0], y: p[1], tx: p[0], ty: p[1], wait: 1 + i, walkT: 0, face: 1, moving: false }); });
+  for (const [x, y] of [[-520, 40], [-490, 70], [-540, 80], [520, 40], [500, 75]]) LIFE.hens.push({ x, y, hx: x, hy: y, t: Math.random() * 3, peck: 0, face: 1, vx: 0, vy: 0 });
+  for (let i = 0; i < 10; i++) LIFE.flies.push({ x: rand(-600, 600), y: rand(-380, 420), ph: rand(0, 6), col: pick(['#ffd54f', '#ffffff', '#ff8ab0', '#8fd0ff']), vx: 0, vy: 0 });
+  for (let i = 0; i < 4; i++) LIFE.clouds.push({ x: rand(-900, 900), y: rand(-500, 500), r: rand(180, 300), v: rand(10, 18) });
+}
+
+function villageLife(dt) {
+  buildLife();
+  // aldeanos: caminan entre puntos del camino y se paran a ratos
+  for (const w of LIFE.walkers) {
+    if (w.wait > 0) { w.wait -= dt; w.moving = false; if (w.wait <= 0) { const p = pick(VPATH); w.tx = p[0] + rand(-20, 20); w.ty = p[1] + rand(-14, 14); } continue; }
+    const dx = w.tx - w.x, dy = w.ty - w.y, d = Math.hypot(dx, dy);
+    if (d < 4) { w.wait = rand(1.5, 5); w.moving = false; continue; }
+    w.moving = true; w.walkT += dt;
+    w.x += (dx / d) * w.v.speed * dt; w.y += (dy / d) * w.v.speed * dt;
+    if (Math.abs(dx) > 2) w.face = dx > 0 ? 1 : -1;
+  }
+  // gallinas: picotean, dan saltitos y huyen del héroe
+  for (const h of LIFE.hens) {
+    h.t -= dt; h.peck = Math.max(0, h.peck - dt);
+    const dh = dist(h.x, h.y, vHero.x, vHero.y);
+    if (S && dh < 70) { const a = Math.atan2(h.y - vHero.y, h.x - vHero.x); h.vx = Math.cos(a) * 140; h.vy = Math.sin(a) * 140; h.face = h.vx > 0 ? 1 : -1; }
+    else if (h.t <= 0) {
+      h.t = rand(0.6, 2.2);
+      if (Math.random() < 0.5) h.peck = 0.5;
+      else { const a = Math.atan2(h.hy - h.y, h.hx - h.x) + rand(-1.6, 1.6); h.vx = Math.cos(a) * 45; h.vy = Math.sin(a) * 45; h.face = h.vx > 0 ? 1 : -1; }
+    }
+    h.x += h.vx * dt; h.y += h.vy * dt;
+    const fr = Math.exp(-4 * dt); h.vx *= fr; h.vy *= fr;
+  }
+  // bandadas de pájaros que cruzan el cielo
+  LIFE.birdT -= dt;
+  if (LIFE.birdT <= 0) {
+    LIFE.birdT = rand(6, 12);
+    const dir = Math.random() < 0.5 ? 1 : -1, y0 = rand(-350, 300), x0 = vCam.x - dir * 700;
+    for (let i = 0; i < randi(3, 6); i++) LIFE.birds.push({ x: x0 - dir * i * 26 + rand(-8, 8), y: y0 + Math.abs(i - 2) * 16 + rand(-6, 6), vx: dir * rand(150, 175), ph: rand(0, 6), life: 9 });
+  }
+  for (const b of LIFE.birds) { b.x += b.vx * dt; b.y += Math.sin(now * 2 + b.ph) * 6 * dt; b.life -= dt; }
+  LIFE.birds = LIFE.birds.filter((b) => b.life > 0);
+  // mariposas
+  for (const f of LIFE.flies) {
+    f.vx += rand(-90, 90) * dt; f.vy += rand(-90, 90) * dt;
+    f.vx = clamp(f.vx, -40, 40); f.vy = clamp(f.vy, -30, 30);
+    f.x = clamp(f.x + f.vx * dt, -650, 650); f.y = clamp(f.y + f.vy * dt, -400, 440);
+  }
+  for (const c of LIFE.clouds) { c.x += c.v * dt; if (c.x > 1100) { c.x = -1100; c.y = rand(-500, 500); } }
+  // chispas que suben del Portal
+  if (Math.random() < dt * 8) VILLAGE.fx.push({ k: 'spark', x: PORTAL.x + rand(-40, 40), y: PORTAL.y + rand(-6, 10), vx: rand(-6, 6), vy: rand(-55, -30), life: 1.6, max: 1.6, r: 2 });
+  // humo de chimeneas y luciérnagas
+  for (const s of VILLAGE.smoke) {
+    s.t -= dt;
+    if (s.t <= 0) { s.t = 0.35 + Math.random() * 0.3; VILLAGE.fx.push({ k: 'smoke', x: s.x + rand(-3, 3), y: s.y, vx: rand(4, 14), vy: rand(-26, -18), life: 3, max: 3, r: rand(5, 8) }); }
+  }
+  if (Math.random() < dt * 3) VILLAGE.fx.push({ k: 'fly', x: rand(VB.x0, VB.x1), y: rand(VB.y0, VB.y1), vx: rand(-12, 12), vy: rand(-12, 12), life: 4, max: 4, r: 3 });
+  for (const f of VILLAGE.fx) { f.life -= dt; f.x += f.vx * dt; f.y += f.vy * dt; if (f.k === 'smoke') f.r += dt * 6; else { f.vx += rand(-30, 30) * dt; f.vy += rand(-30, 30) * dt; } }
+  VILLAGE.fx = VILLAGE.fx.filter((f) => f.life > 0);
+  if (VILLAGE.fx.length > 160) VILLAGE.fx.splice(0, VILLAGE.fx.length - 160);
+}
+
+// ---------- Arte de los aldeanos y animales ----------
+function artVillager(v, p, moving) {
+  const g = ctx;
+  const sc = v.kid ? 0.72 : 1;
+  g.scale(sc, sc);
+  const step = moving ? Math.sin(p * TAU) : 0;
+  const bob = moving ? Math.abs(Math.sin(p * TAU)) * 2 : Math.sin(p * TAU) * 0.6;
+  // piernas
+  g.fillStyle = v.pants;
+  g.fillRect(-6 + step * 3, -20, 5, 18); g.fillRect(1 - step * 3, -20, 5, 18);
+  g.fillStyle = '#3a2416'; g.fillRect(-7 + step * 3, -3, 7, 3); g.fillRect(0 - step * 3, -3, 7, 3);
+  g.translate(0, -bob);
+  // cuerpo y brazos
+  g.fillStyle = v.shirt; g.beginPath(); g.roundRect(-9, -42, 18, 24, 4); g.fill();
+  g.fillStyle = 'rgba(0,0,0,0.18)'; g.fillRect(-9, -24, 18, 4);
+  g.fillStyle = '#5a3a22'; g.fillRect(-9, -26, 18, 3);
+  g.save(); g.translate(-9, -40); g.rotate(step * 0.5 + 0.1); g.fillStyle = v.shirt; g.fillRect(-3, 0, 5, 14); g.fillStyle = v.skin; g.fillRect(-3, 13, 5, 4); g.restore();
+  g.save(); g.translate(9, -40); g.rotate(-step * 0.5 - 0.1);
+  g.fillStyle = v.shirt; g.fillRect(-2, 0, 5, 14); g.fillStyle = v.skin; g.fillRect(-2, 13, 5, 4);
+  if (v.item === 'hoe') { g.fillStyle = '#6e4628'; g.fillRect(0, -16, 2, 40); g.fillStyle = '#9aa4ae'; g.fillRect(-4, -18, 8, 3); }
+  if (v.item === 'spear') { g.fillStyle = '#6e4628'; g.fillRect(0, -30, 2, 52); g.fillStyle = '#c8d0d8'; g.beginPath(); g.moveTo(-2, -30); g.lineTo(1, -38); g.lineTo(4, -30); g.closePath(); g.fill(); }
+  if (v.item === 'basket') { g.fillStyle = '#a8784a'; g.fillRect(-4, 14, 12, 8); g.fillStyle = '#d83a2e'; g.fillRect(-2, 12, 3, 3); g.fillRect(3, 12, 3, 3); }
+  g.restore();
+  // cabeza
+  g.fillStyle = v.skin; g.beginPath(); g.ellipse(0, -50, 8, 9, 0, 0, TAU); g.fill();
+  g.fillStyle = '#2a1a10'; g.fillRect(2, -52, 2, 2);
+  g.fillStyle = v.hair; g.beginPath(); g.ellipse(-1, -55, 8.5, 5, 0, Math.PI, 0); g.fill(); g.fillRect(-9, -55, 4, 7);
+  if (v.hat === 'straw') { g.fillStyle = '#e8c870'; g.beginPath(); g.ellipse(0, -57, 14, 3.5, 0, 0, TAU); g.fill(); g.beginPath(); g.ellipse(0, -60, 8, 5, 0, Math.PI, 0); g.fill(); g.fillStyle = '#b04a4a'; g.fillRect(-8, -60, 16, 2); }
+  if (v.hat === 'helm') { g.fillStyle = '#8a949e'; g.beginPath(); g.ellipse(0, -56, 9, 7, 0, Math.PI, 0); g.fill(); g.fillStyle = '#c8d0d8'; g.fillRect(-9, -57, 18, 2); g.fillStyle = '#c0392b'; g.fillRect(-1, -66, 2, 6); }
+}
+
+function artHen(p, peck) {
+  const g = ctx;
+  const hop = peck ? 0 : Math.abs(Math.sin(p * TAU)) * 1.5;
+  g.fillStyle = '#e8a030'; g.fillRect(-3, -4, 1.5, 4); g.fillRect(1, -4, 1.5, 4);
+  g.translate(0, -hop);
+  g.fillStyle = '#f4f0e6'; g.beginPath(); g.ellipse(0, -9, 8, 6, 0, 0, TAU); g.fill();
+  g.fillStyle = '#d8d0c0'; g.beginPath(); g.ellipse(-2, -9, 5, 3.5, 0.2, 0, TAU); g.fill();
+  g.fillStyle = '#f4f0e6'; g.beginPath(); g.moveTo(-8, -10); g.lineTo(-12, -16); g.lineTo(-6, -12); g.closePath(); g.fill();
+  const hy = peck ? -6 : -15, hx = peck ? 9 : 6;
+  g.fillStyle = '#f4f0e6'; g.beginPath(); g.arc(hx, hy, 4, 0, TAU); g.fill();
+  g.fillStyle = '#d83a2e'; g.fillRect(hx - 1, hy - 6, 3, 3); g.fillRect(hx + 1, hy + 2, 2, 3);
+  g.fillStyle = '#e8a030'; g.beginPath(); g.moveTo(hx + 3, hy - 1); g.lineTo(hx + 7, hy + 1); g.lineTo(hx + 3, hy + 2); g.closePath(); g.fill();
+  g.fillStyle = '#1a1010'; g.fillRect(hx + 1, hy - 1.5, 1.5, 1.5);
+}
+
+function drawWalker(w) {
+  const fi = w.moving ? Math.floor((w.walkT * 2.2) % 1 * 8) : Math.floor(((now * 0.4 + w.id * 0.3) % 1) * 8);
+  shadow(w.x, w.y + 1, w.v.kid ? 9 : 12);
+  ctx.save(); ctx.translate(w.x, w.y); ctx.scale(w.face, 1);
+  sprite('vil|' + w.id + '|' + fi + '|' + (w.moving ? 1 : 0), 50, 92, 25, 88, () => artVillager(w.v, fi / 8, w.moving));
+  ctx.restore();
+}
+function drawHen(h) {
+  const moving = Math.hypot(h.vx, h.vy) > 8;
+  const fi = moving ? Math.floor((now * 3 + h.hx) % 1 * 4) : 0;
+  shadow(h.x, h.y + 1, 7);
+  ctx.save(); ctx.translate(h.x, h.y); ctx.scale(h.face, 1);
+  sprite('hen|' + fi + '|' + (h.peck > 0 ? 1 : 0), 30, 26, 15, 23, () => artHen(fi / 4, h.peck > 0));
+  ctx.restore();
+}
+
+// Capas extra del pueblo (las llama renderVillage)
+function villageLifeProps(list) {
+  buildLife();
+  for (const w of LIFE.walkers) list.push({ kind: 'walker', y: w.y, w });
+  for (const h of LIFE.hens) list.push({ kind: 'hen', y: h.y, h });
+}
+function drawCloudShadows() {
+  for (const c of LIFE.clouds) { ctx.globalAlpha = 0.12; ctx.drawImage(glowTex('0,0,20'), c.x - c.r, c.y - c.r * 0.55, c.r * 2, c.r * 1.1); }
+  ctx.globalAlpha = 1;
+}
+function drawSkyLife() {
+  // mariposas
+  for (const f of LIFE.flies) {
+    const flap = Math.abs(Math.sin(now * 14 + f.ph));
+    ctx.fillStyle = f.col;
+    ctx.fillRect(f.x - 3 * flap - 1, f.y - 2, 3 * flap + 1, 3);
+    ctx.fillRect(f.x + 1, f.y - 2, 3 * flap + 1, 3);
+  }
+  // pájaros (con su sombra en el suelo)
+  for (const b of LIFE.birds) {
+    const flap = Math.sin(now * 10 + b.ph) * 4;
+    ctx.globalAlpha = 0.18; ctx.fillStyle = '#000'; ctx.fillRect(b.x - 4, b.y + 90, 8, 2); ctx.globalAlpha = 1;
+    ctx.strokeStyle = '#1a1a24'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(b.x - 7, b.y - flap); ctx.lineTo(b.x, b.y); ctx.lineTo(b.x + 7, b.y - flap); ctx.stroke();
   }
 }

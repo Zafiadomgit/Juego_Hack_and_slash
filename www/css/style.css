@@ -432,3 +432,17 @@ h1.title span { color: #ecd18a; }
 @media (max-width: 700px) { .hub-card { width: 210px; } .hub-sel { width: 220px !important; } .hbtn { width: 50px; height: 50px; font-size: 19px; } }
 
 .offer .buy { font-family: Garamond, Georgia, serif !important; }
+
+/* panel del Portal (aparece al acercarse) */
+.portal-panel { left: 50%; bottom: max(14px, env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(440px, 92vw); display: none; padding: 8px 12px 10px;
+  border: 1px solid #c9b27a; border-radius: 6px; background: linear-gradient(180deg, rgba(30, 40, 72, 0.95), rgba(14, 19, 38, 0.96));
+  box-shadow: inset 0 0 0 2px rgba(8, 11, 22, 0.85), inset 0 0 0 3px rgba(201, 178, 122, 0.35), 0 0 26px rgba(110, 200, 255, 0.25); animation: pop 0.25s ease-out; }
+.portal-panel.show { display: block; }
+.pp-title { font: 900 13px Cinzel, serif; letter-spacing: 1.5px; color: #9fd8ff; text-align: center; }
+.pp-info { text-align: center; font-weight: 800; font-size: 16px; color: #ecd18a; line-height: 1.2; margin: 3px 0 6px; }
+.pp-info small { display: block; font-size: 12px; font-weight: 600; color: #e2dfd4; }
+.pp-info small.warn { color: #ff8a65; }
+.pp-btns { display: flex; gap: 8px; }
+.pp-btns .btn { margin: 0; flex: 1; padding: 8px 6px; }
+.pp-btns .btn.big { flex: 1.3; font-size: 17px; }
+.hub-hint.hide { display: none; }

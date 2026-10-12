@@ -27,13 +27,19 @@
     <div id="hubChar" class="hub-card"></div>
     <div class="hub-btns">
       <button id="btnInv" class="hbtn">🎒<span>Personaje</span></button>
-      <button id="btnMapIco" class="hbtn">🗺<span>Mapa</span></button>
       <button id="btnStyleHub" class="hbtn">🎨<span>HD-2D</span></button>
       <button id="btnChange" class="hbtn">⇄<span>Héroes</span></button>
     </div>
-    <button id="btnMap" class="mapsel hub-sel"><span class="ms-ico">🌀</span><span id="fLabel"></span><span class="ms-go">Cambiar ›</span></button>
     <button id="hubPrompt" class="hub-prompt"></button>
-    <div id="hubHint" class="hub-hint">Muévete con el joystick o tocando el suelo · Habla con los vecinos · Entra en el Portal para ir a la Grieta</div>
+    <div id="portalPanel" class="portal-panel">
+      <div class="pp-title">🌀 Portal Rúnico</div>
+      <div id="fLabel" class="pp-info"></div>
+      <div class="pp-btns">
+        <button id="btnMap" class="btn">🗺 Elegir Grieta</button>
+        <button id="btnPortalGo" class="btn big">⚔ Entrar</button>
+      </div>
+    </div>
+    <div id="hubHint" class="hub-hint">Muévete con el joystick o tocando el suelo · Habla con los vecinos · Acércate al Portal para ir a una Grieta</div>
   </div>
 
   <!-- Ficha de personaje (equipo, características y bolsa) -->
