@@ -69,10 +69,25 @@ const HERO_ART = {};
   img.onload = () => { HERO_ART[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
   img.src = 'img/heroes/' + id + '.png';
 });
+// Sprites pixel art de los héroes (estilo HD-2D); miran a su derecha
+const HERO_PX = {};
+['iop', 'cra', 'feca'].forEach((id) => {
+  const img = new Image();
+  img.onload = () => { HERO_PX[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
+  img.src = 'img/heroes/px/' + id + '.png';
+});
+// Arte del héroe a usar: pixel art en HD-2D; si no, el pintado (o el pixel art si no hay pintado)
+function heroArt(cls) {
+  const px = HERO_PX[cls], pa = HERO_ART[cls];
+  if (px && (HD2D.on || !pa)) return { img: px, right: true, px: true, url: 'img/heroes/px/' + cls + '.png' };
+  if (pa) return { img: pa, right: false, px: false, url: 'img/heroes/' + cls + '.png' };
+  return null;
+}
 const HERO_H = 64; // altura en unidades de mundo
 
-function drawHeroImage(g, img, o) {
+function drawHeroImage(g, img, o, right = false) {
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
+  const flip = right ? face : -face;
   const run = o.moving ? o.walkT * 12 : 0;
   const breath = Math.sin(o.t * 3);
   const hop = o.moving ? Math.abs(Math.sin(run)) * 3 : 0;
@@ -93,20 +108,24 @@ function drawHeroImage(g, img, o) {
   if (HD2D.active && g === ctx) {
     // HD-2D: sprite pixelado, sin rotación (los píxeles se mantienen rectos)
     const pi = pixelImage(img, Math.max(8, Math.round(h * SPR.scale)));
-    g.scale(-face * (sx > 1.03 ? 1.08 : 1), sy < 0.97 ? 0.94 : 1);
+    g.scale(flip * (sx > 1.03 ? 1.08 : 1), sy < 0.97 ? 0.94 : 1);
     g.drawImage(pi, -w / 2 - 1 / SPR.scale, -h - 1 / SPR.scale, pi.width / SPR.scale, pi.height / SPR.scale);
     g.restore();
     return;
   }
   g.rotate(tilt);
-  g.scale(sx * -face, sy); // la imagen mira a su izquierda
+  g.scale(sx * flip, sy);
+  const sm = g.imageSmoothingEnabled;
+  if (right) g.imageSmoothingEnabled = false; // pixel art nítido también en estilo clásico
   g.drawImage(img, -w / 2, -h, w, h);
+  g.imageSmoothingEnabled = sm;
   g.restore();
 }
 
 // Dibuja al personaje (también usado en las tarjetas del menú y el retrato)
 function drawHero(g, clsId, o) {
-  if (HERO_ART[clsId]) { drawHeroImage(g, HERO_ART[clsId], o); return; }
+  const art = heroArt(clsId);
+  if (art) { drawHeroImage(g, art.img, o, art.right); return; }
   // o: {x, y, dir, walkT, moving, swing, swingSide, shot, t, alpha}
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   const run = o.moving ? o.walkT * 12 : 0;

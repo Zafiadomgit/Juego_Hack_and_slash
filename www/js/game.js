@@ -1803,10 +1803,13 @@ function drawHUD() {
   circle(px, py, 26 * s, '#3a2a17', '#c9a24a', 3 * s);
   ctx.save();
   ctx.beginPath(); ctx.arc(px, py, 24 * s, 0, Math.PI * 2); ctx.clip();
-  if (HERO_ART[P.cls]) {
-    // retrato: la cabeza del arte pintado
-    const img = HERO_ART[P.cls], sw = img.width * 0.5, sh = sw;
-    ctx.drawImage(img, img.width * 0.25, 0, sw, sh, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
+  const art = heroArt(P.cls);
+  if (art) {
+    // retrato: la cabeza del arte del héroe
+    const img = art.img, sw = img.width * (art.px ? 0.36 : 0.5), sx0 = img.width * (art.px ? 0.36 : 0.25);
+    ctx.imageSmoothingEnabled = !art.px;
+    ctx.drawImage(img, sx0, 0, sw, sw, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
+    ctx.imageSmoothingEnabled = true;
   } else {
     ctx.translate(px, py + 30 * s);
     ctx.scale(s * 1.15, s * 1.15);
@@ -2350,8 +2353,10 @@ function buildMenu() {
       <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} energía)`).join('<br>')}</div>`;
     const g = el.querySelector('canvas').getContext('2d');
     g.scale(2, 2);
-    if (HERO_ART[id]) {
-      const img = HERO_ART[id], h = 56, w = (h * img.width) / img.height;
+    const art = heroArt(id);
+    if (art) {
+      const img = art.img, h = 56, w = (h * img.width) / img.height;
+      g.imageSmoothingEnabled = !art.px;
       g.drawImage(img, 28 - w / 2, 0, w, h);
     } else {
       g.translate(28, 52); g.scale(1.1, 1.1);
@@ -2630,7 +2635,8 @@ function closeInventory() {
 
 let heroDollURL = {};
 function heroDollHTML() {
-  if (HERO_ART[S.cls]) return `<img class="hero" src="img/heroes/${S.cls}.png" alt="">`;
+  const art = heroArt(S.cls);
+  if (art) return `<img class="hero${art.px ? ' px' : ''}" src="${art.url}" alt="">`;
   if (!heroDollURL[S.cls]) {
     const c = document.createElement('canvas');
     c.width = 180; c.height = 260;
