@@ -94,3 +94,20 @@ function drawVillaSprite(o) {
   blitProp(fr, o.x, o.y, scale);
   return true;
 }
+
+// Vecinos pintados: personaje de pie que respira o camina (rebote y balanceo suaves)
+function drawVillager(kind, x, y, face, moving, t) {
+  const img = PROP_IMG.villa, list = PROP_ATLAS.villa && PROP_ATLAS.villa[kind];
+  if (!img || !list) return false;
+  const f = list[0];
+  const hop = moving ? Math.abs(Math.sin(t * 9)) * 2.2 : 0;
+  const breath = moving ? 0 : Math.sin(t * 2.4) * 0.012;
+  const w = f[2] * PROP_WU_PER_PX, h = f[3] * PROP_WU_PER_PX;
+  ctx.save();
+  ctx.translate(x, y - hop);
+  ctx.rotate(moving ? Math.sin(t * 9) * 0.05 : 0);
+  ctx.scale(face * (1 - breath * 0.5), 1 + breath);
+  ctx.drawImage(img, f[0], f[1], f[2], f[3], -w / 2, -h + 2, w, h);
+  ctx.restore();
+  return true;
+}

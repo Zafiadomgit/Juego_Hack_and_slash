@@ -477,7 +477,8 @@ function drawNpc(n) {
   ctx.save();
   ctx.translate(n.x, n.y);
   if (vHero.x > n.x + 20) ctx.scale(-1, 1); // mira hacia el héroe
-  sprite('npc|' + n.id + '|' + fi, 60, 100, 30, 96, () => (n.id === 'merchant' ? artMerchant : artAlchemist)(fi / 8));
+  if (!drawVillager(n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
+    sprite('npc|' + n.id + '|' + fi, 60, 100, 30, 96, () => (n.id === 'merchant' ? artMerchant : artAlchemist)(fi / 8));
   ctx.restore();
   // nombre e indicador flotante
   const bob = Math.sin(now * 3 + n.x) * 3;
@@ -734,6 +735,7 @@ function artHen(p, peck) {
 function drawWalker(w) {
   const fi = w.moving ? Math.floor((w.walkT * 2.2) % 1 * 8) : Math.floor(((now * 0.4 + w.id * 0.3) % 1) * 8);
   shadow(w.x, w.y + 1, w.v.kid ? 9 : 12);
+  if (drawVillager('vil' + w.id, w.x, w.y, w.face, w.moving, w.moving ? w.walkT : now + w.id)) return;
   ctx.save(); ctx.translate(w.x, w.y); ctx.scale(w.face, 1);
   sprite('vil|' + w.id + '|' + fi + '|' + (w.moving ? 1 : 0), 50, 92, 25, 88, () => artVillager(w.v, fi / 8, w.moving));
   ctx.restore();

@@ -14,7 +14,8 @@ WORLD_H = {'tree': 124, 'pillar': 88, 'rock': 46, 'crystal': 58, 'brazier': 52,
            'fern': 22, 'bones': 20, 'shroom': 22, 'skull': 26, 'shard': 20,
            # Villa Candela
            'house': 176, 'stall': 156, 'alchemy': 168, 'well': 100, 'lamp': 74, 'barrel': 30, 'bush': 40,
-           'sign': 70, 'cauldron': 42, 'board': 88, 'oak': 128}
+           'sign': 70, 'cauldron': 42, 'board': 88, 'oak': 128,
+           'merchant': 64, 'alchemist': 76, 'vil0': 60, 'vil1': 54, 'vil2': 66, 'vil3': 44}
 WU_PER_PX = 1.2  # densidad de píxel (≈ la del búfer HD-2D)
 
 SEL = {
@@ -62,6 +63,9 @@ SEL = {
         'cauldron': ['v-3/17'],
         'board': ['v-3/10'],
         'oak': ['v-3/13', 'v-2/09', 'v-0/10'],
+        # vecinos (vil0 granjero, vil1 anciana, vil2 guardia, vil3 niño: mismo orden que VILLAGERS)
+        'merchant': ['n2-0/00'], 'alchemist': ['n1-0/00'],
+        'vil0': ['n0-0/00'], 'vil1': ['n0-0/03'], 'vil2': ['n0-0/02'], 'vil3': ['n0-0/01'],
     },
     'abismo': {
         'tree': ['g5-0/00', 'g5-0/03', 'g5-1/01'],
