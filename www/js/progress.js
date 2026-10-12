@@ -150,7 +150,7 @@ function refPlayer(cls, L, d) {
   const dmgMul = (1 + t.fue * 0.01) * (1 + 0.05 * up);
   const crit = Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01);
   const armor = Math.min(0.75, t.res * 0.01);
-  const out = { hit: power * C.basicMul * dmgMul * (1 + crit * 0.8), ehp: maxHp / (1 - armor), plvl };
+  const out = { hit: power * C.basicMul * (C.refK || 1) * dmgMul * (1 + crit * 0.8), ehp: maxHp / (1 - armor), plvl };
   REF_CACHE.set(key, out);
   return out;
 }

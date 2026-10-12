@@ -1222,6 +1222,7 @@ function drawPickup(k) {
 }
 
 function drawProjectile(p) {
+  if (p.look) { drawProjLook(p); return; }
   ctx.save();
   if (p.kind === 'arrow' || p.kind === 'explo') {
     ctx.translate(p.x, p.y);

@@ -12,7 +12,13 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
 
 ## Cómo se juega
 
-1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
+1. **Elige personaje** entre 7 clases, cada una con su partida guardada:
+   - **Rompeyelmos** (cuerpo a cuerpo), **Ojo de Halcón** (a distancia) y **Runista** (mago protector).
+   - **Sombra**: asesina de dagas; Paso Sombrío (aparece tras el enemigo con crítico seguro), Abanico Venenoso y la definitiva Danza de Mil Cortes.
+   - **Domadora**: látigo y lobos; Llamada del Lobo (hasta 3 lobos), Rugido Salvaje (enfurece a la manada) y la definitiva Estampida.
+   - **Artificiera**: bombas en parábola; Torreta de Chispas, Bomba Racimo y la definitiva Bombardeo.
+   - **Berserker**: martillo; pega más fuerte cuanto menos vida tiene y se cura al golpear; Golpe Sangriento, Grito de Guerra y la definitiva Frenesí Rojo.
+   *(Los sprites de las 4 clases nuevas son provisionales: variaciones de color de los originales, a la espera del arte definitivo.)*
 2. **Villa Candela** es un pueblo por el que caminas (joystick, teclado o tocando el suelo). **Brunilda la Mercader** vende equipo nuevo tras cada Grieta; **Maese Ivo el Alquimista** vende elixires para la siguiente Grieta, pociones y mejoras permanentes con precio creciente (Piedra de afilar y Talismán de vigor hasta nivel 15, Piel curtida, Cristal de energía, Trébol de la suerte, Botas de reflejos, Imán de ámbar, bolsa y cinto). Los monstruos de cada Grieta cuentan con que vas comprando afilador y talismán poco a poco, así que el ámbar siempre tiene un destino. Todo se paga con ámbar. Al acercarte al **Portal Rúnico** de la plaza aparece su panel: desde ahí eliges Grieta en el mapa y entras. El pueblo tiene vida: aldeanos que pasean, gallinas, pájaros, mariposas y nubes.
    Desde la villa abres el **Mapa de Grietas**: cada mundo tiene 7 Grietas y un **Súper Jefe** al final. Cada Grieta tiene 3 dificultades (**Fácil**, **Medio**, **Difícil**) que se desbloquean en orden; superar una Grieta abre la siguiente y vencer al Súper Jefe abre el mundo siguiente. Cuanto más difícil, más vida y daño tienen los monstruos, pero más ámbar, XP y probabilidad de conseguir piezas del **conjunto** de esa zona (10% / 30% / 60%; el Súper Jefe siempre suelta una). La calidad del botín también depende de la dificultad: **Fácil** suelta Común y Raro, **Medio** Raro y Épico, **Difícil** Épico y Legendario, y cada calidad multiplica mucho los stats (×1 / ×1,7 / ×2,8 / ×4,5). Los monstruos se calculan a partir de un héroe de referencia con el equipo de esa dificultad: Fácil está pensada para equipo Común, Medio para Raro y Difícil para Legendario (e incluso con él sigue siendo dura). Con 2, 4 y 6 piezas del mismo conjunto equipadas se activan sus bonus.
 3. **La Grieta**: cada nivel de Grieta te lleva a uno de 5 mundos (Bosque Ceniciento, Pantano Sombrío, Glaciar Rúnico, Desierto de Ámbar y Abismo Volcánico), cada uno con su terreno, clima, monstruos favoritos y Guardián propio. Los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos y cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** del mundo (Colmillo Ancestral, Reina Tejeceniza, Coloso de Escarcha, Garra Ígnea o Hechicero del Abismo), que entra en furia al 50% de vida.
@@ -50,6 +56,7 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
   js/village.js       Villa Candela: pueblo caminable, vecinos y tiendas
   js/content.js       Definitivas, misiones diarias y eventos de Grieta
+  js/classes.js       Clases nuevas: Sombra, Domadora, Artificiera y Berserker
 audio/ (en www)       Música (.ogg en bucle) y efectos de sonido
 tools/audio/          Sintetizador y compositor de la banda sonora (Python)
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz

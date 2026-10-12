@@ -30,6 +30,29 @@ function iconBody(kind, p) {
         <path d="M8 24 L40 24" stroke="${OL}" stroke-width="3"/><path d="M8 24 L40 24" stroke="${p.c}" stroke-width="1.6"/>
         <path d="M43 24 L36 20 L36 28 Z" fill="${p.m}" stroke="${OL}" stroke-width="1.4"/>
         <circle cx="15" cy="5" r="3" fill="${p.g}" stroke="${OL}" stroke-width="1.4"/><circle cx="15" cy="43" r="3" fill="${p.g}" stroke="${OL}" stroke-width="1.4"/>`;
+    case 'dagger':
+      return `<g transform="rotate(35 24 24)">
+        <path d="M24 3 L29 30 L19 30 Z" fill="${p.m}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 6 L26 28 L24 28 Z" fill="${p.ml}" opacity="0.8"/>
+        <rect x="14" y="30" width="20" height="4" rx="1.5" fill="${p.g}" stroke="${OL}" stroke-width="1.6"/>
+        <path d="M24 34 L24 44" stroke="${OL}" stroke-width="6" stroke-linecap="round"/><path d="M24 34 L24 44" stroke="${p.l}" stroke-width="3" stroke-linecap="round"/></g>`;
+    case 'whip':
+      return `<path d="M10 40 L16 30" stroke="${OL}" stroke-width="7" stroke-linecap="round"/><path d="M10 40 L16 30" stroke="${p.l}" stroke-width="4" stroke-linecap="round"/>
+        <path d="M16 30 Q30 8 40 14 Q46 20 36 26 Q26 30 30 38" stroke="${OL}" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <path d="M16 30 Q30 8 40 14 Q46 20 36 26 Q26 30 30 38" stroke="${p.m}" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+        <circle cx="16" cy="30" r="3" fill="${p.g}" stroke="${OL}" stroke-width="1.4"/>`;
+    case 'launcher':
+      return `<g transform="rotate(-20 24 24)"><rect x="6" y="18" width="32" height="12" rx="3" fill="${p.m}" stroke="${OL}" stroke-width="2"/>
+        <rect x="36" y="16" width="6" height="16" rx="1.5" fill="${p.g}" stroke="${OL}" stroke-width="1.8"/>
+        <path d="M12 30 L10 40 L17 40 L19 30" fill="${p.l}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M9 21 L33 21" stroke="${p.ml}" stroke-width="1.6" opacity="0.8"/></g>
+        <circle cx="12" cy="10" r="5" fill="#3a3440" stroke="${OL}" stroke-width="1.6"/><path d="M15 6 Q18 2 21 4" stroke="#ffb040" stroke-width="2" fill="none"/>`;
+    case 'hammer':
+      return `<g transform="rotate(-30 24 24)"><path d="M24 46 L24 16" stroke="${OL}" stroke-width="6.5" stroke-linecap="round"/>
+        <path d="M24 46 L24 16" stroke="${p.l}" stroke-width="3.6" stroke-linecap="round"/>
+        <rect x="9" y="5" width="30" height="15" rx="2.5" fill="${p.m}" stroke="${OL}" stroke-width="2"/>
+        <rect x="9" y="5" width="5" height="15" fill="${p.g}" stroke="${OL}" stroke-width="1.6"/><rect x="34" y="5" width="5" height="15" fill="${p.g}" stroke="${OL}" stroke-width="1.6"/>
+        <path d="M15 8 L33 8" stroke="${p.ml}" stroke-width="1.6" opacity="0.8"/></g>`;
     case 'staff':
       return `<path d="M24 46 L24 18" stroke="${OL}" stroke-width="6.5" stroke-linecap="round"/>
         <path d="M24 46 L24 18" stroke="${p.l}" stroke-width="3.6" stroke-linecap="round"/>

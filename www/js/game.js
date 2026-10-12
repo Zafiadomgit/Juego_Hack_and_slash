@@ -484,7 +484,7 @@ function derived() {
     power: 8 + S.level * 1.2 + t.dmg,
     dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: 1 + t.int * 0.015,
-    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (transRank() >= 7 ? 0.05 : 0)),
+    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transRank() >= 7 ? 0.05 : 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
@@ -520,7 +520,7 @@ function createPlayer() {
     walkT: 0, moving: false, hurtFlash: 0,
     swingT: 0, swingSide: 1, shotT: 0,
     slowT: 0, sq: 0, lean: 0, recoil: 0, stepT: 0, ghostT: 0,
-    ult: transRank() >= 5 ? 50 : 0, spinT: 0, spinTick: 0, altarT: 0,
+    ult: transRank() >= 5 ? 50 : 0, spinT: 0, frenzyT: 0, warcryT: 0, danceT: 0, spinTick: 0, altarT: 0,
   };
   recalc();
   P.hp = P.maxHp;
@@ -544,11 +544,12 @@ function aimAt(range) {
   return P.dir;
 }
 
-const basicDmg = () => P.power * P.C.basicMul * P.dmgMul;
-const skillDmg = (mul) => P.power * mul * P.dmgMul * P.skillMul;
+const basicDmg = () => P.power * P.C.basicMul * P.dmgMul * classDmgMul();
+const skillDmg = (mul) => P.power * mul * P.dmgMul * P.skillMul * classDmgMul();
 
 function basicAttack() {
   const cls = P.cls;
+  if (CLASS_KIT[cls]) { CLASS_KIT[cls].basic(); return; }
   if (cls === 'iop') {
     const a = aimAt(170);
     P.dir = a; P.aimHold = 0.3;
@@ -603,6 +604,7 @@ function useSkill(i) {
   P.pa -= sk.cost;
   P.skillCd[i] = sk.cd;
   const cls = P.cls;
+  if (CLASS_KIT[cls]) { CLASS_KIT[cls].skill(i); return; }
 
   if (cls === 'iop' && i === 0) {
     const t = nearestEnemy(P.x, P.y, 340);
@@ -777,7 +779,7 @@ function heal(n) {
 
 function hurtPlayer(dmg, sx, sy, src) {
   if (state !== 'play' || P.invul > 0 || P.dashT > 0 || P.jump) return;
-  dmg = Math.max(1, Math.round(dmg * (1 - P.armor) * rand(0.9, 1.1)));
+  dmg = Math.max(1, Math.round(dmg * (1 - P.armor) * classDefMul() * rand(0.9, 1.1)));
   if (P.shield > 0) {
     const a = Math.min(P.shield, dmg);
     P.shield -= a; dmg -= a;
@@ -834,11 +836,18 @@ function spawnEnemy(type, x, y, o = {}) {
 
 function damageEnemy(e, base, o = {}) {
   if (e.dead) return;
-  const crit = Math.random() < P.crit;
+  const crit = !o.quiet && (o.crit || Math.random() < P.crit);
   const armor = e.elite && e.elite.armor ? e.elite.armor : 0;
-  const dmg = Math.max(1, Math.round(base * (crit ? 1.8 : 1) * rand(0.9, 1.1) * (1 - armor)));
+  const dmg = Math.max(1, Math.round(base * (crit ? P.C.critMul || 1.8 : 1) * rand(0.9, 1.1) * (1 - armor)));
   e.hp -= dmg;
   e.flash = 0.1;
+  if (o.poison) e.dot = { t: o.poison.t, dps: o.poison.dps, tick: 0.5 };
+  stealLife(dmg);
+  if (o.quiet) {
+    texts.push({ x: e.x + rand(-6, 6), y: e.y - e.r * 1.4, txt: String(dmg), color: o.color || '#cfcfcf', scale: 0.85, life: 0.7, max: 0.7, vx: rand(-20, 20), vy: -110 });
+    if (e.hp <= 0) killEnemy(e);
+    return;
+  }
   if (o.kb) {
     const a = Math.atan2(e.y - o.fy, e.x - o.fx);
     const k = o.kb * e.D.kbRes;
@@ -1490,6 +1499,7 @@ function startNode(b, n, d) {
   bossRef = null; banner = null; subBanner = null;
   streak = { n: 0, t: -10 };
   resetRiftEvents();
+  resetClassState();
   clearInput();
   state = 'play';
   showOverlay(null);
@@ -1649,7 +1659,7 @@ function updateProjectiles(dt) {
         if (dist(p.x, p.y, e.x, e.y - e.r * 0.4) < p.r + e.r) {
           if (p.kind === 'explo') { explode(p); p.life = -1; break; }
           p.hit.push(e);
-          damageEnemy(e, p.dmg, { kb: p.kb, fx: p.x - p.vx, fy: p.y - p.vy });
+          damageEnemy(e, p.dmg, { kb: p.kb, fx: p.x - p.vx, fy: p.y - p.vy, poison: p.poison });
           p.pierce--;
           if (p.pierce < 0) { p.life = -1; break; }
         }
@@ -2060,7 +2070,7 @@ function drawControls() {
     ctx.restore();
   };
 
-  const atkIcon = P.cls === 'iop' ? '⚔' : P.cls === 'cra' ? '➶' : '✦';
+  const atkIcon = ATK_ICON[P.cls] || '⚔';
   btn(L.attack, atkIcon, null, '#ecd18a', 0, true, input.attack);
   for (let i = 0; i < 2; i++) {
     const sk = P.C.skills[i];
@@ -2123,11 +2133,13 @@ function renderRift() {
   for (const e of enemies) if (inView(e.x, e.y, 60)) drawList.push(e);
   for (const c of corpses) if (inView(c.x, c.y, 60)) drawList.push(c);
   if (riftEvent) drawList.push({ kind: 'riftEvent', y: riftEvent.y });
+  for (const m of minions) drawList.push({ kind: 'minion', y: m.kind === 'bomb' ? m.y + 1000 : m.y, m });
   drawList.push(P);
   drawList.sort((a, b) => a.y - b.y);
   for (const o of drawList) {
     if (o === P) { drawGhosts(); drawPlayer(); }
     else if (o.kind === 'riftEvent') drawRiftEvents();
+    else if (o.kind === 'minion') drawMinion(o.m);
     else if (o.kind === 'tree') drawTree(o);
     else if (o.kind === 'rock') drawRock(o);
     else if (o.kind === 'pillar') drawPillar(o);
@@ -2265,6 +2277,7 @@ function update(dt) {
   updateProjectiles(dt);
   updateGlyphs(dt);
   updateUltimates(dt);
+  updateClassKits(dt);
   updateAltarBuff(dt);
   updateHazards(dt);
   updatePickups(dt);
