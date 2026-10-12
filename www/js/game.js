@@ -1777,12 +1777,12 @@ function drawHeart(x, y, r, fill) {
   ctx.strokeStyle = '#3a0a0a'; ctx.lineWidth = 1.5; ctx.stroke();
 }
 
-function text(str, x, y, size, color, align = 'left', weight = 800, stroke = true, family = 'Nunito, "Trebuchet MS", sans-serif') {
+function text(str, x, y, size, color, align = 'left', weight = 800, stroke = true, family = 'Garamond, Georgia, serif') {
   if (HD2D.active && ctx === HD2D.g) { hd2dDeferText([str, x, y, size, color, align, weight, stroke, family]); return; }
   ctx.font = `${weight} ${size}px ${family}`;
   ctx.textAlign = align;
   ctx.textBaseline = 'middle';
-  if (stroke) { ctx.lineWidth = Math.max(2, size / 6); ctx.strokeStyle = 'rgba(20,10,0,0.85)'; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
+  if (stroke) { ctx.lineWidth = Math.max(2, size / 6); ctx.strokeStyle = 'rgba(6,8,18,0.85)'; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
   ctx.fillStyle = color;
   ctx.fillText(str, x, y);
 }
@@ -1800,7 +1800,7 @@ function drawHUD() {
 
   // retrato
   const px = pad + 26 * s, py = pad + 30 * s;
-  circle(px, py, 26 * s, '#3a2a17', '#c9a24a', 3 * s);
+  circle(px, py, 26 * s, '#1f2a4a', '#c9b27a', 3 * s);
   ctx.save();
   ctx.beginPath(); ctx.arc(px, py, 24 * s, 0, Math.PI * 2); ctx.clip();
   const art = heroArt(P.cls);
@@ -1816,13 +1816,13 @@ function drawHUD() {
     drawHero(ctx, P.cls, { x: 0, y: 0, dir: 0.2, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now });
   }
   ctx.restore();
-  roundRect(px - 13 * s, py + 17 * s, 26 * s, 15 * s, 6 * s, '#c9a24a');
-  text(String(S.level), px, py + 25 * s, 12 * s, '#2a1d0e', 'center', 900, false);
+  roundRect(px - 13 * s, py + 17 * s, 26 * s, 15 * s, 6 * s, '#c9b27a');
+  text(String(S.level), px, py + 25 * s, 12 * s, '#151d34', 'center', 900, false);
 
   // PV
   const bx = px + 34 * s, bw = Math.min(190 * s, W * 0.28), bh = 16 * s;
   let by = pad + 8 * s;
-  roundRect(bx, by, bw, bh, bh / 2, 'rgba(0,0,0,0.6)', '#2a1d0e', 2);
+  roundRect(bx, by, bw, bh, bh / 2, 'rgba(0,0,0,0.6)', '#151d34', 2);
   const hpk = Math.max(0, P.hp / P.maxHp);
   if (hpk > 0) roundRect(bx + 2, by + 2, (bw - 4) * hpk, bh - 4, (bh - 4) / 2, hpk < 0.3 ? '#ff1744' : '#e53935');
   if (P.shield > 0) roundRect(bx + 2, by + 2, Math.min(bw - 4, (bw - 4) * (P.shield / P.maxHp)), (bh - 4) / 2, 3, 'rgba(140,210,255,0.85)');
@@ -1856,11 +1856,11 @@ function drawHUD() {
   });
 
   // botones pausa / bolsa
-  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(0,0,0,0.45)', '#c9a24a', 2);
-  ctx.fillStyle = '#f3ead2';
+  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(0,0,0,0.45)', '#c9b27a', 2);
+  ctx.fillStyle = '#efece2';
   ctx.fillRect(L.pause.x - 6 * s, L.pause.y - 7 * s, 4 * s, 14 * s);
   ctx.fillRect(L.pause.x + 2 * s, L.pause.y - 7 * s, 4 * s, 14 * s);
-  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(0,0,0,0.45)', '#c9a24a', 2);
+  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(0,0,0,0.45)', '#c9b27a', 2);
   text('🎒', L.bag.x, L.bag.y + 1, 18 * s, '#fff', 'center', 400, false);
   if (S.points > 0) {
     circle(L.bag.x + L.bag.r * 0.75, L.bag.y - L.bag.r * 0.7, 8 * s, '#e53935');
@@ -1870,16 +1870,16 @@ function drawHUD() {
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
   text(rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
-  const tcol = rift.time > 30 ? '#f3ead2' : '#ff8a80';
+  const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
   text(rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
-  roundRect(rx - pw, ry + 9 * s, pw, 8 * s, 4 * s, 'rgba(0,0,0,0.6)', '#6b5228', 1.5);
+  roundRect(rx - pw, ry + 9 * s, pw, 8 * s, 4 * s, 'rgba(0,0,0,0.6)', '#6f6a5a', 1.5);
   const pk = rift.progress / rift.goal;
   if (pk > 0) roundRect(rx - pw + 1.5, ry + 10.5 * s, (pw - 3) * pk, 5 * s, 3 * s, rift.bossSpawned ? '#ff7043' : '#ffb300');
 
   // minimapa (radar)
   const mr = 30 * s, mx = rx - mr, my = ry + 26 * s + mr;
-  circle(mx, my, mr, 'rgba(20,12,4,0.55)', '#c9a24a', 2);
+  circle(mx, my, mr, 'rgba(10,14,28,0.6)', '#c9b27a', 2);
   ctx.save();
   ctx.beginPath(); ctx.arc(mx, my, mr - 2, 0, Math.PI * 2); ctx.clip();
   const ms = mr / 900;
@@ -1892,14 +1892,14 @@ function drawHUD() {
   if (rift.zaap) { const zx = mx + (rift.zaap.x - P.x) * ms, zy = my + (rift.zaap.y - P.y) * ms; circle(clamp(zx, mx - mr + 5, mx + mr - 5), clamp(zy, my - mr + 5, my + mr - 5), 4 * s, '#4fc3f7', '#fff', 1.5); }
   ctx.restore();
   drawStar(mx, my, 3.5 * s, '#fff');
-  text(S.kamas + ' ámbar', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ffd76a', 'right', 900);
-  text('☠ ' + rift.kills, mx - mr - 8 * s, my + 10 * s, 11 * s, '#f3ead2', 'right', 800);
+  text(S.kamas + ' ámbar', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ecd18a', 'right', 900);
+  text('☠ ' + rift.kills, mx - mr - 8 * s, my + 10 * s, 11 * s, '#efece2', 'right', 800);
 
   // jefe
   if (bossRef && !bossRef.dead) {
     const w = Math.min(W * 0.42, 340 * s), x = W / 2 - w / 2, y = pad + 18 * s;
-    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ffd76a', 'center', 900);
-    roundRect(x, y + 2 * s, w, 12 * s, 6 * s, 'rgba(0,0,0,0.65)', '#c9a24a', 2);
+    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ecd18a', 'center', 900);
+    roundRect(x, y + 2 * s, w, 12 * s, 6 * s, 'rgba(0,0,0,0.65)', '#c9b27a', 2);
     roundRect(x + 2, y + 2 * s + 2, (w - 4) * Math.max(0, bossRef.hp / bossRef.maxHp), 12 * s - 4, 4 * s, '#d84315');
   }
 
@@ -1926,7 +1926,7 @@ function drawBanners() {
       y += 10 * s;
     }
     text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900, true, 'Cinzel, serif');
-    if (banner.sub) text(banner.sub, W / 2, y + 26 * s, 12 * s, '#f3ead2', 'center', 700);
+    if (banner.sub) text(banner.sub, W / 2, y + 26 * s, 12 * s, '#efece2', 'center', 700);
     ctx.restore();
   }
   if (subBanner) {
@@ -1953,7 +1953,7 @@ function drawControls() {
   const btn = (b, label, sub, color, cdk, enabled, held) => {
     ctx.save();
     ctx.globalAlpha = enabled ? 1 : 0.55;
-    circle(b.x, b.y, b.r, held ? 'rgba(255,220,140,0.55)' : 'rgba(30,20,8,0.55)', color, 3);
+    circle(b.x, b.y, b.r, held ? 'rgba(255,220,140,0.55)' : 'rgba(12,16,32,0.6)', color, 3);
     if (cdk > 0) {
       ctx.beginPath();
       ctx.moveTo(b.x, b.y);
@@ -1968,7 +1968,7 @@ function drawControls() {
   };
 
   const atkIcon = P.cls === 'iop' ? '⚔' : P.cls === 'cra' ? '➶' : '✦';
-  btn(L.attack, atkIcon, null, '#ffd76a', 0, true, input.attack);
+  btn(L.attack, atkIcon, null, '#ecd18a', 0, true, input.attack);
   for (let i = 0; i < 2; i++) {
     const sk = P.C.skills[i];
     const cdk = clamp(P.skillCd[i] / sk.cd, 0, 1);
@@ -2002,7 +2002,7 @@ function renderRift() {
   const c0x = Math.max(0, Math.floor(vl / CHUNK)), c1x = Math.min(Math.ceil(WORLD.w / CHUNK) - 1, Math.floor(vr / CHUNK));
   const c0y = Math.max(0, Math.floor(vt / CHUNK)), c1y = Math.min(Math.ceil(WORLD.h / CHUNK) - 1, Math.floor(vb / CHUNK));
   for (let cy = c0y; cy <= c1y; cy++) {
-    for (let cx = c0x; cx <= c1x; cx++) ctx.drawImage(groundChunk(cx, cy), cx * CHUNK - 0.5, cy * CHUNK - 0.5, CHUNK + 1, CHUNK + 1);
+    for (let cx = c0x; cx <= c1x; cx++) { const ov = HD2D.active ? 2 : 0.5; ctx.drawImage(groundChunk(cx, cy), cx * CHUNK - ov, cy * CHUNK - ov, CHUNK + ov * 2, CHUNK + ov * 2); }
   }
   ctx.strokeStyle = 'rgb(' + B.ground[2].map((v) => v * 0.4 | 0).join(',') + ')'; ctx.lineWidth = 24;
   ctx.strokeRect(-12, -12, WORLD.w + 24, WORLD.h + 24);
@@ -3196,7 +3196,7 @@ try {
 } catch (e) { /* entorno web */ }
 
 // Arranque
-if (document.fonts && document.fonts.load) ['900 20px Cinzel', '900 20px Nunito', '800 20px Nunito'].forEach((f) => document.fonts.load(f).catch(() => {}));
+if (document.fonts && document.fonts.load) ['900 20px Cinzel', '800 20px Garamond', '700 20px Garamond'].forEach((f) => document.fonts.load(f).catch(() => {}));
 function onHeroArtLoaded() { if (state === 'menu') buildMenu(); }
 selectedClass = SAVE.last;
 buildMenu();

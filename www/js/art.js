@@ -1062,7 +1062,7 @@ function drawPickup(k) {
     if (icon.complete) ctx.drawImage(icon, -11, -11, 22, 22);
     ctx.restore();
     // etiqueta con el nombre
-    ctx.font = '800 9px Nunito, sans-serif';
+    ctx.font = '800 9px Garamond, Georgia, serif';
     const tw = ctx.measureText(k.item.name).width + 8;
     roundRect(k.x - tw / 2, y - 27, tw, 13, 3, 'rgba(15,10,5,0.75)', R.color, 1);
     ctx.fillStyle = R.color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
