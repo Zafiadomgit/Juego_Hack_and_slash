@@ -2347,10 +2347,12 @@ function groundChunk(cx, cy) {
   g.translate(-cx * CHUNK, -cy * CHUNK);
   const B = curBiome();
   // textura de ruido pintada del bioma (a escala 2:1 para que no se note la repetición)
-  const pat = g.createPattern(biomeGroundTex(B), 'repeat');
-  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(2.2));
+  const tex = biomeGroundTex(B);
+  const pat = g.createPattern(tex, 'repeat');
+  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(tex.patScale || 2.2));
   g.fillStyle = pat;
   g.fillRect(cx * CHUNK, cy * CHUNK, CHUNK, CHUNK);
+  const painted = !!tex.painted;
   let seed = (cx * 73856093) ^ (cy * 19349663);
   const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
   // grandes manchas de color (deterministas en coordenadas de mundo para que no haya cortes entre trozos)
@@ -2358,7 +2360,7 @@ function groundChunk(cx, cy) {
     for (let gy = cy - 1; gy <= cy + 1; gy++) {
       let s2 = (gx * 92821 + gy * 68917 + 7) | 0;
       const r2 = () => { s2 = (s2 * 1103515245 + 12345) & 0x7fffffff; return s2 / 0x7fffffff; };
-      for (let i = 0; i < 4; i++) {
+      for (let i = 0; i < (painted ? 2 : 4); i++) {
         const px = (gx + r2()) * CHUNK, py = (gy + r2()) * CHUNK, pr = 120 + r2() * 200;
         const gr = g.createRadialGradient(px, py, 0, px, py, pr);
         const col = B.patch[i % 2];
@@ -2368,7 +2370,7 @@ function groundChunk(cx, cy) {
       }
     }
   }
-  for (let i = 0; i < 500; i++) {
+  for (let i = 0; i < (painted ? 0 : 500); i++) {
     g.fillStyle = rnd() < 0.5 ? 'rgba(0,0,0,0.12)' : `rgba(${B.grain.join(',')},0.08)`;
     const sz = 1 + rnd() * 2;
     g.fillRect(cx * CHUNK + rnd() * CHUNK, cy * CHUNK + rnd() * CHUNK, sz, sz);
@@ -2378,6 +2380,7 @@ function groundChunk(cx, cy) {
   try {
     for (const d of decos) {
       if (d.x < cx * CHUNK - 40 || d.x > (cx + 1) * CHUNK + 40 || d.y < cy * CHUNK - 40 || d.y > (cy + 1) * CHUNK + 40) continue;
+      if (painted && (d.kind === 'blotch' || d.kind === 'pebble')) continue; // la textura pintada ya los trae
       if (drawBiomeDeco(d)) continue;
       if (d.kind === 'fern') drawFern(d);
       else if (d.kind === 'blotch') {

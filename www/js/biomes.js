@@ -52,9 +52,32 @@ function curBiome() { return rift ? rift.biome : BIOMES[0]; }
 
 // ---------- Textura de terreno: ruido de valor en mosaico (sin costuras) ----------
 const BIOME_TEX = new Map();
+// Texturas de suelo pintadas (pixel art HD-2D, 256 px, ya repetibles). Si existe la del bioma se usa en lugar
+// del ruido procedural. GROUND_TILE = unidades de mundo que ocupa una repetición de la textura.
+const GROUND_TILE = 420;
+const GROUND_IMG = {};
+['ceniza', 'glaciar', 'desierto', 'abismo', 'plaza'].forEach((id) => {
+  const img = new Image();
+  img.onload = () => {
+    GROUND_IMG[id] = img;
+    BIOME_TEX.delete(id);
+    if (typeof groundChunks !== 'undefined') groundChunks.clear();
+    if (typeof VILLAGE !== 'undefined') VILLAGE.ground = null;
+  };
+  img.src = 'img/ground/' + id + '.png';
+});
 function biomeGroundTex(b) {
   let c = BIOME_TEX.get(b.id);
   if (c) return c;
+  if (GROUND_IMG[b.id]) {
+    const img = GROUND_IMG[b.id];
+    c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    c.getContext('2d').drawImage(img, 0, 0);
+    c.painted = true; c.patScale = GROUND_TILE / img.width;
+    BIOME_TEX.set(b.id, c);
+    return c;
+  }
   const N = 256;
   c = document.createElement('canvas');
   c.width = c.height = N;

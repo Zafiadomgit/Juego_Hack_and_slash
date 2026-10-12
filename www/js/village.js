@@ -98,7 +98,12 @@ function villageGround() {
   g.beginPath(); g.ellipse(0, -40, 270, 175, 0, 0, TAU); g.closePath();
   g.fillStyle = '#4a4238'; g.fill();
   g.clip();
-  for (let y = -230; y < 150; y += 16) {
+  if (GROUND_IMG.plaza) {
+    // adoquines pintados (pixel art)
+    const pat = g.createPattern(GROUND_IMG.plaza, 'repeat');
+    if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(GROUND_TILE / GROUND_IMG.plaza.width));
+    g.fillStyle = pat; g.fillRect(-300, -240, 600, 400);
+  } else for (let y = -230; y < 150; y += 16) {
     const off = ((y / 16) & 1) * 13;
     for (let x = -300 + off; x < 300; x += 26) {
       const v = r();
