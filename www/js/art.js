@@ -1119,6 +1119,7 @@ function treeShape(hue, sway) {
 }
 
 function drawTree(o) {
+  if (drawPropSprite(o, 'tree')) return;
   const s = o.s;
   shadow(o.x, o.y + 2, 24 * s);
   const fi = Math.floor((((now * 0.19 + o.x * 0.001) % 1) + 1) % 1 * 8);
@@ -1142,6 +1143,7 @@ function drawTree(o) {
 }
 
 function drawRock(o) {
+  if (drawPropSprite(o, 'rock')) return;
   shadow(o.x, o.y + 2, o.r * 1.1);
   const r = Math.round(o.r);
   ctx.save();
@@ -1507,6 +1509,7 @@ function drawLavaPool(pl) {
 }
 
 function drawPillar(o) {
+  if (drawPropSprite(o, 'pillar')) return;
   shadow(o.x, o.y + 2, 20 * o.s);
   const s = Math.round(o.s * 20) / 20;
   ctx.save();
@@ -1539,8 +1542,9 @@ function drawPillar(o) {
   glow(o.x - 2 * o.s, o.y + (tops[o.v] + 26) * o.s, 12, '120,210,255', 0.35 + Math.sin(now * 2 + o.x) * 0.15);
 }
 
-const CRYSTAL_COLS = [['#5fc8ff', '#c8f0ff', '#1e6a9a', '95,200,255'], ['#c07cf0', '#f0d8ff', '#5a2a8a', '192,124,240'], ['#4fe0a8', '#d0ffe8', '#1a7a5a', '80,224,168'], ['#ffb84a', '#fff0c8', '#9a5a10', '255,184,74']];
+const CRYSTAL_COLS = [['#5fc8ff', '#c8f0ff', '#1e6a9a', '95,200,255'], ['#c07cf0', '#f0d8ff', '#5a2a8a', '192,124,240'], ['#4fe0a8', '#d0ffe8', '#1a7a5a', '80,224,168'], ['#ffb84a', '#fff0c8', '#9a5a10', '255,184,74'], ['#ff5a4a', '#ffd0c8', '#8a1a1a', '255,90,74']];
 function drawCrystal(o) {
+  if (drawPropSprite(o, 'crystal')) return;
   const [c, hi, dk, rgb] = CRYSTAL_COLS[o.hue];
   const s = Math.round(o.s * 20) / 20;
   const pulse = 0.75 + Math.sin(now * 2 + o.ph) * 0.25;
@@ -1567,6 +1571,7 @@ function drawCrystal(o) {
 }
 
 function drawBrazier(o) {
+  if (drawPropSprite(o, 'brazier')) return;
   shadow(o.x, o.y + 2, 14);
   ctx.save();
   ctx.translate(o.x, o.y);

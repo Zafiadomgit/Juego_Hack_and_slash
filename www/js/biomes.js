@@ -41,7 +41,7 @@ const BIOMES = [
     id: 'abismo', mfilter: 'hue-rotate(-22deg) saturate(1.3) brightness(0.9)', name: 'Abismo Volcánico',
     ground: [[34, 28, 28], [46, 38, 36], [20, 16, 16]], grain: [120, 90, 80], patch: ['rgba(120,30,10,0.3)', 'rgba(0,0,0,0.35)'],
     deco: { crackline: 26, obsidian: 14, pebble: 14, bones: 6, blotch: 14 }, decoCol: ['#3a2a28', '#2a1a18', '#5a3a30'],
-    tree: 'dead', props: { pillar: 16, crystal: 8, brazier: 22 }, pool: 'lava', pools: 26, crystalHue: 1,
+    tree: 'dead', props: { pillar: 16, crystal: 8, brazier: 22 }, pool: 'lava', pools: 26, crystalHue: 4,
     ambient: 0.6, shade: '96,40,60', fog: '170,60,40', mote: 'ember', tint: 'rgba(255,60,20,0.14)',
     weights: { tofu: 4, bouftou: 2, arakne: 2, pissenlit: 2, craqueleur: 4 }, boss: 'hechicero',
   },
@@ -56,7 +56,7 @@ const BIOME_TEX = new Map();
 // del ruido procedural. GROUND_TILE = unidades de mundo que ocupa una repetición de la textura.
 const GROUND_TILE = 420;
 const GROUND_IMG = {};
-['ceniza', 'glaciar', 'desierto', 'abismo', 'plaza'].forEach((id) => {
+['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza'].forEach((id) => {
   const img = new Image();
   img.onload = () => {
     GROUND_IMG[id] = img;

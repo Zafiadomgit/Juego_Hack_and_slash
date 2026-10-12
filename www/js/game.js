@@ -2381,6 +2381,7 @@ function groundChunk(cx, cy) {
     for (const d of decos) {
       if (d.x < cx * CHUNK - 40 || d.x > (cx + 1) * CHUNK + 40 || d.y < cy * CHUNK - 40 || d.y > (cy + 1) * CHUNK + 40) continue;
       if (painted && (d.kind === 'blotch' || d.kind === 'pebble')) continue; // la textura pintada ya los trae
+      if (drawPropDeco(d)) continue;
       if (drawBiomeDeco(d)) continue;
       if (d.kind === 'fern') drawFern(d);
       else if (d.kind === 'blotch') {

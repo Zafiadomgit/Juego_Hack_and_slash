@@ -419,8 +419,13 @@ const V_ART = {
 };
 
 function drawVillageProp(o) {
-  if (o.kind === 'tree') { drawTree(o); return; }
   if (o.kind === 'npc') { drawNpc(o.npc); return; }
+  if (drawVillaSprite(o)) {
+    if (o.kind === 'lamp') glow(o.x, o.y - 62, 34, '255,200,110', 0.55 + Math.sin(now * 5 + o.x) * 0.05);
+    if (o.kind === 'cauldron') glow(o.x, o.y - 30, 40, '120,255,100', 0.45 + Math.sin(now * 3) * 0.1);
+    return;
+  }
+  if (o.kind === 'tree') { drawTree(o); return; }
   const A = V_ART[o.kind](o);
   if (o.kind !== 'portalbase' && o.kind !== 'fence') shadow(o.x, o.y + 1, A[1] * 0.35);
   ctx.save();
@@ -456,9 +461,11 @@ function artBoard(g) {
 function drawNpc(n) {
   if (n.id === 'board') {
     shadow(n.x, n.y + 1, 30);
-    ctx.save(); ctx.translate(n.x, n.y);
-    sprite('vboard', 80, 92, 40, 88, artBoard);
-    ctx.restore();
+    if (!drawVillaSprite({ kind: 'board', x: n.x, y: n.y })) {
+      ctx.save(); ctx.translate(n.x, n.y);
+      sprite('vboard', 80, 92, 40, 88, artBoard);
+      ctx.restore();
+    }
     const bob = Math.sin(now * 3) * 3, near = vNear === n, ready = typeof dailyReady === 'function' ? dailyReady() : 0;
     text(n.name, n.x, n.y - 98 + bob, near ? 13 : 11, n.color, 'center', 800);
     text(n.title, n.x, n.y - 86 + bob, 9, '#efece2', 'center', 700);
@@ -587,7 +594,7 @@ function renderVillage() {
   const toS = (x, y) => ({ x: (x - cx) * hz + W / 2, y: (y - cy) * hz + H / 2 });
   const lights = [];
   if (S) { const q = toS(vHero.x, vHero.y - 20); lights.push({ x: q.x, y: q.y, r: 200 * hz, a: 0.55, rgb: '255,238,212' }); }
-  for (const l of VILLAGE.lamps) { const q = toS(l.x + 11, l.y + 5); lights.push({ x: q.x, y: q.y, r: 175 * hz, a: 0.75, rgb: '255,165,85', haze: 0.35 }); }
+  for (const l of VILLAGE.lamps) { const q = toS(l.x + (PROP_IMG.villa ? 0 : 11), l.y + 5); lights.push({ x: q.x, y: q.y, r: 175 * hz, a: 0.75, rgb: '255,165,85', haze: 0.35 }); }
   for (const w of VILLAGE.windows) { const q = toS(w.x + 8, w.y + 20); lights.push({ x: q.x, y: q.y, r: 95 * hz, a: 0.75, rgb: '255,190,110', haze: 0.2 }); }
   { const q = toS(PORTAL.x, PORTAL.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
   { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
