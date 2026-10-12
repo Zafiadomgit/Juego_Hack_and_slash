@@ -207,6 +207,8 @@ function migrateSlot(s) {
   s.up = Object.assign({ bolsa: 0, cinto: 0, afilador: 0, vigor: 0 }, s.up || {});
   s.boosts = Object.assign({ furia: 0, piedra: 0, sabio: 0, fortuna: 0 }, s.boosts || {});
   if (!s.shop) s.shop = null;
+  s.seals = s.seals || 0; s.trans = s.trans || 0;
+  s.forge = Object.assign({}, s.forge || {});
   migrateMap(s);
   return s;
 }
@@ -466,7 +468,8 @@ function totalStats() {
   for (const slot of SLOTS) {
     const it = S.equip[slot];
     if (!it) continue;
-    for (const [k, v] of Object.entries(it.stats)) t[k] = (t[k] || 0) + v;
+    const fm = forgeMul(slot);
+    for (const [k, v] of Object.entries(it.stats)) t[k] = (t[k] || 0) + Math.round(v * fm);
   }
   return t;
 }
@@ -477,11 +480,11 @@ function derived() {
   const has = (d) => S.dofus.includes(d);
   const sb = activeSetBonus();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0)) * (1 + (sb.hpP || 0))),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (P && P.altarT > 0 ? 1.5 : 1),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: 1 + t.int * 0.015,
-    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0)),
+    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (transRank() >= 7 ? 0.05 : 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
@@ -517,7 +520,7 @@ function createPlayer() {
     walkT: 0, moving: false, hurtFlash: 0,
     swingT: 0, swingSide: 1, shotT: 0,
     slowT: 0, sq: 0, lean: 0, recoil: 0, stepT: 0, ghostT: 0,
-    ult: 0, spinT: 0, spinTick: 0, altarT: 0,
+    ult: transRank() >= 5 ? 50 : 0, spinT: 0, spinTick: 0, altarT: 0,
   };
   recalc();
   P.hp = P.maxHp;
@@ -1598,6 +1601,10 @@ function guardianDefeated(e) {
   obstacles = obstacles.filter((o) => !o.gone);
   later(1.2, () => { rift.zaap = { x: zx, y: zy }; poof(zx, zy - 30); SFX.play('zaap'); });
   MUSIC.play('victory', { loop: false, fade: 0.3, then: rift.biome.id });
+  // Sellos de Gesta por primeras victorias importantes
+  const prevC = mapProg().c[nodeKey(rift.b, rift.n)] || 0;
+  if (rift.isSuper && !prevC) later(2, () => gainSeals(5, 'primer Súper Jefe'));
+  else if (!rift.isSuper && rift.d === 2 && prevC < 3) later(2, () => gainSeals(2, 'primera victoria en Difícil'));
   markCleared(rift.b, rift.n, rift.d);
   S.maxFaille = Math.max(S.maxFaille, highestLevel());
   autoAdvance();
@@ -2451,9 +2458,9 @@ function buildHub() {
   const C = CLASSES[S.cls];
   const nx = xpNext(S.level);
   $('hubChar').innerHTML = `
-    <div class="hubName">${C.name} <span>nivel ${S.level}</span></div>
+    <div class="hubName">${C.name} <span>nivel ${S.level}${transRank() ? ` · <b style="color:#ffd76a">✦${transRank()} ${TRANS_TITLES[transRank()]}</b>` : ''}</span></div>
     <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
-    <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
+    <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>${SEAL_SVG} ${fmtNum(seals())}</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
     ${Object.keys(ELIXIRS).some((k) => S.boosts[k] > 0) ? `<div class="hubBoosts">Elixires para la próxima Grieta: ${Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0).map((k) => `<span style="color:${ELIXIRS[k].hi}">${ELIXIRS[k].name.replace('Elixir ', '')}${S.boosts[k] > 1 ? ' ×' + S.boosts[k] : ''}</span>`).join(', ')}</div>` : ''}
     <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}"></span>`).join('')}</div>`;
   const sel = mapSel();
@@ -3183,7 +3190,13 @@ function shopAction(act) {
 
 $('btnShopClose').addEventListener('click', closeShop);
 $('btnQuestClose').addEventListener('click', closeQuests);
-$('questList').addEventListener('click', (ev) => { const b = ev.target.closest('button[data-q]'); if (b && !b.disabled) claimQuest(+b.dataset.q); });
+$('questList').addEventListener('click', (ev) => {
+  const b = ev.target.closest('button[data-q]');
+  if (b && !b.disabled) { claimQuest(b.dataset.q === 'bonus' ? 'bonus' : +b.dataset.q); return; }
+  const g = ev.target.closest('button[data-g]');
+  if (g && !g.disabled) gestaAction(g.dataset.g);
+});
+$('questTabs').addEventListener('click', (ev) => { const b = ev.target.closest('button[data-tab]'); if (b) { questTab = b.dataset.tab; SFX.play('click'); buildQuests(); } });
 $('btnRestock').addEventListener('click', () => {
   if (!pay(restockPrice())) return;
   genStock();

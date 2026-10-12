@@ -13,7 +13,7 @@ let vNear = null, vNearShown = undefined, vCam = { x: 0, y: 0 };
 const NPCS = [
   { id: 'merchant', name: 'Brunilda', title: 'Mercader', x: -212, y: 132, prompt: '💬 Hablar con Brunilda · Equipo', color: '#ffcf7a' },
   { id: 'alchemist', name: 'Maese Ivo', title: 'Alquimista', x: 214, y: 132, prompt: '💬 Hablar con Maese Ivo · Elixires y mejoras', color: '#d9a8ff' },
-  { id: 'board', name: 'Tablón', title: 'Misiones diarias', x: -86, y: 226, prompt: '📜 Leer el tablón · Misiones diarias', color: '#ecd18a' },
+  { id: 'board', name: 'Tablón', title: 'Misiones y Gesta', x: -86, y: 226, prompt: '📜 Tablón · Misiones, Trascendencia y Forja', color: '#ecd18a' },
 ];
 const PORTAL = { x: 0, y: -80 };
 
