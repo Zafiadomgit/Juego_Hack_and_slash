@@ -23,19 +23,17 @@
   </div>
 
   <!-- Villa Candela (hub) -->
-  <div id="hub" class="overlay side">
-    <div class="panel hubpanel">
-      <h2 class="gold">Villa Candela</h2>
-      <div id="hubChar"></div>
-      <button id="btnMap" class="mapsel"><span class="ms-ico">🗺</span><span id="fLabel"></span><span class="ms-go">Mapa ›</span></button>
-      <button id="btnZaap" class="btn big">🌀 Cruzar el Portal Rúnico</button>
-      <div class="row2">
-        <button id="btnInv" class="btn">🎒 Personaje</button>
-        <button id="btnShop" class="btn">🛒 Mercader</button>
-      </div>
-      <button id="btnStyleHub" class="btn ghost">🎨 Estilo: HD-2D</button>
-      <button id="btnChange" class="btn ghost">Cambiar de personaje</button>
+  <div id="hub" class="overlay hubhud">
+    <div id="hubChar" class="hub-card"></div>
+    <div class="hub-btns">
+      <button id="btnInv" class="hbtn">🎒<span>Personaje</span></button>
+      <button id="btnMapIco" class="hbtn">🗺<span>Mapa</span></button>
+      <button id="btnStyleHub" class="hbtn">🎨<span>HD-2D</span></button>
+      <button id="btnChange" class="hbtn">⇄<span>Héroes</span></button>
     </div>
+    <button id="btnMap" class="mapsel hub-sel"><span class="ms-ico">🌀</span><span id="fLabel"></span><span class="ms-go">Cambiar ›</span></button>
+    <button id="hubPrompt" class="hub-prompt"></button>
+    <div id="hubHint" class="hub-hint">Muévete con el joystick o tocando el suelo · Habla con los vecinos · Entra en el Portal para ir a la Grieta</div>
   </div>
 
   <!-- Ficha de personaje (equipo, características y bolsa) -->
@@ -72,7 +70,7 @@
     <div class="sheet">
       <header class="sh-head">
         <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 L6 3 L18 3 L20 9 Z" fill="#b8322a" stroke="#2a1a0c" stroke-width="1.5"/><path d="M5 9 L5 20 L19 20 L19 9" fill="#6b4528" stroke="#2a1a0c" stroke-width="1.5"/><rect x="10" y="13" width="4" height="7" fill="#2a1a0c"/></svg>
-        <span class="sh-name">Mercader</span>
+        <span id="shopTitle" class="sh-name">Mercader</span>
         <div id="shopTabs" class="sh-tabs shop-tabs"></div>
         <span id="shopAmber" class="sh-amber" style="margin-left:auto"></span>
         <button id="btnShopClose" class="sh-close" aria-label="Cerrar">✕</button>
@@ -141,6 +139,7 @@
   <script src="js/art.js"></script>
   <script src="js/biomes.js"></script>
   <script src="js/progress.js"></script>
+  <script src="js/village.js"></script>
   <script src="js/game.js"></script>
 </body>
 </html>

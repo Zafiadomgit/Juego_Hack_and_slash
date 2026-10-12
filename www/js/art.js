@@ -1269,41 +1269,6 @@ function drawPortal(x, y, t) {
   ctx.restore();
 }
 
-function drawHouse(h) {
-  shadow(h.x, h.y + 4, h.w * 0.7);
-  ctx.save();
-  ctx.translate(h.x, h.y);
-  ctx.lineWidth = 2; ctx.strokeStyle = OUTLINE;
-  const w = h.w, ht = h.h;
-  ctx.fillStyle = '#f1e3c6';
-  ctx.fillRect(-w / 2, -ht, w, ht); ctx.strokeRect(-w / 2, -ht, w, ht);
-  // vigas
-  ctx.strokeStyle = '#6d4c41'; ctx.lineWidth = 3;
-  ctx.beginPath(); ctx.moveTo(-w / 2, -ht * 0.55); ctx.lineTo(w / 2, -ht * 0.55); ctx.stroke();
-  ctx.lineWidth = 2; ctx.strokeStyle = OUTLINE;
-  // puerta y ventana
-  ctx.fillStyle = '#6d4c41';
-  ctx.beginPath(); ctx.roundRect(-9, -26, 18, 26, [9, 9, 0, 0]); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#ffe082';
-  ctx.fillRect(w / 2 - 24, -ht + 12, 14, 12); ctx.strokeRect(w / 2 - 24, -ht + 12, 14, 12);
-  // tejado
-  ctx.fillStyle = h.roof;
-  ctx.beginPath();
-  ctx.moveTo(-w / 2 - 12, -ht + 4);
-  ctx.lineTo(0, -ht - h.w * 0.55);
-  ctx.lineTo(w / 2 + 12, -ht + 4);
-  ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.strokeStyle = 'rgba(0,0,0,0.2)';
-  for (let i = 1; i < 4; i++) {
-    const k = i / 4;
-    ctx.beginPath();
-    ctx.moveTo(lerp(-w / 2 - 12, 0, k), lerp(-ht + 4, -ht - h.w * 0.55, k));
-    ctx.lineTo(lerp(w / 2 + 12, 0, k), lerp(-ht + 4, -ht - h.w * 0.55, k));
-    ctx.stroke();
-  }
-  ctx.restore();
-}
-
 function drawFern(d) {
   ctx.save();
   ctx.translate(d.x, d.y);

@@ -194,6 +194,18 @@ function treeArt(kind, hue, sway) {
     }
     g.strokeStyle = '#ff8a3d'; g.lineWidth = 1.2;
     g.beginPath(); g.moveTo(1, -12); g.lineTo(-1, -20); g.lineTo(2, -26); g.stroke();
+  } else if (kind === 'oak') {
+    // roble frondoso del pueblo: copa de muchas masas con luz arriba a la izquierda
+    g.fillStyle = '#3a2618'; g.beginPath(); g.moveTo(-9, 0); g.quadraticCurveTo(-5, -20, -6, -40); g.lineTo(6, -40); g.quadraticCurveTo(5, -20, 10, 0); g.closePath(); g.fill();
+    g.fillStyle = '#5a3a24'; g.fillRect(-4, -38, 4, 36);
+    g.fillStyle = '#2a1a10'; g.fillRect(-12, -3, 7, 3); g.fillRect(6, -3, 8, 3);
+    const greens = hue ? ['#1f3f22', '#2d5a2c', '#3f7a36', '#62a046'] : ['#223a1a', '#33562a', '#4a7a34', '#78a848'];
+    const blobs = [[-26, -52, 20], [24, -54, 20], [0, -68, 26], [-16, -78, 18], [16, -80, 18], [0, -50, 22], [-30, -66, 14], [30, -68, 14]];
+    for (const [x, y, r] of blobs) { g.fillStyle = greens[0]; g.beginPath(); g.arc(x + sway * 0.4, y + 3, r, 0, TAU); g.fill(); }
+    for (const [x, y, r] of blobs) { g.fillStyle = greens[1]; g.beginPath(); g.arc(x + sway * 0.5, y, r - 2, 0, TAU); g.fill(); }
+    for (const [x, y, r] of blobs) { g.fillStyle = greens[2]; g.beginPath(); g.arc(x - r * 0.25 + sway * 0.6, y - r * 0.3, r * 0.62, 0, TAU); g.fill(); }
+    g.fillStyle = greens[3];
+    for (const [x, y, r] of blobs) { g.beginPath(); g.arc(x - r * 0.4 + sway * 0.6, y - r * 0.5, r * 0.28, 0, TAU); g.fill(); }
   } else if (kind === 'willow') {
     g.fillStyle = '#2a2018'; g.beginPath(); g.moveTo(-6, 0); g.quadraticCurveTo(-2, -26, -3, -44); g.lineTo(5, -44); g.quadraticCurveTo(3, -24, 7, 0); g.closePath(); g.fill();
     const greens = ['#1f3a28', '#2c4f34', '#3d6a40'];

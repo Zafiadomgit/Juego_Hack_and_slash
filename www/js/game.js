@@ -240,42 +240,6 @@ function genRift() {
   for (let i = 0; i < nm; i++) motes.push({ x: rand(0, 1), y: rand(0, 1), s: rand(1, 2.5), v: rand(0.004, 0.015), p: rand(0, 6) });
 }
 
-// Hub: Villa Candela
-const HUB = { houses: [], stones: [], trees: [], lamps: [] };
-function genHub() {
-  HUB.houses = [
-    { x: -270, y: -120, w: 90, h: 64, roof: '#c62828' },
-    { x: 260, y: -150, w: 100, h: 70, roof: '#6a1b9a' },
-    { x: -420, y: 90, w: 80, h: 58, roof: '#1565c0' },
-    { x: 430, y: 60, w: 86, h: 60, roof: '#c62828' },
-  ];
-  HUB.stones = [];
-  for (let i = 0; i < 260; i++) {
-    const a = rand(0, Math.PI * 2), r = Math.sqrt(Math.random());
-    HUB.stones.push({ x: Math.cos(a) * r * 300, y: Math.sin(a) * r * 170 + 10, w: rand(14, 26), h: rand(8, 14), c: pick(['#c8a878', '#bb9a6a', '#d2b48c', '#b08d5e']) });
-  }
-  HUB.trees = [];
-  for (let i = 0; i < 26; i++) {
-    const a = rand(0, Math.PI * 2);
-    HUB.trees.push({ kind: 'tree', x: Math.cos(a) * rand(560, 900), y: Math.sin(a) * rand(330, 600), r: 22, s: rand(0.9, 1.3), hue: randi(0, 2) });
-  }
-}
-genHub();
-
-function makePattern(base, alt, line) {
-  const c = document.createElement('canvas');
-  c.width = 128; c.height = 64;
-  const g = c.getContext('2d');
-  g.fillStyle = base; g.fillRect(0, 0, 128, 64);
-  g.fillStyle = alt;
-  g.beginPath(); g.moveTo(64, 0); g.lineTo(128, 32); g.lineTo(64, 64); g.lineTo(0, 32); g.closePath(); g.fill();
-  g.strokeStyle = line; g.lineWidth = 1.5;
-  g.beginPath(); g.moveTo(0, 32); g.lineTo(64, 0); g.lineTo(128, 32); g.lineTo(64, 64); g.closePath(); g.stroke();
-  const pat = ctx.createPattern(c, 'repeat');
-  pat.src = c;
-  return pat;
-}
-
 // ============================================================
 // Entrada (táctil + teclado)
 // ============================================================
@@ -320,6 +284,13 @@ function clearInput() {
 canvas.addEventListener('pointerdown', (ev) => {
   ev.preventDefault();
   SFX.init();
+  if (state === 'hub' && scene === 'hub') {
+    // pueblo: joystick a la izquierda; un toque sin arrastrar mueve al héroe (o habla con quien toques)
+    const x = ev.clientX, y = ev.clientY;
+    input.touches.set(ev.pointerId, { tap: true, x0: x, y0: y });
+    if (x < W * 0.45 && !input.joy) input.joy = { id: ev.pointerId, ox: x, oy: y, x, y };
+    return;
+  }
   if (state !== 'play') return;
   const x = ev.clientX, y = ev.clientY;
   const b = hitButton(x, y);
@@ -357,6 +328,12 @@ canvas.addEventListener('pointermove', (ev) => {
 
 function releasePointer(ev) {
   const b = input.touches.get(ev.pointerId);
+  if (b && b.tap) {
+    input.touches.delete(ev.pointerId);
+    if (input.joy && input.joy.id === ev.pointerId) { input.joy = null; input.mx = 0; input.my = 0; }
+    if (state === 'hub' && Math.hypot(ev.clientX - b.x0, ev.clientY - b.y0) < 12) villageTap(ev.clientX, ev.clientY);
+    return;
+  }
   input.touches.delete(ev.pointerId);
   if (b === 'joy' || (input.joy && input.joy.id === ev.pointerId)) {
     input.joy = null; input.mx = 0; input.my = 0;
@@ -382,6 +359,7 @@ window.addEventListener('keydown', (e) => {
   } else if (state === 'pause' && (k === 'escape' || k === 'p')) resumeGame();
   else if (state === 'inv' && (k === 'escape' || k === 'b' || k === 'c')) closeInventory();
   else if (state === 'shop' && k === 'escape') closeShop();
+  else if (state === 'hub' && (k === 'e' || k === 'enter')) villageInteract(vNear);
 });
 window.addEventListener('keyup', (e) => input.keys.delete(e.key.toLowerCase()));
 
@@ -2137,49 +2115,6 @@ function renderRift() {
 
 // césped pintado de Villa Candela (ruido, sin rombos)
 const HUB_GROUND = { id: 'hub', ground: [[86, 118, 56], [104, 138, 66], [62, 92, 44]], grain: [170, 200, 120] };
-let hubGround = null;
-function renderHub() {
-  const hz = zoom * 0.8;
-  const offX = W > H * 1.2 ? (W * 0.2) / hz : 0;
-  const cx = offX, cy = -30;
-  ctx.save();
-  ctx.translate(W / 2, H / 2);
-  ctx.scale(hz, hz);
-  ctx.translate(-cx, -cy);
-  const vw = W / hz / 2 + 50, vh = H / hz / 2 + 50;
-  if (!hubGround) {
-    hubGround = ctx.createPattern(biomeGroundTex(HUB_GROUND), 'repeat');
-    if (hubGround.setTransform) hubGround.setTransform(new DOMMatrix().scale(2.4));
-  }
-  ctx.fillStyle = hubGround;
-  ctx.fillRect(cx - vw, cy - vh, vw * 2, vh * 2);
-  // plaza empedrada
-  ellipse(0, 10, 315, 182, '#a88a5c');
-  for (const st of HUB.stones) {
-    ctx.fillStyle = st.c;
-    ctx.beginPath(); ctx.roundRect(st.x - st.w / 2, st.y - st.h / 2, st.w, st.h, 3); ctx.fill();
-  }
-  const list = [...HUB.houses.map((h) => ({ y: h.y, f: () => drawHouse(h) })), ...HUB.trees.map((t) => ({ y: t.y, f: () => drawTree(t) }))];
-  list.push({ y: -20, f: () => drawPortal(0, -20, now) });
-  const hero = { y: 70, f: () => { shadow(-10, 70, 13); drawHero(ctx, S ? S.cls : selectedClass || 'iop', { x: -10, y: 70, dir: -0.6, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now }); } };
-  if (S || selectedClass) list.push(hero);
-  list.sort((a, b) => a.y - b.y);
-  for (const o of list) o.f();
-  // jabalíes paseando por Villa Candela
-  for (let i = 0; i < 3; i++) {
-    const t = now * 0.3 + i * 2.1;
-    const e = { type: 'bouftou', x: Math.cos(t) * (420 + i * 40), y: 210 + Math.sin(t * 1.3) * 40 + i * 20, r: 13, t: now + i, state: 'move', face: -Math.sin(t) >= 0 ? 1 : -1, z: 0, flash: 0 };
-    shadow(e.x, e.y + 1, e.r);
-    drawMonsterBody(e);
-  }
-  ctx.restore();
-  hd2dEndWorld(0.18);
-  const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.max(W, H) * 0.8);
-  g.addColorStop(0, 'rgba(0,0,0,0)');
-  g.addColorStop(1, 'rgba(0,0,0,0.45)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-}
-
 function render() {
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
   const bg = scene === 'rift' && rift ? 'rgb(' + rift.biome.ground[2].join(',') + ')' : '#3d6b25';
@@ -2188,7 +2123,7 @@ function render() {
   // HD-2D: el mundo va a un búfer pixelado; luces, interfaz y textos se pintan nítidos encima
   if (hd2dBegin()) { ctx.fillStyle = bg; ctx.fillRect(0, 0, W, H); }
   if (scene === 'rift' && P && rift) renderRift();
-  else renderHub();
+  else renderVillage();
   if (HD2D.active) hd2dEndWorld();
   hd2dFlushText();
 }
@@ -2225,7 +2160,7 @@ function frame(t) {
   if (state === 'play') {
     if (hitStopT > 0) hitStopT -= raw;
     else update(raw);
-  }
+  } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
   shakeMag = Math.max(0, shakeMag - raw * 40);
   zoomPunch *= Math.exp(-7 * raw);
   render();
@@ -2381,6 +2316,8 @@ function goHub() {
   rift = null; bossRef = null;
   enemies = []; projectiles = []; pickups = []; glyphs = []; hazards = []; corpses = []; ghosts = [];
   createPlayer();
+  villageReset();
+  clearInput();
   persist();
   buildHub();
   showOverlay('hub');
@@ -2400,7 +2337,8 @@ function buildHub() {
   $('fLabel').innerHTML = (sel.n === 'S' ? `☠ ${SUPER_BOSSES[fb.id].name}` : `Grieta ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>`) +
     `<small>${fb.name} · Recomendado nivel ${rec}</small>` +
     (S.level + 2 < rec ? `<small class="warn">⚠ Tu nivel (${S.level}) es bajo para esta Grieta</small>` : '');
-  $('btnInv').innerHTML = '🎒 Personaje' + (S.points > 0 ? ` <span class="badge">${S.points}</span>` : '');
+  $('btnInv').innerHTML = '🎒<span>Personaje</span>' + (S.points > 0 ? `<i class="badge">${S.points}</i>` : '');
+  updateHubPrompt();
 }
 
 $('btnStart').addEventListener('click', () => {
@@ -2412,7 +2350,19 @@ $('btnStart').addEventListener('click', () => {
 });
 $('btnMap').addEventListener('click', () => openMap());
 $('btnMapClose').addEventListener('click', () => closeMap());
-$('btnZaap').addEventListener('click', () => { const s2 = mapSel(); startNode(s2.b, s2.n, s2.d); });
+$('btnMapIco').addEventListener('click', () => openMap());
+$('hubPrompt').addEventListener('click', () => villageInteract(vNear));
+// Botón contextual de la villa: hablar con un vecino o cruzar el Portal
+function updateHubPrompt() {
+  const b = $('hubPrompt');
+  if (!b || !S) return;
+  if (!vNear) { b.classList.remove('show'); return; }
+  if (vNear === 'portal') {
+    const s2 = mapSel(), DF = DIFFS[s2.n === 'S' ? 2 : s2.d];
+    b.innerHTML = s2.n === 'S' ? `☠ Desafiar a ${SUPER_BOSSES[BIOMES[s2.b].id].name.split(',')[0]}` : `🌀 Entrar · Grieta ${s2.n} <span style="color:${DF.color}">${DF.name}</span>`;
+  } else b.textContent = vNear.prompt;
+  b.classList.add('show');
+}
 
 // ---------- Mapa de Grietas ----------
 const MAP_POS = [[9, 72], [21, 40], [33, 68], [45, 34], [57, 66], [68, 34], [79, 64], [91, 38]];
@@ -2583,7 +2533,6 @@ $('mapInfo').addEventListener('click', (ev) => {
   if (ev.target.closest('#btnMapGo')) { const s2 = mapSel(); persist(); startNode(s2.b, s2.n, s2.d); }
 });
 $('btnInv').addEventListener('click', () => openInventory('hub'));
-$('btnShop').addEventListener('click', () => openShop());
 $('btnChange').addEventListener('click', () => { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); });
 
 // ---------- Inventario / características ----------
@@ -2942,7 +2891,13 @@ function showToast(id, msg, good = true) {
 
 // ---------- Mercader ----------
 let shopTab = 'gear';
-const SHOP_TABS = [['gear', 'Equipo'], ['elixir', 'Elixires'], ['upgrade', 'Mejoras']];
+// Cada vecino tiene su tienda: Brunilda vende equipo; Maese Ivo, elixires y mejoras
+const SHOPS = {
+  merchant: { title: 'Brunilda · Mercader', tabs: [['gear', 'Equipo']] },
+  alchemist: { title: 'Maese Ivo · Alquimista', tabs: [['elixir', 'Elixires'], ['upgrade', 'Mejoras']] },
+};
+let shopKind = 'merchant';
+let SHOP_TABS = SHOPS.merchant.tabs;
 const elixirPrice = (k) => Math.round(ELIXIRS[k].base * (1 + (S.maxFaille - 1) * 0.35));
 const restockPrice = () => 30 * S.maxFaille;
 const UPGRADE_ICON = { bolsa: ['bag', '#6fd05a', '#d6ffc4'], cinto: ['potion', '#7cc457', '#e0ffd0'], afilador: ['whetstone', '#ffb040', '#fff3c4'], vigor: ['talisman', '#ff5a4e', '#ffd0cc'] };
@@ -2960,7 +2915,11 @@ function genStock() {
   S.shop = { stock, rifts: S.rifts };
 }
 
-function openShop() {
+function openShop(kind = 'merchant') {
+  shopKind = kind;
+  SHOP_TABS = SHOPS[kind].tabs;
+  if (!SHOP_TABS.some((t) => t[0] === shopTab)) shopTab = SHOP_TABS[0][0];
+  $('shopTitle').textContent = SHOPS[kind].title;
   if (!S.shop || S.shop.rifts !== S.rifts) genStock();
   state = 'shop';
   $('shopCard').classList.remove('show');
@@ -3151,7 +3110,7 @@ function playerDied() {
 
 $('btnResume').addEventListener('click', resumeGame);
 // Estilo visual: HD-2D (pixel art con luces modernas) o clásico (vectorial suave)
-function styleLabel() { const t = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico'); $('btnStyle').textContent = t; $('btnStyleHub').textContent = '🎨 ' + t; }
+function styleLabel() { const t = HD2D.on ? 'HD-2D' : 'Clásico'; $('btnStyle').textContent = 'Estilo: ' + t; $('btnStyleHub').innerHTML = '🎨<span>' + t + '</span>'; VILLAGE.ground = null; }
 function toggleStyle() { setHd2d(!HD2D.on); SAVE.hd2d = HD2D.on; persist(); styleLabel(); SFX.play('click'); }
 $('btnStyle').addEventListener('click', toggleStyle);
 $('btnStyleHub').addEventListener('click', toggleStyle);

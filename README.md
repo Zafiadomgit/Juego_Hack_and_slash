@@ -9,7 +9,7 @@ Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja com
 ## Cómo se juega
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
-2. **Villa Candela** es el hub: elige el nivel de Grieta, gestiona tu equipo y visita al **Mercader** (equipo nuevo tras cada Grieta, elixires para la siguiente Grieta y mejoras permanentes; todo se paga con ámbar).
+2. **Villa Candela** es un pueblo por el que caminas (joystick, teclado o tocando el suelo). **Brunilda la Mercader** vende equipo nuevo tras cada Grieta; **Maese Ivo el Alquimista** vende elixires para la siguiente Grieta, pociones y mejoras permanentes. Todo se paga con ámbar. Para ir a la Grieta elegida en el mapa, entra en el **Portal Rúnico** de la plaza.
    Desde la villa abres el **Mapa de Grietas**: cada mundo tiene 7 Grietas y un **Súper Jefe** al final. Cada Grieta tiene 3 dificultades (**Fácil**, **Medio**, **Difícil**) que se desbloquean en orden; superar una Grieta abre la siguiente y vencer al Súper Jefe abre el mundo siguiente. Cuanto más difícil, más vida y daño tienen los monstruos, pero más ámbar, XP y probabilidad de conseguir piezas del **conjunto** de esa zona (10% / 30% / 60%; el Súper Jefe siempre suelta una). La calidad del botín también depende de la dificultad: **Fácil** suelta Común y Raro, **Medio** Raro y Épico, **Difícil** Épico y Legendario, y cada calidad multiplica mucho los stats (×1 / ×1,7 / ×2,8 / ×4,5). Los monstruos se calculan a partir de un héroe de referencia con el equipo de esa dificultad: Fácil está pensada para equipo Común, Medio para Raro y Difícil para Legendario (e incluso con él sigue siendo dura). Con 2, 4 y 6 piezas del mismo conjunto equipadas se activan sus bonus.
 3. **La Grieta**: cada nivel de Grieta te lleva a uno de 5 mundos (Bosque Ceniciento, Pantano Sombrío, Glaciar Rúnico, Desierto de Ámbar y Abismo Volcánico), cada uno con su terreno, clima, monstruos favoritos y Guardián propio. Los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos y cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** del mundo (Colmillo Ancestral, Reina Tejeceniza, Coloso de Escarcha, Garra Ígnea o Hechicero del Abismo), que entra en furia al 50% de vida.
    La dificultad sube con cada Grieta: más vida y daño, más élites (Acorazado, Explosivo…) y ataques nuevos (doble embestida, abanicos de 5 proyectiles, suelo en llamas, Chispines que estallan).
@@ -37,6 +37,7 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/biomes.js        Mundos de las Grietas (terreno, vegetación, clima)
   js/progress.js      Mapa, dificultades, conjuntos y Súper Jefes
   js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
+  js/village.js       Villa Candela: pueblo caminable, vecinos y tiendas
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
 android/              Proyecto Android (Capacitor)
 eas.json / app.json   Compilación del APK con EAS
