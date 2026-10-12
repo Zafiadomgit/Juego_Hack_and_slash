@@ -8,10 +8,17 @@
 const LEVELS_PER_BIOME = 7;
 
 const DIFFS = [
-  { id: 'facil',   name: 'Fácil',   color: '#7cc457', hp: 1,   dmg: 1,   lvl: 0, threat: 0, reward: 1,   rarity: 0,  set: 0.10, eliteSet: 0 },
-  { id: 'medio',   name: 'Medio',   color: '#f0b030', hp: 2.1, dmg: 1.5, lvl: 3, threat: 2, reward: 1.6, rarity: 8,  set: 0.30, eliteSet: 0.01 },
-  { id: 'dificil', name: 'Difícil', color: '#ff4a3d', hp: 4.2, dmg: 2.2, lvl: 6, threat: 4, reward: 2.5, rarity: 18, set: 0.60, eliteSet: 0.03 },
+  // rar: calidades que pueden caer (la baja y la alta); hi: probabilidad base de la alta
+  { id: 'facil',   name: 'Fácil',   color: '#7cc457', hp: 1,   dmg: 1,   lvl: 0, threat: 0, reward: 1,   rarity: 0,  rar: [0, 1], hi: 0.25, set: 0.10, eliteSet: 0 },
+  { id: 'medio',   name: 'Medio',   color: '#f0b030', hp: 2.1, dmg: 1.5, lvl: 3, threat: 2, reward: 1.6, rarity: 8,  rar: [1, 2], hi: 0.25, set: 0.30, eliteSet: 0.01 },
+  { id: 'dificil', name: 'Difícil', color: '#ff4a3d', hp: 4.2, dmg: 2.2, lvl: 6, threat: 4, reward: 2.5, rarity: 18, rar: [2, 3], hi: 0.25, set: 0.60, eliteSet: 0.03 },
 ];
+
+// Calidad del botín según la dificultad: Fácil = Común/Raro, Medio = Raro/Épico, Difícil = Épico/Legendario
+function rollDiffRarity(DF, bonus = 0) {
+  return Math.random() < Math.min(0.9, DF.hi + bonus) ? DF.rar[1] : DF.rar[0];
+}
+const rarityRangeText = (DF) => DF.rar.map((r) => `<span style="color:${RARITY[r].color}">${RARITY[r].name}</span>`).join(' y ');
 
 // Conjuntos de equipo (uno por bioma). Bonus por piezas equipadas: 2, 4 y 6.
 // Claves: dmgP (daño), hpP (PV), critP (crítico), spdP (vel. ataque), armorP (resistencia), kamaP (ámbar), regenP (energía), xpP (experiencia)

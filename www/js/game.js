@@ -822,9 +822,9 @@ function killEnemy(e) {
   for (let i = 0; i < orbs; i++) dropPickup(e.x, e.y, 'xp', { val: xp / orbs });
   if (Math.random() < 0.025) dropPickup(e.x, e.y, 'pain', { val: 25 });
   if (e.elite) {
-    dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(12 + rift.D.rarity))) });
+    dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollDiffRarity(rift.D, 0.25)) });
     if (Math.random() < rift.D.eliteSet) dropPickup(e.x, e.y, 'item', { item: makeSetItem(S.cls, itemLevel(), rift.biome.id) });
-  } else if (!e.boss && Math.random() < 0.035 * (boostOn('fortuna') ? 1.7 : 1)) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity((boostOn('fortuna') ? 10 : 0) + rift.D.rarity)) });
+  } else if (!e.boss && Math.random() < 0.035 * (boostOn('fortuna') ? 1.7 : 1)) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollDiffRarity(rift.D, boostOn('fortuna') ? 0.15 : 0)) });
 
   for (let i = 0; i < 12; i++) {
     const a = rand(0, Math.PI * 2), sp = rand(40, 160);
@@ -1486,8 +1486,8 @@ function guardianDefeated(e) {
   // botín del guardián
   const n = Math.min(10, 4 + Math.floor(rift.level / 5) + rift.d + (rift.isSuper ? 3 : 0));
   for (let i = 0; i < n; i++) {
-    let r = rollRarity(10 + rift.D.rarity);
-    if (i === 0) r = Math.max(2, r);
+    let r = rollDiffRarity(rift.D, 0.15);
+    if (i === 0) r = rift.D.rar[1]; // la primera pieza del Guardián siempre es de la calidad alta
     const named = r === 3 ? { name: e.superDef ? 'de ' + e.superDef.name.split(',')[0] : BOSS_LOOT_NAME[e.type] } : {};
     dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel() + 1, r, named) });
   }
@@ -1502,7 +1502,7 @@ function guardianDefeated(e) {
   if (rift.time > 0) {
     rift.bonus = Math.round(40 * rift.level * P.kamaMul * rift.D.reward);
     for (let i = 0; i < 6; i++) dropPickup(e.x, e.y, 'kama', { val: Math.round(rift.bonus / 6) });
-    dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(5))) });
+    dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollDiffRarity(rift.D, 0.1)) });
   }
   showBanner(`¡${e.name} derrotado!`, '#ffd76a', 'Recoge el botín y cruza el Portal para volver a Villa Candela');
   // zaap de salida
@@ -2530,8 +2530,9 @@ function buildMapInfo() {
       <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
       <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
-      <span>Vida / daño enemigo</span><b>×${(DF.hp * (isS ? 3.2 : 1)).toFixed(1)} / ×${(DF.dmg * (isS ? 1.3 : 1)).toFixed(1)}</b>
+      <span>Fuerza enemiga</span><b>×${(DF.hp * (isS ? 3.2 : 1)).toFixed(1)} / ×${(DF.dmg * (isS ? 1.3 : 1)).toFixed(1)}</b>
       <span>Ámbar y XP</span><b>×${DF.reward}</b>
+      <span>Calidad del botín</span><b>${rarityRangeText(DF)}</b>
       <span>Pieza de conjunto</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
     </div>
     <div class="mi-set" style="--sc:${SD.color}"><div class="t">Conjunto ${SD.name} (${cnt}/${SLOTS.length})</div>
@@ -2926,8 +2927,10 @@ const restockPrice = () => 30 * S.maxFaille;
 const UPGRADE_ICON = { bolsa: ['bag', '#6fd05a', '#d6ffc4'], cinto: ['potion', '#7cc457', '#e0ffd0'], afilador: ['whetstone', '#ffb040', '#fff3c4'], vigor: ['talisman', '#ff5a4e', '#ffd0cc'] };
 
 function genStock() {
-  const lvl = S.maxFaille * 3 + 2;
-  const rar = [1, 1, 2, 2, Math.random() < 0.4 ? 3 : 2, Math.random() < 0.5 ? 2 : 1];
+  const lvl = Math.max(1, (S.maxFaille - 2) * 2 + 3);
+  // el Mercader solo vende legendarios si ya has superado alguna Grieta en Difícil
+  const hard = Object.values(mapProg().c).some((v) => v >= 3);
+  const rar = [1, 1, 2, 2, hard && Math.random() < 0.4 ? 3 : 2, Math.random() < 0.5 ? 2 : 1];
   const stock = rar.map((r, i) => {
     const it = makeItem(S.cls, lvl + randi(0, 1), r, i === 0 ? { slot: 'arma' } : {});
     it.price = Math.round(it.value * 4 * (1 + r * 0.25));

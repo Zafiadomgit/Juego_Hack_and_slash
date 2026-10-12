@@ -57,9 +57,9 @@ const ELITES = [
 // ---------- Objetos ----------
 const RARITY = [
   { name: 'Común',      color: '#e8e2d0', affixes: 1, mul: 1,    beam: 'rgba(255,255,255,0)' },
-  { name: 'Raro',       color: '#4fc3f7', affixes: 2, mul: 1.25, beam: 'rgba(79,195,247,0.0)' },
-  { name: 'Épico',      color: '#ce93d8', affixes: 3, mul: 1.55, beam: 'rgba(206,147,216,0.55)' },
-  { name: 'Legendario', color: '#ffa726', affixes: 4, mul: 2,    beam: 'rgba(255,167,38,0.7)' },
+  { name: 'Raro',       color: '#4fc3f7', affixes: 2, mul: 1.7,  beam: 'rgba(79,195,247,0.0)' },
+  { name: 'Épico',      color: '#ce93d8', affixes: 3, mul: 2.8,  beam: 'rgba(206,147,216,0.55)' },
+  { name: 'Legendario', color: '#ffa726', affixes: 4, mul: 4.5,  beam: 'rgba(255,167,38,0.7)' },
 ];
 
 const SLOTS = ['arma', 'sombrero', 'capa', 'amuleto', 'anillo', 'botas', 'cinturon'];

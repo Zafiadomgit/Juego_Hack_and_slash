@@ -362,3 +362,4 @@ button.slot, button.cell { padding: 0; font: inherit; color: inherit; }
 .icard .setbox .t { color: var(--sc); font-weight: 900; }
 .icard .setbox .on { color: #9dff9d; }
 .icard .setbox .off { opacity: .55; }
+.map-info .btn.big { position: sticky; bottom: 0; flex: none; box-shadow: 0 -8px 14px #1e140c; }
