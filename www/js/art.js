@@ -61,8 +61,43 @@ function blob(g, fill, stroke) { if (fill) { g.fillStyle = fill; g.fill(); } if 
 // ============================================================
 // Héroes
 // ============================================================
+// Arte pintado de los héroes (si existe la imagen se usa en lugar del dibujo vectorial)
+const HERO_ART = {};
+['iop'].forEach((id) => {
+  const img = new Image();
+  img.onload = () => { HERO_ART[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
+  img.src = 'img/heroes/' + id + '.png';
+});
+const HERO_H = 56; // altura en unidades de mundo
+
+function drawHeroImage(g, img, o) {
+  const face = Math.cos(o.dir) >= 0 ? 1 : -1;
+  const run = o.moving ? o.walkT * 12 : 0;
+  const breath = Math.sin(o.t * 3);
+  const hop = o.moving ? Math.abs(Math.sin(run)) * 3 : 0;
+  let tilt = o.moving ? Math.sin(run) * 0.05 + face * 0.06 : breath * 0.012;
+  let sx = 1 + (o.moving ? 0 : breath * 0.012), sy = 1 - (o.moving ? 0 : breath * 0.012);
+  let lunge = 0;
+  if (o.swing > 0) {
+    const k = 1 - o.swing / 0.2;
+    tilt = face * Math.sin(k * Math.PI) * 0.22 * (o.swingSide || 1);
+    lunge = Math.sin(k * Math.PI) * 5;
+    sx *= 1 + Math.sin(k * Math.PI) * 0.06;
+    sy *= 1 - Math.sin(k * Math.PI) * 0.05;
+  }
+  const h = HERO_H, w = h * img.width / img.height;
+  g.save();
+  g.translate(o.x + Math.cos(o.dir) * lunge, o.y + Math.sin(o.dir) * lunge * 0.5 - hop);
+  g.globalAlpha = o.alpha ?? 1;
+  g.rotate(tilt);
+  g.scale(sx * -face, sy); // la imagen mira a su izquierda
+  g.drawImage(img, -w / 2, -h, w, h);
+  g.restore();
+}
+
 // Dibuja al personaje (también usado en las tarjetas del menú y el retrato)
 function drawHero(g, clsId, o) {
+  if (HERO_ART[clsId]) { drawHeroImage(g, HERO_ART[clsId], o); return; }
   // o: {x, y, dir, walkT, moving, swing, swingSide, shot, t, alpha}
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   const run = o.moving ? o.walkT * 12 : 0;

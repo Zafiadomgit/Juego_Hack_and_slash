@@ -1360,9 +1360,15 @@ function drawHUD() {
   circle(px, py, 26 * s, '#3a2a17', '#c9a24a', 3 * s);
   ctx.save();
   ctx.beginPath(); ctx.arc(px, py, 24 * s, 0, Math.PI * 2); ctx.clip();
-  ctx.translate(px, py + 30 * s);
-  ctx.scale(s * 1.15, s * 1.15);
-  drawHero(ctx, P.cls, { x: 0, y: 0, dir: 0.2, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now });
+  if (HERO_ART[P.cls]) {
+    // retrato: la cabeza del arte pintado
+    const img = HERO_ART[P.cls], sw = img.width * 0.5, sh = sw;
+    ctx.drawImage(img, img.width * 0.25, 0, sw, sh, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
+  } else {
+    ctx.translate(px, py + 30 * s);
+    ctx.scale(s * 1.15, s * 1.15);
+    drawHero(ctx, P.cls, { x: 0, y: 0, dir: 0.2, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now });
+  }
   ctx.restore();
   roundRect(px - 13 * s, py + 17 * s, 26 * s, 15 * s, 6 * s, '#c9a24a');
   text(String(S.level), px, py + 25 * s, 12 * s, '#2a1d0e', 'center', 900, false);
@@ -1785,8 +1791,14 @@ function buildMenu() {
       <div class="desc">${C.desc}</div>
       <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} energía)`).join('<br>')}</div>`;
     const g = el.querySelector('canvas').getContext('2d');
-    g.scale(2, 2); g.translate(28, 52); g.scale(1.1, 1.1);
-    drawHero(g, id, { x: 0, y: 0, dir: 0.3, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: 0 });
+    g.scale(2, 2);
+    if (HERO_ART[id]) {
+      const img = HERO_ART[id], h = 56, w = (h * img.width) / img.height;
+      g.drawImage(img, 28 - w / 2, 0, w, h);
+    } else {
+      g.translate(28, 52); g.scale(1.1, 1.1);
+      drawHero(g, id, { x: 0, y: 0, dir: 0.3, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: 0 });
+    }
     el.addEventListener('click', () => {
       SFX.init(); SFX.play('click');
       selectedClass = id;
@@ -2071,6 +2083,7 @@ try {
 } catch (e) { /* entorno web */ }
 
 // Arranque
+function onHeroArtLoaded() { if (state === 'menu') buildMenu(); }
 selectedClass = SAVE.last;
 buildMenu();
 if (selectedClass) $('btnStart').textContent = `Continuar con ${CLASSES[selectedClass].name}`;
