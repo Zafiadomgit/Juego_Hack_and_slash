@@ -131,3 +131,31 @@ const GEMS = {
   purpura:   { name: 'Gema Granate',     color: '#c0392b', desc: '+15% de daño' },
   ocre:      { name: 'Gema Solar',       color: '#f9a825', desc: 'La energía se recarga un 30% más rápido' },
 };
+
+// ---------- Qué hace cada característica (texto + efecto actual) ----------
+const STAT_HELP = {
+  vit: { what: '+2 PV por punto', short: 'PV', now: (t) => `+${t.vit * 2} PV` },
+  sab: { what: '+1% XP y +0,5% recarga de energía por punto', short: 'XP', now: (t) => `+${t.sab}% XP` },
+  fue: { what: '+1% a todo tu daño por punto', short: 'daño', now: (t) => `+${t.fue}% daño` },
+  int: { what: '+1,5% al daño de los hechizos por punto', short: 'hechizos', now: (t) => `+${Math.round(t.int * 1.5)}% hechizos` },
+  sue: { what: '+0,15% de crítico y +0,5% de ámbar por punto', short: 'crítico', now: (t) => `+${(t.sue * 0.15).toFixed(1)}% crítico` },
+  agi: { what: '+0,6% de velocidad de ataque y algo de movimiento por punto', short: 'velocidad', now: (t) => `+${Math.round(t.agi * 0.6)}% vel. ataque` },
+};
+// Características recomendadas por clase
+const STAT_REC = { iop: ['fue', 'vit'], cra: ['agi', 'sue'], feca: ['int', 'vit'] };
+
+// ---------- Mercader ----------
+// Elixires: se consumen al entrar en la siguiente Grieta y duran toda la Grieta
+const ELIXIRS = {
+  furia:   { name: 'Elixir de Furia',          color: '#c0392b', hi: '#ffb07a', desc: '+30% de daño durante una Grieta', base: 120 },
+  piedra:  { name: 'Elixir de Piel de Piedra', color: '#7d8a96', hi: '#dfe8ee', desc: '-25% de daño recibido durante una Grieta', base: 120 },
+  sabio:   { name: 'Elixir del Sabio',         color: '#8e5ad0', hi: '#e2c8ff', desc: '+50% de experiencia durante una Grieta', base: 100 },
+  fortuna: { name: 'Elixir de Fortuna',        color: '#e8b64c', hi: '#fff3c4', desc: '+50% ámbar y más objetos raros durante una Grieta', base: 150 },
+};
+// Mejoras permanentes (por personaje)
+const UPGRADES = {
+  bolsa:    { name: 'Bolsa ampliada',     max: 4, cost: (l) => 400 + l * 400, desc: (l) => `+6 huecos en la bolsa (${36 + 6 * l} → ${42 + 6 * l})` },
+  cinto:    { name: 'Cinto de pociones',  max: 3, cost: (l) => 250 + l * 250, desc: (l) => `Llevas hasta ${6 + l} pociones (ahora ${5 + l})` },
+  afilador: { name: 'Piedra de afilar',   max: 5, cost: (l) => 500 + l * 500, desc: (l) => `+5% de daño para siempre (ahora +${l * 5}%)` },
+  vigor:    { name: 'Talismán de vigor',  max: 5, cost: (l) => 500 + l * 500, desc: (l) => `+5% de PV máximos para siempre (ahora +${l * 5}%)` },
+};

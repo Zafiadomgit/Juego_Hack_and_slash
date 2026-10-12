@@ -280,3 +280,32 @@ button.slot, button.cell { padding: 0; font: inherit; color: inherit; }
 .icard ul { flex: 1 1 auto; min-height: 0; padding: 8px 14px; gap: 5px; }
 .icard .cmp { flex: none; padding: 6px 10px; }
 .icard .btns { padding: 10px 12px 12px; }
+
+/* ---------- Mercader (diseño: canvas "Mercader") ---------- */
+.shop-tabs { margin-left: 10px; }
+.shop-grid { flex: 1; min-height: 0; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); grid-auto-rows: minmax(118px, auto); gap: 8px; padding: 10px 12px 6px; }
+.offer { display: flex; flex-direction: column; gap: 6px; padding: 8px; border-radius: 12px; background: linear-gradient(#2e1f14, #1f150d); border: 2px solid #4a3622; box-shadow: inset 0 0 0 1px #120b07; text-align: left; color: inherit; font: inherit; cursor: pointer; }
+.offer.sold { opacity: 0.4; cursor: default; }
+.offer .row { display: flex; gap: 8px; align-items: center; }
+.offer .ico { width: 52px; height: 52px; flex: none; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px solid var(--rc, #5a4126); background: radial-gradient(circle at 50% 40%, var(--rb, #3a2a1c), #150d08); box-shadow: 0 0 10px var(--rg, transparent); }
+.offer .nm { display: block; font-size: 14px; font-weight: 900; line-height: 1.15; }
+.offer .sub { font-size: 11px; font-weight: 800; letter-spacing: 0.4px; text-transform: uppercase; }
+.offer .desc { font-size: 12px; color: #e8f4ff; line-height: 1.3; }
+.buy { margin-top: auto; height: 34px; border-radius: 9px; border: 2px solid #7a5512; background: linear-gradient(#ffe08a, #d9a636); box-shadow: 0 2px 0 #7a5512; color: #2a1d0e; font: 900 14px Nunito, sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; pointer-events: none; }
+.buy.no { filter: grayscale(0.8); opacity: 0.55; }
+.shop-foot { height: 42px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 12px 6px; }
+.shop-foot span { font-size: 12px; color: #cdb58a; }
+.shop-foot .sh-sell { margin-left: auto; padding: 6px 12px; }
+.hubBoosts { margin-top: 6px; font-size: 12px; color: #cdb58a; }
+.stat .eff { display: block; font-size: 10.5px; font-weight: 700; color: #cdb58a; line-height: 1.1; }
+.stat .rec { font-size: 9.5px; font-weight: 900; color: #ffd76a; margin-left: 4px; }
+.stat { min-height: 38px; }
+.sh-help { width: 24px; height: 24px; border-radius: 50%; border: 2px solid #b98523; background: #3a2414; color: #ffe2a0; font: 900 13px Nunito, sans-serif; padding: 0; margin-left: 6px; cursor: pointer; }
+.sh-sub h2 { display: flex; align-items: center; }
+.help-list { list-style: none; margin: 0; padding: 8px 14px; display: flex; flex-direction: column; gap: 7px; overflow-y: auto; font-size: 13px; }
+.help-list li { display: grid; grid-template-columns: 18px 1fr; gap: 8px; align-items: start; }
+.help-list b { display: block; font-size: 13.5px; }
+.help-list span { color: #e3cc9c; font-size: 12px; }
+#shPoints, .shop-foot .sh-sell, .sh-sub h2 { white-space: nowrap; }
+.stat .rec { font-size: 12px; font-style: normal; }
+.stat { min-height: 35px; }

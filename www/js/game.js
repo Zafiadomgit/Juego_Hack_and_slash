@@ -121,7 +121,16 @@ const SFX = {
 // Guardado (localStorage)
 // ============================================================
 const SAVE_KEY = 'astrubSlash.v2';
-const BAG_MAX = 36;
+const bagMax = () => 36 + 6 * ((S && S.up && S.up.bolsa) || 0);
+const panMax = () => 5 + ((S && S.up && S.up.cinto) || 0);
+// Asegura los campos nuevos en partidas antiguas
+function migrateSlot(s) {
+  s.up = Object.assign({ bolsa: 0, cinto: 0, afilador: 0, vigor: 0 }, s.up || {});
+  s.boosts = Object.assign({ furia: 0, piedra: 0, sabio: 0, fortuna: 0 }, s.boosts || {});
+  if (!s.shop) s.shop = null;
+  return s;
+}
+const boostOn = (k) => !!(rift && rift.boost && rift.boost[k]);
 let SAVE = loadSave();
 let S = null; // personaje activo
 
@@ -152,7 +161,7 @@ let state = 'menu'; // menu | hub | play | pause | inv | end | dead
 let scene = 'hub';  // hub | rift
 let P = null;
 let enemies = [], projectiles = [], pickups = [], particles = [], texts = [], slashes = [], rings = [], glyphs = [], timers = [];
-let obstacles = [], decos = [], motes = [];
+let obstacles = [], decos = [], motes = [], pools = [], fog = [];
 let cam = { x: 0, y: 0 };
 let shakeMag = 0, hitStopT = 0, gameTime = 0, now = 0;
 let rift = null, bossRef = null, banner = null, subBanner = null;
@@ -187,15 +196,38 @@ function genRift() {
     const pos = tryPlace(r, 200);
     if (pos) obstacles.push({ kind: 'rock', x: pos.x, y: pos.y, r, s: r / 16 });
   }
-  for (let i = 0; i < 700; i++) {
+  // ruinas, cristales y braseros (obstáculos con luz)
+  for (let i = 0; i < 22; i++) {
+    const pos = tryPlace(16, 240);
+    if (pos) obstacles.push({ kind: 'pillar', x: pos.x, y: pos.y, r: 16, s: rand(0.9, 1.2), v: randi(0, 2) });
+  }
+  for (let i = 0; i < 26; i++) {
+    const pos = tryPlace(13, 200);
+    if (pos) obstacles.push({ kind: 'crystal', x: pos.x, y: pos.y, r: 13, s: rand(0.8, 1.3), hue: Math.random() < 0.55 ? 0 : 1, ph: rand(0, 6) });
+  }
+  for (let i = 0; i < 20; i++) {
+    const pos = tryPlace(11, 180);
+    if (pos) obstacles.push({ kind: 'brazier', x: pos.x, y: pos.y, r: 11, ph: rand(0, 6) });
+  }
+  // charcos de lava (solo decoración y luz)
+  pools = [];
+  for (let i = 0; i < 16; i++) {
+    const x = rand(150, WORLD.w - 150), y = rand(150, WORLD.h - 150);
+    if (dist(x, y, cx, cy) < 260 || obstacles.some((o) => dist(x, y, o.x, o.y) < o.r + 70)) continue;
+    pools.push({ x, y, rx: rand(38, 70), ry: rand(18, 30), ph: rand(0, 6) });
+  }
+  for (let i = 0; i < 900; i++) {
     const t = Math.random();
     decos.push({
       x: rand(0, WORLD.w), y: rand(0, WORLD.h),
-      kind: t < 0.45 ? 'fern' : t < 0.75 ? 'blotch' : 'pebble',
+      kind: t < 0.36 ? 'fern' : t < 0.6 ? 'blotch' : t < 0.75 ? 'pebble' : t < 0.82 ? 'bones' : t < 0.92 ? 'grass' : 'crackline',
       c: pick(['#3e5a2a', '#4d6b30', '#2f4a22', '#5b6e2c']),
       s: rand(0.8, 1.6),
+      r: rand(0, Math.PI * 2),
     });
   }
+  fog = [];
+  for (let i = 0; i < 7; i++) fog.push({ x: rand(0, WORLD.w), y: rand(0, WORLD.h), r: rand(260, 420), vx: rand(6, 16) * (Math.random() < 0.5 ? -1 : 1), vy: rand(-5, 5) });
   motes = [];
   for (let i = 0; i < 40; i++) motes.push({ x: rand(0, 1), y: rand(0, 1), s: rand(1, 2.5), v: rand(0.004, 0.015), p: rand(0, 6) });
 }
@@ -343,6 +375,7 @@ window.addEventListener('keydown', (e) => {
     if (k === 'escape' || k === 'p') pauseGame();
   } else if (state === 'pause' && (k === 'escape' || k === 'p')) resumeGame();
   else if (state === 'inv' && (k === 'escape' || k === 'b' || k === 'c')) closeInventory();
+  else if (state === 'shop' && k === 'escape') closeShop();
 });
 window.addEventListener('keyup', (e) => input.keys.delete(e.key.toLowerCase()));
 
@@ -379,17 +412,17 @@ function derived() {
   const C = CLASSES[S.cls];
   const has = (d) => S.dofus.includes(d);
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1)),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0))),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1),
     skillMul: 1 + t.int * 0.015,
     crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0)),
     atkSpeed: 1 + t.agi * 0.006,
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)),
-    xpMul: 1 + t.sab * 0.01,
+    xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1),
     paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1),
-    armor: Math.min(0.6, t.res * 0.01),
-    kamaMul: 1 + (t.pros + t.sue * 0.5) * 0.01,
+    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0)),
+    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1),
     magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)),
     t,
   };
@@ -704,6 +737,7 @@ function spawnEnemy(type, x, y, o = {}) {
   };
   enemies.push(e);
   if (e.boss) bossRef = e;
+  else addDecal('rune', x, y, e.r * 1.8, 0.7, elite ? hexRgb(elite.color) : '255,90,60');
   return e;
 }
 
@@ -764,7 +798,7 @@ function killEnemy(e) {
   for (let i = 0; i < orbs; i++) dropPickup(e.x, e.y, 'xp', { val: xp / orbs });
   if (Math.random() < 0.025) dropPickup(e.x, e.y, 'pain', { val: 25 });
   if (e.elite) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(12))) });
-  else if (!e.boss && Math.random() < 0.035) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity()) });
+  else if (!e.boss && Math.random() < 0.035 * (boostOn('fortuna') ? 1.7 : 1)) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity(boostOn('fortuna') ? 10 : 0)) });
 
   for (let i = 0; i < 12; i++) {
     const a = rand(0, Math.PI * 2), sp = rand(40, 160);
@@ -1085,7 +1119,10 @@ function startRift(level) {
     level, progress: 0, goal: 70 + level * 5, time: RIFT_TIME, elapsed: 0,
     bossSpawned: false, bossDead: false, zaap: null, spawnT: 1, kills: 0,
     items: 0, legendaries: 0, kamas0: S.kamas, xp: 0, levels: 0, bonus: 0, dofus: null,
+    boost: {},
   };
+  // los elixires comprados se beben al entrar
+  for (const k of Object.keys(ELIXIRS)) if (S.boosts[k] > 0) { S.boosts[k]--; rift.boost[k] = true; }
   createPlayer();
   enemies = []; projectiles = []; pickups = []; particles = []; texts = []; slashes = []; rings = []; glyphs = []; timers = [];
   cam.x = P.x; cam.y = P.y;
@@ -1260,11 +1297,11 @@ function collect(k) {
   if (k.type === 'kama') { S.kamas += k.val; SFX.play('coin'); }
   else if (k.type === 'xp') { gainXp(k.val); SFX.play('xp'); }
   else if (k.type === 'pain') {
-    if (P.hp >= P.maxHp && S.pan < 5) { S.pan++; addText(P.x, P.y - 40, '+1 🧪', '#b5f28a', 0.9); }
+    if (P.hp >= P.maxHp && S.pan < panMax()) { S.pan++; addText(P.x, P.y - 40, '+1 🧪', '#b5f28a', 0.9); }
     else heal(Math.round(P.maxHp * 0.25));
     SFX.play('heal');
   } else if (k.type === 'item') {
-    if (S.bag.length >= BAG_MAX) {
+    if (S.bag.length >= bagMax()) {
       if (bagFullMsgT <= 0) { addText(P.x, P.y - 50, '¡Bolsa llena!', '#ff8a80', 1); bagFullMsgT = 2; }
       return;
     }
@@ -1449,6 +1486,13 @@ function drawHUD() {
     if (fillK > 0) circle(cx, cy, 6 * s * (fillK >= 1 ? 1 : fillK * 0.8), fillK >= 1 ? '#66bb6a' : '#2e7d32');
   }
   text('IM', bx + 9 * s + P.maxPm * 17 * s, by + 8 * s, 10 * s, '#a5d6a7', 'left', 900);
+  // elixires activos en esta Grieta
+  const active = Object.keys(ELIXIRS).filter((k) => rift.boost && rift.boost[k]);
+  active.forEach((k, i) => {
+    const ex = bx + 8 * s + i * 22 * s, ey = by + 30 * s;
+    circle(ex, ey, 9 * s, ELIXIRS[k].color, '#2a1a0c', 2);
+    circle(ex - 2.5 * s, ey - 2.5 * s, 2.5 * s, ELIXIRS[k].hi);
+  });
 
   // botones pausa / bolsa
   circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(0,0,0,0.45)', '#c9a24a', 2);
@@ -1598,6 +1642,7 @@ function renderRift() {
   ctx.strokeStyle = '#1a0d08'; ctx.lineWidth = 24;
   ctx.strokeRect(-12, -12, WORLD.w + 24, WORLD.h + 24);
 
+  for (const pl of pools) if (inView(pl.x, pl.y, 80)) drawLavaPool(pl);
   drawDecals();
   for (const g of glyphs) drawGlyph(g);
   for (const r of rings) {
@@ -1619,6 +1664,9 @@ function renderRift() {
     if (o === P) drawPlayer();
     else if (o.kind === 'tree') drawTree(o);
     else if (o.kind === 'rock') drawRock(o);
+    else if (o.kind === 'pillar') drawPillar(o);
+    else if (o.kind === 'crystal') drawCrystal(o);
+    else if (o.kind === 'brazier') drawBrazier(o);
     else drawEnemy(o);
   }
 
@@ -1686,7 +1734,24 @@ function renderRift() {
   for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.6 }); }
   if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 220 * zoom, a: 1 }); }
   for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1 }); }
+  for (const o of obstacles) {
+    if ((o.kind !== 'crystal' && o.kind !== 'brazier') || !inView(o.x, o.y, 200)) continue;
+    const q = toS(o.x, o.y - 24);
+    const fl = o.kind === 'brazier' ? 0.85 + Math.sin(now * 13 + o.ph) * 0.08 + Math.sin(now * 7.3) * 0.05 : 0.75 + Math.sin(now * 2 + o.ph) * 0.12;
+    lights.push({ x: q.x, y: q.y, r: (o.kind === 'brazier' ? 210 : 150) * zoom * fl, a: 0.9 });
+  }
+  for (const pl of pools) if (inView(pl.x, pl.y, 200)) { const q = toS(pl.x, pl.y); lights.push({ x: q.x, y: q.y, r: pl.rx * 3 * zoom, a: 0.85 }); }
   renderLighting(lights, 0.5);
+  // niebla que se desplaza
+  for (const f of fog) {
+    f.x += f.vx * 0.016; f.y += f.vy * 0.016;
+    if (f.x < -400) f.x = WORLD.w + 400; if (f.x > WORLD.w + 400) f.x = -400;
+    const q = toS(f.x, f.y), rr = f.r * zoom;
+    if (q.x < -rr || q.x > W + rr || q.y < -rr || q.y > H + rr) continue;
+    ctx.globalAlpha = 0.16;
+    ctx.drawImage(glowTex('120,90,110'), q.x - rr, q.y - rr * 0.6, rr * 2, rr * 1.2);
+  }
+  ctx.globalAlpha = 1;
 
   // atmósfera: motas flotantes y viñeta
   for (const m of motes) {
@@ -1823,6 +1888,9 @@ function groundChunk(cx, cy) {
       if (d.x < cx * CHUNK - 40 || d.x > (cx + 1) * CHUNK + 40 || d.y < cy * CHUNK - 40 || d.y > (cy + 1) * CHUNK + 40) continue;
       if (d.kind === 'fern') drawFern(d);
       else if (d.kind === 'blotch') ellipse(d.x, d.y, 26 * d.s, 12 * d.s, 'rgba(120,60,30,0.25)');
+      else if (d.kind === 'bones') drawBones(d);
+      else if (d.kind === 'grass') drawGrassTuft(d);
+      else if (d.kind === 'crackline') drawCrackLine(d);
       else ellipse(d.x, d.y, 3 * d.s, 2 * d.s, '#7a5a48');
     }
   } finally { ctx = saved; }
@@ -1857,7 +1925,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['menu', 'hub', 'inv', 'pause', 'end', 'dead'];
+const overlays = ['menu', 'hub', 'inv', 'shop', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -1914,32 +1982,27 @@ function buildHub() {
   $('hubChar').innerHTML = `
     <div class="hubName">${C.name} <span>nivel ${S.level}</span></div>
     <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
-    <div class="hubRow"><span>🪙 ${S.kamas} kamas</span><span>🍞 ${S.pan}/5</span><span>🎒 ${S.bag.length}/${BAG_MAX}</span></div>
+    <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
+    ${Object.keys(ELIXIRS).some((k) => S.boosts[k] > 0) ? `<div class="hubBoosts">Elixires para la próxima Grieta: ${Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0).map((k) => `<span style="color:${ELIXIRS[k].hi}">${ELIXIRS[k].name.replace('Elixir ', '')}${S.boosts[k] > 1 ? ' ×' + S.boosts[k] : ''}</span>`).join(', ')}</div>` : ''}
     <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}"></span>`).join('')}</div>`;
   $('fLabel').innerHTML = `Grieta ${S.faille}<small>Monstruos nivel ${1 + (S.faille - 1) * 3}–${5 + (S.faille - 1) * 3} · Guardián: ${S.faille % 2 ? 'Colmillo Ancestral' : 'Garra Ígnea'}</small>`;
   $('fMinus').disabled = S.faille <= 1;
   $('fPlus').disabled = S.faille >= S.maxFaille;
   $('btnInv').innerHTML = '🎒 Personaje' + (S.points > 0 ? ` <span class="badge">${S.points}</span>` : '');
-  $('btnBakery').disabled = S.kamas < 40 || S.pan >= 5;
 }
 
 $('btnStart').addEventListener('click', () => {
   if (!selectedClass) return;
   if (!SAVE.slots[selectedClass]) SAVE.slots[selectedClass] = newSlot(selectedClass);
   SAVE.last = selectedClass;
-  S = SAVE.slots[selectedClass];
+  S = migrateSlot(SAVE.slots[selectedClass]);
   goHub();
 });
 $('fMinus').addEventListener('click', () => { S.faille--; SFX.play('click'); buildHub(); });
 $('fPlus').addEventListener('click', () => { S.faille++; SFX.play('click'); buildHub(); });
 $('btnZaap').addEventListener('click', () => startRift(S.faille));
 $('btnInv').addEventListener('click', () => openInventory('hub'));
-$('btnBakery').addEventListener('click', () => {
-  if (S.kamas < 40 || S.pan >= 5) return;
-  S.kamas -= 40; S.pan++;
-  SFX.play('coin');
-  persist(); buildHub();
-});
+$('btnShop').addEventListener('click', () => openShop());
 $('btnChange').addEventListener('click', () => { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); });
 
 // ---------- Inventario / características ----------
@@ -2059,18 +2122,25 @@ function buildInventory(justEquipped) {
 
   // características
   const pts = $('shPoints');
-  pts.textContent = S.points > 0 ? S.points + ' puntos' : 'Nv. ' + S.level;
+  pts.textContent = S.points > 0 ? S.points + ' pts' : 'Nv. ' + S.level;
   pts.classList.toggle('none', S.points <= 0);
   $('shStatRows').innerHTML = CORE_STATS.map((k) => {
     const base = S.stats[k], bonus = t[k] - base, col = STAT_COLOR[k];
+    const rec = (STAT_REC[S.cls] || []).includes(k);
     return `<div class="stat" data-k="${k}" style="background:${col}14">
-      ${statIcon(k)}<span class="nm" title="${STAT_INFO[k].desc}">${STAT_INFO[k].name}</span>
+      ${statIcon(k)}<span class="nm">${STAT_INFO[k].name}${rec ? '<i class="rec" title="Recomendada para tu clase">★</i>' : ''}<small class="eff">Da <b style="color:${col};font-size:10.5px">${STAT_HELP[k].now(t)}</b></small></span>
       <b style="color:${col}">${base}${bonus ? ` <small>+${bonus}</small>` : ''}</b>
       <button class="plus" data-stat="${k}" ${S.points < 1 ? 'disabled' : ''} aria-label="Subir ${STAT_INFO[k].name}">+</button>
     </div>`;
   }).join('');
   for (const b of $('shStatRows').querySelectorAll('.plus')) bindStatButton(b);
   $('shDerived').innerHTML = derivedRows(d).map(([k, name, , col, txt]) => `<span data-k="${k}">${name} <b style="color:${col}">${txt}</b></span>`).join('');
+
+  if (!$('shHelpBtn')) {
+    const h2 = document.querySelector('.sh-sub h2');
+    h2.insertAdjacentHTML('beforeend', '<button id="shHelpBtn" class="sh-help" aria-label="¿Qué hace cada característica?">?</button>');
+    $('shHelpBtn').addEventListener('click', showStatHelp);
+  }
 
   // animar lo que ha subido
   if (prev) {
@@ -2095,7 +2165,7 @@ function buildInventory(justEquipped) {
   }
 
   // bolsa
-  $('shTabs').innerHTML = BAG_TABS.map(([id, label]) => `<button data-tab="${id}" class="${invTab === id ? 'on' : ''}">${label}</button>`).join('') + `<span class="count">${S.bag.length}/${BAG_MAX}</span>`;
+  $('shTabs').innerHTML = BAG_TABS.map(([id, label]) => `<button data-tab="${id}" class="${invTab === id ? 'on' : ''}">${label}</button>`).join('') + `<span class="count">${S.bag.length}/${bagMax()}</span>`;
   for (const b of $('shTabs').querySelectorAll('button')) b.addEventListener('click', () => { invTab = b.dataset.tab; SFX.play('click'); buildInventory(); });
   const cells = [];
   S.bag.forEach((it, i) => {
@@ -2103,7 +2173,7 @@ function buildInventory(justEquipped) {
     const better = itemPower(it) > itemPower(S.equip[it.slot]);
     cells.push(`<button class="cell r${it.rarity}" data-i="${i}" aria-label="${it.name}">${itemSVG(it, 36)}${better ? '<i class="up">▲</i>' : ''}</button>`);
   });
-  const fill = invTab === 'all' ? BAG_MAX - S.bag.length : Math.max(0, 10 - cells.length);
+  const fill = invTab === 'all' ? bagMax() - S.bag.length : Math.max(0, 10 - cells.length);
   for (let i = 0; i < fill; i++) cells.push('<div class="cell empty"></div>');
   $('bagGrid').innerHTML = cells.join('');
   for (const el of $('bagGrid').querySelectorAll('button.cell')) {
@@ -2161,24 +2231,7 @@ function showItemCard(from, key) {
     return `<li>${statIcon(k)}<span style="color:${v ? STAT_COLOR[k] : '#7d6a52'}">${v >= 0 ? '+' : ''}${v}${unit}${name}</span>${cmp}</li>`;
   }).join('');
   const card = $('itemCard');
-  card.innerHTML = `<article class="icard" style="--rc:${R.color};--rg:rgba(${rgb},.5);--rt:${it.rarity === 3 ? '#ffc37a' : R.color}">
-    <div class="bar"></div>
-    <div class="top">
-      <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 58)}</div>
-      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
-        <h2>${it.name}</h2>
-        <span class="rar">${R.name}</span>
-        <span class="meta">${SLOT_INFO[it.slot].name} · Nivel ${it.level}</span>
-      </div>
-    </div>
-    <div class="sep"></div>
-    <ul>${lines}</ul>
-    ${eq ? `<p class="cmp">Comparado con <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipado)</p>` : ''}
-    <div class="btns">
-      ${from === 'bag' ? '<button class="pri" id="icEquip">Equipar</button>' : '<button class="pri" id="icUnequip">Quitar</button>'}
-      <button class="sec" id="icSell">Vender · ${it.value}</button>
-    </div>
-  </article>`;
+  card.innerHTML = itemCardHTML(it, eq, from === 'bag' ? '<button class="pri" id="icEquip">Equipar</button>' : '<button class="pri" id="icUnequip">Quitar</button>', `<button class="sec" id="icSell">Vender · ${it.value}</button>`, lines);
   card.classList.add('show');
   const close = () => { card.classList.remove('show'); invSel = null; };
   card.onclick = (e) => { if (e.target === card) close(); };
@@ -2196,7 +2249,7 @@ function showItemCard(from, key) {
     buildInventory(it.slot);
   };
   if (unBtn) unBtn.onclick = () => {
-    if (S.bag.length >= BAG_MAX) return;
+    if (S.bag.length >= bagMax()) return;
     S.bag.push(it);
     delete S.equip[it.slot];
     recalc(); close(); SFX.play('click'); buildInventory();
@@ -2233,6 +2286,225 @@ $('btnSellCommons').addEventListener('click', () => {
   if (gain) SFX.play('coin');
   invSel = null;
   buildInventory();
+});
+
+function itemCardHTML(it, eq, priBtn, secBtn, lines) {
+  const R = RARITY[it.rarity];
+  const rgb = RARITY_RGB[it.rarity];
+  return `<article class="icard" style="--rc:${R.color};--rg:rgba(${rgb},.5);--rt:${it.rarity === 3 ? '#ffc37a' : R.color}">
+    <div class="bar"></div>
+    <div class="top">
+      <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 52)}</div>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h2>${it.name}</h2>
+        <span class="rar">${R.name}</span>
+        <span class="meta">${SLOT_INFO[it.slot].name} · Nivel ${it.level}</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <ul>${lines}</ul>
+    ${eq ? `<p class="cmp">Comparado con <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipado)</p>` : ''}
+    <div class="btns">${priBtn}${secBtn}</div>
+  </article>`;
+}
+
+function itemStatLines(it, eq) {
+  const keys = ['dmg', ...CORE_STATS, 'crit', 'res', 'pros'].filter((k) => (it.stats[k] || 0) || (eq && eq.stats[k]));
+  return keys.map((k) => {
+    const v = it.stats[k] || 0;
+    let cmp = '';
+    if (eq) {
+      const dlt = v - (eq.stats[k] || 0);
+      if (dlt) cmp = `<em class="${dlt > 0 ? 'up' : 'down'}">${dlt > 0 ? '▲' : '▼'} ${Math.abs(dlt)}</em>`;
+    }
+    const unit = k === 'crit' || k === 'res' ? '% ' : ' ';
+    const name = STAT_INFO[k].name.replace('% ', '');
+    return `<li>${statIcon(k)}<span style="color:${v ? STAT_COLOR[k] : '#7d6a52'}">${v >= 0 ? '+' : ''}${v}${unit}${name}</span>${cmp}</li>`;
+  }).join('');
+}
+
+// Explicación de todas las características
+function showStatHelp() {
+  SFX.play('click');
+  const t = derived().t;
+  const rec = STAT_REC[S.cls] || [];
+  const rows = CORE_STATS.map((k) => `<li>${statIcon(k)}<div><b style="color:${STAT_COLOR[k]}">${STAT_INFO[k].name}${rec.includes(k) ? ' <small style="color:#ffd76a">★ recomendada para ' + CLASSES[S.cls].name + '</small>' : ''}</b><span>${STAT_HELP[k].what}. Ahora: ${STAT_HELP[k].now(t)}.</span></div></li>`).join('')
+    + `<li>${statIcon('dmg')}<div><b>Daños</b><span>Se suma a la potencia de cada golpe (sobre todo en armas).</span></div></li>`
+    + `<li>${statIcon('crit')}<div><b>% Crítico</b><span>Probabilidad de golpe crítico (×1,8 de daño).</span></div></li>`
+    + `<li>${statIcon('res')}<div><b>% Resistencia</b><span>Reduce el daño que recibes.</span></div></li>`
+    + `<li>${statIcon('pros')}<div><b>Prospección</b><span>Más ámbar y mayor radio para recoger botín.</span></div></li>`;
+  const card = $('itemCard');
+  card.innerHTML = `<article class="icard" style="--rc:#e8b64c;--rg:rgba(232,182,76,.4);--rt:#ffd76a;width:360px">
+    <div class="bar"></div>
+    <div class="top"><div style="display:flex;flex-direction:column;gap:2px"><h2>¿Qué hace cada característica?</h2><span class="meta">Cada nivel te da 5 puntos. Mantén pulsado «+» para repartir rápido.</span></div></div>
+    <div class="sep"></div>
+    <ul class="help-list">${rows}</ul>
+    <div class="btns"><button class="pri" id="helpOk">Entendido</button></div>
+  </article>`;
+  card.classList.add('show');
+  card.onclick = (e) => { if (e.target === card) card.classList.remove('show'); };
+  $('helpOk').onclick = () => card.classList.remove('show');
+}
+
+function showToast(id, msg, good = true) {
+  const el = $(id);
+  el.style.borderColor = good ? '#8fe36a' : '#ff8a80';
+  el.style.color = good ? '#d6ffc4' : '#ffd0cc';
+  el.textContent = msg;
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
+// ---------- Mercader ----------
+let shopTab = 'gear';
+const SHOP_TABS = [['gear', 'Equipo'], ['elixir', 'Elixires'], ['upgrade', 'Mejoras']];
+const elixirPrice = (k) => Math.round(ELIXIRS[k].base * (1 + (S.maxFaille - 1) * 0.35));
+const restockPrice = () => 30 * S.maxFaille;
+const UPGRADE_ICON = { bolsa: ['bag', '#6fd05a', '#d6ffc4'], cinto: ['potion', '#7cc457', '#e0ffd0'], afilador: ['whetstone', '#ffb040', '#fff3c4'], vigor: ['talisman', '#ff5a4e', '#ffd0cc'] };
+
+function genStock() {
+  const lvl = S.maxFaille * 3 + 2;
+  const rar = [1, 1, 2, 2, Math.random() < 0.4 ? 3 : 2, Math.random() < 0.5 ? 2 : 1];
+  const stock = rar.map((r, i) => {
+    const it = makeItem(S.cls, lvl + randi(0, 1), r, i === 0 ? { slot: 'arma' } : {});
+    it.price = Math.round(it.value * 4 * (1 + r * 0.25));
+    return it;
+  });
+  S.shop = { stock, rifts: S.rifts };
+}
+
+function openShop() {
+  if (!S.shop || S.shop.rifts !== S.rifts) genStock();
+  state = 'shop';
+  $('shopCard').classList.remove('show');
+  buildShop();
+  showOverlay('shop');
+  SFX.play('click');
+}
+function closeShop() {
+  $('shopCard').classList.remove('show');
+  persist();
+  state = 'hub';
+  buildHub();
+  showOverlay('hub');
+}
+
+function offerHTML(o) {
+  return `<button class="offer${o.sold ? ' sold' : ''}" data-act="${o.act}" style="--rc:${o.rc};--rb:${o.rb};--rg:${o.rg || 'transparent'}" ${o.sold ? 'disabled' : ''}>
+    <div class="row"><div class="ico">${o.icon}</div>
+      <div style="min-width:0"><span class="nm" style="color:${o.nameColor}">${o.name}</span><span class="sub" style="color:${o.subColor}">${o.sub}</span></div></div>
+    <span class="desc">${o.desc}</span>
+    <span class="buy${o.can ? '' : ' no'}">${o.sold ? 'Vendido' : AMBER_SVG + ' ' + fmtNum(o.price)}</span>
+  </button>`;
+}
+
+function buildShop() {
+  $('shopTabs').innerHTML = SHOP_TABS.map(([id, label]) => `<button data-tab="${id}" class="${shopTab === id ? 'on' : ''}">${label}</button>`).join('');
+  for (const b of $('shopTabs').querySelectorAll('button')) b.addEventListener('click', () => { shopTab = b.dataset.tab; SFX.play('click'); buildShop(); });
+  $('shopAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas);
+  const offers = [];
+  if (shopTab === 'gear') {
+    S.shop.stock.forEach((it, i) => {
+      const R = RARITY[it.rarity], rgb = RARITY_RGB[it.rarity];
+      const eq = S.equip[it.slot];
+      const top = Object.entries(it.stats).sort((a, b) => (b[0] === 'dmg') - (a[0] === 'dmg') || b[1] - a[1]).slice(0, 2)
+        .map(([k, v]) => `+${v}${k === 'crit' || k === 'res' ? '%' : ''} ${STAT_INFO[k].name.replace('% ', '')}`).join(' · ');
+      const better = itemPower(it) > itemPower(eq);
+      offers.push(offerHTML({ act: 'gear:' + i, sold: it.sold, icon: itemSVG(it, 40), rc: R.color, rb: `rgba(${rgb},.45)`, rg: it.rarity >= 3 ? `rgba(${rgb},.6)` : '',
+        name: it.name, nameColor: it.rarity === 3 ? '#ffc37a' : R.color, sub: `${R.name} · Nv ${it.level}`, subColor: R.color,
+        desc: top + (better ? ' <b style="color:#8fe36a">▲ mejor que el tuyo</b>' : ''), price: it.price, can: S.kamas >= it.price }));
+    });
+    $('shopNote').textContent = 'Existencias nuevas tras cada Grieta cerrada. El ámbar se gana con monstruos, Guardianes, rachas y vendiendo objetos.';
+    $('btnRestock').style.display = '';
+    $('btnRestock').innerHTML = 'Renovar existencias · ' + AMBER_SVG + ' ' + restockPrice();
+    $('btnRestock').disabled = S.kamas < restockPrice();
+  } else if (shopTab === 'elixir') {
+    for (const k of Object.keys(ELIXIRS)) {
+      const E = ELIXIRS[k], price = elixirPrice(k), have = S.boosts[k] || 0;
+      offers.push(offerHTML({ act: 'elixir:' + k, icon: tintIcon('potion', E.color, E.hi, 40), rc: E.color, rb: E.color + '66',
+        name: E.name, nameColor: E.hi, sub: have ? `Tienes ${have} · Próxima Grieta` : 'Próxima Grieta', subColor: '#cdb58a',
+        desc: E.desc, price, can: S.kamas >= price && have < 3 }));
+    }
+    offers.push(offerHTML({ act: 'potion', icon: tintIcon('potion', '#7cc457', '#e0ffd0', 40), rc: '#7cc457', rb: '#7cc45766',
+      name: 'Poción de Savia', nameColor: '#b5f28a', sub: `Tienes ${S.pan}/${panMax()}`, subColor: '#cdb58a',
+      desc: 'Cura el 40% de tus PV en combate (botón 🧪).', price: 40, can: S.kamas >= 40 && S.pan < panMax() }));
+    $('shopNote').textContent = 'Los elixires se beben solos al cruzar el Portal y duran toda la Grieta.';
+    $('btnRestock').style.display = 'none';
+  } else {
+    for (const k of Object.keys(UPGRADES)) {
+      const U = UPGRADES[k], lv = S.up[k] || 0, maxed = lv >= U.max, price = U.cost(lv);
+      const [kind, col, hi] = UPGRADE_ICON[k];
+      offers.push(offerHTML({ act: 'up:' + k, sold: maxed, icon: tintIcon(kind, col, hi, 40), rc: col, rb: col + '55',
+        name: U.name, nameColor: hi, sub: `Mejora permanente · ${lv}/${U.max}`, subColor: '#cdb58a',
+        desc: maxed ? 'Nivel máximo alcanzado' : U.desc(lv), price, can: !maxed && S.kamas >= price }));
+    }
+    $('shopNote').textContent = 'Las mejoras son permanentes para este personaje.';
+    $('btnRestock').style.display = 'none';
+  }
+  $('shopGrid').innerHTML = offers.join('');
+  for (const el of $('shopGrid').querySelectorAll('.offer')) el.addEventListener('click', () => shopAction(el.dataset.act));
+}
+
+function pay(price) {
+  if (S.kamas < price) { showToast('shopToast', 'No tienes suficiente ámbar', false); SFX.play('hurt'); return false; }
+  S.kamas -= price;
+  SFX.play('coin');
+  return true;
+}
+
+function shopAction(act) {
+  const [kind, key] = act.split(':');
+  if (kind === 'gear') {
+    const it = S.shop.stock[+key];
+    if (!it || it.sold) return;
+    SFX.play('click');
+    const card = $('shopCard');
+    const eq = S.equip[it.slot];
+    card.innerHTML = itemCardHTML(it, eq, `<button class="pri" id="scBuy">Comprar · ${fmtNum(it.price)}</button>`, '<button class="sec" id="scClose">Cerrar</button>', itemStatLines(it, eq));
+    card.classList.add('show');
+    card.onclick = (e) => { if (e.target === card) card.classList.remove('show'); };
+    $('scClose').onclick = () => card.classList.remove('show');
+    $('scBuy').onclick = () => {
+      if (S.bag.length >= bagMax()) { showToast('shopToast', '¡Bolsa llena! Vende algo primero', false); return; }
+      if (!pay(it.price)) return;
+      const bought = { ...it };
+      delete bought.price; delete bought.sold;
+      S.bag.push(bought);
+      it.sold = true;
+      card.classList.remove('show');
+      showToast('shopToast', `${it.name} está en tu bolsa · ábrela en Personaje para equipártelo`);
+      SFX.play(it.rarity >= 2 ? 'legend' : 'loot');
+      persist(); buildShop();
+    };
+  } else if (kind === 'elixir') {
+    if ((S.boosts[key] || 0) >= 3) { showToast('shopToast', 'Máximo 3 de cada elixir', false); return; }
+    if (!pay(elixirPrice(key))) return;
+    S.boosts[key] = (S.boosts[key] || 0) + 1;
+    showToast('shopToast', `${ELIXIRS[key].name} listo para la próxima Grieta`);
+    persist(); buildShop();
+  } else if (kind === 'potion') {
+    if (S.pan >= panMax()) { showToast('shopToast', 'Ya llevas el máximo de pociones', false); return; }
+    if (!pay(40)) return;
+    S.pan++;
+    showToast('shopToast', `Poción de Savia comprada (${S.pan}/${panMax()})`);
+    persist(); buildShop();
+  } else if (kind === 'up') {
+    const U = UPGRADES[key], lv = S.up[key] || 0;
+    if (lv >= U.max) return;
+    if (!pay(U.cost(lv))) return;
+    S.up[key] = lv + 1;
+    if (P) recalc();
+    SFX.play('level');
+    showToast('shopToast', `${U.name} mejorada a nivel ${lv + 1}`);
+    persist(); buildShop();
+  }
+}
+
+$('btnShopClose').addEventListener('click', closeShop);
+$('btnRestock').addEventListener('click', () => {
+  if (!pay(restockPrice())) return;
+  genStock();
+  showToast('shopToast', 'Existencias renovadas');
+  persist(); buildShop();
 });
 
 // ---------- Pausa, fin de Grieta, muerte ----------
@@ -2320,6 +2592,7 @@ try {
       if (state === 'play') pauseGame();
       else if (state === 'pause') resumeGame();
       else if (state === 'inv') closeInventory();
+      else if (state === 'shop') closeShop();
       else if (state === 'hub') { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); }
       else if (state === 'menu') App.exitApp();
     });

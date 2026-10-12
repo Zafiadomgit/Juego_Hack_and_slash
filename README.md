@@ -7,11 +7,11 @@ Todo el arte del juego se dibuja por código (sin assets de terceros).
 ## Cómo se juega
 
 1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
-2. **Villa Candela** es el hub: elige el nivel de Grieta, compra pociones y gestiona tu equipo.
+2. **Villa Candela** es el hub: elige el nivel de Grieta, gestiona tu equipo y visita al **Mercader** (equipo nuevo tras cada Grieta, elixires para la siguiente Grieta y mejoras permanentes; todo se paga con ámbar).
 3. **La Grieta**: los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos. Cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** (Colmillo Ancestral o Garra Ígnea), que entra en furia al 50% de vida.
 4. **Botín** con rareza (Común, Raro, Épico, Legendario). Los Guardianes pueden soltar una **Gema Ancestral** (bonus permanente).
 5. Al vencer al Guardián se abre un **Portal**: crúzalo para volver a Villa Candela y desbloquear la siguiente Grieta.
-6. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒.
+6. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
 
 ### Controles
 

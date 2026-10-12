@@ -650,11 +650,16 @@ function drawEnemy(e) {
   if (e.slowT > 0) circle(e.x, e.y - e.r, 3, '#ff7043');
 
   // barra de vida
+  // ojos que brillan cuando va a atacar
+  if (e.state === 'wind' || e.state === 'charge' || e.enraged) glow(e.x + e.face * e.r * 0.5, e.y - e.r * 1.3 - e.z, e.r * 0.9, '255,60,30', 0.7);
   const y = e.y - e.r * 2 - 18 - e.z;
   if ((e.hp < e.maxHp || e.elite) && !e.boss) {
-    const bw = Math.max(24, e.r * 2);
-    ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(e.x - bw / 2 - 1, y - 1, bw + 2, 6);
-    ctx.fillStyle = e.elite ? e.elite.color : '#e53935'; ctx.fillRect(e.x - bw / 2, y, bw * Math.max(0, e.hp / e.maxHp), 4);
+    const bw = Math.max(26, e.r * 2.2);
+    const k = Math.max(0, e.hp / e.maxHp);
+    e.hpShow = e.hpShow === undefined ? k : Math.max(k, e.hpShow - 0.012);
+    ctx.fillStyle = 'rgba(10,4,2,0.75)'; ctx.fillRect(e.x - bw / 2 - 1.5, y - 1.5, bw + 3, 7);
+    ctx.fillStyle = '#fff3c4'; ctx.fillRect(e.x - bw / 2, y, bw * e.hpShow, 4);
+    ctx.fillStyle = e.elite ? e.elite.color : '#e53935'; ctx.fillRect(e.x - bw / 2, y, bw * k, 4);
   }
   if (e.elite) text(e.name + ' · nv. ' + e.lvl, e.x, y - 9, 10, '#9fd3ff', 'center', 800);
   if (e.spawnT > 0) ctx.restore();
@@ -673,6 +678,9 @@ function drawMonsterBody(e) {
   const jitter = e.state === 'wind' ? rand(-1.5, 1.5) : 0;
   ctx.save();
   ctx.translate(e.x + jitter, e.y - e.z);
+  // al aparecer sube desde el suelo; al recibir un golpe se aplasta
+  if (e.spawnT > 0) { const k2 = 1 - e.spawnT / 0.35; ctx.scale(0.7 + k2 * 0.3, 0.3 + k2 * 0.7); }
+  else if (e.flash > 0) ctx.scale(1.12, 0.9);
   sprite(key, w, h, ax, ay, (g) => {
     g.scale(k, k);
     A.draw(fi / ANIM_FRAMES, e.face, v);
@@ -1011,4 +1019,171 @@ function drawFern(d) {
     ctx.stroke();
   }
   ctx.restore();
+}
+
+// ============================================================
+// Entorno de la Grieta: decoración horneada en el suelo
+// ============================================================
+function drawBones(d) {
+  const g = ctx;
+  g.save();
+  g.translate(d.x, d.y);
+  g.rotate(d.r);
+  g.scale(d.s * 0.8, d.s * 0.8);
+  g.fillStyle = '#d8ccb4'; g.strokeStyle = '#3a2a1c'; g.lineWidth = 1.2;
+  // hueso largo
+  g.beginPath(); g.roundRect(-9, -1.5, 18, 3, 1.5); g.fill(); g.stroke();
+  for (const sx of [-9, 9]) { g.beginPath(); g.arc(sx, -1.8, 2, 0, TAU); g.arc(sx, 1.8, 2, 0, TAU); g.fill(); }
+  // calavera pequeña
+  g.translate(8, 6);
+  g.beginPath(); g.arc(0, 0, 4.5, 0, TAU); g.fill(); g.stroke();
+  g.fillRect(-2.5, 3, 5, 2.5);
+  g.fillStyle = '#2a1a0c'; g.beginPath(); g.arc(-1.6, -0.4, 1.1, 0, TAU); g.arc(1.6, -0.4, 1.1, 0, TAU); g.fill();
+  g.restore();
+}
+
+function drawGrassTuft(d) {
+  const g = ctx;
+  g.save();
+  g.translate(d.x, d.y);
+  g.scale(d.s, d.s);
+  g.strokeStyle = d.c; g.lineWidth = 1.6; g.lineCap = 'round';
+  for (let i = -3; i <= 3; i++) {
+    g.beginPath(); g.moveTo(i * 1.6, 0); g.quadraticCurveTo(i * 2.4, -6, i * 3.4 + Math.sin(i) * 2, -11 + Math.abs(i)); g.stroke();
+  }
+  g.restore();
+}
+
+function drawCrackLine(d) {
+  const g = ctx;
+  g.save();
+  g.translate(d.x, d.y);
+  g.rotate(d.r);
+  g.scale(d.s, d.s * 0.6);
+  g.lineCap = 'round'; g.lineJoin = 'round';
+  g.strokeStyle = 'rgba(15,6,2,0.8)'; g.lineWidth = 3.5;
+  g.beginPath(); g.moveTo(-22, 0); g.lineTo(-10, 3); g.lineTo(-2, -2); g.lineTo(8, 2); g.lineTo(20, -1); g.stroke();
+  g.strokeStyle = 'rgba(255,120,40,0.75)'; g.lineWidth = 1.4;
+  g.beginPath(); g.moveTo(-18, 1); g.lineTo(-10, 3); g.lineTo(-2, -2); g.lineTo(6, 1.5); g.stroke();
+  g.restore();
+}
+
+// ============================================================
+// Entorno de la Grieta: objetos (con caché + luz dinámica)
+// ============================================================
+function drawLavaPool(pl) {
+  const pulse = 0.85 + Math.sin(now * 2 + pl.ph) * 0.15;
+  ctx.save();
+  ctx.translate(pl.x, pl.y);
+  sprite('pool|' + Math.round(pl.rx) + '|' + Math.round(pl.ry), pl.rx * 2 + 16, pl.ry * 2 + 16, pl.rx + 8, pl.ry + 8, (g) => {
+    g.fillStyle = '#1c0c06';
+    g.beginPath(); g.ellipse(0, 0, pl.rx + 6, pl.ry + 5, 0, 0, TAU); g.fill();
+    const gr = g.createRadialGradient(0, 0, 2, 0, 0, pl.rx);
+    gr.addColorStop(0, '#fff0a0'); gr.addColorStop(0.35, '#ffb030'); gr.addColorStop(0.75, '#e0480c'); gr.addColorStop(1, '#7a1c04');
+    g.fillStyle = gr;
+    g.beginPath(); g.ellipse(0, 0, pl.rx, pl.ry, 0, 0, TAU); g.fill();
+    g.strokeStyle = '#3a1608'; g.lineWidth = 3;
+    g.beginPath(); g.ellipse(0, 0, pl.rx + 2, pl.ry + 2, 0, 0, TAU); g.stroke();
+    // costras oscuras flotando
+    g.fillStyle = 'rgba(60,20,8,0.6)';
+    for (let i = 0; i < 4; i++) { g.beginPath(); g.ellipse(Math.cos(i * 1.7) * pl.rx * 0.55, Math.sin(i * 2.3) * pl.ry * 0.5, 6, 3, i, 0, TAU); g.fill(); }
+  });
+  ctx.restore();
+  glow(pl.x, pl.y, pl.rx * 1.6, '255,110,30', 0.45 * pulse);
+  if (Math.random() < 0.06) particles.push({ kind: 'glowdot', x: pl.x + rand(-pl.rx, pl.rx) * 0.6, y: pl.y + rand(-pl.ry, pl.ry) * 0.5, vx: 0, vy: -30, life: 0.9, max: 0.9, rgb: '255,150,50', size: 4, grav: 0 });
+}
+
+function drawPillar(o) {
+  shadow(o.x, o.y + 2, 20 * o.s);
+  const s = Math.round(o.s * 20) / 20;
+  ctx.save();
+  ctx.translate(o.x, o.y);
+  sprite('pillar|' + o.v + '|' + s, 52 * s, 96 * s, 26 * s, 90 * s, (g) => {
+    g.scale(s, s);
+    g.lineWidth = 2; g.strokeStyle = OUTLINE; g.lineJoin = 'round';
+    // base
+    g.fillStyle = '#6e6560'; g.beginPath(); g.roundRect(-20, -12, 40, 12, 3); g.fill(); g.stroke();
+    // fuste (roto a distinta altura según la variante)
+    const top = [-78, -60, -44][o.v];
+    g.fillStyle = '#8a8078';
+    g.beginPath(); g.moveTo(-14, -12); g.lineTo(-14, top + 6); g.lineTo(-6, top); g.lineTo(2, top + 8); g.lineTo(9, top - 2); g.lineTo(14, top + 4); g.lineTo(14, -12); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#a59a90'; g.fillRect(-12, top + 8, 7, -top - 22);
+    g.strokeStyle = 'rgba(40,30,25,0.6)'; g.lineWidth = 1.5;
+    g.beginPath(); g.moveTo(-1, top + 10); g.lineTo(-1, -14); g.moveTo(7, top + 10); g.lineTo(7, -14); g.stroke();
+    g.beginPath(); g.moveTo(-8, -30); g.lineTo(-3, -36); g.lineTo(1, -33); g.stroke();
+    // runa grabada que brilla
+    g.strokeStyle = '#7fd4f0'; g.lineWidth = 1.8;
+    g.beginPath(); g.moveTo(-4, top + 20); g.lineTo(0, top + 26); g.lineTo(-4, top + 32); g.moveTo(3, top + 20); g.lineTo(3, top + 32); g.stroke();
+    // musgo
+    g.fillStyle = '#4f7a2f'; g.beginPath(); g.ellipse(-8, -12, 9, 3, 0.2, 0, TAU); g.fill();
+    // escombros
+    g.fillStyle = '#7a7068'; g.strokeStyle = OUTLINE; g.lineWidth = 1.5;
+    g.beginPath(); g.roundRect(14, -7, 9, 6, 2); g.fill(); g.stroke();
+    g.beginPath(); g.roundRect(-25, -6, 7, 5, 2); g.fill(); g.stroke();
+  });
+  ctx.restore();
+  const tops = [-78, -60, -44];
+  glow(o.x - 2 * o.s, o.y + (tops[o.v] + 26) * o.s, 12, '120,210,255', 0.35 + Math.sin(now * 2 + o.x) * 0.15);
+}
+
+const CRYSTAL_COLS = [['#5fc8ff', '#c8f0ff', '#1e6a9a', '95,200,255'], ['#c07cf0', '#f0d8ff', '#5a2a8a', '192,124,240']];
+function drawCrystal(o) {
+  const [c, hi, dk, rgb] = CRYSTAL_COLS[o.hue];
+  const s = Math.round(o.s * 20) / 20;
+  const pulse = 0.75 + Math.sin(now * 2 + o.ph) * 0.25;
+  glow(o.x, o.y - 18 * s, 46 * s, rgb, 0.5 * pulse);
+  shadow(o.x, o.y + 2, 16 * s);
+  ctx.save();
+  ctx.translate(o.x, o.y);
+  sprite('crystal|' + o.hue + '|' + s, 54 * s, 70 * s, 27 * s, 64 * s, (g) => {
+    g.scale(s, s);
+    g.lineWidth = 1.8; g.strokeStyle = '#140c1c'; g.lineJoin = 'round';
+    g.fillStyle = '#4a4048'; g.beginPath(); g.ellipse(0, -3, 18, 6, 0, 0, TAU); g.fill(); g.stroke();
+    const shards = [[-10, -4, 6, 34, -0.35], [10, -4, 6, 28, 0.4], [0, -6, 8, 52, 0.05], [-4, -2, 4, 18, -0.7]];
+    for (const [x, y, w, h, a] of shards) {
+      g.save(); g.translate(x, y); g.rotate(a);
+      g.beginPath(); g.moveTo(-w, 0); g.lineTo(-w * 0.8, -h * 0.75); g.lineTo(0, -h); g.lineTo(w * 0.8, -h * 0.75); g.lineTo(w, 0); g.closePath();
+      g.fillStyle = c; g.fill(); g.stroke();
+      g.fillStyle = dk; g.beginPath(); g.moveTo(0, -h); g.lineTo(w * 0.8, -h * 0.75); g.lineTo(w, 0); g.lineTo(0, 0); g.closePath(); g.fill();
+      g.fillStyle = hi; g.globalAlpha = 0.85; g.beginPath(); g.moveTo(-w * 0.55, -h * 0.1); g.lineTo(-w * 0.45, -h * 0.7); g.lineTo(-w * 0.1, -h * 0.85); g.lineTo(-w * 0.2, -h * 0.1); g.closePath(); g.fill(); g.globalAlpha = 1;
+      g.restore();
+    }
+  });
+  ctx.restore();
+  if (Math.random() < 0.03) particles.push({ kind: 'glowdot', x: o.x + rand(-10, 10) * s, y: o.y - rand(10, 40) * s, vx: 0, vy: -18, life: 1, max: 1, rgb, size: 3, grav: 0 });
+}
+
+function drawBrazier(o) {
+  shadow(o.x, o.y + 2, 14);
+  ctx.save();
+  ctx.translate(o.x, o.y);
+  sprite('brazier', 40, 44, 20, 40, (g) => {
+    g.lineWidth = 2; g.strokeStyle = OUTLINE; g.lineCap = 'round';
+    g.strokeStyle = '#2a2420'; g.lineWidth = 3;
+    g.beginPath(); g.moveTo(-10, 0); g.lineTo(-4, -16); g.moveTo(10, 0); g.lineTo(4, -16); g.moveTo(0, 2); g.lineTo(0, -16); g.stroke();
+    g.lineWidth = 2; g.strokeStyle = OUTLINE;
+    g.fillStyle = '#4a4440';
+    g.beginPath(); g.moveTo(-15, -26); g.lineTo(15, -26); g.lineTo(10, -14); g.lineTo(-10, -14); g.closePath(); g.fill(); g.stroke();
+    g.fillStyle = '#6e6560'; g.fillRect(-15, -28, 30, 3);
+    g.fillStyle = '#1a0c06'; g.beginPath(); g.ellipse(0, -26, 13, 3, 0, 0, TAU); g.fill();
+  });
+  ctx.restore();
+  // fuego animado (no se cachea)
+  const t = now * 9 + o.ph;
+  ctx.save();
+  ctx.translate(o.x, o.y - 27);
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 3; i++) {
+    const h = 18 + Math.sin(t + i * 2.1) * 5 - i * 3;
+    const w = 9 - i * 2;
+    ctx.fillStyle = ['rgba(255,90,20,0.85)', 'rgba(255,170,40,0.85)', 'rgba(255,240,170,0.9)'][i];
+    ctx.beginPath();
+    ctx.moveTo(-w, 0);
+    ctx.quadraticCurveTo(-w * 0.8 + Math.sin(t * 1.3 + i) * 2, -h * 0.6, Math.sin(t + i) * 2.5, -h);
+    ctx.quadraticCurveTo(w * 0.8 + Math.sin(t * 1.7 + i) * 2, -h * 0.6, w, 0);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+  glow(o.x, o.y - 36, 50, '255,140,40', 0.55 + Math.sin(t * 1.4) * 0.1);
+  if (Math.random() < 0.15) particles.push({ kind: 'glowdot', x: o.x + rand(-5, 5), y: o.y - 40, vx: rand(-15, 15), vy: rand(-90, -50), life: 0.7, max: 0.7, rgb: '255,170,60', size: 3, grav: 0 });
 }

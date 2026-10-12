@@ -76,6 +76,23 @@ function iconBody(kind, p) {
         <rect x="17" y="14" width="14" height="20" rx="3" fill="none" stroke="${p.m}" stroke-width="3"/>
         <circle cx="24" cy="24" r="3" fill="${p.g}" stroke="${OL}" stroke-width="1.4"/>
         <circle cx="9" cy="24" r="1.6" fill="${p.ml}"/><circle cx="39" cy="24" r="1.6" fill="${p.ml}"/>`;
+    case 'potion':
+      return `<path d="M19 6 L29 6 L29 14 L36 26 Q38 40 24 43 Q10 40 12 26 L19 14 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M13.5 29 Q24 25 34.5 29 Q36 40 24 41.5 Q12 40 13.5 29 Z" fill="${p.ml}" opacity="0.55"/>
+        <rect x="18" y="3" width="12" height="5" rx="1.5" fill="#8a5a32" stroke="${OL}" stroke-width="1.6"/>
+        <path d="M16 22 Q16 30 19 34" stroke="#fff" stroke-width="2" opacity="0.6" fill="none" stroke-linecap="round"/>`;
+    case 'bag':
+      return `<rect x="8" y="14" width="32" height="27" rx="6" fill="#7a5233" stroke="${OL}" stroke-width="2"/>
+        <path d="M16 14 Q16 5 24 5 Q32 5 32 14" stroke="${OL}" stroke-width="3" fill="none"/>
+        <path d="M8 22 L40 22" stroke="rgba(0,0,0,.3)" stroke-width="2"/>
+        <rect x="20" y="20" width="8" height="8" rx="1.5" fill="${p.g}" stroke="${OL}" stroke-width="1.4"/>`;
+    case 'whetstone':
+      return `<path d="M8 30 L30 8 L40 18 L18 40 Z" fill="#8a8f96" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M12 30 L30 12" stroke="#d6dde3" stroke-width="2"/>
+        <path d="M33 33 L42 42 M38 30 L44 36" stroke="${p.g}" stroke-width="2.5" stroke-linecap="round"/>`;
+    case 'talisman':
+      return `<path d="M24 4 L28 16 L41 16 L31 24 L35 37 L24 29 L13 37 L17 24 L7 16 L20 16 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="24" cy="21" r="5" fill="#fff" opacity="0.5"/>`;
     case 'gem':
       return `<path d="M24 4 L38 16 L33 40 L15 40 L10 16 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
         <path d="M24 4 L38 16 L24 20 L10 16 Z" fill="#fff" opacity="0.5"/>
@@ -90,8 +107,12 @@ const SLOT_KIND = { sombrero: 'helm', capa: 'cape', amuleto: 'amulet', anillo: '
 
 function itemKind(it, cls) { return it.slot === 'arma' ? WEAPON_KIND[cls || S.cls] : SLOT_KIND[it.slot]; }
 
-function iconSVG(kind, rarity, size = 48, extra = '') {
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="${size}" height="${size}" ${extra}>${iconBody(kind, ICON_PAL[rarity] || ICON_PAL[0])}</svg>`;
+function iconSVG(kind, rarity, size = 48, extra = '', pal) {
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="${size}" height="${size}" ${extra}>${iconBody(kind, pal || ICON_PAL[rarity] || ICON_PAL[0])}</svg>`;
+}
+// Icono con un color propio (elixires, mejoras)
+function tintIcon(kind, color, hi, size = 40) {
+  return iconSVG(kind, 0, size, 'aria-hidden="true"', { m: '#9aa3ab', ml: hi || '#ffffff', g: color, l: '#7a5233', c: color });
 }
 function itemSVG(it, size = 48) { return iconSVG(itemKind(it), it.rarity, size, 'aria-hidden="true"'); }
 
