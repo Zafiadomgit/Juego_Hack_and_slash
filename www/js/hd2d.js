@@ -1,12 +1,12 @@
 /* Fendaria — estilo "HD-2D" (inspirado en Octopath Traveler):
  * el mundo se dibuja en un búfer de baja resolución y se amplía sin suavizado (pixel art nítido),
- * y encima se aplican efectos modernos suaves: luz dinámica, bloom y desenfoque tipo maqueta (tilt-shift).
+ * y encima se aplica luz dinámica. (El desenfoque tipo maqueta existe pero está apagado: HD2D.dof.)
  * Los sprites se "pixelan" al guardarse en la caché: alfa binario, paleta reducida y contorno oscuro de 1 píxel.
  * La interfaz y los números de daño se dibujan nítidos a resolución completa.
  */
 'use strict';
 
-const HD2D = { on: true, dof: true, pixMul: 1, pix: 2, c: null, g: null, main: null, active: false, texts: [], blur1: null, blur2: null };
+const HD2D = { on: true, dof: false, pixMul: 1, pix: 2, c: null, g: null, main: null, active: false, texts: [], blur1: null, blur2: null };
 
 // Tamaño del píxel en CSS px: ~250 píxeles de alto de pantalla, como una consola clásica
 const hd2dPixSize = () => Math.max(1.25, H / 250) * HD2D.pixMul;

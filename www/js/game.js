@@ -55,19 +55,26 @@ resize();
 // Efectos grabados (www/audio/sfx/*.ogg, generados con tools/audio/sfx.py). Si un archivo aún no ha cargado
 // se usa el sonido sintetizado de respaldo.
 const SFX_FILES = ['swing', 'hit', 'crit', 'boom', 'coin', 'xp', 'hurt', 'level', 'dash', 'shield', 'baa', 'piou', 'boss', 'die', 'heal', 'click', 'loot', 'legend', 'zaap', 'shoot', 'magic', 'step'];
-const SFX_GAIN = { swing: 0.5, hit: 0.55, crit: 0.8, boom: 0.85, coin: 0.35, xp: 0.25, hurt: 0.8, level: 0.8, dash: 0.45, shield: 0.6, baa: 0.45, piou: 0.35, boss: 0.9, die: 0.8, heal: 0.6, click: 0.4, loot: 0.55, legend: 0.85, zaap: 0.7, shoot: 0.5, magic: 0.45, step: 0.18 };
+const SFX_GAIN = { swing: 0.32, hit: 0.42, crit: 0.6, boom: 0.6, coin: 0.18, xp: 0.07, hurt: 0.65, level: 0.8, dash: 0.35, shield: 0.55, baa: 0.3, piou: 0.25, boss: 0.8, die: 0.8, heal: 0.55, click: 0.4, loot: 0.5, legend: 0.8, zaap: 0.65, shoot: 0.35, magic: 0.32, step: 0.18 };
+// Separación mínima (s) entre dos reproducciones del mismo efecto: en una pelea hay decenas de golpes,
+// monedas y orbes por segundo, y sonando todos a la vez el resultado es un ruido desagradable
+const SFX_GAP = { hit: 0.06, crit: 0.08, swing: 0.07, coin: 0.09, xp: 0.12, boom: 0.12, shoot: 0.06, magic: 0.07, baa: 0.4, piou: 0.35, hurt: 0.15, dash: 0.1, loot: 0.15 };
 const SFX = {
   ac: null,
   muted: false,
   budget: 0,
-  bufs: {},
+  bufs: {}, lastT: {},
   master: null, sfxGain: null,
   init() {
     if (this.ac) { if (this.ac.state === 'suspended') this.ac.resume(); return; }
     try { this.ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { this.ac = null; return; }
     this.master = this.ac.createGain(); this.master.connect(this.ac.destination);
     this.master.gain.value = this.muted ? 0 : 1;
-    this.sfxGain = this.ac.createGain(); this.sfxGain.gain.value = 0.9; this.sfxGain.connect(this.master);
+    // compresor suave: evita que los golpes amontonados saturen
+    this.comp = this.ac.createDynamicsCompressor();
+    this.comp.threshold.value = -18; this.comp.knee.value = 12; this.comp.ratio.value = 4; this.comp.attack.value = 0.003; this.comp.release.value = 0.15;
+    this.comp.connect(this.master);
+    this.sfxGain = this.ac.createGain(); this.sfxGain.gain.value = 0.9; this.sfxGain.connect(this.comp);
     for (const n of SFX_FILES) loadAudio('audio/sfx/' + n + '.ogg').then((b) => { this.bufs[n] = b; }).catch(() => {});
     MUSIC.attach(this.ac, this.master);
   },
@@ -116,7 +123,10 @@ const SFX = {
   },
   play(name) {
     if (!this.ac || this.muted) return;
-    if (this.budget > 6) return;
+    if (this.budget > 3) return;
+    const t = this.ac.currentTime, last = this.lastT[name] || -1;
+    if (t - last < (SFX_GAP[name] || 0.03)) return;
+    this.lastT[name] = t;
     this.budget++;
     // muestra grabada con una ligera variación de tono para que los golpes no suenen idénticos
     if (this.sample(name, name === 'click' || name === 'level' || name === 'legend' ? 1 : 0.93 + Math.random() * 0.14)) return;

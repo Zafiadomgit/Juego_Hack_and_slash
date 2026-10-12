@@ -50,55 +50,81 @@ def fx(name):
     return deco
 
 
+def sine_drop(f0, f1, d, k):
+    """Tono que cae de f0 a f1 con decaimiento exponencial (cuerpo de un golpe)."""
+    n = int(d * SR); t = np.arange(n) / SR
+    f = f1 + (f0 - f1) * np.exp(-t * k)
+    return np.sin(2 * np.pi * np.cumsum(f) / SR)
+
+
+def soft_noise(d, lo, hi, att=0.01):
+    """Ruido filtrado con ataque suave (sin chasquidos)."""
+    n = int(d * SR); t = np.arange(n) / SR
+    env = np.minimum(1, t / att) * np.exp(-t * 6 / d)
+    return bp(noise(n), lo, hi) * env
+
+
+def chime(freqs, d, decay=7):
+    """Campanilla limpia de senos (brillo sin estridencia)."""
+    n = int(d * SR); t = np.arange(n) / SR
+    y = sum(np.sin(2 * np.pi * f * t) * (0.6 ** k) for k, f in enumerate(freqs))
+    return y * np.exp(-t * decay) * np.minimum(1, t / 0.004)
+
+
 @fx('swing')
-def _():  # tajo de hacha: soplido + filo metálico
-    d = 0.28
-    w = bp(noise(int(d * SR)), 600, 4000) * np.sin(np.pi * T(d) / d) ** 1.5
-    shing = S.bell(2600, 0.25, ratio=2.7, index=1.5) * 0.25
-    return mixdown([(w, 0, 0.9), (shing, 0.05, 1)], d + 0.2)
+def _():  # tajo: soplido de aire corto y grave, sin chirrido metálico
+    d = 0.2
+    t = T(d)
+    sweep = lp(noise(len(t)), 1800) * np.sin(np.pi * t / d) ** 2
+    return lp(sweep, 2200) * 0.9
 
 
 @fx('hit')
-def _():  # golpe seco con cuerpo
-    d = 0.22
-    thud = np.sin(2 * np.pi * np.cumsum(140 * env_exp(int(d * SR), 18) + 60) / SR) * env_exp(int(d * SR), 22)
-    crack = bp(noise(int(0.06 * SR)), 1500, 6000) * env_exp(int(0.06 * SR), 60)
-    return mixdown([(thud, 0, 1), (crack, 0, 0.7)], d)
+def _():  # golpe: cuerpo grave y redondo, chasquido muy corto y filtrado
+    d = 0.16
+    body = sine_drop(330, 150, d, 26) * env_exp(int(d * SR), 22)
+    knock = sine_drop(620, 420, d, 30) * env_exp(int(d * SR), 45) * 0.35
+    tap = lp(noise(int(0.02 * SR)), 2500) * env_exp(int(0.02 * SR), 180)
+    return mixdown([(body, 0, 1), (knock, 0, 1), (tap, 0, 0.3)], d)
 
 
 @fx('crit')
-def _():  # crítico: golpe pesado + campanazo agudo
-    d = 0.6
-    thud = np.sin(2 * np.pi * np.cumsum(180 * env_exp(int(0.35 * SR), 12) + 55) / SR) * env_exp(int(0.35 * SR), 12)
-    crack = bp(noise(int(0.1 * SR)), 1000, 8000) * env_exp(int(0.1 * SR), 35)
-    ring = S.bell(1760, 0.5, ratio=3.1, index=2) * 0.35
-    return small_verb(mixdown([(thud, 0, 1), (crack, 0, 0.9), (ring, 0.01, 1)], d), amt=0.5)
+def _():  # crítico: golpe con más cuerpo + campanilla brillante y breve
+    d = 0.5
+    body = sine_drop(400, 150, 0.3, 16) * env_exp(int(0.3 * SR), 12)
+    tap = lp(noise(int(0.03 * SR)), 3000) * env_exp(int(0.03 * SR), 120)
+    ring = chime([1568, 2349, 3136], 0.45, 9)
+    return small_verb(mixdown([(body, 0, 1), (tap, 0, 0.4), (ring, 0.01, 0.35)], d), amt=0.35)
 
 
 @fx('boom')
-def _():
-    d = 1.4
-    return small_verb(S.impact(1.0)[: int(d * SR)] * env_exp(int(d * SR), 2.5), rt=0.9, amt=0.6)
+def _():  # explosión: retumbo grave, sin siseo agudo
+    d = 1.1
+    t = T(d)
+    sub = sine_drop(110, 38, d, 5) * np.exp(-t * 3.2)
+    rumble = lp(noise(len(t)), 500) * np.exp(-t * 3.5) * np.minimum(1, t / 0.01)
+    puff = lp(noise(len(t)), 2000) * np.exp(-t * 18)
+    crunch = bp(noise(len(t)), 250, 1200) * np.exp(-t * 7)
+    return small_verb(mixdown([(sub, 0, 1), (rumble, 0, 0.9), (crunch, 0, 0.7), (puff, 0, 0.25)], d), rt=0.8, amt=0.35)
 
 
 @fx('coin')
-def _():
-    d = 0.45
-    a = S.bell(1975, 0.4, ratio=2.0, index=0.8); b = S.bell(2637, 0.35, ratio=2.0, index=0.8)
-    return mixdown([(a, 0, 0.6), (b, 0.07, 0.6)], d)
+def _():  # ámbar: dos notas suaves y cortas
+    return mixdown([(chime([2093, 4186], 0.18, 22), 0, 0.5), (chime([2637, 5274], 0.25, 18), 0.06, 0.5)], 0.32)
 
 
 @fx('xp')
-def _():
-    return S.celesta(1568, 0.25) * 0.5
+def _():  # orbe de experiencia: burbujita aguda muy discreta
+    d = 0.12
+    return sine_drop(1400, 1900, d, -6)[: int(d * SR)] * np.sin(np.pi * T(d) / d) * 0.4
 
 
 @fx('hurt')
-def _():  # el héroe recibe daño: golpe sordo + quejido grave
-    d = 0.4
-    thud = np.sin(2 * np.pi * np.cumsum(110 * env_exp(int(0.25 * SR), 10) + 50) / SR) * env_exp(int(0.25 * SR), 14)
-    grunt = bp(chirp(220, 140, 0.3, 'saw'), 300, 1400) * np.sin(np.pi * T(0.3) / 0.3)
-    return mixdown([(thud, 0, 1), (grunt, 0.02, 0.5)], d)
+def _():  # el héroe recibe daño: golpe sordo + nota que baja (sin graznido)
+    d = 0.35
+    thud = sine_drop(280, 120, 0.25, 14) * env_exp(int(0.25 * SR), 13)
+    tone = sine_drop(392, 262, 0.3, 6) * np.sin(np.pi * T(0.3) / 0.3) * 0.3
+    return mixdown([(thud, 0, 1), (lp(tone, 1500), 0.02, 1)], d)
 
 
 @fx('level')
@@ -110,9 +136,9 @@ def _():  # subida de nivel: arpa ascendente + brillo
 
 
 @fx('dash')
-def _():
-    d = 0.25
-    return bp(noise(int(d * SR)), 800, 5000) * np.sin(np.pi * T(d) / d) ** 2 * 0.9
+def _():  # esquiva: soplido suave
+    d = 0.22
+    return lp(bp(noise(int(d * SR)), 300, 2500), 2000) * np.sin(np.pi * T(d) / d) ** 2 * 0.9
 
 
 @fx('shield')
@@ -124,17 +150,16 @@ def _():  # égida: destello que sube
 
 
 @fx('baa')
-def _():  # gruñido de jabalí
-    d = 0.45
-    g = S.saw(np.cumsum(90 + 25 * np.sin(2 * np.pi * 12 * T(d))) / SR)
-    g = bp(g, 200, 1100) * np.sin(np.pi * T(d) / d) + bp(noise(int(d * SR)), 300, 900) * 0.3 * np.sin(np.pi * T(d) / d)
-    return g * 0.8
+def _():  # gruñido de bestia, grave y filtrado
+    d = 0.4
+    g = S.saw(np.cumsum(85 + 18 * np.sin(2 * np.pi * 9 * T(d))) / SR)
+    return lp(bp(g, 120, 900), 800) * np.sin(np.pi * T(d) / d) * 0.8
 
 
 @fx('piou')
-def _():  # chillido del pájaro de fuego
-    d = 0.3
-    return chirp(1800, 3200, d) * np.sin(np.pi * T(d) / d) * 0.4 + bp(noise(int(d * SR)), 2000, 6000) * 0.1
+def _():  # chillido del pájaro de fuego, más suave
+    d = 0.25
+    return lp(chirp(1100, 1700, d), 2500) * np.sin(np.pi * T(d) / d) * 0.35
 
 
 @fx('boss')
@@ -188,19 +213,20 @@ def _():  # Portal Rúnico
 
 
 @fx('shoot')
-def _():  # cuerda de arco + silbido de flecha
-    d = 0.35
-    tw = S.ks(110, 0.25, bright=0.3, decay=0.98) * 0.6
-    wh = bp(noise(int(0.22 * SR)), 1500, 7000) * np.sin(np.pi * T(0.22) / 0.22) * 0.35
+def _():  # arco: cuerda pulsada redonda + aire muy leve
+    d = 0.3
+    tw = lp(S.ks(147, 0.25, bright=0.2, decay=0.985), 2500) * 0.8
+    wh = lp(bp(noise(int(0.15 * SR)), 600, 3000), 2500) * np.sin(np.pi * T(0.15) / 0.15) * 0.18
     return mixdown([(tw, 0, 1), (wh, 0.02, 1)], d)
 
 
 @fx('magic')
-def _():  # orbe arcano
-    d = 0.4
+def _():  # orbe arcano: nota de cristal con ataque suave
+    d = 0.35
     t = T(d)
-    y = np.sin(2 * np.pi * 660 * t + 3 * np.sin(2 * np.pi * 990 * t) * np.exp(-t * 6)) * env_exp(len(t), 7)
-    return small_verb(mixdown([(y, 0, 0.5), (S.celesta(1320, 0.3), 0, 0.2)], d), amt=0.5)
+    y = np.sin(2 * np.pi * 784 * t) * np.exp(-t * 9) * np.minimum(1, t / 0.015)
+    y += np.sin(2 * np.pi * 1176 * t) * np.exp(-t * 12) * 0.3
+    return small_verb(y * 0.8, amt=0.4)
 
 
 @fx('step')
@@ -212,7 +238,9 @@ def _():  # paso sobre tierra
 def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
     total = 0
+    only = set(sys.argv[2:])
     for name, fn in FX.items():
+        if only and name not in only: continue
         y = fn()
         y = y / (np.abs(y).max() + 1e-9) * 0.9
         st = np.stack([y, y], 1)
