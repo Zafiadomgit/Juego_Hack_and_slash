@@ -141,10 +141,10 @@ h2 { font-size: clamp(18px, 3.4vw, 24px); }
 .hubRow { display: flex; justify-content: space-between; font-size: 13px; gap: 6px; }
 .dofusRow { display: flex; gap: 8px; justify-content: center; margin: 8px 0 4px; }
 .egg {
-  width: 16px; height: 21px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  width: 15px; height: 15px; margin: 3px; transform: rotate(45deg); border-radius: 3px;
   background: rgba(0, 0, 0, 0.45); border: 1.5px dashed rgba(255, 255, 255, 0.25);
 }
-.egg.got { background: radial-gradient(circle at 35% 30%, #fff, var(--c) 45%, #111); border: 1.5px solid #fff; box-shadow: 0 0 10px var(--c); }
+.egg.got { background: linear-gradient(135deg, #fff 0%, var(--c) 40%, #111 100%); border: 1.5px solid #fff; box-shadow: 0 0 10px var(--c); }
 .faille { display: flex; align-items: center; gap: 8px; margin: 10px 0 4px; }
 .faille #fLabel { flex: 1; text-align: center; font-weight: 800; font-size: 18px; color: #ffd76a; }
 .faille small { display: block; font-size: 11px; font-weight: 400; color: #f3ead2; opacity: 0.8; }

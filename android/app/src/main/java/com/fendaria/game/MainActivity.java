@@ -1,4 +1,4 @@
-package com.fan.astrubslash;
+package com.fendaria.game;
 
 import android.os.Bundle;
 import android.view.View;

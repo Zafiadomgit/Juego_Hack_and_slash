@@ -1,47 +1,38 @@
-# Astrub Slash
+# Fendaria
 
-Un hack & slash (ARPG) para Android inspirado en el mundo de **Dofus**: entra por el Zaap de Astrub, limpia las *Failles*, derrota al Guardián y equípate con su botín.
+Un hack & slash (ARPG) para Android: cruza el Portal Rúnico de Villa Candela, cierra las *Grietas*, derrota al Guardián y equípate con su botín.
 
-> Fan game sin ánimo de lucro. Dofus, sus clases y sus monstruos son propiedad de Ankama. Todo el arte del juego se dibuja por código; no se usa ningún asset oficial.
+Todo el arte del juego se dibuja por código (sin assets de terceros).
 
 ## Cómo se juega
 
-1. **Elige personaje**: Iop (cuerpo a cuerpo), Cra (a distancia) o Feca (mago protector). Cada uno tiene su propia partida guardada.
-2. **Astrub** es el hub: elige el nivel de Faille, compra pan (curación) y gestiona tu equipo.
-3. **La Faille**: los monstruos llegan en grupos. Cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** (Bouftou Real o Tofu Real), que entra en furia al 50% de vida.
-4. **Botín**: objetos con rareza (Común, Raro, Épico, Legendario), con nombre en el suelo y haz de luz para los mejores. Los Guardianes pueden soltar un **Dofus** (bonus permanente).
-5. Al vencer al Guardián se abre un **Zaap**: entra para volver a Astrub y desbloquear la siguiente Faille. Si acabas antes de que se agote el tiempo, recibes un bonus.
-6. Cada nivel te da **5 puntos de característica** (Vitalidad, Sabiduría, Fuerza, Inteligencia, Suerte, Agilidad) que repartes desde la bolsa 🎒.
+1. **Elige personaje**: Rompeyelmos (cuerpo a cuerpo), Ojo de Halcón (a distancia) o Runista (mago protector). Cada uno tiene su propia partida guardada.
+2. **Villa Candela** es el hub: elige el nivel de Grieta, compra pociones y gestiona tu equipo.
+3. **La Grieta**: los monstruos (Chispín, Jabalí Musgoso, Tejeceniza, Seta Escupidora, Gólem de Basalto) llegan en grupos. Cada muerte llena la barra de progreso. Al llenarla aparece el **Guardián** (Colmillo Ancestral o Garra Ígnea), que entra en furia al 50% de vida.
+4. **Botín** con rareza (Común, Raro, Épico, Legendario). Los Guardianes pueden soltar una **Gema Ancestral** (bonus permanente).
+5. Al vencer al Guardián se abre un **Portal**: crúzalo para volver a Villa Candela y desbloquear la siguiente Grieta.
+6. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒.
 
 ### Controles
 
 | Móvil | Teclado | Acción |
 |---|---|---|
 | Joystick (mitad izquierda) | WASD / flechas | Moverse |
-| Botón grande | J / Espacio (mantener) | Ataque básico (apunta solo al enemigo más cercano) |
-| Botones azules | K / L | Hechizos (cuestan PA ★) |
-| Botón verde | Shift | Esquiva (gasta 1 PM) |
-| 🍞 | H | Comer pan (cura un 40%) |
-| 🎒 | B | Personaje: equipo, bolsa y características |
-
-### Clases
-
-- **Iop**: espadazos en arco. *Salto* (cae sobre el enemigo y aplasta la zona) y *Cólera de Iop* (tajo gigante tras una carga).
-- **Cra**: flechas rápidas. *Flecha Explosiva* (daño en área) y *Lluvia de Flechas*.
-- **Feca**: orbes mágicos que atraviesan enemigos. *Escudo Feca* (absorbe daño y empuja) y *Glifo Ardiente* (quema y ralentiza).
+| Botón grande | J / Espacio (mantener) | Ataque básico (apunta solo) |
+| Botones azules | K / L | Hechizos (cuestan energía ★) |
+| Botón verde | Shift | Esquiva (gasta impulso) |
+| 🧪 | H | Poción (cura un 40%) |
+| 🎒 | B | Equipo, bolsa y características |
 
 ## Estructura
 
 ```
 www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
-  index.html
-  css/style.css
-  js/data.js          Clases, monstruos, objetos, Dofus
-  js/art.js           Arte procedural (personajes, monstruos, Zaap, casas…)
-  js/game.js          Lógica: combate, IA, Failles, botín, HUD, interfaz
-android/              Proyecto Android generado por Capacitor
-capacitor.config.json
-.github/workflows/android.yml   Compila el APK en cada push
+  js/data.js          Clases, monstruos, objetos, gemas
+  js/art.js           Arte procedural + caché de sprites
+  js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
+android/              Proyecto Android (Capacitor)
+eas.json / app.json   Compilación del APK con EAS
 ```
 
 ## Probar en el navegador

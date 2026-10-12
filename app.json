@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "Astrub Slash",
+    "name": "Fendaria",
     "slug": "astrub-slash",
     "version": "0.1.0",
     "android": {
-      "package": "com.fan.astrubslash"
+      "package": "com.fendaria.game"
     },
     "extra": {
       "eas": {

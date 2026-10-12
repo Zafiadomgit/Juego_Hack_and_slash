@@ -1,10 +1,10 @@
 apply plugin: 'com.android.application'
 
 android {
-    namespace "com.fan.astrubslash"
+    namespace "com.fendaria.game"
     compileSdk rootProject.ext.compileSdkVersion
     defaultConfig {
-        applicationId "com.fan.astrubslash"
+        applicationId "com.fendaria.game"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

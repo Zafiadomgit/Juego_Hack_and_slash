@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#1b2e12" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Astrub Slash</title>
+  <title>Fendaria</title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -14,28 +14,28 @@
   <!-- Selección de personaje -->
   <div id="menu" class="overlay">
     <div class="panel wide">
-      <h1 class="title">Astrub <span>Slash</span></h1>
-      <p class="subtitle">Un hack &amp; slash fan inspirado en el mundo de Dofus</p>
+      <h1 class="title">Fen<span>daria</span></h1>
+      <p class="subtitle">Cierra las Grietas. Reclama el ámbar.</p>
       <div id="classList" class="cards"></div>
       <button id="btnStart" class="btn big" disabled>Elige un personaje</button>
       <p id="menuHint" class="small"></p>
     </div>
   </div>
 
-  <!-- Astrub (hub) -->
+  <!-- Villa Candela (hub) -->
   <div id="hub" class="overlay side">
     <div class="panel hubpanel">
-      <h2 class="gold">Astrub</h2>
+      <h2 class="gold">Villa Candela</h2>
       <div id="hubChar"></div>
       <div class="faille">
         <button id="fMinus" class="btn round">−</button>
         <div id="fLabel"></div>
         <button id="fPlus" class="btn round">+</button>
       </div>
-      <button id="btnZaap" class="btn big">🌀 Entrar por el Zaap</button>
+      <button id="btnZaap" class="btn big">🌀 Cruzar el Portal Rúnico</button>
       <div class="row2">
         <button id="btnInv" class="btn">🎒 Personaje</button>
-        <button id="btnBakery" class="btn">🍞 Pan · 40 K</button>
+        <button id="btnBakery" class="btn">🧪 Poción · 40 ámbar</button>
       </div>
       <button id="btnChange" class="btn ghost">Cambiar de personaje</button>
     </div>
@@ -70,16 +70,16 @@
       <button id="btnResume" class="btn big">Continuar</button>
       <button id="btnPauseInv" class="btn">🎒 Personaje</button>
       <button id="btnMute" class="btn">Sonido: ON</button>
-      <button id="btnQuit" class="btn ghost">Abandonar la Faille (conservas el botín)</button>
+      <button id="btnQuit" class="btn ghost">Abandonar la Grieta (conservas el botín)</button>
     </div>
   </div>
 
-  <!-- Faille terminada -->
+  <!-- Grieta cerrada -->
   <div id="end" class="overlay">
     <div class="panel">
-      <h2 id="endTitle" class="gold">Faille terminada</h2>
+      <h2 id="endTitle" class="gold">Grieta cerrada</h2>
       <div id="endStats" class="stats"></div>
-      <button id="btnEndHub" class="btn big">Volver a Astrub</button>
+      <button id="btnEndHub" class="btn big">Volver a Villa Candela</button>
     </div>
   </div>
 
@@ -87,9 +87,9 @@
   <div id="dead" class="overlay">
     <div class="panel">
       <h2 class="red">Has caído...</h2>
-      <p class="small">Tu alma vuela hacia el Fénix más cercano. Conservas el botín y la experiencia.</p>
+      <p class="small">Despiertas junto al Portal de Villa Candela. Conservas el botín y la experiencia.</p>
       <div id="deadStats" class="stats"></div>
-      <button id="btnDeadHub" class="btn big">Volver a Astrub</button>
+      <button id="btnDeadHub" class="btn big">Volver a Villa Candela</button>
     </div>
   </div>
 

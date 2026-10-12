@@ -1,8 +1,8 @@
 {
-  "name": "astrub-slash",
+  "name": "fendaria",
   "version": "0.1.0",
   "private": true,
-  "description": "Hack & slash fan game inspirado en Dofus, para Android (Capacitor)",
+  "description": "Fendaria: hack & slash para Android (Capacitor)",
   "scripts": {
     "serve": "npx --yes http-server www -p 8080 -c-1",
     "sync": "npx cap sync android",

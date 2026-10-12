@@ -1,5 +1,5 @@
-/* Astrub Slash — hack & slash fan game inspirado en Dofus.
- * Bucle: Astrub (hub con Zaap) -> Faille (oleadas, barra de progreso) -> Guardián -> botín -> Zaap de vuelta.
+/* Fendaria — hack & slash para móvil.
+ * Bucle: Villa Candela (hub con Portal Rúnico) -> Grieta (oleadas, barra de progreso) -> Guardián -> botín -> Portal de vuelta.
  * Todo el arte se dibuja por código (art.js). Datos en data.js.
  */
 'use strict';
@@ -25,18 +25,25 @@ const fmtTime = (t) => { t = Math.max(0, Math.ceil(t)); return Math.floor(t / 60
 // Canvas y escalado
 // ============================================================
 const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
+let ctx = canvas.getContext('2d', { alpha: false }); // `let`: la caché de sprites lo intercambia al dibujar
 let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 
+// Calidad adaptativa: si el móvil no llega a ~45 FPS se baja la resolución interna
+const QUALITY = { maxDpr: 1.5, samples: [], checkT: 0 };
 function resize() {
-  DPR = Math.min(window.devicePixelRatio || 1, 2);
+  DPR = Math.min(window.devicePixelRatio || 1, QUALITY.maxDpr);
   W = window.innerWidth;
   H = window.innerHeight;
   canvas.width = Math.floor(W * DPR);
   canvas.height = Math.floor(H * DPR);
   zoom = Math.min(W, H) / 420; // ~420 unidades de mundo en el lado corto
   ui = clamp(Math.min(W, H) / 400, 0.8, 1.6);
+  spriteScaleUpdate(zoom * DPR);
+  groundChunks.clear();
+  vignetteCache = null;
 }
+const groundChunks = new Map();
+let vignetteCache = null;
 window.addEventListener('resize', resize);
 resize();
 
@@ -154,7 +161,7 @@ let invReturn = 'hub';
 let selectedClass = null;
 
 // ============================================================
-// Mundo de la Faille
+// Mundo de la Grieta
 // ============================================================
 const WORLD = { w: 2600, h: 2600 };
 
@@ -193,7 +200,7 @@ function genRift() {
   for (let i = 0; i < 40; i++) motes.push({ x: rand(0, 1), y: rand(0, 1), s: rand(1, 2.5), v: rand(0.004, 0.015), p: rand(0, 6) });
 }
 
-// Hub: Astrub
+// Hub: Villa Candela
 const HUB = { houses: [], stones: [], trees: [], lamps: [] };
 function genHub() {
   HUB.houses = [
@@ -224,7 +231,9 @@ function makePattern(base, alt, line) {
   g.beginPath(); g.moveTo(64, 0); g.lineTo(128, 32); g.lineTo(64, 64); g.lineTo(0, 32); g.closePath(); g.fill();
   g.strokeStyle = line; g.lineWidth = 1.5;
   g.beginPath(); g.moveTo(0, 32); g.lineTo(64, 0); g.lineTo(128, 32); g.lineTo(64, 64); g.closePath(); g.stroke();
-  return ctx.createPattern(c, 'repeat');
+  const pat = ctx.createPattern(c, 'repeat');
+  pat.src = c;
+  return pat;
 }
 const grassPattern = makePattern('#7fb24a', '#78aa45', 'rgba(40,70,20,0.18)');
 const riftPattern = makePattern('#5b3324', '#56301f', 'rgba(20,8,0,0.25)');
@@ -711,7 +720,7 @@ function killEnemy(e) {
   // racha de masacre
   streak.n = gameTime - streak.t < 1.6 ? streak.n + 1 : 1;
   streak.t = gameTime;
-  // progreso de la Faille
+  // progreso de la Grieta
   if (!rift.bossSpawned) {
     rift.progress = Math.min(rift.goal, rift.progress + D.prog * (e.elite ? 4 : 1));
     if (rift.progress >= rift.goal) spawnGuardian();
@@ -983,7 +992,7 @@ function collideObstacles(o) {
 }
 
 // ============================================================
-// La Faille
+// La Grieta
 // ============================================================
 const RIFT_TIME = 300;
 
@@ -1032,6 +1041,7 @@ function startRift(level) {
   SFX.init();
   scene = 'rift';
   genRift();
+  groundChunks.clear();
   rift = {
     level, progress: 0, goal: 70 + level * 5, time: RIFT_TIME, elapsed: 0,
     bossSpawned: false, bossDead: false, zaap: null, spawnT: 1, kills: 0,
@@ -1045,7 +1055,7 @@ function startRift(level) {
   clearInput();
   state = 'play';
   showOverlay(null);
-  showBanner('Faille ' + level, '#ffd76a', 'Llena la barra de progreso para invocar al Guardián');
+  showBanner('Grieta ' + level, '#ffd76a', 'Llena la barra de progreso para invocar al Guardián');
   SFX.play('zaap');
   enterFullscreen();
 }
@@ -1073,12 +1083,12 @@ function guardianDefeated(e) {
   for (let i = 0; i < n; i++) {
     let r = rollRarity(10);
     if (i === 0) r = Math.max(2, r);
-    const named = r === 3 ? { name: e.D.name.includes('Bouftou') ? 'del Bouftou Real' : 'del Tofu Real' } : {};
+    const named = r === 3 ? { name: e.type === 'bouftouRoyal' ? 'del Colmillo Ancestral' : 'de la Garra Ígnea' } : {};
     dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel() + 1, r, named) });
   }
   for (let i = 0; i < 3; i++) dropPickup(e.x, e.y, 'pain', { val: 30 });
-  // ¿Dofus?
-  const missing = Object.keys(DOFUS).filter((k) => !S.dofus.includes(k));
+  // ¿Gema Ancestral?
+  const missing = Object.keys(GEMS).filter((k) => !S.dofus.includes(k));
   if (missing.length && Math.random() < 0.3 + rift.level * 0.07) dropPickup(e.x, e.y, 'dofus', { id: pick(missing) });
   // bonus de tiempo
   if (rift.time > 0) {
@@ -1086,7 +1096,7 @@ function guardianDefeated(e) {
     for (let i = 0; i < 6; i++) dropPickup(e.x, e.y, 'kama', { val: Math.round(rift.bonus / 6) });
     dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(5))) });
   }
-  showBanner(`¡${e.D.name} derrotado!`, '#ffd76a', 'Recoge el botín y entra en el Zaap para volver a Astrub');
+  showBanner(`¡${e.D.name} derrotado!`, '#ffd76a', 'Recoge el botín y cruza el Portal para volver a Villa Candela');
   // zaap de salida
   const zx = clamp(e.x + 140, 80, WORLD.w - 80), zy = clamp(e.y - 60, 80, WORLD.h - 80);
   for (const o of obstacles) if (dist(o.x, o.y, zx, zy) < 90) o.gone = true;
@@ -1113,7 +1123,7 @@ function updateRift(dt) {
     const bonus = Math.round(streak.n * 2 * P.kamaMul);
     S.kamas += bonus;
     gainXp(streak.n * rift.level);
-    subBanner = { text: `Masacre ×${streak.n}  ·  +${bonus} kamas`, t: 2.5, max: 2.5 };
+    subBanner = { text: `Racha ×${streak.n}  ·  +${bonus} ámbar`, t: 2.5, max: 2.5 };
     SFX.play('coin');
     streak.n = 0;
   }
@@ -1208,7 +1218,7 @@ function collect(k) {
   if (k.type === 'kama') { S.kamas += k.val; SFX.play('coin'); }
   else if (k.type === 'xp') { gainXp(k.val); SFX.play('xp'); }
   else if (k.type === 'pain') {
-    if (P.hp >= P.maxHp && S.pan < 5) { S.pan++; addText(P.x, P.y - 40, '+1 🍞', '#ffe082', 0.9); }
+    if (P.hp >= P.maxHp && S.pan < 5) { S.pan++; addText(P.x, P.y - 40, '+1 🧪', '#b5f28a', 0.9); }
     else heal(Math.round(P.maxHp * 0.25));
     SFX.play('heal');
   } else if (k.type === 'item') {
@@ -1229,7 +1239,7 @@ function collect(k) {
     if (!S.dofus.includes(k.id)) S.dofus.push(k.id);
     rift.dofus = k.id;
     recalc();
-    showBanner(DOFUS[k.id].name.toUpperCase(), DOFUS[k.id].color, DOFUS[k.id].desc);
+    showBanner(GEMS[k.id].name.toUpperCase(), GEMS[k.id].color, GEMS[k.id].desc);
     banner.egg = k.id;
     SFX.play('legend');
     shake(6);
@@ -1261,7 +1271,7 @@ function updateEffects(dt) {
     p.x += p.vx * dt; p.y += p.vy * dt;
   }
   particles = particles.filter((p) => p.life > 0);
-  if (particles.length > 600) particles.splice(0, particles.length - 600);
+  if (particles.length > 350) particles.splice(0, particles.length - 350);
   for (const t of texts) { t.life -= dt; t.y -= 38 * dt; }
   texts = texts.filter((t) => t.life > 0);
   for (const s of slashes) {
@@ -1376,7 +1386,7 @@ function drawHUD() {
     if (fillK >= 1) drawStar(cx, cy, 7 * s, '#29b6f6');
     else if (fillK > 0) drawStar(cx, cy, 7 * s * fillK, '#0277bd');
   }
-  text('PA', bx + 9 * s + P.maxPa * 17 * s, by + 8 * s, 10 * s, '#81d4fa', 'left', 900);
+  text('EN', bx + 9 * s + P.maxPa * 17 * s, by + 8 * s, 10 * s, '#81d4fa', 'left', 900);
   by += 18 * s;
   for (let i = 0; i < P.maxPm; i++) {
     const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
@@ -1384,7 +1394,7 @@ function drawHUD() {
     const fillK = clamp(P.pm - i, 0, 1);
     if (fillK > 0) circle(cx, cy, 6 * s * (fillK >= 1 ? 1 : fillK * 0.8), fillK >= 1 ? '#66bb6a' : '#2e7d32');
   }
-  text('PM', bx + 9 * s + P.maxPm * 17 * s, by + 8 * s, 10 * s, '#a5d6a7', 'left', 900);
+  text('IM', bx + 9 * s + P.maxPm * 17 * s, by + 8 * s, 10 * s, '#a5d6a7', 'left', 900);
 
   // botones pausa / bolsa
   circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(0,0,0,0.45)', '#c9a24a', 2);
@@ -1400,7 +1410,7 @@ function drawHUD() {
 
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
-  text('Faille ' + rift.level, rx - 150 * s, ry, 13 * s, '#ffd76a', 'left', 900);
+  text('Grieta ' + rift.level, rx - 150 * s, ry, 13 * s, '#ffd76a', 'left', 900);
   const tcol = rift.time > 30 ? '#f3ead2' : '#ff8a80';
   text(rift.bossSpawned ? (rift.bossDead ? '✔' : 'GUARDIÁN') : fmtTime(rift.time), rx, ry, 12 * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
@@ -1423,7 +1433,7 @@ function drawHUD() {
   if (rift.zaap) { const zx = mx + (rift.zaap.x - P.x) * ms, zy = my + (rift.zaap.y - P.y) * ms; circle(clamp(zx, mx - mr + 5, mx + mr - 5), clamp(zy, my - mr + 5, my + mr - 5), 4 * s, '#4fc3f7', '#fff', 1.5); }
   ctx.restore();
   drawStar(mx, my, 3.5 * s, '#fff');
-  text(S.kamas + ' K', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ffd76a', 'right', 900);
+  text(S.kamas + ' ámbar', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ffd76a', 'right', 900);
   text('☠ ' + rift.kills, mx - mr - 8 * s, my + 10 * s, 11 * s, '#f3ead2', 'right', 800);
 
   // jefe
@@ -1436,7 +1446,7 @@ function drawHUD() {
 
   // racha
   if (streak.n >= 5 && gameTime - streak.t < 1.6) {
-    text('Masacre ×' + streak.n, pad, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
+    text('Racha ×' + streak.n, pad, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
   }
 
   drawBanners();
@@ -1453,7 +1463,7 @@ function drawBanners() {
     const sc = 1 + Math.max(0, k - 0.85) * 2;
     let y = H * 0.3;
     if (banner.egg) {
-      drawDofusEgg(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, DOFUS[banner.egg].color, now);
+      drawGem(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
       y += 10 * s;
     }
     text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900);
@@ -1503,11 +1513,11 @@ function drawControls() {
   for (let i = 0; i < 2; i++) {
     const sk = P.C.skills[i];
     const cdk = clamp(P.skillCd[i] / sk.cd, 0, 1);
-    btn(L['s' + i], sk.icon, sk.cost + ' PA', '#29b6f6', cdk, P.pa >= sk.cost && cdk <= 0, false);
+    btn(L['s' + i], sk.icon, sk.cost + ' EN', '#29b6f6', cdk, P.pa >= sk.cost && cdk <= 0, false);
   }
   const pmk = P.pm >= 1 ? 0 : 1 - (P.pm % 1);
-  btn(L.dash, '»', Math.floor(P.pm) + ' PM', '#66bb6a', pmk, P.pm >= 1, false);
-  btn(L.pan, '🍞', String(S.pan), '#ffb74d', 0, S.pan > 0, false);
+  btn(L.dash, '»', String(Math.floor(P.pm)), '#66bb6a', pmk, P.pm >= 1, false);
+  btn(L.pan, '🧪', String(S.pan), '#7cc457', 0, S.pan > 0, false);
 }
 
 // ============================================================
@@ -1525,18 +1535,14 @@ function renderRift() {
   const vl = cam.x - vw, vr = cam.x + vw, vt = cam.y - vh, vb = cam.y + vh;
   const inView = (x, y, m = 0) => x > vl - m && x < vr + m && y > vt - m && y < vb + m;
 
-  ctx.fillStyle = riftPattern;
-  const gl = Math.max(0, vl), gt = Math.max(0, vt), gr = Math.min(WORLD.w, vr), gb = Math.min(WORLD.h, vb);
-  ctx.fillRect(gl, gt, gr - gl, gb - gt);
+  // suelo pre-renderizado por trozos (una sola copia de imagen por trozo visible)
+  const c0x = Math.max(0, Math.floor(vl / CHUNK)), c1x = Math.min(Math.ceil(WORLD.w / CHUNK) - 1, Math.floor(vr / CHUNK));
+  const c0y = Math.max(0, Math.floor(vt / CHUNK)), c1y = Math.min(Math.ceil(WORLD.h / CHUNK) - 1, Math.floor(vb / CHUNK));
+  for (let cy = c0y; cy <= c1y; cy++) {
+    for (let cx = c0x; cx <= c1x; cx++) ctx.drawImage(groundChunk(cx, cy), cx * CHUNK - 0.5, cy * CHUNK - 0.5, CHUNK + 1, CHUNK + 1);
+  }
   ctx.strokeStyle = '#1a0d08'; ctx.lineWidth = 24;
   ctx.strokeRect(-12, -12, WORLD.w + 24, WORLD.h + 24);
-
-  for (const d of decos) {
-    if (!inView(d.x, d.y)) continue;
-    if (d.kind === 'fern') drawFern(d);
-    else if (d.kind === 'blotch') ellipse(d.x, d.y, 26 * d.s, 12 * d.s, 'rgba(120,60,30,0.25)');
-    else ellipse(d.x, d.y, 3 * d.s, 2 * d.s, '#7a5a48');
-  }
 
   for (const g of glyphs) drawGlyph(g);
   for (const r of rings) {
@@ -1545,7 +1551,7 @@ function renderRift() {
     circle(r.x, r.y, r.r1, r.color + (0.15 * k) + ')', r.color + (0.7 * k) + ')', 2);
   }
 
-  if (rift.zaap) drawZaap(rift.zaap.x, rift.zaap.y, now);
+  if (rift.zaap) drawPortal(rift.zaap.x, rift.zaap.y, now);
   for (const k of pickups) if (inView(k.x, k.y, 200)) drawPickup(k);
   if (P.cast) drawCast();
 
@@ -1601,11 +1607,7 @@ function renderRift() {
     circle(m.x * W, m.y * H, m.s * ui, '#ffe9b0');
   }
   ctx.globalAlpha = 1;
-  const low = P.hp / P.maxHp < 0.3;
-  const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
-  g.addColorStop(0, 'rgba(0,0,0,0)');
-  g.addColorStop(1, low ? `rgba(160,0,0,${0.45 + Math.sin(now * 5) * 0.12})` : 'rgba(10,0,0,0.55)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  drawVignette(P.hp / P.maxHp < 0.3);
 
   drawHUD();
 }
@@ -1628,17 +1630,17 @@ function renderHub() {
     ctx.beginPath(); ctx.roundRect(st.x - st.w / 2, st.y - st.h / 2, st.w, st.h, 3); ctx.fill();
   }
   const list = [...HUB.houses.map((h) => ({ y: h.y, f: () => drawHouse(h) })), ...HUB.trees.map((t) => ({ y: t.y, f: () => drawTree(t) }))];
-  list.push({ y: -20, f: () => drawZaap(0, -20, now) });
+  list.push({ y: -20, f: () => drawPortal(0, -20, now) });
   const hero = { y: 70, f: () => { shadow(-10, 70, 13); drawHero(ctx, S ? S.cls : selectedClass || 'iop', { x: -10, y: 70, dir: -0.6, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now }); } };
   if (S || selectedClass) list.push(hero);
   list.sort((a, b) => a.y - b.y);
   for (const o of list) o.f();
-  // bouftous paseando por Astrub
+  // jabalíes paseando por Villa Candela
   for (let i = 0; i < 3; i++) {
     const t = now * 0.3 + i * 2.1;
-    const e = { x: Math.cos(t) * (420 + i * 40), y: 210 + Math.sin(t * 1.3) * 40 + i * 20, r: 13, t: now + i, state: 'move', face: -Math.sin(t) >= 0 ? 1 : -1, z: 0 };
+    const e = { type: 'bouftou', x: Math.cos(t) * (420 + i * 40), y: 210 + Math.sin(t * 1.3) * 40 + i * 20, r: 13, t: now + i, state: 'move', face: -Math.sin(t) >= 0 ? 1 : -1, z: 0, flash: 0 };
     shadow(e.x, e.y + 1, e.r);
-    drawBouftou(e, false);
+    drawMonsterBody(e);
   }
   ctx.restore();
   const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.max(W, H) * 0.8);
@@ -1688,7 +1690,77 @@ function frame(t) {
   }
   shakeMag = Math.max(0, shakeMag - raw * 40);
   render();
+  adaptQuality(raw);
   requestAnimationFrame(frame);
+}
+
+function adaptQuality(dt) {
+  if (state !== 'play' || QUALITY.maxDpr <= 1) return;
+  QUALITY.samples.push(dt);
+  QUALITY.checkT += dt;
+  if (QUALITY.checkT < 3) return;
+  const avg = QUALITY.samples.reduce((a, b) => a + b, 0) / QUALITY.samples.length;
+  QUALITY.samples = []; QUALITY.checkT = 0;
+  if (avg > 1 / 45 && (window.devicePixelRatio || 1) > 1) { QUALITY.maxDpr = 1; resize(); }
+}
+
+// Trozo de suelo: textura + manchas + helechos + guijarros, dibujado una vez
+const CHUNK = 520;
+function groundChunk(cx, cy) {
+  const key = cx + ',' + cy;
+  let c = groundChunks.get(key);
+  if (c) return c;
+  const gs = Math.min(1.4, Math.max(0.8, zoom * DPR));
+  c = document.createElement('canvas');
+  c.width = c.height = Math.ceil(CHUNK * gs);
+  const g = c.getContext('2d', { alpha: false });
+  g.scale(gs, gs);
+  g.translate(-cx * CHUNK, -cy * CHUNK);
+  g.fillStyle = g.createPattern(riftPattern.src, 'repeat');
+  g.fillRect(cx * CHUNK, cy * CHUNK, CHUNK, CHUNK);
+  // grano de tierra
+  let seed = (cx * 73856093) ^ (cy * 19349663);
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+  for (let i = 0; i < 900; i++) {
+    g.fillStyle = rnd() < 0.5 ? 'rgba(25,10,5,0.22)' : 'rgba(150,100,70,0.16)';
+    const sz = 1 + rnd() * 2.5;
+    g.fillRect(cx * CHUNK + rnd() * CHUNK, cy * CHUNK + rnd() * CHUNK, sz, sz);
+  }
+  const saved = ctx;
+  ctx = g;
+  try {
+    for (const d of decos) {
+      if (d.x < cx * CHUNK - 40 || d.x > (cx + 1) * CHUNK + 40 || d.y < cy * CHUNK - 40 || d.y > (cy + 1) * CHUNK + 40) continue;
+      if (d.kind === 'fern') drawFern(d);
+      else if (d.kind === 'blotch') ellipse(d.x, d.y, 26 * d.s, 12 * d.s, 'rgba(120,60,30,0.25)');
+      else ellipse(d.x, d.y, 3 * d.s, 2 * d.s, '#7a5a48');
+    }
+  } finally { ctx = saved; }
+  if (groundChunks.size > 30) groundChunks.delete(groundChunks.keys().next().value);
+  groundChunks.set(key, c);
+  return c;
+}
+
+function drawVignette(low) {
+  if (!vignetteCache) {
+    const mk = (col) => {
+      const c = document.createElement('canvas');
+      c.width = Math.ceil(W / 2); c.height = Math.ceil(H / 2);
+      const g = c.getContext('2d');
+      const gr = g.createRadialGradient(c.width / 2, c.height / 2, Math.min(c.width, c.height) * 0.35, c.width / 2, c.height / 2, Math.max(c.width, c.height) * 0.75);
+      gr.addColorStop(0, 'rgba(0,0,0,0)');
+      gr.addColorStop(1, col);
+      g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
+      return c;
+    };
+    vignetteCache = { dark: mk('rgba(10,0,0,0.55)'), red: mk('rgba(170,0,0,0.6)') };
+  }
+  ctx.drawImage(vignetteCache.dark, 0, 0, W, H);
+  if (low) {
+    ctx.globalAlpha = 0.65 + Math.sin(now * 5) * 0.2;
+    ctx.drawImage(vignetteCache.red, 0, 0, W, H);
+    ctx.globalAlpha = 1;
+  }
 }
 
 // ============================================================
@@ -1711,7 +1783,7 @@ function buildMenu() {
     el.className = 'card' + (selectedClass === id ? ' selected' : '');
     el.innerHTML = `<div class="head"><canvas width="112" height="112"></canvas><div><div class="name">${C.name}</div><div class="role">${slot ? `Nivel ${slot.level} · Faille ${slot.maxFaille}` : C.role}</div></div></div>
       <div class="desc">${C.desc}</div>
-      <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} PA)`).join('<br>')}</div>`;
+      <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} energía)`).join('<br>')}</div>`;
     const g = el.querySelector('canvas').getContext('2d');
     g.scale(2, 2); g.translate(28, 52); g.scale(1.1, 1.1);
     drawHero(g, id, { x: 0, y: 0, dir: 0.3, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: 0 });
@@ -1725,7 +1797,7 @@ function buildMenu() {
     list.appendChild(el);
   }
   $('btnStart').disabled = !selectedClass;
-  $('menuHint').textContent = 'Joystick a la izquierda, ataques a la derecha. Teclado: WASD + J (ataque), K / L (hechizos), Shift (esquiva), H (pan), B (bolsa)';
+  $('menuHint').textContent = 'Joystick a la izquierda, ataques a la derecha. Teclado: WASD + J (ataque), K / L (hechizos), Shift (esquiva), H (poción), B (bolsa)';
 }
 
 function goHub() {
@@ -1747,8 +1819,8 @@ function buildHub() {
     <div class="hubName">${C.name} <span>nivel ${S.level}</span></div>
     <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
     <div class="hubRow"><span>🪙 ${S.kamas} kamas</span><span>🍞 ${S.pan}/5</span><span>🎒 ${S.bag.length}/${BAG_MAX}</span></div>
-    <div class="dofusRow">${Object.keys(DOFUS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${DOFUS[k].color}" title="${DOFUS[k].name}"></span>`).join('')}</div>`;
-  $('fLabel').innerHTML = `Faille ${S.faille}<small>Monstruos nivel ${1 + (S.faille - 1) * 3}–${5 + (S.faille - 1) * 3} · Guardián: ${S.faille % 2 ? 'Bouftou Real' : 'Tofu Real'}</small>`;
+    <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}"></span>`).join('')}</div>`;
+  $('fLabel').innerHTML = `Grieta ${S.faille}<small>Monstruos nivel ${1 + (S.faille - 1) * 3}–${5 + (S.faille - 1) * 3} · Guardián: ${S.faille % 2 ? 'Colmillo Ancestral' : 'Garra Ígnea'}</small>`;
   $('fMinus').disabled = S.faille <= 1;
   $('fPlus').disabled = S.faille >= S.maxFaille;
   $('btnInv').innerHTML = '🎒 Personaje' + (S.points > 0 ? ` <span class="badge">${S.points}</span>` : '');
@@ -1835,7 +1907,7 @@ function buildInventory() {
       <span>Crítico</span><b>${Math.round(d.crit * 100)}%</b><span>Vel. ataque</span><b>${d.atkSpeed.toFixed(2)}</b>
       <span>Resistencia</span><b>${Math.round(d.armor * 100)}%</b><span>Prospección</span><b>${Math.round(100 * d.kamaMul)}</b>
     </div>
-    <div class="dofusRow">${Object.keys(DOFUS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${DOFUS[k].color}" title="${DOFUS[k].name}: ${DOFUS[k].desc}"></span>`).join('')}</div>`;
+    <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}"></span>`).join('')}</div>`;
   for (const b of $('charStats').querySelectorAll('button[data-stat]')) {
     b.addEventListener('click', () => {
       const n = Math.min(S.points, +b.dataset.n);
@@ -1848,7 +1920,7 @@ function buildInventory() {
     });
   }
   // bolsa
-  $('bagTitle').textContent = `Bolsa ${S.bag.length}/${BAG_MAX} · ${S.kamas} kamas`;
+  $('bagTitle').textContent = `Bolsa ${S.bag.length}/${BAG_MAX} · ${S.kamas} ámbar`;
   const cells = [];
   for (let i = 0; i < BAG_MAX; i++) {
     const it = S.bag[i];
@@ -1913,7 +1985,7 @@ function riftRows(extra = []) {
     ['Tiempo', fmtTime(rift.elapsed)],
     ['Monstruos derrotados', rift.kills],
     ['Objetos encontrados', rift.items + (rift.legendaries ? ` (${rift.legendaries} legendario${rift.legendaries > 1 ? 's' : ''})` : '')],
-    ['Kamas ganados', S.kamas - rift.kamas0],
+    ['Ámbar ganado', S.kamas - rift.kamas0],
     ['Experiencia', '+' + Math.round(rift.xp) + (rift.levels ? ` (+${rift.levels} niv.)` : '')],
     ...extra,
   ].map(([k, v]) => `<span>${k}</span><b>${v}</b>`).join('');
@@ -1941,10 +2013,10 @@ function finishRift() {
   S.rifts++;
   SFX.play('zaap');
   persist();
-  $('endTitle').textContent = `Faille ${rift.level} terminada`;
+  $('endTitle').textContent = `Grieta ${rift.level} cerrada`;
   $('endStats').innerHTML = riftRows([
-    ['Bonus de tiempo', rift.bonus ? '+' + rift.bonus + ' K' : '—'],
-    ...(rift.dofus ? [[DOFUS[rift.dofus].name, '★']] : []),
+    ['Bonus de tiempo', rift.bonus ? '+' + rift.bonus + ' ámbar' : '—'],
+    ...(rift.dofus ? [[GEMS[rift.dofus].name, '★']] : []),
   ]);
   showOverlay('end');
 }
@@ -2008,5 +2080,6 @@ requestAnimationFrame(frame);
 // Gancho para pruebas automatizadas
 window.__game = {
   get state() { return state; }, get P() { return P; }, get S() { return S; }, get rift() { return rift; }, get enemies() { return enemies; },
-  input, startRift, useSkill, spawnGuardian, goHub, openInventory,
+  input, startRift, useSkill, spawnGuardian, goHub, openInventory, spawnEnemy,
+  get fps() { return QUALITY; },
 };

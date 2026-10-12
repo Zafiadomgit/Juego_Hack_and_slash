@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Astrub Slash</string>
-    <string name="title_activity_main">Astrub Slash</string>
-    <string name="package_name">com.fan.astrubslash</string>
-    <string name="custom_url_scheme">com.fan.astrubslash</string>
+    <string name="app_name">Fendaria</string>
+    <string name="title_activity_main">Fendaria</string>
+    <string name="package_name">com.fendaria.game</string>
+    <string name="custom_url_scheme">com.fendaria.game</string>
 </resources>
