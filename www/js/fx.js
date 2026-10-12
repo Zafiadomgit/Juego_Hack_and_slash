@@ -198,9 +198,9 @@ function drawFlashes() {
 }
 
 // ---------- Iluminación: oscurece la escena y "recorta" luces ----------
-const LIGHT = { c: null, g: null, w: 0, h: 0 };
+const LIGHT = { c: null, g: null, w: 0, h: 0, div: 3 }; // div: resolución del mapa de luz (1/div)
 function renderLighting(lights, ambient) {
-  const w = Math.ceil(W / 3), h = Math.ceil(H / 3);
+  const D = LIGHT.div, w = Math.ceil(W / D), h = Math.ceil(H / D);
   if (!LIGHT.c || LIGHT.w !== w || LIGHT.h !== h) {
     LIGHT.c = document.createElement('canvas');
     LIGHT.c.width = w; LIGHT.c.height = h;
@@ -216,9 +216,9 @@ function renderLighting(lights, ambient) {
   g.globalCompositeOperation = 'destination-out';
   const tex = glowTex('255,255,255');
   for (const L of lights) {
-    const r = L.r / 3;
+    const r = L.r / D;
     g.globalAlpha = L.a;
-    g.drawImage(tex, L.x / 3 - r, L.y / 3 - r, r * 2, r * 2);
+    g.drawImage(tex, L.x / D - r, L.y / D - r, r * 2, r * 2);
   }
   g.globalAlpha = 1;
   ctx.drawImage(LIGHT.c, 0, 0, W, H);

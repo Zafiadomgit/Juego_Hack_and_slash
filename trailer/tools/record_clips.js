@@ -16,7 +16,7 @@ const SCENES = [
     await p.evaluate(() => { localStorage.clear(); window.TRAILER = true; });
     await p.reload(); await p.evaluate(() => { window.TRAILER = true; });
     await p.waitForTimeout(700);
-    await p.click(`.card:nth-child(${sc.cls})`); await p.click('#btnStart'); await p.waitForTimeout(500);
+    await p.click(`#classList button:nth-child(${sc.cls})`); await p.click('#btnStart'); await p.waitForTimeout(500);
     await p.addStyleTag({ content: '#hub, .overlay { display: none !important; }' });
     await p.evaluate(() => { const S = __game.S; S.level = 60; for (const k of Object.keys(S.stats)) S.stats[k] = 80; });
     if (sc.village) {

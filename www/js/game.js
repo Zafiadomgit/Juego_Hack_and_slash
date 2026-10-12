@@ -29,7 +29,8 @@ let ctx = canvas.getContext('2d', { alpha: false }); // `let`: la caché de spri
 let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 
 // Calidad adaptativa: si el móvil no llega a ~45 FPS se baja la resolución interna
-const QUALITY = { maxDpr: 1.5, samples: [], checkT: 0 };
+// nivel 0: todo; 1: sin desenfoque de maqueta; 2: resolución 1x y luces más baratas; 3: píxel más grande
+const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0 };
 function resize() {
   DPR = Math.min(window.devicePixelRatio || 1, QUALITY.maxDpr);
   W = window.innerWidth;
@@ -134,13 +135,12 @@ function migrateSlot(s) {
 }
 const boostOn = (k) => !!(rift && rift.boost && rift.boost[k]);
 let SAVE = loadSave();
-if (!HD2D.on) resize();
 let S = null; // personaje activo
 
 function loadSave() {
   try {
     const s = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null');
-    if (s && s.slots) { if (s.hd2d === false) HD2D.on = false; return s; }
+    if (s && s.slots) return s;
   } catch (e) { /* ignorar */ }
   return { slots: {}, last: null };
 }
@@ -2069,7 +2069,7 @@ function renderRift() {
   }
   ctx.globalAlpha = 1;
   ctx.restore();
-  hd2dEndWorld(B.id === 'glaciar' || B.id === 'desierto' ? 0.14 : 0.32);
+  hd2dEndWorld();
 
   // luz: la escena se oscurece salvo alrededor del héroe y de las fuentes de luz
   const toS = (x, y) => ({ x: (x - cam.x + sx) * zr + W / 2, y: (y - cam.y + sy) * zr + H / 2 });
@@ -2169,14 +2169,19 @@ function frame(t) {
   requestAnimationFrame(frame);
 }
 
+// Calidad automática: si el móvil no llega a ~50 FPS se van quitando efectos, de uno en uno
 function adaptQuality(dt) {
-  if (state !== 'play' || QUALITY.maxDpr <= 1) return;
+  if ((state !== 'play' && state !== 'hub') || QUALITY.level >= 3) return;
   QUALITY.samples.push(dt);
   QUALITY.checkT += dt;
-  if (QUALITY.checkT < 3) return;
+  if (QUALITY.checkT < 2.5) return;
   const avg = QUALITY.samples.reduce((a, b) => a + b, 0) / QUALITY.samples.length;
   QUALITY.samples = []; QUALITY.checkT = 0;
-  if (avg > 1 / 45 && (window.devicePixelRatio || 1) > 1) { QUALITY.maxDpr = 1; resize(); }
+  if (avg <= 1 / 50) return;
+  QUALITY.level++;
+  if (QUALITY.level === 1) HD2D.dof = false;
+  if (QUALITY.level === 2) { QUALITY.maxDpr = 1; LIGHT.div = 4; resize(); }
+  if (QUALITY.level === 3) { HD2D.pixMul = 1.3; resize(); }
 }
 
 // Trozo de suelo: textura + manchas + helechos + guijarros, dibujado una vez
@@ -2279,37 +2284,36 @@ function showOverlay(id) {
 function buildMenu() {
   const list = $('classList');
   list.innerHTML = '';
+  if (!selectedClass) selectedClass = 'iop';
   for (const id of Object.keys(CLASSES)) {
-    const C = CLASSES[id];
-    const slot = SAVE.slots[id];
-    const el = document.createElement('div');
-    el.className = 'card' + (selectedClass === id ? ' selected' : '');
-    el.innerHTML = `<div class="head"><canvas width="112" height="112"></canvas><div><div class="name">${C.name}</div><div class="role">${slot ? `Nivel ${slot.level} · Grieta ${slot.maxFaille}` : C.role}</div></div></div>
-      <div class="desc">${C.desc}</div>
-      <div class="skills">${C.skills.map((sk) => `${sk.icon} ${sk.name} (${sk.cost} energía)`).join('<br>')}</div>`;
-    const g = el.querySelector('canvas').getContext('2d');
-    g.scale(2, 2);
+    const C = CLASSES[id], slot = SAVE.slots[id];
     const art = heroArt(id);
-    if (art) {
-      const img = art.img, h = 56, w = (h * img.width) / img.height;
-      g.imageSmoothingEnabled = !art.px;
-      g.drawImage(img, 28 - w / 2, 0, w, h);
-    } else {
-      g.translate(28, 52); g.scale(1.1, 1.1);
-      drawHero(g, id, { x: 0, y: 0, dir: 0.3, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: 0 });
-    }
-    el.addEventListener('click', () => {
-      SFX.init(); SFX.play('click');
-      selectedClass = id;
-      for (const c of list.children) c.classList.toggle('selected', c === el);
-      $('btnStart').disabled = false;
-      confirmNew = false;
-      $('btnStart').textContent = SAVE.slots[id] ? (menuMode === 'new' ? `Empezar de nuevo con ${C.name}` : `Continuar con ${C.name}`) : `Comenzar con ${C.name}`;
-    });
-    list.appendChild(el);
+    const b = document.createElement('button');
+    b.className = selectedClass === id ? 'on' : '';
+    b.innerHTML = `${art ? `<img src="${art.url}" alt="">` : ''}<span>${C.name}<small>${slot ? `Nivel ${slot.level}` : C.role}</small></span>`;
+    b.addEventListener('click', () => { SFX.init(); SFX.play('click'); selectedClass = id; confirmNew = false; buildMenu(); });
+    list.appendChild(b);
   }
-  $('btnStart').disabled = !selectedClass;
-  $('menuHint').textContent = 'Joystick a la izquierda, ataques a la derecha. Teclado: WASD + J (ataque), K / L (hechizos), Shift (esquiva), H (poción), B (bolsa)';
+  showClassInfo(selectedClass);
+}
+
+function showClassInfo(id) {
+  const C = CLASSES[id], L = CLASS_LORE[id], slot = SAVE.slots[id];
+  const art = heroArt(id);
+  const img = $('hsArt');
+  if (art) { img.src = art.url; img.style.display = ''; img.style.animation = 'none'; void img.offsetWidth; img.style.animation = ''; } else img.style.display = 'none';
+  const bar = (n) => `<span class="bar">${[1, 2, 3, 4, 5].map((k) => `<i class="${k <= n ? 'f' : ''}"></i>`).join('')}</span>`;
+  $('hsInfo').innerHTML = `
+    <h3>${C.name}</h3>
+    <div class="ep">${L.hero}, ${L.epithet} · ${C.role} · Dificultad ${'★'.repeat(L.difficulty)}${'☆'.repeat(3 - L.difficulty)}</div>
+    ${slot ? `<span class="hs-save">Partida guardada · nivel ${slot.level}</span>` : ''}
+    <p class="sum">${L.summary}</p>
+    <p class="hs-story">${L.story}</p>
+    <p class="ps">${L.playstyle}</p>
+    <div class="hs-stats">${Object.entries(L.stats).map(([k, v]) => `<span>${k}</span>${bar(v)}`).join('')}</div>
+    <div class="hs-skills">${C.skills.map((sk) => `<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energía — ${sk.desc}</span></div>`).join('')}</div>`;
+  $('btnStart').disabled = false;
+  $('btnStart').textContent = slot ? (menuMode === 'new' ? `Empezar de nuevo con ${C.name}` : `Continuar con ${C.name}`) : `Comenzar con ${C.name}`;
 }
 
 function goHub() {
@@ -3122,12 +3126,6 @@ function playerDied() {
 }
 
 $('btnResume').addEventListener('click', resumeGame);
-// Estilo visual: HD-2D (pixel art con luces modernas) o clásico (vectorial suave)
-function styleLabel() { const t = HD2D.on ? 'HD-2D' : 'Clásico'; $('btnStyle').textContent = 'Estilo: ' + t; $('btnStyleHub').innerHTML = '🎨<span>' + t + '</span>'; VILLAGE.ground = null; }
-function toggleStyle() { setHd2d(!HD2D.on); SAVE.hd2d = HD2D.on; persist(); styleLabel(); SFX.play('click'); }
-$('btnStyle').addEventListener('click', toggleStyle);
-$('btnStyleHub').addEventListener('click', toggleStyle);
-styleLabel();
 $('btnPauseInv').addEventListener('click', () => { state = 'play'; openInventory('pause'); });
 $('btnQuit').addEventListener('click', () => { persist(); goHub(); });
 $('btnEndHub').addEventListener('click', goHub);
@@ -3198,7 +3196,6 @@ function showStart() {
   const last = SAVE.last && SAVE.slots[SAVE.last];
   $('stContinue').disabled = !last;
   $('stContinueSub').textContent = last ? `${CLASSES[SAVE.last].name} · nivel ${last.level}` : 'Aún no hay partidas';
-  $('stStyle').textContent = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico');
   for (const b of document.querySelectorAll('.s-menu button')) b.classList.remove('sel');
   (last ? $('stContinue') : $('stNew')).classList.add('sel');
   showOverlay('start');
@@ -3210,7 +3207,6 @@ function openClassMenu(mode) {
   $('menuTitle').textContent = mode === 'new' ? 'Nuevo juego · Elige tu héroe' : 'Elige con quién jugar';
   $('menuSub').textContent = mode === 'new' ? 'Cada héroe tiene su propia partida.' : 'Cambia de héroe; cada uno conserva su progreso.';
   buildMenu();
-  if (selectedClass) $('btnStart').textContent = `Continuar con ${CLASSES[selectedClass].name}`;
   showOverlay('menu');
 }
 $('introVid').addEventListener('ended', endIntro);
@@ -3220,7 +3216,6 @@ $('title').addEventListener('click', () => { SFX.init(); SFX.play('zaap'); enter
 $('stContinue').addEventListener('click', () => { if (!SAVE.last || !SAVE.slots[SAVE.last]) return; SFX.init(); SFX.play('click'); S = migrateSlot(SAVE.slots[SAVE.last]); goHub(); });
 $('stNew').addEventListener('click', () => { SFX.init(); SFX.play('click'); openClassMenu('new'); });
 $('stIntro').addEventListener('click', () => { SFX.play('click'); playIntro(); });
-$('stStyle').addEventListener('click', () => { toggleStyle(); $('stStyle').textContent = 'Estilo: ' + (HD2D.on ? 'HD-2D' : 'Clásico'); });
 $('btnMenuBack').addEventListener('click', () => { SFX.play('click'); showStart(); });
 window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();

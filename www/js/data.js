@@ -31,6 +31,31 @@ const CLASSES = {
   },
 };
 
+// Información de la pantalla de selección: quién es, cómo se juega y su historia
+const CLASS_LORE = {
+  iop: {
+    hero: 'Kara', epithet: 'la Rompeyelmos',
+    summary: 'Guerrera de primera línea. Aguanta mucho castigo, golpea en arco a todo lo que tenga cerca y salta al centro de la pelea con su hacha.',
+    playstyle: 'Ideal si te gusta el cuerpo a cuerpo directo: acércate, gira el hacha y no pares.',
+    stats: { Vida: 5, Daño: 4, Alcance: 1, Defensa: 4, Movilidad: 3 }, difficulty: 1,
+    story: 'Kara creció entre las forjas de Villa Candela, donde su padre templaba yelmos para la guardia. La noche en que se abrió la primera Grieta, los monstruos arrasaron la herrería y ella los frenó a hachazos con una herramienta de leñador. Desde entonces lleva aquel hacha remachada con hierro de yelmo y ha jurado partir todos los cascos que crucen el Portal.',
+  },
+  cra: {
+    hero: 'Teo', epithet: 'Ojo de Halcón',
+    summary: 'Explorador a distancia. Dispara sin parar y castiga a los grupos desde lejos con flechas explosivas y lluvias de flechas, pero tiene poca vida.',
+    playstyle: 'Para quien prefiere mantener la distancia: muévete, esquiva y no dejes que te rodeen.',
+    stats: { Vida: 2, Daño: 4, Alcance: 5, Defensa: 2, Movilidad: 5 }, difficulty: 2,
+    story: 'Teo fue cazador en los bosques que rodeaban la villa, antes de que se volvieran ceniza. Siguió el rastro de las bestias hasta la primera Grieta y aprendió a leer sus caminos como nadie. Dicen que nunca falla un disparo y que su halcón vuela por delante de él para avisarle de lo que espera al otro lado del Portal.',
+  },
+  feca: {
+    hero: 'Elara', epithet: 'la Runista',
+    summary: 'Arcanista de las runas. Se protege con escudos que absorben el daño, empuja a los enemigos y quema el suelo con círculos rúnicos.',
+    playstyle: 'Equilibrada y segura: usa la Égida cuando te rodeen y deja que las runas hagan el trabajo.',
+    stats: { Vida: 3, Daño: 4, Alcance: 4, Defensa: 5, Movilidad: 2 }, difficulty: 2,
+    story: 'Elara era la aprendiz más joven de la Torre de las Runas cuando la Grieta la partió en dos. Sobrevivió encerrada tras un escudo rúnico que aún no sabía mantener. Ahora estudia las Grietas desde dentro: cree que las runas que brillan en sus bordes son una cerradura, y que alguien, en algún lugar, tiene la llave.',
+  },
+};
+
 // lvl: nivel base del monstruo dentro de la Grieta 1; prog: cuánto llena la barra de la Grieta
 const ENEMIES = {
   tofu:        { name: 'Chispín',         hp: 10,  speed: 150, dmg: 5,  r: 11, xp: 2,   kamas: [1, 2],   ai: 'chase',   blood: '#ff9a3d', kbRes: 1.2,  lvl: 1, prog: 1 },

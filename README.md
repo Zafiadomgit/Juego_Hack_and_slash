@@ -4,9 +4,9 @@ Un hack & slash (ARPG) para Android: cruza el Portal Rúnico de Villa Candela, c
 
 Todo el arte del juego se dibuja por código (sin assets de terceros).
 
-Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja como pixel art en baja resolución y encima se aplican luz dinámica, bloom y desenfoque tipo maqueta. Se puede cambiar al estilo clásico desde la villa o el menú de pausa.
+Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja como pixel art en baja resolución y encima se aplican luz dinámica, bloom y desenfoque tipo maqueta.
 
-Al abrir el juego por primera vez se reproduce un **video de presentación** (se puede saltar tocando). Después aparece la pantalla de título con el logotipo (**Toca para empezar**) y el menú principal: *Continuar*, *Nuevo juego* (eligiendo clase), *Ver presentación* y el estilo visual. El tráiler se genera con HyperFrames desde `trailer/`.
+Al abrir el juego por primera vez se reproduce un **video de presentación** (se puede saltar tocando). Después aparece la pantalla de título con el logotipo (**Toca para empezar**) y el menú principal: *Continuar*, *Nuevo juego* (con una ficha de cada héroe: resumen, atributos, habilidades e historia) y *Ver presentación*. El tráiler se genera con HyperFrames desde `trailer/`.
 
 ## Cómo se juega
 

@@ -33,19 +33,23 @@
       <button id="stContinue">Continuar<small id="stContinueSub"></small></button>
       <button id="stNew">Nuevo juego</button>
       <button id="stIntro">Ver presentación</button>
-      <button id="stStyle">Estilo: HD-2D</button>
     </nav>
   </div>
 
   <!-- Selección de personaje -->
-  <div id="menu" class="overlay">
-    <div class="panel wide">
-      <button id="btnMenuBack" class="menu-back">‹ Volver</button>
-      <h2 id="menuTitle" class="gold">Elige tu héroe</h2>
-      <p id="menuSub" class="subtitle">Cierra las Grietas. Reclama el ámbar.</p>
-      <div id="classList" class="cards"></div>
-      <button id="btnStart" class="btn big" disabled>Elige un personaje</button>
-      <p id="menuHint" class="small"></p>
+  <div id="menu" class="overlay sheet-ov">
+    <div class="sheet herosel">
+      <header class="sh-head">
+        <button id="btnMenuBack" class="menu-back">‹ Volver</button>
+        <span id="menuTitle" class="sh-name">Elige tu héroe</span>
+        <span id="menuSub" class="hs-sub"></span>
+      </header>
+      <div class="hs-body">
+        <nav id="classList" class="hs-list"></nav>
+        <section class="hs-art"><img id="hsArt" alt="" /><div class="hs-floor"></div></section>
+        <section id="hsInfo" class="hs-info"></section>
+      </div>
+      <footer class="hs-foot"><button id="btnStart" class="btn big" disabled>Elige un personaje</button></footer>
     </div>
   </div>
 
@@ -54,7 +58,6 @@
     <div id="hubChar" class="hub-card"></div>
     <div class="hub-btns">
       <button id="btnInv" class="hbtn">🎒<span>Personaje</span></button>
-      <button id="btnStyleHub" class="hbtn">🎨<span>HD-2D</span></button>
       <button id="btnChange" class="hbtn">⇄<span>Héroes</span></button>
     </div>
     <button id="hubPrompt" class="hub-prompt"></button>
@@ -141,7 +144,6 @@
       <button id="btnResume" class="btn big">Continuar</button>
       <button id="btnPauseInv" class="btn">🎒 Personaje</button>
       <button id="btnMute" class="btn">Sonido: ON</button>
-      <button id="btnStyle" class="btn">Estilo: HD-2D</button>
       <button id="btnQuit" class="btn ghost">Abandonar la Grieta (conservas el botín)</button>
     </div>
   </div>

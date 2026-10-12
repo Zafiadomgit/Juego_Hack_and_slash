@@ -548,7 +548,7 @@ function renderVillage() {
   ctx.globalAlpha = 1;
   drawSkyLife();
   ctx.restore();
-  hd2dEndWorld(0.26);
+  hd2dEndWorld();
   // luz de atardecer: faroles, ventanas, portal y caldero iluminan
   const toS = (x, y) => ({ x: (x - cx) * hz + W / 2, y: (y - cy) * hz + H / 2 });
   const lights = [];
@@ -560,9 +560,7 @@ function renderVillage() {
   for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.8 }); }
   renderLighting(lights, 0.42);
   ctx.fillStyle = 'rgba(255,150,80,0.08)'; ctx.fillRect(0, 0, W, H); // tono cálido de atardecer
-  const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.4, W / 2, H / 2, Math.max(W, H) * 0.8);
-  g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,10,0.45)');
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  drawVignette(false);
   hd2dFlushText();
   if (input.joy) {
     const j = input.joy;

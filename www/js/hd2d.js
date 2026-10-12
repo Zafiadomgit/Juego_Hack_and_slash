@@ -6,10 +6,10 @@
  */
 'use strict';
 
-const HD2D = { on: true, pix: 2, c: null, g: null, main: null, active: false, texts: [], blur1: null, blur2: null, bloom: null };
+const HD2D = { on: true, dof: true, pixMul: 1, pix: 2, c: null, g: null, main: null, active: false, texts: [], blur1: null, blur2: null };
 
 // Tamaño del píxel en CSS px: ~250 píxeles de alto de pantalla, como una consola clásica
-const hd2dPixSize = () => Math.max(1.25, H / 250);
+const hd2dPixSize = () => Math.max(1.25, H / 250) * HD2D.pixMul;
 
 function hd2dCanvas(w, h, alpha = true) {
   const c = document.createElement('canvas');
@@ -27,7 +27,6 @@ function hd2dBegin() {
     HD2D.c = b.c; HD2D.g = b.g;
     HD2D.blur1 = hd2dCanvas(Math.ceil(w / 3), Math.ceil(h / 3));
     HD2D.blur2 = hd2dCanvas(Math.ceil(w / 7), Math.ceil(h / 7));
-    HD2D.bloom = hd2dCanvas(Math.ceil(w / 5), Math.ceil(h / 5));
   }
   HD2D.main = ctx;
   ctx = HD2D.g;
@@ -40,8 +39,9 @@ function hd2dBegin() {
   return true;
 }
 
-// Termina el mundo: amplía el búfer con píxeles nítidos y aplica desenfoque de maqueta y bloom
-function hd2dEndWorld(bloomAmt = 0.3) {
+// Termina el mundo: amplía el búfer con píxeles nítidos y aplica el desenfoque de maqueta (tilt-shift).
+// (El antiguo "bloom" con filtros de canvas se quitó: era el efecto más caro en móviles.)
+function hd2dEndWorld() {
   if (!HD2D.active) return;
   HD2D.active = false;
   ctx = HD2D.main;
@@ -50,36 +50,21 @@ function hd2dEndWorld(bloomAmt = 0.3) {
   ctx.imageSmoothingEnabled = false;
   ctx.drawImage(lo, 0, 0, lo.width * pix, lo.height * pix);
   ctx.imageSmoothingEnabled = true;
-  ctx.imageSmoothingQuality = 'low';
+  if (!HD2D.dof) return;
   // desenfoque: dos reducciones sucesivas (barato) y bandas arriba/abajo con transparencia gradual
   const b1 = HD2D.blur1, b2 = HD2D.blur2;
   b1.g.drawImage(lo, 0, 0, b1.c.width, b1.c.height);
   b2.g.drawImage(b1.c, 0, 0, b2.c.width, b2.c.height);
-  const bands = 7;
-  for (const [y0, y1, top] of [[0, H * 0.24, true], [H * 0.8, H, false]]) {
+  const bands = 4;
+  for (const [y0, y1, top] of [[0, H * 0.2, true], [H * 0.84, H, false]]) {
     const bh = (y1 - y0) / bands;
     for (let i = 0; i < bands; i++) {
-      const k = top ? 1 - i / bands : (i + 1) / bands;
-      ctx.globalAlpha = Math.min(1, k * 1.05);
+      ctx.globalAlpha = top ? 1 - i / bands : (i + 1) / bands;
       const sy = (y0 + i * bh) / H * b2.c.height, sh = bh / H * b2.c.height;
       ctx.drawImage(b2.c, 0, sy, b2.c.width, sh, 0, y0 + i * bh, W, bh + 0.5);
     }
   }
   ctx.globalAlpha = 1;
-  // bloom: las zonas brillantes se esparcen suavemente
-  if (bloomAmt > 0) {
-    const bl = HD2D.bloom;
-    bl.g.globalCompositeOperation = 'copy';
-    bl.g.filter = 'brightness(0.8) contrast(2.6) saturate(1.5)';
-    bl.g.drawImage(b1.c, 0, 0, bl.c.width, bl.c.height);
-    bl.g.filter = 'none';
-    bl.g.globalCompositeOperation = 'source-over';
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha = bloomAmt;
-    ctx.drawImage(bl.c, 0, 0, W, H);
-    ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = 'source-over';
-  }
 }
 
 // Textos del mundo dibujados durante el pase en baja resolución: se guardan y se pintan nítidos al final
