@@ -882,6 +882,14 @@ function drawEnemy(e) {
     ctx.restore();
   }
 
+  // estela de la embestida
+  if (e.state === 'charge' && (e.cdx || e.cdy)) {
+    for (let i = 3; i >= 1; i--) {
+      const gh = Object.assign({}, e, { x: e.x - (e.cdx || 0) * i * e.r * 0.9, y: e.y - (e.cdy || 0) * i * e.r * 0.9, alpha: 0.32 - i * 0.08, flash: 0, atkT: 0 });
+      drawMonsterBody(gh);
+    }
+    ctx.globalAlpha = 1;
+  }
   shadow(e.x, e.y + 1, e.r * (1 - Math.min(0.6, e.z / 200)));
   if (e.elite) glow(e.x, e.y - e.r * 0.8 - e.z, e.r * 2.6, hexRgb(e.elite.color), 0.45 + Math.sin(now * 5) * 0.12);
   if (e.superDef) {
@@ -924,13 +932,46 @@ function drawEnemy(e) {
 // Cadáver: destello, sale despedido, se vuelca y se deshace en ascuas
 function drawCorpse(c) {
   const k = c.ct / c.cmax;
-  const fall = Math.min(1, k * 3.2);
-  c.rot = c.fall * (fall * (2 - fall)) * 1.45;
-  c.alpha = k < 0.5 ? 1 : Math.max(0, 1 - (k - 0.5) / 0.5);
+  c.dsx = 1; c.dsy = 1; c.rot = 0;
+  let sink = 0, jx = 0;
+  if (c.style === 'burst') {
+    // el Chispín se infla y revienta en llamas
+    c.dsx = c.dsy = 1 + k * 0.8; c.alpha = 1 - k;
+    glow(c.x, c.y - c.r, c.r * 3 * (1 + k), '255,150,50', 0.8 * (1 - k));
+  } else if (c.style === 'crumble') {
+    // el gólem tiembla y se hunde en el suelo mientras se desmorona
+    c.dsy = 1 - k * 0.55; c.dsx = 1 + k * 0.15; sink = k * c.r * 0.4;
+    jx = Math.sin(c.ct * 70) * 1.5 * (1 - k);
+    c.alpha = k < 0.6 ? 1 : 1 - (k - 0.6) / 0.4;
+  } else if (c.style === 'deflate') {
+    // la seta se desinfla soltando esporas
+    c.dsy = Math.max(0.15, 1 - k * 1.2); c.dsx = 1 + k * 0.5; c.alpha = k < 0.6 ? 1 : 1 - (k - 0.6) / 0.4;
+  } else if (c.style === 'curl') {
+    // la araña se da la vuelta y encoge las patas
+    c.dsy = Math.cos(Math.min(1, k * 2.5) * Math.PI) * 0.85; c.dsx = 1 - k * 0.3; c.alpha = k < 0.55 ? 1 : 1 - (k - 0.55) / 0.45;
+  } else if (c.style === 'boss') {
+    // el Guardián parpadea en blanco, se encoge y estalla en luz
+    c.flash = Math.sin(c.ct * 30) > 0 && k < 0.75 ? 0.05 : 0;
+    jx = Math.sin(c.ct * 55) * 2.5 * (1 - k);
+    c.dsx = 1 + Math.sin(c.ct * 12) * 0.05; c.dsy = 1 - k * 0.3;
+    c.alpha = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
+    glow(c.x, c.y - c.r, c.r * (2 + k * 6), '255,240,200', 0.25 + k * 0.6);
+    if (k > 0.74 && !c.blown) {
+      c.blown = true;
+      hitFlash(c.x, c.y - c.r, c.r * 3, '255,240,200');
+      rings.push({ x: c.x, y: c.y, r0: 20, r1: c.r * 6, life: 0.5, max: 0.5, color: 'rgba(255,230,180,' });
+      embers(c.x, c.y - c.r, 30, '255,200,120', c.r * 1.5);
+      shake(16); SFX.play('boom'); zoomPunch = Math.max(zoomPunch, 0.1);
+    }
+  } else {
+    const fall = Math.min(1, k * 3.2);
+    c.rot = c.fall * (fall * (2 - fall)) * 1.45;
+    c.alpha = k < 0.5 ? 1 : Math.max(0, 1 - (k - 0.5) / 0.5);
+    sink = k > 0.5 ? (k - 0.5) * c.r * 0.6 : 0;
+  }
   shadow(c.x, c.y + 1, c.r * (1 - k * 0.6));
   ctx.save();
-  // se hunde ligeramente al deshacerse
-  ctx.translate(0, k > 0.5 ? (k - 0.5) * c.r * 0.6 : 0);
+  ctx.translate(jx, sink);
   drawMonsterBody(c);
   ctx.restore();
   ctx.globalAlpha = 1;
@@ -1009,8 +1050,20 @@ function drawMonsterBody(e) {
   const key = e.type + '|' + fi + '|' + e.face + '|' + v + '|' + Math.round(k * 20) + '|' + tint + (e.superDef ? '|S' + e.superDef.name.length : filt ? '|' + B.id : '');
   const w = A.w * k, h = A.h * k, ax = A.ax * k, ay = A.ay * k;
   const jitter = e.state === 'wind' ? rand(-1.5, 1.5) : 0;
+  // ataque: se lanza hacia el héroe (o retrocede al disparar)
+  let lx = 0, ly = 0;
+  if (e.atkT > 0) { const kk = Math.sin((1 - e.atkT / 0.25) * Math.PI) * e.r * 0.55 * (e.atkDir || 1); lx = Math.cos(e.atkA) * kk; ly = Math.sin(e.atkA) * kk * 0.6; }
+  // flotar (espíritus) y corretear (arañas)
+  if (e.ct === undefined) {
+    if (e.type === 'tofu') ly -= 3 + Math.sin(e.t * 6 + e.seed) * 3;
+    if (e.type === 'hechicero') ly -= 6 + Math.sin(e.t * 2) * 5;
+  }
   ctx.save();
-  ctx.translate(e.x + jitter, e.y - e.z);
+  ctx.translate(e.x + jitter + lx, e.y - e.z + ly);
+  if (e.dsx) ctx.scale(e.dsx, e.dsy);
+  if (e.slamT > 0) { const ks = e.slamT / 0.3; ctx.scale(1 + ks * 0.25, 1 - ks * 0.22); }
+  if (e.atkT > 0 && (e.atkDir || 1) > 0) { const ks = Math.sin((1 - e.atkT / 0.25) * Math.PI); ctx.scale(1 + ks * 0.12, 1 - ks * 0.08); }
+  if (e.type === 'arakne' && e.ct === undefined && e.state === 'move') ctx.rotate(Math.sin(e.t * 22) * 0.06);
   // al aparecer sube desde el suelo; al recibir un golpe se aplasta
   if (e.rot) ctx.rotate(e.rot);
   else if (e.kvx) ctx.rotate(clamp(e.kvx * 0.0007, -0.35, 0.35));

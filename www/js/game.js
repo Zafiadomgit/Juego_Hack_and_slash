@@ -900,6 +900,11 @@ function killEnemy(e) {
   c.ct = 0; c.cmax = e.boss ? 1.6 : 0.65; c.flash = 0.07; c.spawnT = 0; c.z = 0;
   c.fall = (e.kvx >= 0 ? 1 : -1);
   if (!e.kvx && !e.kvy) { const a = Math.atan2(e.y - P.y, e.x - P.x); c.kvx = Math.cos(a) * 160; c.kvy = Math.sin(a) * 160; c.fall = c.kvx >= 0 ? 1 : -1; }
+  c.style = e.boss ? 'boss' : DEATH_STYLE[e.type] || 'tip';
+  if (c.style === 'burst') { c.cmax = 0.32; for (let i = 0; i < 14; i++) { const a = rand(0, TAU), sp = rand(80, 220); particles.push({ kind: 'glowdot', x: e.x, y: e.y - e.r, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 40, life: 0.5, max: 0.5, rgb: '255,170,60', size: 6, grav: 0 }); } }
+  if (c.style === 'crumble') { c.cmax = 0.9; for (let i = 0; i < 16; i++) { const a = rand(0, TAU), sp = rand(60, 200); particles.push({ x: e.x + rand(-e.r, e.r) * 0.6, y: e.y - rand(0, e.r * 1.6), vx: Math.cos(a) * sp, vy: -rand(120, 260), life: 0.8, max: 0.8, color: pick(['#4d4544', '#5c5352', '#3b3534', '#6b6260']), size: rand(4, 8), grav: 700 }); } }
+  if (c.style === 'deflate') for (let i = 0; i < 10; i++) particles.push({ kind: 'glowdot', x: e.x + rand(-8, 8), y: e.y - rand(10, 24), vx: rand(-40, 40), vy: rand(-80, -30), life: 0.9, max: 0.9, rgb: '127,224,232', size: 4, grav: 0 });
+  if (c.style === 'boss') c.cmax = 1.9;
   corpses.push(c);
   if (corpses.length > 40) corpses.shift();
   if (e.elite || e.boss) { zoomPunch = Math.max(zoomPunch, e.boss ? 0.12 : 0.04); hitStop(e.boss ? 0.25 : 0.06); }
@@ -922,6 +927,7 @@ function dropPickup(x, y, type, o = {}) {
 }
 
 function enemyShoot(e, a, speed, dmg, kind = 'seed', r = 6, life = 2.4) {
+  if (!e.boss) { e.atkT = 0.18; e.atkA = a; e.atkDir = -0.6; } // retroceso del disparo
   projectiles.push({ team: 'e', kind, x: e.x, y: e.y - 14 - (e.boss ? e.r * 0.5 : 0), vx: Math.cos(a) * speed, vy: Math.sin(a) * speed, r, dmg, life, pierce: 0, hit: [], src: e, sp: speed });
 }
 
@@ -1031,6 +1037,7 @@ function updateEnemy(e, dt) {
           dust(e.x, e.y, 14); shake(8); SFX.play('boom');
           if (dist(P.x, P.y, e.x, e.y) < R + P.r) hurtPlayer(e.dmg * 1.4, e.x, e.y, e);
           addDecal('crack', e.x, e.y, R * 0.9, 2, '255,140,50');
+          e.slamT = 0.3;
           // desde la Grieta 4 deja el suelo ardiendo
           if (rift.threat >= 4) addHazard('fire', e.x, e.y, 70, 0.01, e.dmg, { linger: 2.5, src: e });
           e.state = 'rest'; e.st = 0.9;
@@ -1079,7 +1086,10 @@ function updateEnemy(e, dt) {
   if (e.z <= 1 && d < e.r + P.r - 2 && e.hitCd <= 0) {
     hurtPlayer(e.dmg * contactMul, e.x, e.y, e);
     e.hitCd = 0.8;
+    e.atkT = 0.25; e.atkA = Math.atan2(P.y - e.y, P.x - e.x); e.atkDir = 1; // se lanza a morder
   }
+  if (e.atkT > 0) e.atkT -= dt;
+  if (e.slamT > 0) e.slamT -= dt;
 }
 
 function updateBossBouftou(e, dt, d, ux, uy, sp) {
@@ -1386,6 +1396,9 @@ function collideObstacles(o) {
     }
   }
 }
+
+// Cómo muere cada monstruo: se vuelca (por defecto), estalla, se desmorona, se desinfla o se encoge
+const DEATH_STYLE = { tofu: 'burst', craqueleur: 'crumble', colosoHielo: 'crumble', pissenlit: 'deflate', arakne: 'curl' };
 
 // ============================================================
 // La Grieta
