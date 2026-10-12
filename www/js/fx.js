@@ -197,9 +197,12 @@ function drawFlashes() {
   }
 }
 
-// ---------- Iluminación: oscurece la escena y "recorta" luces ----------
+// ---------- Iluminación de color (estilo HD-2D) ----------
+// Mapa de luz a baja resolución que se MULTIPLICA sobre la escena: las zonas sin luz quedan oscuras y
+// teñidas del color de sombra del mundo (frío), y cada fuente suma su propio color (cálido, azul, verde…).
+// Después, las fuentes con "haze" añaden un halo suave encima, como el aire iluminado de Octopath.
 const LIGHT = { c: null, g: null, w: 0, h: 0, div: 3 }; // div: resolución del mapa de luz (1/div)
-function renderLighting(lights, ambient) {
+function renderLighting(lights, ambient, shade = '80,90,130') {
   const D = LIGHT.div, w = Math.ceil(W / D), h = Math.ceil(H / D);
   if (!LIGHT.c || LIGHT.w !== w || LIGHT.h !== h) {
     LIGHT.c = document.createElement('canvas');
@@ -208,18 +211,26 @@ function renderLighting(lights, ambient) {
     LIGHT.w = w; LIGHT.h = h;
   }
   const g = LIGHT.g;
+  // base: color de sombra del mundo con el brillo del ambiente
+  const sc = shade.split(',').map(Number), mx = Math.max(...sc), b = 1 - ambient;
   g.globalCompositeOperation = 'source-over';
   g.globalAlpha = 1;
-  g.clearRect(0, 0, w, h);
-  g.fillStyle = `rgba(14,5,10,${ambient})`;
+  g.fillStyle = `rgb(${sc.map((c) => Math.round(255 * b * (0.35 + 0.65 * c / mx))).join(',')})`;
   g.fillRect(0, 0, w, h);
-  g.globalCompositeOperation = 'destination-out';
-  const tex = glowTex('255,255,255');
+  // luces: se suman
+  g.globalCompositeOperation = 'lighter';
   for (const L of lights) {
     const r = L.r / D;
-    g.globalAlpha = L.a;
-    g.drawImage(tex, L.x / D - r, L.y / D - r, r * 2, r * 2);
+    if (L.x + L.r < 0 || L.x - L.r > W || L.y + L.r < 0 || L.y - L.r > H) continue;
+    g.globalAlpha = Math.min(1, L.a);
+    g.drawImage(glowTex(L.rgb || '255,236,205'), L.x / D - r, L.y / D - r, r * 2, r * 2);
   }
   g.globalAlpha = 1;
+  g.globalCompositeOperation = 'source-over';
+  const op = ctx.globalCompositeOperation;
+  ctx.globalCompositeOperation = 'multiply';
   ctx.drawImage(LIGHT.c, 0, 0, W, H);
+  ctx.globalCompositeOperation = op;
+  // halo atmosférico de las fuentes de color
+  for (const L of lights) if (L.haze) glow(L.x, L.y, L.r * 0.42, L.rgb, L.haze * L.a);
 }

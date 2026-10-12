@@ -581,13 +581,13 @@ function renderVillage() {
   // luz de atardecer: faroles, ventanas, portal y caldero iluminan
   const toS = (x, y) => ({ x: (x - cx) * hz + W / 2, y: (y - cy) * hz + H / 2 });
   const lights = [];
-  if (S) { const q = toS(vHero.x, vHero.y - 20); lights.push({ x: q.x, y: q.y, r: 220 * hz, a: 0.85 }); }
-  for (const l of VILLAGE.lamps) { const q = toS(l.x + 11, l.y + 5); lights.push({ x: q.x, y: q.y, r: 190 * hz, a: 0.95 }); }
-  for (const w of VILLAGE.windows) { const q = toS(w.x + 8, w.y + 20); lights.push({ x: q.x, y: q.y, r: 90 * hz, a: 0.7 }); }
-  { const q = toS(PORTAL.x, PORTAL.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * hz, a: 1 }); }
-  { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9 }); }
-  for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.8 }); }
-  renderLighting(lights, 0.42);
+  if (S) { const q = toS(vHero.x, vHero.y - 20); lights.push({ x: q.x, y: q.y, r: 200 * hz, a: 0.55, rgb: '255,238,212' }); }
+  for (const l of VILLAGE.lamps) { const q = toS(l.x + 11, l.y + 5); lights.push({ x: q.x, y: q.y, r: 175 * hz, a: 0.75, rgb: '255,165,85', haze: 0.35 }); }
+  for (const w of VILLAGE.windows) { const q = toS(w.x + 8, w.y + 20); lights.push({ x: q.x, y: q.y, r: 95 * hz, a: 0.75, rgb: '255,190,110', haze: 0.2 }); }
+  { const q = toS(PORTAL.x, PORTAL.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
+  { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
+  for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.75, rgb: '255,226,190' }); }
+  renderLighting(lights, 0.56, '84,96,150');
   ctx.fillStyle = 'rgba(255,150,80,0.08)'; ctx.fillRect(0, 0, W, H); // tono cálido de atardecer
   drawVignette(false);
   hd2dFlushText();

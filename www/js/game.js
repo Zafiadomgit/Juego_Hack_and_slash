@@ -2218,23 +2218,26 @@ function renderRift() {
   const toS = (x, y) => ({ x: (x - cam.x + sx) * zr + W / 2, y: (y - cam.y + sy) * zr + H / 2 });
   const lights = [];
   const ps = toS(P.x, P.y - 20);
-  lights.push({ x: ps.x, y: ps.y, r: 360 * zoom, a: 1 });
-  for (const p of projectiles) if (p.kind !== 'arrow') { const q = toS(p.x, p.y); lights.push({ x: q.x, y: q.y, r: 90 * zoom, a: 0.8 }); }
-  for (const g of glyphs) { const q = toS(g.x, g.y); lights.push({ x: q.x, y: q.y, r: g.r * 2 * zoom, a: 0.9 }); }
-  for (const f of flashes) { const q = toS(f.x, f.y); lights.push({ x: q.x, y: q.y, r: f.size * 5 * zoom, a: 0.8 }); }
-  for (const k of pickups) if (k.type === 'item' && k.item.rarity >= 2) { const q = toS(k.x, k.y); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7 }); }
-  for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.6 }); }
-  if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 220 * zoom, a: 1 }); }
-  for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1 }); }
+  lights.push({ x: ps.x, y: ps.y, r: 420 * zoom, a: 0.85, rgb: '255,236,208' });
+  lights.push({ x: ps.x, y: ps.y, r: 820 * zoom, a: 0.28, rgb: '255,226,200' }); // luz de relleno suave
+  for (const p of projectiles) if (p.kind !== 'arrow' && p.kind !== 'dagger') { const q = toS(p.x, p.y); lights.push({ x: q.x, y: q.y, r: 90 * zoom, a: 0.8, rgb: p.team === 'p' ? '255,200,140' : '210,140,255' }); }
+  for (const g of glyphs) { const q = toS(g.x, g.y); lights.push({ x: q.x, y: q.y, r: g.r * 2 * zoom, a: 0.9, rgb: '255,150,80', haze: 0.25 }); }
+  for (const f of flashes) { const q = toS(f.x, f.y); lights.push({ x: q.x, y: q.y, r: f.size * 5 * zoom, a: 0.8, rgb: f.rgb }); }
+  for (const k of pickups) if (k.type === 'item' && k.item.rarity >= 2) { const q = toS(k.x, k.y); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7, rgb: RARITY_RGB[k.item.rarity] }); }
+  for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.55, rgb: e.boss ? '255,120,90' : hexRgb(e.elite.color) }); }
+  if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * zoom, a: 1, rgb: '120,200,255', haze: 0.35 }); }
+  for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1, rgb: '255,220,140', haze: 0.3 }); }
+  if (riftEvent && !riftEvent.done && (riftEvent.kind === 'chest' || riftEvent.kind === 'altar')) { const q = toS(riftEvent.x, riftEvent.y - 30); lights.push({ x: q.x, y: q.y, r: 170 * zoom, a: 0.9, rgb: riftEvent.kind === 'chest' ? '255,210,110' : '120,200,255', haze: 0.3 }); }
+  for (const m of minions) if (m.kind === 'turret' || m.kind === 'spirit' || m.kind === 'shell') { const q = toS(m.x, m.y - 16); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7, rgb: m.kind === 'spirit' ? '140,200,255' : '255,180,90' }); }
   for (const o of obstacles) {
     if ((o.kind !== 'crystal' && o.kind !== 'brazier') || !inView(o.x, o.y, 200)) continue;
     const q = toS(o.x, o.y - 24);
     const fl = o.kind === 'brazier' ? 0.85 + Math.sin(now * 13 + o.ph) * 0.08 + Math.sin(now * 7.3) * 0.05 : 0.75 + Math.sin(now * 2 + o.ph) * 0.12;
-    lights.push({ x: q.x, y: q.y, r: (o.kind === 'brazier' ? 210 : 150) * zoom * fl, a: 0.9 });
+    lights.push({ x: q.x, y: q.y, r: (o.kind === 'brazier' ? 230 : 160) * zoom * fl, a: 0.95, rgb: o.kind === 'brazier' ? '255,150,70' : CRYSTAL_COLS[o.hue][3], haze: o.kind === 'brazier' ? 0.35 : 0.25 });
   }
-  if (POOL_STYLE[B.pool].light) for (const pl of pools) if (inView(pl.x, pl.y, 200)) { const q = toS(pl.x, pl.y); lights.push({ x: q.x, y: q.y, r: pl.rx * 3 * zoom, a: 0.85 }); }
-  for (const h of hazards) if (h.kind === 'fire' || h.kind === 'meteor' || h.kind === 'boom') { const q = toS(h.x, h.y); lights.push({ x: q.x, y: q.y, r: h.r * 2.2 * zoom, a: 0.8 }); }
-  renderLighting(lights, B.ambient);
+  if (POOL_STYLE[B.pool].light) for (const pl of pools) if (inView(pl.x, pl.y, 200)) { const q = toS(pl.x, pl.y); lights.push({ x: q.x, y: q.y, r: pl.rx * 3 * zoom, a: 0.85, rgb: B.pool === 'lava' ? '255,110,40' : '160,220,255', haze: 0.2 }); }
+  for (const h of hazards) if (h.kind === 'fire' || h.kind === 'meteor' || h.kind === 'boom') { const q = toS(h.x, h.y); lights.push({ x: q.x, y: q.y, r: h.r * 2.2 * zoom, a: 0.8, rgb: '255,130,60', haze: 0.2 }); }
+  renderLighting(lights, B.ambient, B.shade);
   // gradación de color propia de cada mundo
   if (B.tint) { ctx.fillStyle = B.tint; ctx.fillRect(0, 0, W, H); }
   // niebla que se desplaza
@@ -2407,7 +2410,7 @@ function drawVignette(low) {
       g.fillStyle = gr; g.fillRect(0, 0, c.width, c.height);
       return c;
     };
-    vignetteCache = { dark: mk('rgba(10,0,0,0.55)'), red: mk('rgba(170,0,0,0.6)') };
+    vignetteCache = { dark: mk('rgba(6,4,16,0.72)'), red: mk('rgba(170,0,0,0.6)') };
   }
   ctx.drawImage(vignetteCache.dark, 0, 0, W, H);
   if (low) {
