@@ -41,25 +41,33 @@
     </div>
   </div>
 
-  <!-- Inventario y características -->
-  <div id="inv" class="overlay">
-    <div class="panel invpanel">
-      <div class="invhead">
-        <h2 class="gold">Personaje</h2>
-        <button id="btnInvClose" class="btn round">✕</button>
-      </div>
-      <div class="invbody">
-        <div class="invcol">
-          <div id="equipGrid" class="equipGrid"></div>
-          <div id="charStats" class="charStats"></div>
-        </div>
-        <div class="invcol">
-          <div class="baghead"><span id="bagTitle"></span><button id="btnSellCommons" class="btn mini2">Vender comunes</button></div>
-          <div id="bagGrid" class="bagGrid"></div>
-          <div id="itemDetail" class="itemDetail"></div>
-        </div>
+  <!-- Ficha de personaje (equipo, características y bolsa) -->
+  <div id="inv" class="overlay sheet-ov">
+    <div class="sheet">
+      <header class="sh-head">
+        <span id="shName" class="sh-name"></span>
+        <span id="shLevel" class="sh-lvl"></span>
+        <div class="sh-xp"><div id="shXp"></div></div>
+        <span id="shPower" class="sh-power"></span>
+        <span id="shAmber" class="sh-amber"></span>
+        <button id="btnInvClose" class="sh-close" aria-label="Cerrar">✕</button>
+      </header>
+      <div class="sh-body">
+        <section id="shDoll" class="sh-doll"></section>
+        <section class="sh-stats">
+          <div class="sh-sub"><h2>Características</h2><span id="shPoints"></span></div>
+          <div id="shStatRows"></div>
+          <div id="shDerived" class="sh-derived"></div>
+        </section>
+        <section class="sh-bag">
+          <div class="sh-tabs" id="shTabs"></div>
+          <div id="bagGrid" class="sh-grid"></div>
+          <button id="btnSellCommons" class="sh-sell">Vender comunes</button>
+        </section>
       </div>
     </div>
+    <div id="itemCard" class="icard-ov"></div>
+    <div id="shToast" class="sh-toast"></div>
   </div>
 
   <!-- Pausa -->
@@ -94,6 +102,8 @@
   </div>
 
   <script src="js/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/fx.js"></script>
   <script src="js/art.js"></script>
   <script src="js/game.js"></script>
 </body>

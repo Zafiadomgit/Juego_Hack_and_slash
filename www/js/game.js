@@ -451,7 +451,7 @@ function basicAttack() {
     P.dir = a; P.aimHold = 0.3;
     P.swingT = 0.2; P.swingSide *= -1;
     const range = 80;
-    slashes.push({ x: P.x, y: P.y, dir: a, arc: 2.3, range, life: 0.16, max: 0.16, color: '#fff6d0', side: P.swingSide, width: 22, follow: true });
+    slashes.push({ x: P.x, y: P.y, dir: a, arc: 2.3, range, life: 0.18, max: 0.18, color: weaponFxColor(), side: P.swingSide, width: 24, follow: true });
     meleeArc(P.x, P.y, a, range, 1.2, basicDmg(), 240);
     P.x += Math.cos(a) * 5; P.y += Math.sin(a) * 5;
     P.atkCd = 0.42 / P.atkSpeed;
@@ -469,6 +469,12 @@ function basicAttack() {
     P.atkCd = 0.46 / P.atkSpeed;
     SFX.play('magic');
   }
+}
+
+// Color del efecto del arma según su rareza (el equipo se nota en combate)
+function weaponFxColor() {
+  const w = S.equip.arma;
+  return ['#fff6d0', '#a8e2ff', '#e6c0ff', '#ffc860'][w ? w.rarity : 0];
 }
 
 function meleeArc(x, y, a, range, halfArc, dmg, kb, heavy = false) {
@@ -518,6 +524,13 @@ function useSkill(i) {
       slashes.push({ x: P.x, y: P.y, dir: a, arc: 2.2, range: 160, life: 0.28, max: 0.28, color: '#ffcc33', side: 1, width: 46, follow: false });
       meleeArc(P.x, P.y, a, 160, 1.05, skillDmg(7), 520, true);
       shake(16); hitStop(0.09);
+      hitFlash(P.x + Math.cos(a) * 70, P.y + Math.sin(a) * 70 - 10, 50, '255,150,40');
+      for (let k = 0; k < 7; k++) {
+        const dd = 40 + k * 18, aa = a + rand(-0.6, 0.6);
+        const fx = P.x + Math.cos(aa) * dd, fy = P.y + Math.sin(aa) * dd;
+        embers(fx, fy, 3, k % 2 ? '255,120,30' : '255,200,80', 14);
+        addDecal('scorch', fx, fy, 22, 2.5, '255,110,30');
+      }
       SFX.play('boom');
       for (let k = 0; k < 24; k++) {
         const aa = a + rand(-1, 1), sp = rand(150, 420);
@@ -550,12 +563,17 @@ function useSkill(i) {
     P.shieldT = 6;
     rings.push({ x: P.x, y: P.y, r0: 20, r1: 120, life: 0.35, max: 0.35, color: 'rgba(130,200,255,' });
     aoe(P.x, P.y, 110, skillDmg(1.3), 480);
+    addDecal('rune', P.x, P.y, 95, 1.3, '130,200,255');
+    hitFlash(P.x, P.y - 20, 34, '140,210,255');
+    sparks(P.x, P.y - 16, 14, '#bfe8ff', 320);
     SFX.play('shield');
     shake(5);
   } else if (cls === 'feca' && i === 1) {
     const t = nearestEnemy(P.x, P.y, 320);
     const gx = t ? t.x : P.x, gy = t ? t.y : P.y;
     glyphs.push({ x: gx, y: gy, r: 115, life: 4.5, max: 4.5, tick: 0 });
+    addDecal('rune', gx, gy, 118, 4.5, '255,140,60');
+    hitFlash(gx, gy - 10, 36, '255,150,60');
     SFX.play('magic');
   }
 }
@@ -599,8 +617,12 @@ function updatePlayer(dt) {
       P.jump = null;
       rings.push({ x: P.x, y: P.y, r0: 10, r1: 105, life: 0.3, max: 0.3, color: 'rgba(255,220,150,' });
       aoe(P.x, P.y, 100, skillDmg(2.4), 380, true);
-      shake(9); SFX.play('boom');
+      shake(11); SFX.play('boom');
       dust(P.x, P.y, 16);
+      addDecal('crack', P.x, P.y, 115, 2.6, '255,140,50');
+      hitFlash(P.x, P.y - 10, 42, '255,200,120');
+      sparks(P.x, P.y, 18, '#ffd27a', 380, 0, TAU, 520);
+      embers(P.x, P.y, 10, '255,150,60', 40);
     }
     return;
   }
@@ -646,7 +668,8 @@ function hurtPlayer(dmg, sx, sy, src) {
     if (dmg <= 0) { P.invul = 0.25; SFX.play('hit'); return; }
   }
   P.hp -= dmg;
-  addText(P.x, P.y - 40, '-' + dmg, '#ff3b3b', 1.15);
+  texts.push({ x: P.x, y: P.y - 44, txt: '-' + dmg, color: '#ff4a3d', scale: 1.25, life: 0.9, max: 0.9, vx: rand(-30, 30), vy: -150 });
+  hitFlash(P.x, P.y - 22, 20, '255,80,60');
   P.invul = 0.55; P.hurtFlash = 0.25;
   shake(7); SFX.play('hurt');
   if (src && src.elite && src.elite.vampire) { src.hp = Math.min(src.maxHp, src.hp + dmg * 2); addText(src.x, src.y - src.r * 2, '+' + dmg * 2, '#ce93d8', 0.9); }
@@ -695,8 +718,13 @@ function damageEnemy(e, base, o = {}) {
     const k = o.kb * e.D.kbRes;
     e.kvx += Math.cos(a) * k; e.kvy += Math.sin(a) * k;
   }
-  addText(e.x + rand(-6, 6), e.y - e.r - 10 - e.z, String(dmg), crit ? '#ffa726' : '#ffffff', crit ? 1.45 : 1);
-  for (let i = 0; i < (crit ? 9 : 4); i++) {
+  const hx = e.x + rand(-e.r * 0.4, e.r * 0.4), hy = e.y - e.r * 0.8 - e.z;
+  texts.push({ x: hx, y: hy - e.r * 0.5, txt: String(dmg), color: crit ? '#ffb43a' : '#ffffff', scale: crit ? 1.7 : 1.05, life: 0.85, max: 0.85, vx: rand(-55, 55), vy: -175, crit });
+  hitFlash(hx, hy, crit ? 26 : 14, crit ? '255,170,50' : '255,235,190');
+  const hitDir = o.fx !== undefined ? Math.atan2(e.y - o.fy, e.x - o.fx) : rand(0, TAU);
+  sparks(hx, hy, crit ? 12 : 6, crit ? '#ffcf6a' : '#fff1c8', crit ? 380 : 260, hitDir, 1.7);
+  if (crit) shake(4);
+  for (let i = 0; i < (crit ? 6 : 3); i++) {
     const a = rand(0, Math.PI * 2), sp = rand(60, 200);
     particles.push({ x: e.x, y: e.y - e.r * 0.6, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp - 60, life: 0.4, max: 0.4, color: e.D.blood, size: rand(2, 4), grav: 500 });
   }
@@ -738,16 +766,26 @@ function killEnemy(e) {
   if (e.elite) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), Math.max(1, rollRarity(12))) });
   else if (!e.boss && Math.random() < 0.035) dropPickup(e.x, e.y, 'item', { item: makeItem(S.cls, itemLevel(), rollRarity()) });
 
-  for (let i = 0; i < 14; i++) {
+  for (let i = 0; i < 12; i++) {
     const a = rand(0, Math.PI * 2), sp = rand(40, 160);
     particles.push({ x: e.x, y: e.y - e.r * 0.5, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0.5, max: 0.5, color: i % 2 ? '#ffffff' : D.blood, size: rand(3, 7), grav: 0 });
   }
+  hitFlash(e.x, e.y - e.r * 0.6, e.r * 1.4 + 10, '255,220,160');
+  sparks(e.x, e.y - e.r * 0.6, 10, '#ffd9a0', 300);
+  embers(e.x, e.y - e.r * 0.6, e.elite || e.boss ? 16 : 5, '255,190,110', e.r);
+  rings.push({ x: e.x, y: e.y, r0: 5, r1: e.r * 2.4, life: 0.3, max: 0.3, color: 'rgba(255,220,160,' });
+  addDecal('scorch', e.x, e.y, e.r * 1.3, 3, '255,120,40');
   if (e.boss) guardianDefeated(e);
 }
 
 function dropPickup(x, y, type, o = {}) {
   const a = rand(0, Math.PI * 2), sp = type === 'item' || type === 'dofus' ? rand(60, 160) : rand(40, 140);
   pickups.push({ x, y, type, val: o.val || 0, item: o.item, id: o.id, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, t: 0, z: 0, vz: rand(140, 220) });
+  if ((type === 'item' && o.item.rarity >= 2) || type === 'dofus') {
+    const rgb = type === 'dofus' ? '120,220,255' : RARITY_RGB[o.item.rarity];
+    hitFlash(x, y - 10, 30, rgb);
+    embers(x, y, 12, rgb, 20);
+  }
 }
 
 function enemyShoot(e, a, speed, dmg) {
@@ -1042,6 +1080,7 @@ function startRift(level) {
   scene = 'rift';
   genRift();
   groundChunks.clear();
+  resetFx();
   rift = {
     level, progress: 0, goal: 70 + level * 5, time: RIFT_TIME, elapsed: 0,
     bossSpawned: false, bossDead: false, zaap: null, spawnT: 1, kills: 0,
@@ -1172,6 +1211,9 @@ function explode(p) {
     particles.push({ x: p.x, y: p.y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0.45, max: 0.45, color: pick(['#ffb300', '#ff5722', '#fff3e0']), size: rand(3, 6), grav: 0 });
   }
   shake(6); SFX.play('boom');
+  addDecal('scorch', p.x, p.y, 60, 3, '255,120,30');
+  hitFlash(p.x, p.y - 6, 40, '255,150,50');
+  embers(p.x, p.y, 10, '255,140,40', 30);
 }
 
 function updateGlyphs(dt) {
@@ -1261,6 +1303,8 @@ function gainXp(v) {
     showBanner('¡Nivel ' + S.level + '!', '#7dd3ff', '+5 puntos de característica (abre la bolsa 🎒)');
     SFX.play('level');
     rings.push({ x: P.x, y: P.y, r0: 10, r1: 90, life: 0.5, max: 0.5, color: 'rgba(120,210,255,' });
+    levelUpPillar(P.x, P.y);
+    shake(5);
   }
 }
 
@@ -1272,7 +1316,11 @@ function updateEffects(dt) {
   }
   particles = particles.filter((p) => p.life > 0);
   if (particles.length > 350) particles.splice(0, particles.length - 350);
-  for (const t of texts) { t.life -= dt; t.y -= 38 * dt; }
+  for (const t of texts) {
+    t.life -= dt;
+    if (t.vy !== undefined) { t.vy += 300 * dt; t.x += t.vx * dt; t.y += t.vy * dt; }
+    else t.y -= 38 * dt;
+  }
   texts = texts.filter((t) => t.life > 0);
   for (const s of slashes) {
     s.life -= dt;
@@ -1335,8 +1383,8 @@ function drawHeart(x, y, r, fill) {
   ctx.strokeStyle = '#3a0a0a'; ctx.lineWidth = 1.5; ctx.stroke();
 }
 
-function text(str, x, y, size, color, align = 'left', weight = 800, stroke = true) {
-  ctx.font = `${weight} ${size}px "Trebuchet MS", "Segoe UI", Roboto, sans-serif`;
+function text(str, x, y, size, color, align = 'left', weight = 800, stroke = true, family = 'Nunito, "Trebuchet MS", sans-serif') {
+  ctx.font = `${weight} ${size}px ${family}`;
   ctx.textAlign = align;
   ctx.textBaseline = 'middle';
   if (stroke) { ctx.lineWidth = Math.max(2, size / 6); ctx.strokeStyle = 'rgba(20,10,0,0.85)'; ctx.lineJoin = 'round'; ctx.strokeText(str, x, y); }
@@ -1472,7 +1520,7 @@ function drawBanners() {
       drawGem(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
       y += 10 * s;
     }
-    text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900);
+    text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900, true, 'Cinzel, serif');
     if (banner.sub) text(banner.sub, W / 2, y + 26 * s, 12 * s, '#f3ead2', 'center', 700);
     ctx.restore();
   }
@@ -1550,6 +1598,7 @@ function renderRift() {
   ctx.strokeStyle = '#1a0d08'; ctx.lineWidth = 24;
   ctx.strokeRect(-12, -12, WORLD.w + 24, WORLD.h + 24);
 
+  drawDecals();
   for (const g of glyphs) drawGlyph(g);
   for (const r of rings) {
     if (!r.fill) continue;
@@ -1573,8 +1622,15 @@ function renderRift() {
     else drawEnemy(o);
   }
 
-  for (const p of projectiles) if (inView(p.x, p.y)) drawProjectile(p);
+  for (const p of projectiles) {
+    if (!inView(p.x, p.y)) continue;
+    if (p.kind === 'orb') glow(p.x, p.y, 34, '120,200,255', 0.9);
+    else if (p.kind === 'explo') glow(p.x, p.y, 30, '255,140,40', 0.9);
+    else if (p.kind === 'seed') glow(p.x, p.y, 16, '200,255,80', 0.6);
+    drawProjectile(p);
+  }
   for (const s of slashes) drawSlash(s);
+  drawFlashes();
   for (const r of rings) {
     if (r.fill) continue;
     const k = 1 - r.life / r.max;
@@ -1591,6 +1647,14 @@ function renderRift() {
       const off = a * 60;
       ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(p.x - 6, p.y - off - 16); ctx.lineTo(p.x, p.y - off); ctx.stroke();
+      glow(p.x, p.y, 10, '255,200,120', 0.5 * (1 - a));
+    } else if (p.kind === 'spark') {
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.strokeStyle = p.color; ctx.lineWidth = p.size; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 0.035, p.y - p.vy * 0.035); ctx.stroke();
+      ctx.globalCompositeOperation = 'source-over';
+    } else if (p.kind === 'glowdot') {
+      glow(p.x, p.y, p.size * (0.6 + a * 0.6), p.rgb, a);
     } else {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
@@ -1598,12 +1662,31 @@ function renderRift() {
   }
   ctx.globalAlpha = 1;
   for (const t of texts) {
-    ctx.globalAlpha = Math.min(1, (t.life / t.max) * 2);
-    const pop = 1 + Math.max(0, t.life - t.max + 0.15) * 4;
+    ctx.globalAlpha = Math.min(1, (t.life / t.max) * 2.5);
+    const age = t.max - t.life;
+    const pop = age < 0.08 ? 0.6 + age * 12 : age < 0.18 ? 1.56 - (age - 0.08) * 5.6 : 1;
+    if (t.crit) {
+      glow(t.x, t.y, 30 * t.scale, '255,170,40', 0.55 * Math.min(1, t.life * 3));
+      text('¡CRÍTICO!', t.x, t.y - 15 * t.scale * pop, 8 * t.scale, '#fff1b8', 'center', 900);
+    }
     text(t.txt, t.x, t.y, 15 * t.scale * pop, t.color, 'center', 900);
   }
   ctx.globalAlpha = 1;
   ctx.restore();
+
+  // luz: la escena se oscurece salvo alrededor del héroe y de las fuentes de luz
+  const toS = (x, y) => ({ x: (x - cam.x + sx) * zoom + W / 2, y: (y - cam.y + sy) * zoom + H / 2 });
+  const lights = [];
+  const ps = toS(P.x, P.y - 20);
+  lights.push({ x: ps.x, y: ps.y, r: 360 * zoom, a: 1 });
+  for (const p of projectiles) if (p.kind !== 'arrow') { const q = toS(p.x, p.y); lights.push({ x: q.x, y: q.y, r: 90 * zoom, a: 0.8 }); }
+  for (const g of glyphs) { const q = toS(g.x, g.y); lights.push({ x: q.x, y: q.y, r: g.r * 2 * zoom, a: 0.9 }); }
+  for (const f of flashes) { const q = toS(f.x, f.y); lights.push({ x: q.x, y: q.y, r: f.size * 5 * zoom, a: 0.8 }); }
+  for (const k of pickups) if (k.type === 'item' && k.item.rarity >= 2) { const q = toS(k.x, k.y); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7 }); }
+  for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.6 }); }
+  if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 220 * zoom, a: 1 }); }
+  for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1 }); }
+  renderLighting(lights, 0.5);
 
   // atmósfera: motas flotantes y viñeta
   for (const m of motes) {
@@ -1680,6 +1763,7 @@ function update(dt) {
   updateGlyphs(dt);
   updatePickups(dt);
   updateEffects(dt);
+  updateFx(dt);
   if (state === 'play') updateRift(dt);
   cam.x = lerp(cam.x, P.x, 1 - Math.exp(-8 * dt));
   cam.y = lerp(cam.y, P.y - 10, 1 - Math.exp(-8 * dt));
@@ -1859,7 +1943,32 @@ $('btnBakery').addEventListener('click', () => {
 $('btnChange').addEventListener('click', () => { state = 'menu'; S = null; buildMenu(); showOverlay('menu'); });
 
 // ---------- Inventario / características ----------
-let invSel = null; // {from:'bag'|'equip', idx|slot}
+let invSel = null; // objeto abierto en la ficha: {from:'bag'|'equip', idx|slot}
+let invTab = 'all';
+let invPrev = null; // valores anteriores, para animar lo que sube
+
+const fmtNum = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const AMBER_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L14 6 L11.5 15 L4.5 15 L2 6 Z" fill="#f0a030" stroke="#7a4a10" stroke-width="1.2"/></svg>';
+const SLOT_POS = {
+  sombrero: 'left: 6px; top: 6px', amuleto: 'left: 6px; top: 66px', anillo: 'left: 6px; top: 126px',
+  capa: 'right: 6px; top: 6px', cinturon: 'right: 6px; top: 66px', botas: 'right: 6px; top: 126px',
+};
+const BAG_TABS = [['all', 'Todo'], ['weapon', 'Armas'], ['armor', 'Ropa'], ['jewel', 'Joyas']];
+const tabMatch = (tab, it) => tab === 'all' || (tab === 'weapon' ? it.slot === 'arma' : tab === 'jewel' ? it.slot === 'amuleto' || it.slot === 'anillo' : it.slot !== 'arma' && it.slot !== 'amuleto' && it.slot !== 'anillo');
+
+function powerScore(d) {
+  return Math.round(d.maxHp * 0.6 + d.power * d.dmgMul * 8 + d.crit * 400 + d.armor * 600 + d.atkSpeed * 60 + (d.skillMul - 1) * 200);
+}
+function derivedRows(d) {
+  return [
+    ['hp', 'PV', d.maxHp, '#ff8a80', String(d.maxHp)],
+    ['dmg', 'Daño', Math.round((d.dmgMul - 1) * 100), '#f0b070', '+' + Math.round((d.dmgMul - 1) * 100) + '%'],
+    ['crit', 'Crítico', Math.round(d.crit * 100), '#ffc04a', Math.round(d.crit * 100) + '%'],
+    ['spell', 'Hechizos', Math.round((d.skillMul - 1) * 100), '#ffa070', '+' + Math.round((d.skillMul - 1) * 100) + '%'],
+    ['aspd', 'Vel. ataque', Math.round(d.atkSpeed * 100), '#a0e890', d.atkSpeed.toFixed(2)],
+    ['res', 'Resist.', Math.round(d.armor * 100), '#9fb6c8', Math.round(d.armor * 100) + '%'],
+  ];
+}
 
 function openInventory(from) {
   if (from === 'play' && state !== 'play') return;
@@ -1867,120 +1976,255 @@ function openInventory(from) {
   state = 'inv';
   clearInput();
   invSel = null;
+  invPrev = null;
+  $('itemCard').classList.remove('show');
   buildInventory();
   showOverlay('inv');
 }
 function closeInventory() {
+  $('itemCard').classList.remove('show');
   persist();
   if (invReturn === 'hub') { state = 'hub'; buildHub(); showOverlay('hub'); }
   else if (invReturn === 'pause') { state = 'pause'; buildPause(); showOverlay('pause'); }
   else { state = 'play'; last = performance.now(); showOverlay(null); }
 }
 
-function statLines(stats, cmp) {
-  const keys = new Set([...Object.keys(stats), ...Object.keys(cmp || {})]);
-  const order = ['dmg', ...CORE_STATS, 'crit', 'res', 'pros'];
-  return order.filter((k) => keys.has(k)).map((k) => {
-    const v = stats[k] || 0;
-    let diff = '';
-    if (cmp) {
-      const dlt = v - (cmp[k] || 0);
-      if (dlt) diff = ` <em class="${dlt > 0 ? 'up' : 'down'}">(${dlt > 0 ? '+' : ''}${dlt})</em>`;
-    }
-    return v || diff ? `<div>${v >= 0 ? '+' : ''}${v} ${STAT_INFO[k].name}${diff}</div>` : '';
-  }).join('');
+let heroDollURL = {};
+function heroDollHTML() {
+  if (HERO_ART[S.cls]) return `<img class="hero" src="img/heroes/${S.cls}.png" alt="">`;
+  if (!heroDollURL[S.cls]) {
+    const c = document.createElement('canvas');
+    c.width = 180; c.height = 260;
+    const g = c.getContext('2d');
+    g.translate(90, 236); g.scale(3.6, 3.6);
+    drawHero(g, S.cls, { x: 0, y: 0, dir: 0.3, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: 0 });
+    heroDollURL[S.cls] = c.toDataURL();
+  }
+  return `<img class="hero" src="${heroDollURL[S.cls]}" alt="">`;
 }
 
-function itemCell(it, extra = '') {
-  if (!it) return `<div class="cell empty">${extra}</div>`;
-  return `<div class="cell r${it.rarity}"><span>${it.icon}</span>${extra}</div>`;
+function slotHTML(slot, style, size = 40) {
+  const it = S.equip[slot];
+  return `<button class="slot ${it ? 'r' + it.rarity : ''}" data-slot="${slot}" style="${style}" aria-label="${SLOT_INFO[slot].name}">${it ? itemSVG(it, size) : slotSVG(slot, size - 4)}</button>`;
 }
 
-function buildInventory() {
+function floater(el, txt) {
+  if (!el) return;
+  const f = document.createElement('span');
+  f.className = 'floater';
+  f.textContent = txt;
+  el.appendChild(f);
+  setTimeout(() => f.remove(), 950);
+}
+
+function buildInventory(justEquipped) {
   const d = derived();
   const t = d.t;
-  // equipo
-  $('equipGrid').innerHTML = SLOTS.map((slot) => {
-    const it = S.equip[slot];
-    return `<div class="eqslot" data-slot="${slot}">${itemCell(it, it ? '' : `<small>${SLOT_INFO[slot].name}</small>`)}</div>`;
-  }).join('');
-  for (const el of $('equipGrid').querySelectorAll('.eqslot')) {
-    el.addEventListener('click', () => { if (S.equip[el.dataset.slot]) { invSel = { from: 'equip', slot: el.dataset.slot }; SFX.play('click'); buildInventory(); } });
-  }
-  // características
-  $('charStats').innerHTML = `
-    <div class="pts">${S.points > 0 ? `<b>${S.points}</b> puntos por repartir` : `Nivel ${S.level}`}</div>
-    ${CORE_STATS.map((k) => `<div class="statrow"><span title="${STAT_INFO[k].desc}">${STAT_INFO[k].name}</span><b>${t[k]}</b>
-      <button class="mini" data-stat="${k}" data-n="1" ${S.points < 1 ? 'disabled' : ''}>+1</button>
-      <button class="mini" data-stat="${k}" data-n="5" ${S.points < 5 ? 'disabled' : ''}>+5</button></div>`).join('')}
-    <div class="derived">
-      <span>PV</span><b>${d.maxHp}</b><span>Potencia</span><b>${Math.round(d.power)}</b>
-      <span>Daño</span><b>+${Math.round((d.dmgMul - 1) * 100)}%</b><span>Hechizos</span><b>+${Math.round((d.skillMul - 1) * 100)}%</b>
-      <span>Crítico</span><b>${Math.round(d.crit * 100)}%</b><span>Vel. ataque</span><b>${d.atkSpeed.toFixed(2)}</b>
-      <span>Resistencia</span><b>${Math.round(d.armor * 100)}%</b><span>Prospección</span><b>${Math.round(100 * d.kamaMul)}</b>
-    </div>
-    <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}"></span>`).join('')}</div>`;
-  for (const b of $('charStats').querySelectorAll('button[data-stat]')) {
-    b.addEventListener('click', () => {
-      const n = Math.min(S.points, +b.dataset.n);
-      if (n <= 0) return;
-      S.stats[b.dataset.stat] += n;
-      S.points -= n;
-      recalc();
-      SFX.play('click');
-      buildInventory();
-    });
-  }
-  // bolsa
-  $('bagTitle').textContent = `Bolsa ${S.bag.length}/${BAG_MAX} · ${S.kamas} ámbar`;
-  const cells = [];
-  for (let i = 0; i < BAG_MAX; i++) {
-    const it = S.bag[i];
-    const up = it && itemPower(it) > itemPower(S.equip[it.slot]) ? '<i class="upArrow">▲</i>' : '';
-    cells.push(`<div class="bagslot ${invSel && invSel.from === 'bag' && invSel.idx === i ? 'sel' : ''}" data-i="${i}">${itemCell(it, up)}</div>`);
-  }
-  $('bagGrid').innerHTML = cells.join('');
-  for (const el of $('bagGrid').querySelectorAll('.bagslot')) {
-    el.addEventListener('click', () => { const i = +el.dataset.i; if (S.bag[i]) { invSel = { from: 'bag', idx: i }; SFX.play('click'); buildInventory(); } });
-  }
-  // detalle
-  const det = $('itemDetail');
-  let it = null;
-  if (invSel && invSel.from === 'bag') it = S.bag[invSel.idx];
-  if (invSel && invSel.from === 'equip') it = S.equip[invSel.slot];
-  if (!it) { det.innerHTML = '<p class="small">Toca un objeto para ver sus características. ▲ = mejor que lo equipado.</p>'; return; }
-  const R = RARITY[it.rarity];
-  const eq = invSel.from === 'bag' ? S.equip[it.slot] : null;
-  det.innerHTML = `
-    <div class="itname" style="color:${R.color}">${it.icon} ${it.name}</div>
-    <div class="small">${R.name} · ${SLOT_INFO[it.slot].name} · nivel ${it.level}</div>
-    <div class="itstats">${statLines(it.stats, eq ? eq.stats : null)}</div>
-    ${eq ? `<div class="small">Comparado con: <span style="color:${RARITY[eq.rarity].color}">${eq.name}</span></div>` : ''}
-    <div class="itbtns">
-      ${invSel.from === 'bag' ? '<button class="btn" id="btnEquip">Equipar</button>' : '<button class="btn" id="btnUnequip">Quitar</button>'}
-      <button class="btn ghost" id="btnSell">Vender (+${it.value} K)</button>
+  const pw = powerScore(d);
+  const prev = invPrev;
+  invPrev = { t: { ...t }, rows: Object.fromEntries(derivedRows(d).map((r) => [r[0], r[2]])), power: pw };
+  const C = CLASSES[S.cls];
+
+  // cabecera
+  $('shName').textContent = C.name;
+  $('shLevel').textContent = 'Nv. ' + S.level;
+  $('shXp').style.width = Math.min(100, (S.xp / xpNext(S.level)) * 100) + '%';
+  $('shPower').innerHTML = statIcon('dmg', 18) + ' Poder ' + fmtNum(pw);
+  $('shAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas);
+
+  // muñeco con las ranuras de equipo
+  let best = -1;
+  for (const s of SLOTS) if (S.equip[s]) best = Math.max(best, S.equip[s].rarity);
+  const aura = best >= 0 ? `rgba(${RARITY_RGB[best]},.6)` : 'rgba(255,170,60,.45)';
+  $('shDoll').innerHTML = `
+    <div class="pedestal" style="--aura:${aura}"></div>
+    ${heroDollHTML()}
+    ${Object.keys(SLOT_POS).map((s) => slotHTML(s, SLOT_POS[s])).join('')}
+    <div class="bottom">
+      ${slotHTML('arma', '', 44)}
+      <span class="gems-label">GEMAS</span>
+      ${Object.keys(GEMS).map((k) => S.dofus.includes(k)
+        ? `<span class="gem got" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 22)}</span>`
+        : '<span class="gem" title="Gema por descubrir"></span>').join('')}
     </div>`;
-  const eqBtn = $('btnEquip'), unBtn = $('btnUnequip');
-  if (eqBtn) eqBtn.addEventListener('click', () => {
+  for (const el of $('shDoll').querySelectorAll('.slot')) {
+    el.addEventListener('click', () => { if (S.equip[el.dataset.slot]) { SFX.play('click'); showItemCard('equip', el.dataset.slot); } });
+  }
+  if (justEquipped) {
+    const el = $('shDoll').querySelector(`.slot[data-slot="${justEquipped}"]`);
+    if (el) el.classList.add('new');
+    const hero = $('shDoll').querySelector('.hero');
+    if (hero) hero.classList.add('flash');
+  }
+
+  // características
+  const pts = $('shPoints');
+  pts.textContent = S.points > 0 ? S.points + ' puntos' : 'Nv. ' + S.level;
+  pts.classList.toggle('none', S.points <= 0);
+  $('shStatRows').innerHTML = CORE_STATS.map((k) => {
+    const base = S.stats[k], bonus = t[k] - base, col = STAT_COLOR[k];
+    return `<div class="stat" data-k="${k}" style="background:${col}14">
+      ${statIcon(k)}<span class="nm" title="${STAT_INFO[k].desc}">${STAT_INFO[k].name}</span>
+      <b style="color:${col}">${base}${bonus ? ` <small>+${bonus}</small>` : ''}</b>
+      <button class="plus" data-stat="${k}" ${S.points < 1 ? 'disabled' : ''} aria-label="Subir ${STAT_INFO[k].name}">+</button>
+    </div>`;
+  }).join('');
+  for (const b of $('shStatRows').querySelectorAll('.plus')) bindStatButton(b);
+  $('shDerived').innerHTML = derivedRows(d).map(([k, name, , col, txt]) => `<span data-k="${k}">${name} <b style="color:${col}">${txt}</b></span>`).join('');
+
+  // animar lo que ha subido
+  if (prev) {
+    for (const k of CORE_STATS) {
+      const diff = t[k] - prev.t[k];
+      if (diff > 0) {
+        const row = $('shStatRows').querySelector(`.stat[data-k="${k}"]`);
+        row.classList.add('up');
+        floater(row, '+' + diff);
+      }
+    }
+    for (const [k, , v] of derivedRows(d)) {
+      if (v > prev.rows[k]) {
+        const el = $('shDerived').querySelector(`span[data-k="${k}"]`);
+        el.classList.add('up');
+      }
+    }
+    if (pw > prev.power) {
+      const el = $('shPower');
+      el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
+    }
+  }
+
+  // bolsa
+  $('shTabs').innerHTML = BAG_TABS.map(([id, label]) => `<button data-tab="${id}" class="${invTab === id ? 'on' : ''}">${label}</button>`).join('') + `<span class="count">${S.bag.length}/${BAG_MAX}</span>`;
+  for (const b of $('shTabs').querySelectorAll('button')) b.addEventListener('click', () => { invTab = b.dataset.tab; SFX.play('click'); buildInventory(); });
+  const cells = [];
+  S.bag.forEach((it, i) => {
+    if (!tabMatch(invTab, it)) return;
+    const better = itemPower(it) > itemPower(S.equip[it.slot]);
+    cells.push(`<button class="cell r${it.rarity}" data-i="${i}" aria-label="${it.name}">${itemSVG(it, 36)}${better ? '<i class="up">▲</i>' : ''}</button>`);
+  });
+  const fill = invTab === 'all' ? BAG_MAX - S.bag.length : Math.max(0, 10 - cells.length);
+  for (let i = 0; i < fill; i++) cells.push('<div class="cell empty"></div>');
+  $('bagGrid').innerHTML = cells.join('');
+  for (const el of $('bagGrid').querySelectorAll('button.cell')) {
+    el.addEventListener('click', () => { SFX.play('click'); showItemCard('bag', +el.dataset.i); });
+  }
+}
+
+function iconSVGColor(color, size) {
+  return `<svg viewBox="0 0 48 48" width="${size}" height="${size}" aria-hidden="true"><path d="M24 4 L38 16 L33 40 L15 40 L10 16 Z" fill="${color}" stroke="#2a1a0c" stroke-width="2"/><path d="M24 4 L38 16 L24 20 L10 16 Z" fill="#fff" opacity="0.5"/></svg>`;
+}
+
+// Botón "+" de característica: toque = +1, mantener = sube seguido
+function bindStatButton(b) {
+  let hold = null, rep = null;
+  const addOne = () => {
+    if (S.points < 1) return stop();
+    S.stats[b.dataset.stat] += 1;
+    S.points -= 1;
+    recalc();
+    SFX.play('click');
+    buildInventory();
+  };
+  const stop = () => { clearTimeout(hold); clearInterval(rep); hold = rep = null; };
+  b.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    addOne();
+    hold = setTimeout(() => {
+      rep = setInterval(() => {
+        const nb = $('shStatRows').querySelector(`.plus[data-stat="${b.dataset.stat}"]`);
+        if (!nb || S.points < 1) return stop();
+        S.stats[b.dataset.stat] += 1; S.points -= 1; recalc(); buildInventory();
+      }, 90);
+    }, 420);
+    window.addEventListener('pointerup', stop, { once: true });
+  });
+}
+
+function showItemCard(from, key) {
+  const it = from === 'bag' ? S.bag[key] : S.equip[key];
+  if (!it) return;
+  invSel = from === 'bag' ? { from, idx: key } : { from, slot: key };
+  const R = RARITY[it.rarity];
+  const rgb = RARITY_RGB[it.rarity];
+  const eq = from === 'bag' ? S.equip[it.slot] : null;
+  const keys = ['dmg', ...CORE_STATS, 'crit', 'res', 'pros'].filter((k) => (it.stats[k] || 0) || (eq && eq.stats[k]));
+  const lines = keys.map((k) => {
+    const v = it.stats[k] || 0;
+    let cmp = '';
+    if (eq) {
+      const dlt = v - (eq.stats[k] || 0);
+      if (dlt) cmp = `<em class="${dlt > 0 ? 'up' : 'down'}">${dlt > 0 ? '▲' : '▼'} ${Math.abs(dlt)}</em>`;
+    }
+    const unit = k === 'crit' || k === 'res' ? '% ' : ' ';
+    const name = STAT_INFO[k].name.replace('% ', '');
+    return `<li>${statIcon(k)}<span style="color:${v ? STAT_COLOR[k] : '#7d6a52'}">${v >= 0 ? '+' : ''}${v}${unit}${name}</span>${cmp}</li>`;
+  }).join('');
+  const card = $('itemCard');
+  card.innerHTML = `<article class="icard" style="--rc:${R.color};--rg:rgba(${rgb},.5);--rt:${it.rarity === 3 ? '#ffc37a' : R.color}">
+    <div class="bar"></div>
+    <div class="top">
+      <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 58)}</div>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h2>${it.name}</h2>
+        <span class="rar">${R.name}</span>
+        <span class="meta">${SLOT_INFO[it.slot].name} · Nivel ${it.level}</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <ul>${lines}</ul>
+    ${eq ? `<p class="cmp">Comparado con <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipado)</p>` : ''}
+    <div class="btns">
+      ${from === 'bag' ? '<button class="pri" id="icEquip">Equipar</button>' : '<button class="pri" id="icUnequip">Quitar</button>'}
+      <button class="sec" id="icSell">Vender · ${it.value}</button>
+    </div>
+  </article>`;
+  card.classList.add('show');
+  const close = () => { card.classList.remove('show'); invSel = null; };
+  card.onclick = (e) => { if (e.target === card) close(); };
+  const eqBtn = $('icEquip'), unBtn = $('icUnequip');
+  if (eqBtn) eqBtn.onclick = () => {
+    const before = derived();
     const old = S.equip[it.slot];
     S.equip[it.slot] = it;
-    S.bag.splice(invSel.idx, 1);
+    S.bag.splice(key, 1);
     if (old) S.bag.push(old);
-    invSel = null; recalc(); SFX.play('loot'); buildInventory();
-  });
-  if (unBtn) unBtn.addEventListener('click', () => {
+    recalc();
+    close();
+    SFX.play(it.rarity >= 2 ? 'legend' : 'loot');
+    equipToast(before, derived());
+    buildInventory(it.slot);
+  };
+  if (unBtn) unBtn.onclick = () => {
     if (S.bag.length >= BAG_MAX) return;
     S.bag.push(it);
     delete S.equip[it.slot];
-    invSel = null; recalc(); SFX.play('click'); buildInventory();
-  });
-  $('btnSell').addEventListener('click', () => {
-    if (invSel.from === 'bag') S.bag.splice(invSel.idx, 1);
-    else delete S.equip[it.slot];
+    recalc(); close(); SFX.play('click'); buildInventory();
+  };
+  $('icSell').onclick = () => {
+    if (from === 'bag') S.bag.splice(key, 1); else delete S.equip[it.slot];
     S.kamas += it.value;
-    invSel = null; recalc(); SFX.play('coin'); buildInventory();
-  });
+    recalc(); close(); SFX.play('coin'); buildInventory();
+  };
 }
+
+function equipToast(a, b) {
+  const parts = [];
+  const add = (label, x, y, fmt) => { const dlt = y - x; if (Math.abs(dlt) >= 0.5) parts.push(`${label} ${dlt > 0 ? '+' : ''}${fmt(dlt)}`); };
+  add('PV', a.maxHp, b.maxHp, Math.round);
+  add('Daño', (a.dmgMul - 1) * 100, (b.dmgMul - 1) * 100, (v) => Math.round(v) + '%');
+  add('Crít', a.crit * 100, b.crit * 100, (v) => Math.round(v) + '%');
+  add('Potencia', a.power, b.power, Math.round);
+  add('Poder', powerScore(a), powerScore(b), Math.round);
+  if (!parts.length) return;
+  const el = $('shToast');
+  const up = powerScore(b) >= powerScore(a);
+  el.style.borderColor = up ? '#8fe36a' : '#ff8a80';
+  el.style.color = up ? '#d6ffc4' : '#ffd0cc';
+  el.textContent = parts.join('  ·  ');
+  el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+}
+
 $('btnInvClose').addEventListener('click', closeInventory);
 $('btnSellCommons').addEventListener('click', () => {
   let gain = 0;
@@ -1991,7 +2235,7 @@ $('btnSellCommons').addEventListener('click', () => {
   buildInventory();
 });
 
-// ---------- Pausa, fin de Faille, muerte ----------
+// ---------- Pausa, fin de Grieta, muerte ----------
 function riftRows(extra = []) {
   return [
     ['Tiempo', fmtTime(rift.elapsed)],
@@ -2083,6 +2327,7 @@ try {
 } catch (e) { /* entorno web */ }
 
 // Arranque
+if (document.fonts && document.fonts.load) ['900 20px Cinzel', '900 20px Nunito', '800 20px Nunito'].forEach((f) => document.fonts.load(f).catch(() => {}));
 function onHeroArtLoaded() { if (state === 'menu') buildMenu(); }
 selectedClass = SAVE.last;
 buildMenu();

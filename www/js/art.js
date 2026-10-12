@@ -68,7 +68,7 @@ const HERO_ART = {};
   img.onload = () => { HERO_ART[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
   img.src = 'img/heroes/' + id + '.png';
 });
-const HERO_H = 56; // altura en unidades de mundo
+const HERO_H = 64; // altura en unidades de mundo
 
 function drawHeroImage(g, img, o) {
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
@@ -318,10 +318,31 @@ function drawWeapon(g, clsId, o, yoff) {
   g.restore();
 }
 
+function bestRarity() {
+  let b = -1;
+  for (const s of SLOTS) if (S.equip[s]) b = Math.max(b, S.equip[s].rarity);
+  return b;
+}
+
 function drawPlayer() {
   let jumpH = 0;
   if (P.jump) { const k = P.jump.t / P.jump.dur; jumpH = Math.sin(k * Math.PI) * 55; }
   shadow(P.x, P.y + 1, 13 * (1 - jumpH / 150));
+  const br = bestRarity();
+  if (br >= 1) {
+    const rgb = RARITY_RGB[br];
+    ctx.save();
+    ctx.translate(P.x, P.y);
+    ctx.scale(1, 0.4);
+    ctx.globalCompositeOperation = 'lighter';
+    ctx.globalAlpha = 0.45 + Math.sin(now * 4) * 0.15;
+    circle(0, 0, 22, null, `rgba(${rgb},0.9)`, 2.5);
+    ctx.restore();
+    glow(P.x, P.y - 4, 34, rgb, 0.35);
+    if (br >= 2 && Math.random() < (br === 3 ? 0.35 : 0.15)) {
+      particles.push({ kind: 'glowdot', x: P.x + rand(-12, 12), y: P.y - rand(0, 30), vx: 0, vy: -50, life: 0.8, max: 0.8, rgb, size: 4, grav: 0 });
+    }
+  }
   if (P.shield > 0) {
     ctx.save();
     ctx.globalAlpha = 0.35 + Math.sin(now * 6) * 0.08;
@@ -622,6 +643,8 @@ function drawEnemy(e) {
   }
 
   shadow(e.x, e.y + 1, e.r * (1 - Math.min(0.6, e.z / 200)));
+  if (e.elite) glow(e.x, e.y - e.r * 0.8 - e.z, e.r * 2.6, hexRgb(e.elite.color), 0.45 + Math.sin(now * 5) * 0.12);
+  if (e.boss) glow(e.x, e.y - e.r - e.z, e.r * 3, e.enraged ? '255,60,20' : '255,170,80', 0.4 + Math.sin(now * 3) * 0.1);
   drawMonsterBody(e);
   if (e.enraged && e.flash <= 0 && Math.random() < 0.3) particles.push({ x: e.x + rand(-e.r, e.r), y: e.y - rand(0, e.r * 2), vx: 0, vy: -60, life: 0.4, max: 0.4, color: '#ff3d00', size: rand(3, 5), grav: 0 });
   if (e.slowT > 0) circle(e.x, e.y - e.r, 3, '#ff7043');
@@ -640,7 +663,7 @@ function drawEnemy(e) {
 // Cuerpo animado del monstruo (desde la caché de sprites)
 function drawMonsterBody(e) {
   const A = MONSTER_ART[e.type];
-  const k = e.r / A.r0;
+  const k = (e.r / A.r0) * 1.15;
   const ph = ((e.t * A.rate) % 1 + 1) % 1;
   const fi = Math.floor(ph * ANIM_FRAMES);
   const v = A.vary(e);
@@ -656,6 +679,15 @@ function drawMonsterBody(e) {
     g.setTransform(1, 0, 0, 1, 0, 0);
     g.scale(SPR.scale, SPR.scale);
     g.translate(ax, ay);
+    // volumen: luz arriba, sombra abajo (se hornea una vez en la caché)
+    g.globalCompositeOperation = 'source-atop';
+    const sh = g.createLinearGradient(0, -ay, 0, h - ay);
+    sh.addColorStop(0, 'rgba(255,236,200,0.28)');
+    sh.addColorStop(0.5, 'rgba(255,255,255,0)');
+    sh.addColorStop(1, 'rgba(10,0,10,0.38)');
+    g.fillStyle = sh;
+    g.fillRect(-ax, -ay, w, h);
+    g.globalCompositeOperation = 'source-over';
     tintSprite(g, w, h, ax, ay, tint);
   });
   ctx.restore();
@@ -737,13 +769,14 @@ function drawPickup(k) {
     }
     shadow(k.x, k.y, 9);
     ctx.save();
+    if (k.item.rarity >= 1) glow(k.x, y, 26, RARITY_RGB[k.item.rarity], 0.55 + Math.sin(k.t * 5) * 0.15);
     ctx.translate(k.x, y);
-    circle(0, 0, 10, 'rgba(30,20,8,0.8)', R.color, 2);
-    ctx.font = '12px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-    ctx.fillText(k.item.icon, 0, 1);
+    circle(0, 0, 12, 'rgba(30,20,8,0.85)', R.color, 2);
+    const icon = itemIconImage(itemKind(k.item), k.item.rarity);
+    if (icon.complete) ctx.drawImage(icon, -11, -11, 22, 22);
     ctx.restore();
     // etiqueta con el nombre
-    ctx.font = '800 9px "Trebuchet MS", sans-serif';
+    ctx.font = '800 9px Nunito, sans-serif';
     const tw = ctx.measureText(k.item.name).width + 8;
     roundRect(k.x - tw / 2, y - 27, tw, 13, 3, 'rgba(15,10,5,0.75)', R.color, 1);
     ctx.fillStyle = R.color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -800,6 +833,7 @@ function drawSlash(s) {
   const sweep = s.arc * Math.min(1, k * 2.2) * s.side;
   ctx.save();
   ctx.globalAlpha = alpha;
+  ctx.globalCompositeOperation = 'lighter';
   ctx.fillStyle = s.color;
   ctx.beginPath();
   const R = s.range, r = s.range - s.width;
@@ -819,6 +853,14 @@ function drawSlash(s) {
   ctx.closePath();
   ctx.fill();
   ctx.restore();
+  const tipA = a0 + sweep;
+  const rgb = s.color === '#ffcc33' ? '255,180,60' : hexRgb(s.color);
+  glow(s.x + Math.cos(tipA) * (R - s.width / 2), s.y - 16 + Math.sin(tipA) * (R - s.width / 2) * 0.85, s.width * 1.6, rgb, alpha * 0.9);
+}
+
+function hexRgb(h) {
+  const n = parseInt(h.slice(1), 16);
+  return ((n >> 16) & 255) + ',' + ((n >> 8) & 255) + ',' + (n & 255);
 }
 
 function drawCast() {
@@ -845,6 +887,7 @@ function drawCast() {
 
 function drawGlyph(g) {
   const fade = Math.min(1, g.life / 0.5, (g.max - g.life) / 0.25);
+  glow(g.x, g.y, g.r * 1.2, '255,110,30', 0.35 * fade);
   ctx.save();
   ctx.globalAlpha = fade;
   ctx.translate(g.x, g.y);
