@@ -146,9 +146,9 @@ const forgeMul = (slot) => 1 + 0.12 * forgeStars(slot);
 
 // --- Armería de Gesta: piezas legendarias exclusivas (más fuertes que las normales) ---
 const ARMORY = {
-  weapon: { name: 'Arma de Gesta', desc: 'Arma legendaria exclusiva, +20% de stats sobre una legendaria normal', cost: 60 },
-  armor: { name: 'Pieza de Gesta', desc: 'Pieza legendaria exclusiva al azar (sin arma), +20% de stats', cost: 35 },
-  gem: { name: 'Gema Ancestral', desc: 'Una Gema Ancestral que aún no tengas (bonus permanente)', cost: 90 },
+  weapon: { name: 'Arma de Gesta', desc: 'Arma legendaria exclusiva, +20% de stats sobre una legendaria normal', cost: 150 },
+  armor: { name: 'Pieza de Gesta', desc: 'Pieza legendaria exclusiva al azar (sin arma), +20% de stats', cost: 90 },
+  gem: { name: 'Gema Ancestral', desc: 'Una Gema Ancestral que aún no tengas (bonus permanente)', cost: 220 },
 };
 function makeGestaItem(slot) {
   const lvl = Math.max(1, (highestLevel() - 1) * 2 + 3 + DIFFS[2].lvl);

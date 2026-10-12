@@ -93,6 +93,20 @@ function iconBody(kind, p) {
     case 'talisman':
       return `<path d="M24 4 L28 16 L41 16 L31 24 L35 37 L24 29 L13 37 L17 24 L7 16 L20 16 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
         <circle cx="24" cy="21" r="5" fill="#fff" opacity="0.5"/>`;
+    case 'shield':
+      return `<path d="M24 4 L40 10 Q40 32 24 44 Q8 32 8 10 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 9 L35 13 Q35 30 24 39 Z" fill="#000" opacity="0.18"/>
+        <path d="M24 12 L24 34 M15 20 L33 20" stroke="${p.ml}" stroke-width="2.5" opacity="0.8"/>`;
+    case 'magnet':
+      return `<path d="M10 8 L18 8 L18 26 Q18 32 24 32 Q30 32 30 26 L30 8 L38 8 L38 26 Q38 40 24 40 Q10 40 10 26 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <rect x="10" y="8" width="8" height="6" fill="#e8eef2" stroke="${OL}" stroke-width="1.5"/><rect x="30" y="8" width="8" height="6" fill="#e8eef2" stroke="${OL}" stroke-width="1.5"/>`;
+    case 'clover':
+      return `<circle cx="17" cy="17" r="8" fill="${p.g}" stroke="${OL}" stroke-width="2"/><circle cx="31" cy="17" r="8" fill="${p.g}" stroke="${OL}" stroke-width="2"/>
+        <circle cx="17" cy="30" r="8" fill="${p.g}" stroke="${OL}" stroke-width="2"/><circle cx="31" cy="30" r="8" fill="${p.g}" stroke="${OL}" stroke-width="2"/>
+        <path d="M24 26 Q26 36 32 44" stroke="${OL}" stroke-width="3" fill="none"/><circle cx="24" cy="24" r="3" fill="${p.ml}"/>`;
+    case 'crystal':
+      return `<path d="M24 3 L34 16 L30 44 L18 44 L14 16 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
+        <path d="M24 3 L24 44 M14 16 L34 16" stroke="#fff" stroke-width="1.2" opacity="0.6"/><path d="M24 3 L34 16 L24 16 Z" fill="#fff" opacity="0.45"/>`;
     case 'gem':
       return `<path d="M24 4 L38 16 L33 40 L15 40 L10 16 Z" fill="${p.g}" stroke="${OL}" stroke-width="2" stroke-linejoin="round"/>
         <path d="M24 4 L38 16 L24 20 L10 16 Z" fill="#fff" opacity="0.5"/>

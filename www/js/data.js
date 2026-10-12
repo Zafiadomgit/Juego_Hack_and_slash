@@ -183,9 +183,16 @@ const ELIXIRS = {
   fortuna: { name: 'Elixir de Fortuna',        color: '#e8b64c', hi: '#fff3c4', desc: '+50% ámbar y más objetos raros durante una Grieta', base: 150 },
 };
 // Mejoras permanentes (por personaje)
+// Coste creciente (redondeado a 50): las mejoras son el gran destino del ámbar a lo largo de toda la partida
+const upCost = (base, k, l) => Math.round((base * Math.pow(k, l)) / 50) * 50;
 const UPGRADES = {
-  bolsa:    { name: 'Bolsa ampliada',     max: 4, cost: (l) => 400 + l * 400, desc: (l) => `+6 huecos en la bolsa (${36 + 6 * l} → ${42 + 6 * l})` },
-  cinto:    { name: 'Cinto de pociones',  max: 3, cost: (l) => 250 + l * 250, desc: (l) => `Llevas hasta ${6 + l} pociones (ahora ${5 + l})` },
-  afilador: { name: 'Piedra de afilar',   max: 5, cost: (l) => 500 + l * 500, desc: (l) => `+5% de daño para siempre (ahora +${l * 5}%)` },
-  vigor:    { name: 'Talismán de vigor',  max: 5, cost: (l) => 500 + l * 500, desc: (l) => `+5% de PV máximos para siempre (ahora +${l * 5}%)` },
+  afilador: { name: 'Piedra de afilar',   max: 15, cost: (l) => upCost(500, 1.32, l), desc: (l) => `+5% de daño para siempre (ahora +${l * 5}%)` },
+  vigor:    { name: 'Talismán de vigor',  max: 15, cost: (l) => upCost(500, 1.32, l), desc: (l) => `+5% de PV máximos para siempre (ahora +${l * 5}%)` },
+  piel:     { name: 'Piel curtida',       max: 10, cost: (l) => upCost(600, 1.38, l), desc: (l) => `-2% de daño recibido (ahora -${l * 2}%)` },
+  energia:  { name: 'Cristal de energía', max: 10, cost: (l) => upCost(500, 1.38, l), desc: (l) => `+6% de recarga de energía (ahora +${l * 6}%)` },
+  fortuna:  { name: 'Trébol de la suerte', max: 10, cost: (l) => upCost(400, 1.4, l), desc: (l) => `+5% de ámbar en las Grietas (ahora +${l * 5}%)` },
+  reflejos: { name: 'Botas de reflejos',  max: 2,  cost: (l) => [3000, 15000][l], desc: (l) => `+1 carga de esquiva (ahora ${3 + l})` },
+  iman:     { name: 'Imán de ámbar',      max: 4,  cost: (l) => upCost(300, 2, l), desc: (l) => `+25% de radio para atraer ámbar y XP (ahora +${l * 25}%)` },
+  bolsa:    { name: 'Bolsa ampliada',     max: 4,  cost: (l) => 400 + l * 400, desc: (l) => `+6 huecos en la bolsa (${36 + 6 * l} → ${42 + 6 * l})` },
+  cinto:    { name: 'Cinto de pociones',  max: 3,  cost: (l) => 250 + l * 250, desc: (l) => `Llevas hasta ${6 + l} pociones (ahora ${5 + l})` },
 };

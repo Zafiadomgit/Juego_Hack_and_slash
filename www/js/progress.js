@@ -120,7 +120,8 @@ function makeSetItem(cls, level, setId) {
 
 // ---------- Héroe de referencia ----------
 // Simula a un aventurero del nivel recomendado con el equipo que se consigue en esa dificultad
-// (misma fórmula que derived(), sin gemas, mejoras ni conjuntos) y devuelve su golpe medio y su vida efectiva.
+// (misma fórmula que derived(), sin gemas, conjuntos ni Trascendencia; con las mejoras de Maese Ivo que se esperan
+// a esa altura: la Piedra de afilar y el Talismán suben ~1 nivel cada 2,5 Grietas) y devuelve su golpe medio y su vida efectiva.
 const REF_CACHE = new Map();
 function refPlayer(cls, L, d) {
   const key = cls + '|' + L + '|' + d;
@@ -143,9 +144,10 @@ function refPlayer(cls, L, d) {
   // puntos de característica repartidos en las dos recomendadas
   const pts = (plvl - 1) * 5, rec = STAT_REC[cls];
   t[rec[0]] = (t[rec[0]] || 0) + pts * 0.6; t[rec[1]] = (t[rec[1]] || 0) + pts * 0.4;
-  const maxHp = C.hp + (plvl - 1) * 8 + t.vit * 2;
+  const up = Math.min(15, (L - 1) / 2.5);
+  const maxHp = (C.hp + (plvl - 1) * 8 + t.vit * 2) * (1 + 0.05 * up);
   const power = 8 + plvl * 1.2 + t.dmg;
-  const dmgMul = 1 + t.fue * 0.01;
+  const dmgMul = (1 + t.fue * 0.01) * (1 + 0.05 * up);
   const crit = Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01);
   const armor = Math.min(0.75, t.res * 0.01);
   const out = { hit: power * C.basicMul * dmgMul * (1 + crit * 0.8), ehp: maxHp / (1 - armor), plvl };

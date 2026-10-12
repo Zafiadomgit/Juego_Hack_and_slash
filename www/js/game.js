@@ -204,7 +204,7 @@ const bagMax = () => 36 + 6 * ((S && S.up && S.up.bolsa) || 0);
 const panMax = () => 5 + ((S && S.up && S.up.cinto) || 0);
 // Asegura los campos nuevos en partidas antiguas
 function migrateSlot(s) {
-  s.up = Object.assign({ bolsa: 0, cinto: 0, afilador: 0, vigor: 0 }, s.up || {});
+  s.up = Object.assign(Object.fromEntries(Object.keys(UPGRADES).map((k) => [k, 0])), s.up || {});
   s.boosts = Object.assign({ furia: 0, piedra: 0, sabio: 0, fortuna: 0 }, s.boosts || {});
   if (!s.shop) s.shop = null;
   s.seals = s.seals || 0; s.trans = s.trans || 0;
@@ -480,18 +480,18 @@ function derived() {
   const has = (d) => S.dofus.includes(d);
   const sb = activeSetBonus();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up ? S.up.vigor : 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up ? S.up.afilador : 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: 1 + t.int * 0.015,
     crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (transRank() >= 7 ? 0.05 : 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
-    paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)),
-    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0)),
-    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)),
-    magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)),
+    paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)) * (1 + 0.06 * (S.up.energia || 0)),
+    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0) + 0.02 * (S.up.piel || 0)),
+    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)) * (1 + 0.05 * (S.up.fortuna || 0)),
+    magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)) * (1 + 0.25 * (S.up.iman || 0)),
     t,
   };
 }
@@ -512,7 +512,7 @@ function createPlayer() {
     dir: 0, aimHold: 0,
     hp: 1, maxHp: 0,
     pa: 6, maxPa: 6,
-    pm: 3, maxPm: 3, pmRegen: 1 / 2.2,
+    pm: 3 + (S.up.reflejos || 0), maxPm: 3 + (S.up.reflejos || 0), pmRegen: 1 / 2.2,
     atkCd: 0, skillCd: [0, 0], panCd: 0,
     invul: 0, shield: 0, shieldT: 0,
     dashT: 0, dashVx: 0, dashVy: 0,
@@ -3042,7 +3042,7 @@ let shopKind = 'merchant';
 let SHOP_TABS = SHOPS.merchant.tabs;
 const elixirPrice = (k) => Math.round(ELIXIRS[k].base * (1 + (S.maxFaille - 1) * 0.35));
 const restockPrice = () => 30 * S.maxFaille;
-const UPGRADE_ICON = { bolsa: ['bag', '#6fd05a', '#d6ffc4'], cinto: ['potion', '#7cc457', '#e0ffd0'], afilador: ['whetstone', '#ffb040', '#fff3c4'], vigor: ['talisman', '#ff5a4e', '#ffd0cc'] };
+const UPGRADE_ICON = { bolsa: ['bag', '#6fd05a', '#d6ffc4'], cinto: ['potion', '#7cc457', '#e0ffd0'], afilador: ['whetstone', '#ffb040', '#fff3c4'], vigor: ['talisman', '#ff5a4e', '#ffd0cc'], piel: ['shield', '#a0784a', '#f0d8b0'], energia: ['crystal', '#4fc3f7', '#e0f6ff'], fortuna: ['clover', '#5cc45a', '#e0ffd0'], reflejos: ['boots', '#66bb6a', '#d6ffc4'], iman: ['magnet', '#e04a3a', '#ffd0cc'] };
 
 function genStock() {
   const lvl = Math.max(1, (S.maxFaille - 2) * 2 + 3);
