@@ -65,6 +65,13 @@ def shrink(im, s):
 CLIP_FWD = {'feca': 0.42, 'cra': 0.6}  # cuánto puede asomar el arma por delante (fracción de la altura)
 
 
+# Ciclos de caminar regenerados (hojas en el orden de clase de NEW_ORDER): índice de fotogramas a usar
+NEW_ORDER = ['iop', 'cra', 'feca', 'sombra', 'domadora', 'artificiera', 'berserker']
+NEW_WALK = {'iop': [4, 5, 6, 8, 10, 11], 'cra': [3, 4, 5, 6, 7, 8, 9, 10], 'feca': [0, 2, 3, 8, 10],
+            'sombra': None, 'domadora': None, 'artificiera': None, 'berserker': None}
+NEW_FLIP = {'feca': [2, 3]}  # fotogramas de la hoja que miran a la izquierda: se voltean
+
+
 def clip_body(im, ax, ay, fwd=0.68, back=0.55):
     """Quita los efectos dibujados lejos del cuerpo (rastros de flechas, rayos, dagas lanzadas):
     solo se conserva lo que cabe en una caja alrededor del personaje y su arma."""
@@ -78,14 +85,20 @@ def clip_body(im, ax, ay, fwd=0.68, back=0.55):
     return Image.fromarray(a), ax - xs.min(), ay - ys.min()
 
 
-def build(src, www):
+def build(src, www, walk_src=None):
     out_dir = os.path.join(www, 'img/heroes/anim'); os.makedirs(out_dir, exist_ok=True)
     data = {}
     for cls, (folder, poses) in PLAN.items():
         sheets = sorted(glob.glob(os.path.join(src, folder, '*', '*.jpg')))
         placed = []
         for pose, (si, keep) in poses.items():
-            fr = frames(sheets[si])
+            if pose == 'walk' and walk_src:
+                fr = frames(walk_src[NEW_ORDER.index(cls)])
+                for i in NEW_FLIP.get(cls, []):
+                    f = fr[i]; f['img'] = f['img'].transpose(Image.FLIP_LEFT_RIGHT); f['ax'] = f['img'].width - 1 - f['ax']
+                keep = NEW_WALK[cls]
+            else:
+                fr = frames(sheets[si])
             if keep is not None: fr = [fr[i] for i in keep]
             s = BODY_PX / float(np.median([f['bh'] for f in fr]))
             for f in fr:
@@ -111,4 +124,4 @@ def build(src, www):
 
 
 if __name__ == '__main__':
-    build(sys.argv[1], sys.argv[2])
+    build(sys.argv[1], sys.argv[2], open(sys.argv[3]).read().split('\n') if len(sys.argv) > 3 else None)
