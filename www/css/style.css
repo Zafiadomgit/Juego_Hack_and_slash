@@ -545,3 +545,9 @@ h1.title span { color: #ecd18a; }
 .offer.gesta.sold { opacity: 0.75; }
 .quest.bonus { border-style: dashed; }
 .gesta-grid { grid-auto-rows: max-content; align-content: start; }
+
+/* Equipamiento rápido */
+.bag-actions { display: flex; gap: 6px; }
+.bag-actions .sh-sell { flex: 1; }
+.sh-sell.auto { border-color: #8a7a4a; color: #e8d6a0; }
+.sh-sell.auto.ready { border-color: #ffd54f; color: #2a1a0c; background: linear-gradient(180deg, #ffe38a, #e0a830); box-shadow: 0 0 12px rgba(255, 213, 79, 0.45); font-weight: 900; }

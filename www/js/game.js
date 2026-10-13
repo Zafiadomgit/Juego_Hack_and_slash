@@ -2835,6 +2835,9 @@ function buildInventory(justEquipped) {
     if (hero) hero.classList.add('flash');
   }
 
+  // botón de equipamiento rápido: avisa cuántas mejoras hay en la bolsa
+  { const n = bestGearPlan().changes.length, b = $('btnAutoEquip'); b.textContent = n ? `⚡ Equipar lo mejor (${n})` : '⚡ Equipar lo mejor'; b.classList.toggle('ready', n > 0); }
+
   // características
   const pts = $('shPoints');
   pts.textContent = S.points > 0 ? S.points + ' pts' : 'Nv. ' + S.level;
@@ -2994,6 +2997,51 @@ function equipToast(a, b) {
 }
 
 $('btnInvClose').addEventListener('click', closeInventory);
+// Equipamiento rápido: para cada ranura prueba las piezas de la bolsa y se queda con la que más sube
+// el Poder total (cuenta vida, daño, crítico, defensa, velocidad, hechizos y bonus de conjunto).
+// Dos pasadas, para que los conjuntos que se completan con varias piezas también se aprovechen.
+function bestGearPlan() {
+  const saved = { ...S.equip }, bag = S.bag.slice();
+  const changes = [];
+  for (let pass = 0; pass < 2; pass++) {
+    for (const slot of SLOTS) {
+      let best = null, bestScore = powerScore(derived());
+      for (const it of bag) {
+        if (it.slot !== slot) continue;
+        const cur = S.equip[slot];
+        S.equip[slot] = it;
+        const sc = powerScore(derived());
+        S.equip[slot] = cur;
+        if (sc > bestScore + 0.5) { bestScore = sc; best = it; }
+      }
+      if (best) {
+        const cur = S.equip[slot];
+        S.equip[slot] = best;
+        bag.splice(bag.indexOf(best), 1);
+        if (cur) bag.push(cur);
+        changes.push(slot);
+      }
+    }
+  }
+  const plan = { equip: { ...S.equip }, bag, changes: [...new Set(changes)] };
+  for (const k of SLOTS) { if (saved[k]) S.equip[k] = saved[k]; else delete S.equip[k]; }
+  return plan;
+}
+function autoEquip() {
+  const plan = bestGearPlan();
+  if (!plan.changes.length) { showToast('shToast', 'Ya llevas lo mejor de tu bolsa'); SFX.play('click'); return; }
+  const before = derived();
+  for (const k of SLOTS) { if (plan.equip[k]) S.equip[k] = plan.equip[k]; else delete S.equip[k]; }
+  S.bag = plan.bag;
+  recalc();
+  const best = Math.max(...plan.changes.map((k) => S.equip[k].rarity));
+  SFX.play(best >= 2 ? 'legend' : 'loot');
+  equipToast(before, derived());
+  persist();
+  buildInventory(plan.changes[0]);
+  for (const k of plan.changes) { const el = $('shDoll').querySelector(`.slot[data-slot="${k}"]`); if (el) el.classList.add('new'); }
+}
+$('btnAutoEquip').addEventListener('click', autoEquip);
 $('btnSellCommons').addEventListener('click', () => {
   let gain = 0;
   S.bag = S.bag.filter((it) => { if (it.rarity === 0) { gain += it.value; return false; } return true; });

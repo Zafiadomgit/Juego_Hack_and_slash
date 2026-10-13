@@ -494,7 +494,7 @@ function drawPlayer() {
     glow(P.x, P.y - 22, 46, '255,214,110', 0.35 + Math.sin(now * 3) * 0.1);
     if (Math.random() < 0.25) particles.push({ kind: 'glowdot', x: P.x + rand(-12, 12), y: P.y - rand(0, 36), vx: 0, vy: -30, life: 0.7, max: 0.7, rgb: '255,214,110', size: 3, grav: 0 });
   }
-  glow(P.x, P.y - 34, 58, '255,226,180', 0.22); // halo suave: el héroe siempre se distingue
+  glow(P.x, P.y - 34, 50, '255,226,180', 0.12); // halo muy suave
   const br = bestRarity();
   if (br >= 1) {
     const rgb = RARITY_RGB[br];

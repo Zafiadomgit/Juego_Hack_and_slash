@@ -162,12 +162,23 @@ function smoothImage(img, hpx, key, rim) {
   const sil = hd2dCanvas(wpx, hpx);
   sil.g.drawImage(body.c, 0, 0);
   sil.g.globalCompositeOperation = 'source-in';
-  // héroes: borde de luz cálida (se distinguen siempre del suelo); monstruos: contorno oscuro
-  sil.g.fillStyle = rim ? '#ffe9bf' : '#140c18'; sil.g.fillRect(0, 0, wpx, hpx);
-  out.g.globalAlpha = rim ? 0.6 : 0.7;
+  sil.g.fillStyle = '#140c18'; sil.g.fillRect(0, 0, wpx, hpx);
+  out.g.globalAlpha = 0.7;
   for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) out.g.drawImage(sil.c, dx, dy);
   out.g.globalAlpha = 1;
   out.g.drawImage(body.c, 1, 1);
+  // héroes: luz cálida desde arriba (como la del farol del juego), sin borde que lo recorte
+  if (rim) {
+    const lit = hd2dCanvas(wpx, hpx);
+    lit.g.drawImage(body.c, 0, 0);
+    lit.g.globalCompositeOperation = 'source-in'; // solo la forma del héroe, no sus colores
+    const gr = lit.g.createLinearGradient(0, 0, 0, hpx);
+    gr.addColorStop(0, 'rgba(255,230,190,0.16)'); gr.addColorStop(0.5, 'rgba(255,230,190,0.04)'); gr.addColorStop(1, 'rgba(255,236,200,0)');
+    lit.g.fillStyle = gr; lit.g.fillRect(0, 0, wpx, hpx);
+    out.g.globalCompositeOperation = 'lighter';
+    out.g.drawImage(lit.c, 1, 1);
+    out.g.globalCompositeOperation = 'source-over';
+  }
   c = out.c;
   if (SMOOTH_IMG.size > 600) SMOOTH_IMG.delete(SMOOTH_IMG.keys().next().value);
   SMOOTH_IMG.set(key, c);
