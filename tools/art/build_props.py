@@ -65,7 +65,7 @@ SEL = {
         'oak': ['v-3/13', 'v-2/09', 'v-0/10'],
         # vecinos (vil0 granjero, vil1 anciana, vil2 guardia, vil3 niño: mismo orden que VILLAGERS)
         'merchant': ['n2-0/00'], 'alchemist': ['n1-0/00'],
-        'vil0': ['n0-0/00'], 'vil1': ['n0-0/03'], 'vil2': ['n0-0/02'], 'vil3': ['n0-0/01'],
+        'vil0': ['n0-0/00'], 'vil1': ['n0-0/02'], 'vil2': ['n0-0/01'], 'vil3': ['n0-0/03'],
     },
     'abismo': {
         'tree': ['g5-0/00', 'g5-0/03', 'g5-1/01'],

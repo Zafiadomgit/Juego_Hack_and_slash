@@ -474,10 +474,11 @@ function drawNpc(n) {
   }
   const fi = Math.floor(((now * 0.35 + n.x * 0.01) % 1 + 1) % 1 * 8);
   shadow(n.x, n.y + 1, 15);
+  if (n.id === 'smith') drawAnvil(n.x, n.y);
   ctx.save();
   ctx.translate(n.x, n.y);
   if (vHero.x > n.x + 20) ctx.scale(-1, 1); // mira hacia el héroe
-  if (!drawVillager(n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
+  if (!drawVillager(n.id === 'smith' ? 'vil2' : n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
     sprite('npc|' + n.id + '|' + fi, 60, 100, 30, 96, () => (n.id === 'merchant' ? artMerchant : artAlchemist)(fi / 8));
   ctx.restore();
   // nombre e indicador flotante
@@ -774,4 +775,17 @@ function drawSkyLife() {
     ctx.strokeStyle = '#1a1a24'; ctx.lineWidth = 2; ctx.lineCap = 'round';
     ctx.beginPath(); ctx.moveTo(b.x - 7, b.y - flap); ctx.lineTo(b.x, b.y); ctx.lineTo(b.x + 7, b.y - flap); ctx.stroke();
   }
+}
+
+// Yunque y fragua del herrero (con chispas)
+function drawAnvil(x, y) {
+  ctx.save(); ctx.translate(x + 30, y + 6);
+  shadow(0, 2, 16);
+  ctx.fillStyle = '#2a2a32'; ctx.fillRect(-6, -14, 12, 14);
+  ctx.fillStyle = '#4a4a56'; ctx.beginPath(); ctx.moveTo(-16, -20); ctx.lineTo(14, -20); ctx.lineTo(20, -16); ctx.lineTo(-12, -14); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#7a7a88'; ctx.fillRect(-14, -21, 26, 2);
+  ctx.fillStyle = '#ff9a3a'; ctx.fillRect(-4, -23, 10, 3);
+  ctx.restore();
+  glow(x + 31, y - 18, 22, '255,140,50', 0.5 + Math.sin(now * 9) * 0.15);
+  if (Math.random() < 0.08) VILLAGE.fx.push({ k: 'spark', x: x + 30 + rand(-4, 4), y: y - 16, vx: rand(-40, 40), vy: rand(-80, -40), life: 0.5, max: 0.5, r: 2 });
 }

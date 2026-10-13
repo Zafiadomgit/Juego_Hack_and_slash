@@ -224,7 +224,7 @@ function migrateSlot(s) {
   // gemas engarzadas (antes estaban todas activas): se engarzan las primeras que tuviera
   if (!Array.isArray(s.gemSlots)) s.gemSlots = (s.dofus || []).slice(0, GEM_SLOTS);
   while (s.gemSlots.length < GEM_SLOTS) s.gemSlots.push(null);
-  s.seals = s.seals || 0; s.trans = s.trans || 0;
+  s.seals = s.seals || 0; s.trans = s.trans || 0; s.frag = s.frag || 0;
   s.forge = Object.assign({}, s.forge || {});
   migrateMap(s);
   return s;
