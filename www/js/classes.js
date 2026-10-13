@@ -110,7 +110,7 @@ function classDmgMul() {
 }
 const classAtkSpeed = () => (P.warcryT > 0 ? 1.4 : 1) * (P.frenzyT > 0 ? 1.3 : 1);
 const classDefMul = () => (P && P.warcryT > 0 ? 0.75 : 1);
-const lifesteal = () => (!P ? 0 : (P.cls === 'berserker' ? (P.frenzyT > 0 ? 0.15 : 0.04) : 0) + (uniqueOn('sangre') ? 0.06 : 0));
+const lifesteal = () => (!P ? 0 : (P.cls === 'berserker' ? (P.frenzyT > 0 ? 0.15 : 0.04) : 0) + (uniqueOn('sangre') ? 0.06 : 0) + (uniqueMods().ls || 0));
 function stealLife(dmg) {
   const ls = lifesteal();
   if (ls > 0 && P.hp > 0) P.hp = Math.min(P.maxHp, P.hp + dmg * ls);

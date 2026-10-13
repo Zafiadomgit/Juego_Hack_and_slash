@@ -17,15 +17,37 @@ const UNIQUES = {
   verdugo: { slot: 'anillo', name: 'Anillo del Verdugo', color: '#ff4a6a', desc: 'Los críticos hacen un 60% más de daño' },
   viento: { slot: 'botas', name: 'Botas del Viento Eterno', color: '#8fe8c0', desc: '+1 esquiva y +20% de velocidad' },
   avaro: { slot: 'cinturon', name: 'Faja del Rey Avaro', color: '#ffd54f', desc: '+60% de ámbar y +40% de experiencia' },
+  // Armas legendarias de clase (solo caen para la clase que las usa); mods: dmg, hp, crit, critDmg, cd, armor, speed, ls
+  volcan: { slot: 'arma', cls: 'iop', name: 'Hacha del Volcán', color: '#ff5a1f', desc: '+30% de daño y +20% de PV máximos', mods: { dmg: 0.3, hp: 0.2 } },
+  alba: { slot: 'arma', cls: 'cra', name: 'Arco del Alba', color: '#ffe08a', desc: '+30% de daño y +12% de crítico', mods: { dmg: 0.3, crit: 0.12 } },
+  milrunas: { slot: 'arma', cls: 'feca', name: 'Báculo de las Mil Runas', color: '#5fc8ff', desc: '+30% de daño y hechizos un 25% más rápidos', mods: { dmg: 0.3, cd: 0.25 } },
+  colmillos: { slot: 'arma', cls: 'sombra', name: 'Colmillos del Eclipse', color: '#c04aff', desc: '+30% de daño y críticos un 50% más fuertes', mods: { dmg: 0.3, critDmg: 0.5 } },
+  cayado: { slot: 'arma', cls: 'domadora', name: 'Cayado del Bosque Antiguo', color: '#7ad85a', desc: '+30% de daño, +15% de resistencia y +10% de velocidad', mods: { dmg: 0.3, armor: 0.15, speed: 0.1 } },
+  solar: { slot: 'arma', cls: 'artificiera', name: 'Cañón Solar', color: '#ffa23a', desc: '+45% de daño', mods: { dmg: 0.45 } },
+  mandoble: { slot: 'arma', cls: 'berserker', name: 'Mandoble del Rey Caído', color: '#e8e8f0', desc: '+30% de daño y robas un 5% del daño como vida', mods: { dmg: 0.3, ls: 0.05 } },
 };
+// Suma de los modificadores de las reliquias equipadas
+function uniqueMods() {
+  const m = {};
+  if (!S) return m;
+  for (const s of SLOTS) {
+    const U = S.equip[s] && UNIQUES[S.equip[s].unique];
+    if (U && U.mods) for (const [k, v] of Object.entries(U.mods)) m[k] = (m[k] || 0) + v;
+  }
+  return m;
+}
+// Reliquias que puede encontrar la clase actual (las armas de otras clases no caen)
+const uniquePool = () => Object.keys(UNIQUES).filter((k) => !UNIQUES[k].cls || UNIQUES[k].cls === S.cls);
+const classUnique = () => Object.keys(UNIQUES).find((k) => UNIQUES[k].cls === S.cls);
 const uniqueOn = (k) => !!(S && SLOTS.some((s) => S.equip[s] && S.equip[s].unique === k));
 function makeUnique(lvl, key) {
-  key = key || pick(Object.keys(UNIQUES));
+  // el arma de la clase tiene más papeletas (un tercio de las veces)
+  key = key || (classUnique() && Math.random() < 0.33 ? classUnique() : pick(uniquePool()));
   const U = UNIQUES[key];
   const it = makeItem(S.cls, lvl, 3, { slot: U.slot });
   for (const k of Object.keys(it.stats)) it.stats[k] = Math.max(1, Math.round(it.stats[k] * (k === 'crit' || k === 'res' ? 1.2 : 1.35)));
   it.base = { ...it.stats };
-  it.name = U.slot === 'arma' ? `${pick(CLASSES[S.cls].weapon.names)} ${U.name}` : U.name;
+  it.name = U.slot === 'arma' && !U.cls ? `${pick(CLASSES[S.cls].weapon.names)} ${U.name}` : U.name;
   it.unique = key;
   it.value = Math.round(it.value * 2.5);
   return it;
@@ -76,7 +98,9 @@ function buildDungeon() {
         <span class="dg-rw">${ESS_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Esencias${first ? ' (primera vez ×2)' : ''} · <b style="color:#ffb040">Reliquia única ${first ? '¡asegurada!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${FRAG_SVG} ${10 * t}</span></div>
       <button class="btn big" data-t="${t}">Entrar</button></div>`);
   }
-  $('dgList').innerHTML = rows.reverse().join('');
+  const ck = classUnique(), cu = ck && UNIQUES[ck];
+  const head = cu ? `<div class="dg-cls"><img src="img/uniques/${ck}.png" width="40" height="40" alt=""><div><b style="color:${cu.color}">Arma legendaria de ${CLASSES[S.cls].name}: ${cu.name}</b><span>${cu.desc} · solo cae en la Mazmorra</span></div></div>` : '';
+  $('dgList').innerHTML = head + rows.reverse().join('');
 }
 $('dgList').addEventListener('click', (ev) => { const b = ev.target.closest('button[data-t]'); if (b) startDungeon(+b.dataset.t); });
 $('btnDgClose').addEventListener('click', closeDungeon);
