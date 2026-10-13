@@ -155,12 +155,24 @@ function itemPower(it) {
 }
 
 // ---------- Gemas Ancestrales (bonus permanentes) ----------
+// Se consiguen al vencer al Guardián (o Súper Jefe) del mundo indicado en `src`; 'super' = cualquier Súper Jefe.
+// Hay que engarzarlas (3 huecos, ver GEM_SLOTS) para que den su bonus; se pueden cambiar cuando quieras.
 const GEMS = {
-  turquesa:  { name: 'Gema de Zafiro',   color: '#3f9cc4', desc: '+10% de golpes críticos' },
-  esmeralda: { name: 'Gema Esmeralda',   color: '#43a047', desc: '+20% de PV máximos' },
-  purpura:   { name: 'Gema Granate',     color: '#c0392b', desc: '+15% de daño' },
-  ocre:      { name: 'Gema Solar',       color: '#f9a825', desc: 'La energía se recarga un 30% más rápido' },
+  purpura:   { name: 'Gema Granate',     color: '#c0392b', src: 'ceniza',   desc: '+15% de daño' },
+  brasa:     { name: 'Gema de Brasa',    color: '#ff7a2a', src: 'ceniza',   desc: '+12% de velocidad de ataque' },
+  esmeralda: { name: 'Gema Esmeralda',   color: '#43a047', src: 'pantano',  desc: '+20% de PV máximos' },
+  musgo:     { name: 'Gema de Musgo',    color: '#8bc34a', src: 'pantano',  desc: 'Recuperas un 1% de tus PV cada segundo' },
+  turquesa:  { name: 'Gema de Zafiro',   color: '#3f9cc4', src: 'glaciar',  desc: '+10% de probabilidad de crítico' },
+  escarcha:  { name: 'Gema de Escarcha', color: '#9fe0ff', src: 'glaciar',  desc: '-12% de daño recibido' },
+  ocre:      { name: 'Gema Solar',       color: '#f9a825', src: 'desierto', desc: 'La energía se recarga un 30% más rápido' },
+  ambar:     { name: 'Gema de Ámbar',    color: '#ffb84a', src: 'desierto', desc: '+40% de ámbar y más radio para recogerlo' },
+  vacio:     { name: 'Gema del Vacío',   color: '#9c5bd8', src: 'abismo',   desc: 'Los críticos hacen un 40% más de daño' },
+  obsidiana: { name: 'Gema de Obsidiana',color: '#5a4a6a', src: 'abismo',   desc: '+25% de daño de los hechizos' },
+  fenix:     { name: 'Corazón de Fénix', color: '#ff5a3d', src: 'super',    desc: 'La definitiva se carga un 50% más rápido' },
+  titan:     { name: 'Corazón de Titán', color: '#e0d6a8', src: 'super',    desc: '+10% de daño y +10% de PV' },
 };
+const GEM_SLOTS = 3;
+const gemsFor = (biomeId, isSuper) => Object.keys(GEMS).filter((k) => GEMS[k].src === biomeId || (isSuper && GEMS[k].src === 'super'));
 
 // ---------- Qué hace cada característica (texto + efecto actual) ----------
 const STAT_HELP = {

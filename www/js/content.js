@@ -14,7 +14,7 @@ const ULT_GAIN = { normal: 2.5, elite: 12, boss: 30 };
 function gainUlt(n) {
   if (!P) return;
   const was = P.ult >= 100;
-  P.ult = Math.min(100, (P.ult || 0) + n * (transRank() >= 3 ? 1.3 : 1));
+  P.ult = Math.min(100, (P.ult || 0) + n * (transRank() >= 3 ? 1.3 : 1) * (gemOn('fenix') ? 1.5 : 1));
   if (!was && P.ult >= 100) { addText(P.x, P.y - 58, '¡Definitiva lista!', '#ffe08a', 1.1); SFX.play('shield'); }
 }
 
@@ -264,7 +264,7 @@ function gestaAction(act) {
     const missing = Object.keys(GEMS).filter((k) => !S.dofus.includes(k));
     if (key === 'gem' && !missing.length) return;
     if (!spend(ARMORY[key].cost)) return;
-    if (key === 'gem') { const g = pick(missing); S.dofus.push(g); showToast('questToast', `${GEMS[g].name}: ${GEMS[g].desc}`); }
+    if (key === 'gem') { const g = pick(missing); S.dofus.push(g); const fr = S.gemSlots.indexOf(null); if (fr >= 0) S.gemSlots[fr] = g; recalc(); showToast('questToast', `${GEMS[g].name}: ${GEMS[g].desc}${fr >= 0 ? ' (engarzada)' : ' · engárzala en Personaje → Gemas'}`); }
     else {
       const it = makeGestaItem(key === 'weapon' ? 'arma' : pick(SLOTS.filter((s) => s !== 'arma')));
       S.bag.push(it);

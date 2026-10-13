@@ -221,6 +221,9 @@ function migrateSlot(s) {
   s.up = Object.assign(Object.fromEntries(Object.keys(UPGRADES).map((k) => [k, 0])), s.up || {});
   s.boosts = Object.assign({ furia: 0, piedra: 0, sabio: 0, fortuna: 0 }, s.boosts || {});
   if (!s.shop) s.shop = null;
+  // gemas engarzadas (antes estaban todas activas): se engarzan las primeras que tuviera
+  if (!Array.isArray(s.gemSlots)) s.gemSlots = (s.dofus || []).slice(0, GEM_SLOTS);
+  while (s.gemSlots.length < GEM_SLOTS) s.gemSlots.push(null);
   s.seals = s.seals || 0; s.trans = s.trans || 0;
   s.forge = Object.assign({}, s.forge || {});
   migrateMap(s);
@@ -491,21 +494,23 @@ function totalStats() {
 function derived() {
   const t = totalStats();
   const C = CLASSES[S.cls];
-  const has = (d) => S.dofus.includes(d);
+  const has = (d) => gemOn(d);
   const sb = activeSetBonus();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (has('titan') ? 1.1 : 1) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
-    skillMul: 1 + t.int * 0.015,
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (has('titan') ? 1.1 : 1) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
+    skillMul: (1 + t.int * 0.015) * (has('obsidiana') ? 1.25 : 1),
+    critDmg: has('vacio') ? 1.4 : 1,
+    hpRegen: has('musgo') ? 0.01 : 0,
     crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transRank() >= 7 ? 0.05 : 0)),
-    atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)),
+    atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)) * (has('brasa') ? 1.12 : 1),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
     paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)) * (1 + 0.06 * (S.up.energia || 0)),
-    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0) + 0.02 * (S.up.piel || 0)),
-    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)) * (1 + 0.05 * (S.up.fortuna || 0)),
-    magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)) * (1 + 0.25 * (S.up.iman || 0)),
+    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0) + 0.02 * (S.up.piel || 0) + (has('escarcha') ? 0.12 : 0)),
+    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)) * (1 + 0.05 * (S.up.fortuna || 0)) * (has('ambar') ? 1.4 : 1),
+    magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)) * (1 + 0.25 * (S.up.iman || 0)) * (has('ambar') ? 1.3 : 1),
     t,
   };
 }
@@ -719,6 +724,7 @@ function eatBread() {
 }
 
 function updatePlayer(dt) {
+  if (P.hpRegen && P.hp > 0) P.hp = Math.min(P.maxHp, P.hp + P.maxHp * P.hpRegen * dt);
   P.pa = Math.min(P.maxPa, P.pa + P.paRegen * dt);
   if (P.pm < P.maxPm) P.pm = Math.min(P.maxPm, P.pm + P.pmRegen * dt);
   P.atkCd -= dt; P.skillCd[0] -= dt; P.skillCd[1] -= dt; P.panCd -= dt;
@@ -854,7 +860,7 @@ function damageEnemy(e, base, o = {}) {
   if (e.dead) return;
   const crit = !o.quiet && (o.crit || Math.random() < P.crit);
   const armor = e.elite && e.elite.armor ? e.elite.armor : 0;
-  const dmg = Math.max(1, Math.round(base * (crit ? P.C.critMul || 1.8 : 1) * rand(0.9, 1.1) * (1 - armor)));
+  const dmg = Math.max(1, Math.round(base * (crit ? (P.C.critMul || 1.8) * (P.critDmg || 1) : 1) * rand(0.9, 1.1) * (1 - armor)));
   e.hp -= dmg;
   e.flash = 0.1;
   if (o.poison) e.dot = { t: o.poison.t, dps: o.poison.dps, tick: 0.5 };
@@ -1613,8 +1619,8 @@ function guardianDefeated(e) {
   const setRolls = rift.isSuper ? [1, 0.5] : [rift.D.set];
   for (const ch of setRolls) if (Math.random() < ch) { dropPickup(e.x, e.y, 'item', { item: makeSetItem(S.cls, itemLevel() + 2, rift.biome.id) }); rift.setDrop = true; }
   // ¿Gema Ancestral?
-  const missing = Object.keys(GEMS).filter((k) => !S.dofus.includes(k));
-  if (missing.length && Math.random() < (rift.isSuper ? 0.6 : 0.15 + rift.level * 0.01 + rift.d * 0.1)) dropPickup(e.x, e.y, 'dofus', { id: pick(missing) });
+  const missing = gemsFor(rift.biome.id, rift.isSuper).filter((k) => !S.dofus.includes(k));
+  if (missing.length && Math.random() < gemChance(rift.level, rift.d, rift.isSuper)) dropPickup(e.x, e.y, 'dofus', { id: pick(missing) });
   // bonus de tiempo
   if (rift.time > 0) {
     rift.bonus = Math.round(40 * rift.level * P.kamaMul * rift.D.reward);
@@ -1785,8 +1791,11 @@ function collect(k) {
   } else if (k.type === 'dofus') {
     if (!S.dofus.includes(k.id)) S.dofus.push(k.id);
     rift.dofus = k.id;
+    // si hay un hueco libre se engarza sola
+    const free = S.gemSlots.indexOf(null);
+    if (free >= 0) S.gemSlots[free] = k.id;
     recalc();
-    showBanner(GEMS[k.id].name.toUpperCase(), GEMS[k.id].color, GEMS[k.id].desc);
+    showBanner(GEMS[k.id].name.toUpperCase(), GEMS[k.id].color, GEMS[k.id].desc + (free >= 0 ? ' · ¡Engarzada!' : ' · Engárzala en Personaje → Gemas'));
     banner.egg = k.id;
     SFX.play('legend');
     shake(6);
@@ -2504,7 +2513,7 @@ function buildHub() {
     <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
     <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>${SEAL_SVG} ${fmtNum(seals())}</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
     ${Object.keys(ELIXIRS).some((k) => S.boosts[k] > 0) ? `<div class="hubBoosts">Elixires para la próxima Grieta: ${Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0).map((k) => `<span style="color:${ELIXIRS[k].hi}">${ELIXIRS[k].name.replace('Elixir ', '')}${S.boosts[k] > 1 ? ' ×' + S.boosts[k] : ''}</span>`).join(', ')}</div>` : ''}
-    <div class="dofusRow">${Object.keys(GEMS).map((k) => `<span class="egg ${S.dofus.includes(k) ? 'got' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}"></span>`).join('')}</div>`;
+    <div class="dofusRow">${S.gemSlots.map((k) => `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</div>`;
   const sel = mapSel();
   const fb = BIOMES[sel.b], rec = recLevel(sel.b, sel.n, sel.d), DF = DIFFS[sel.n === 'S' ? 2 : sel.d];
   $('fLabel').innerHTML = (sel.n === 'S' ? `☠ ${SUPER_BOSSES[fb.id].name}` : `Grieta ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>`) +
@@ -2680,6 +2689,8 @@ function buildMapInfo() {
     <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
     ${diffs}
     ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
+    <div class="mi-gl">Gemas que puedes conseguir aquí</div>
+    <div class="mi-gems">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 18)}<b>${GEMS[k].name}</b><small>${S.dofus.includes(k) ? '✔ ya la tienes' : GEMS[k].desc}</small></span>`).join('')}</div>
     <div class="mi-rows">
       <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
@@ -2688,7 +2699,9 @@ function buildMapInfo() {
       <span>Ámbar y XP</span><b>×${DF.reward}</b>
       <span>Calidad del botín</span><b>${rarityRangeText(DF)}</b>
       <span>Pieza de conjunto</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
+      <span>Gema Ancestral</span><b>${Math.round(gemChance(L, d, isS) * 100)}% si te falta alguna</b>
     </div>
+
     <div class="mi-set" style="--sc:${SD.color}"><div class="t">Conjunto ${SD.name} (${cnt}/${SLOTS.length})</div>
       ${[2, 4, 6].map((k) => `<div class="${cnt >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
     <button id="btnMapGo" class="btn big">${isS ? '☠ Desafiar al Súper Jefe' : '🌀 Entrar en la Grieta'}</button>`;
@@ -2732,6 +2745,43 @@ const SLOT_POS = {
 };
 const BAG_TABS = [['all', 'Todo'], ['weapon', 'Armas'], ['armor', 'Ropa'], ['jewel', 'Joyas']];
 const tabMatch = (tab, it) => tab === 'all' || (tab === 'weapon' ? it.slot === 'arma' : tab === 'jewel' ? it.slot === 'amuleto' || it.slot === 'anillo' : it.slot !== 'arma' && it.slot !== 'amuleto' && it.slot !== 'anillo');
+
+// ---------- Gemas Ancestrales ----------
+const gemOn = (k) => !!(S && S.gemSlots && S.gemSlots.includes(k));
+const gemChance = (level, d, isSuper) => (isSuper ? 0.6 : Math.min(0.6, 0.15 + level * 0.01 + d * 0.1));
+let gemSel = 0; // hueco que se está cambiando
+function openGems(slot) {
+  if (slot !== undefined) gemSel = slot;
+  const card = $('itemCard');
+  const where = (k) => (GEMS[k].src === 'super' ? 'cualquier Súper Jefe' : 'el Guardián de ' + BIOMES.find((b) => b.id === GEMS[k].src).name);
+  card.innerHTML = `<div class="gem-panel" role="dialog">
+    <header><b>Gemas Ancestrales</b><span>${S.dofus.length}/${Object.keys(GEMS).length}</span><button class="sh-close" id="gpClose">✕</button></header>
+    <p class="gp-help">Engarza hasta ${GEM_SLOTS} gemas: solo las engarzadas dan su bonus y puedes cambiarlas cuando quieras. Se consiguen al vencer al Guardián del mundo de cada gema (mira en el mapa la probabilidad).</p>
+    <div class="gp-slots">${S.gemSlots.map((k, i) => `<button data-gs="${i}" class="${i === gemSel ? 'on' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}">${k ? iconSVGColor(GEMS[k].color, 26) + '<small>' + GEMS[k].name + '</small>' : '<small>Hueco libre</small>'}</button>`).join('')}</div>
+    <div class="gp-list">${Object.keys(GEMS).map((k) => {
+      const own = S.dofus.includes(k), on = S.gemSlots.includes(k);
+      return `<div class="gp-gem ${own ? '' : 'locked'} ${on ? 'on' : ''}" style="--c:${GEMS[k].color}">
+        ${iconSVGColor(own ? GEMS[k].color : '#3a3f55', 30)}
+        <div><b>${GEMS[k].name}</b><span>${GEMS[k].desc}</span><small>${own ? (on ? 'Engarzada' : 'En tu colección') : 'Se consigue con ' + where(k)}</small></div>
+        ${own ? `<button data-g="${k}" class="btn">${on ? 'Quitar' : 'Engarzar'}</button>` : ''}
+      </div>`;
+    }).join('')}</div></div>`;
+  card.classList.add('show');
+  card.onclick = (e) => { if (e.target === card) closeGems(); };
+  $('gpClose').onclick = closeGems;
+  for (const b of card.querySelectorAll('.gp-slots button')) b.onclick = () => { gemSel = +b.dataset.gs; SFX.play('click'); openGems(); };
+  for (const b of card.querySelectorAll('button[data-g]')) b.onclick = () => {
+    const k = b.dataset.g, i = S.gemSlots.indexOf(k);
+    if (i >= 0) S.gemSlots[i] = null;
+    else {
+      const free = S.gemSlots.indexOf(null);
+      S.gemSlots[S.gemSlots[gemSel] === null || free < 0 ? gemSel : free] = k;
+    }
+    recalc(); persist(); SFX.play(i >= 0 ? 'click' : 'legend');
+    openGems();
+  };
+}
+function closeGems() { $('itemCard').classList.remove('show'); buildInventory(); }
 
 function powerScore(d) {
   return Math.round(d.maxHp * 0.6 + d.power * d.dmgMul * 8 + d.crit * 400 + d.armor * 600 + d.atkSpeed * 60 + (d.skillMul - 1) * 200);
@@ -2820,11 +2870,13 @@ function buildInventory(justEquipped) {
     ${Object.keys(SLOT_POS).map((s) => slotHTML(s, SLOT_POS[s])).join('')}
     <div class="bottom">
       ${slotHTML('arma', '', 44)}
-      <span class="gems-label">GEMAS</span>
-      ${Object.keys(GEMS).map((k) => S.dofus.includes(k)
-        ? `<span class="gem got" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 22)}</span>`
-        : '<span class="gem" title="Gema por descubrir"></span>').join('')}
+      <button class="gems-label" id="btnGems">GEMAS ${S.dofus.length}/${Object.keys(GEMS).length}</button>
+      ${S.gemSlots.map((k, i) => k
+        ? `<button class="gem got" data-gs="${i}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 22)}</button>`
+        : `<button class="gem" data-gs="${i}" title="Hueco libre: toca para engarzar una gema">+</button>`).join('')}
     </div>`;
+  $('btnGems').onclick = () => openGems();
+  for (const el of $('shDoll').querySelectorAll('.gem')) el.onclick = () => openGems(+el.dataset.gs);
   for (const el of $('shDoll').querySelectorAll('.slot')) {
     el.addEventListener('click', () => { if (S.equip[el.dataset.slot]) { SFX.play('click'); showItemCard('equip', el.dataset.slot); } });
   }
