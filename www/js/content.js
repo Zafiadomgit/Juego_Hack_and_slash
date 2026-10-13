@@ -36,7 +36,7 @@ function useUltimate() {
           const a = (i / 18) * TAU + w * 0.17;
           projectiles.push({ team: 'p', kind: 'arrow', x: P.x, y: P.y - 8, vx: Math.cos(a) * 640, vy: Math.sin(a) * 640, r: 7, dmg: skillDmg(1.5 * ultMul()), life: 0.8, pierce: 2, kb: 160, hit: [] });
         }
-        SFX.play('shoot');
+        SFX.play('arrowrain');
       });
     }
     const near = enemies.filter((e) => !e.dead && dist(e.x, e.y, P.x, P.y) < 420).slice(0, 8);

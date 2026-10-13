@@ -140,6 +140,40 @@ function pixelImage(img, hpx, key = img.src + '|' + hpx) {
   return c;
 }
 
+// Versión suave de una imagen para personajes pintados: reducción de alta calidad (bordes antialias)
+// y un contorno oscuro suave de 1 píxel para que destaquen sobre el suelo sin bordes dentados
+const SMOOTH_IMG = new Map();
+function smoothImage(img, hpx, key, rim) {
+  let c = SMOOTH_IMG.get(key);
+  if (c) return c;
+  const wpx = Math.max(1, Math.round(hpx * img.width / img.height));
+  let src = img, sw = img.width, sh = img.height;
+  while (sh / 2 > hpx * 1.2) {
+    const t = hd2dCanvas(Math.round(sw / 2), Math.round(sh / 2));
+    t.g.imageSmoothingQuality = 'high';
+    t.g.drawImage(src, 0, 0, t.c.width, t.c.height);
+    src = t.c; sw = t.c.width; sh = t.c.height;
+  }
+  const body = hd2dCanvas(wpx, hpx);
+  body.g.imageSmoothingQuality = 'high';
+  body.g.drawImage(src, 0, 0, wpx, hpx);
+  const out = hd2dCanvas(wpx + 2, hpx + 2);
+  // contorno: la silueta en oscuro desplazada en las 4 direcciones
+  const sil = hd2dCanvas(wpx, hpx);
+  sil.g.drawImage(body.c, 0, 0);
+  sil.g.globalCompositeOperation = 'source-in';
+  // héroes: borde de luz cálida (se distinguen siempre del suelo); monstruos: contorno oscuro
+  sil.g.fillStyle = rim ? '#ffe9bf' : '#140c18'; sil.g.fillRect(0, 0, wpx, hpx);
+  out.g.globalAlpha = rim ? 0.6 : 0.7;
+  for (const [dx, dy] of [[0, 1], [2, 1], [1, 0], [1, 2]]) out.g.drawImage(sil.c, dx, dy);
+  out.g.globalAlpha = 1;
+  out.g.drawImage(body.c, 1, 1);
+  c = out.c;
+  if (SMOOTH_IMG.size > 600) SMOOTH_IMG.delete(SMOOTH_IMG.keys().next().value);
+  SMOOTH_IMG.set(key, c);
+  return c;
+}
+
 // Activar / desactivar el estilo
 function setHd2d(on) {
   HD2D.on = on;

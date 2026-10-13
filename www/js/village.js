@@ -600,7 +600,7 @@ function renderVillage() {
   { const q = toS(PORTAL.x, PORTAL.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
   { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
   for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.75, rgb: '255,226,190' }); }
-  renderLighting(lights, 0.56, '84,96,150');
+  renderLighting(lights, 0.5, '84,96,150');
   ctx.fillStyle = 'rgba(255,150,80,0.08)'; ctx.fillRect(0, 0, W, H); // tono cálido de atardecer
   drawVignette(false);
   hd2dFlushText();

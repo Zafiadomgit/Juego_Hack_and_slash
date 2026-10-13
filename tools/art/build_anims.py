@@ -23,14 +23,48 @@ PLAN = {
 }
 
 
+def clean_mask(al):
+    """Silueta limpia: sin píxeles sueltos ni huecos, con el borde redondeado."""
+    from scipy import ndimage
+    m = al > 110
+    m = ndimage.binary_closing(m, iterations=1)
+    m = ndimage.binary_opening(m, iterations=1)
+    lab, n = ndimage.label(m)
+    if n > 1:
+        sizes = ndimage.sum(m, lab, range(1, n + 1))
+        m = np.isin(lab, [i + 1 for i, sz in enumerate(sizes) if sz > max(12, sizes.max() * 0.004)])
+    return ndimage.binary_fill_holes(m)
+
+
 def shrink(im, s):
-    w, h = max(1, round(im.width * s)), max(1, round(im.height * s))
+    """Reduce con alfa suave (bordes antialias) a partir de una silueta limpia."""
+    from scipy import ndimage
     a = np.asarray(im).astype(np.float32)
-    pm = a.copy(); pm[:, :, :3] *= a[:, :, 3:4] / 255
-    r = np.asarray(Image.fromarray(pm.astype(np.uint8)).resize((w, h), Image.LANCZOS)).astype(np.float32)
+    r_, g_, b_ = a[:, :, 0], a[:, :, 1], a[:, :, 2]
+    spill = (r_ > 140) & (b_ > 120) & (g_ < r_ * 0.55) & (g_ < b_ * 0.6) & (np.abs(r_ - b_) < 90)  # restos del fondo magenta
+    a[:, :, 3] = np.where(spill, 0, a[:, :, 3])
+    m = clean_mask(a[:, :, 3]).astype(np.float32)
+    m = ndimage.gaussian_filter(m, 0.8) * 255
+    w, h = max(1, round(im.width * s)), max(1, round(im.height * s))
+    pm = a.copy(); pm[:, :, 3] = m; pm[:, :, :3] *= m[..., None] / 255
+    r = np.asarray(Image.fromarray(np.clip(pm, 0, 255).astype(np.uint8)).resize((w, h), Image.LANCZOS)).astype(np.float32)
     al = r[:, :, 3:4]
     rgb = np.where(al > 0, r[:, :, :3] * 255 / np.maximum(al, 1), 0)
-    return Image.fromarray(np.dstack([np.clip(rgb, 0, 255), np.where(al[:, :, 0] > 110, 255, 0)]).astype(np.uint8))
+    al = np.where(al < 24, 0, np.clip((al - 24) * 255 / 200, 0, 255))
+    return Image.fromarray(np.dstack([np.clip(rgb, 0, 255), al[:, :, 0]]).astype(np.uint8))
+
+
+def clip_body(im, ax, ay):
+    """Quita los efectos dibujados lejos del cuerpo (rastros de flechas, rayos, dagas lanzadas):
+    solo se conserva lo que cabe en una caja alrededor del personaje y su arma."""
+    a = np.asarray(im).copy()
+    h, w = a.shape[:2]
+    x0 = int(max(0, ax - BODY_PX * 0.55)); x1 = int(min(w, ax + BODY_PX * 0.68))
+    y0 = int(max(0, ay - BODY_PX * 1.18))
+    a[:, :x0, 3] = 0; a[:, x1:, 3] = 0; a[:y0, :, 3] = 0
+    ys, xs = np.where(a[:, :, 3] > 0)
+    a = a[ys.min():ys.max() + 1, xs.min():xs.max() + 1]
+    return Image.fromarray(a), ax - xs.min(), ay - ys.min()
 
 
 def build(src, www):
@@ -44,7 +78,9 @@ def build(src, www):
             if keep is not None: fr = [fr[i] for i in keep]
             s = BODY_PX / float(np.median([f['bh'] for f in fr]))
             for f in fr:
-                placed.append((pose, shrink(f['img'], s), f['ax'] * s, f['ay'] * s))
+                im, ax, ay = clip_body(shrink(f['img'], s), f['ax'] * s, f['ay'] * s)
+                if im.height > BODY_PX * 1.3 and len(fr) > 2: continue  # pose mal recortada (efecto pegado a los pies)
+                placed.append((pose, im, ax, ay))
         W = 1024; x = y = rowh = 0; rects = []
         for pose, im, ax, ay in placed:
             if x + im.width + 2 > W: x = 0; y += rowh + 2; rowh = 0
@@ -54,7 +90,7 @@ def build(src, www):
         for pose, im, px, py, ax, ay in rects:
             atlas.paste(im, (px, py))
             entry.setdefault(pose, []).append([px, py, im.width, im.height, round(ax, 1), round(ay, 1)])
-        atlas.save(os.path.join(out_dir, cls + '.png'), optimize=True)
+        atlas.save(os.path.join(out_dir, cls + '.webp'), quality=92, method=6)
         data[cls] = entry
         print(cls, atlas.size, {k: len(v) for k, v in entry.items() if k != 'bh'})
     with open(os.path.join(www, 'js/anim_data.js'), 'w') as f:

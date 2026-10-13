@@ -71,21 +71,40 @@ def chime(freqs, d, decay=7):
     return y * np.exp(-t * decay) * np.minimum(1, t / 0.004)
 
 
-@fx('swing')
-def _():  # tajo: soplido de aire corto y grave, sin chirrido metálico
-    d = 0.2
+def _swing(lo, d):
     t = T(d)
-    sweep = lp(noise(len(t)), 1800) * np.sin(np.pi * t / d) ** 2
-    return lp(sweep, 2200) * 0.9
+    return lp(bp(noise(len(t)), lo, lo * 3.2), 2200) * np.sin(np.pi * t / d) ** 2 * 0.9
+
+
+@fx('swing')
+def _(): return _swing(500, 0.2)
+
+
+@fx('swing2')
+def _(): return _swing(420, 0.22)
+
+
+@fx('swing3')
+def _(): return _swing(600, 0.18)
+
+
+def _hit(f0, f1, tap, d=0.15):
+    body = sine_drop(f0, f1, d, 26) * env_exp(int(d * SR), 24)
+    knock = sine_drop(f0 * 1.8, f1 * 2.4, d, 30) * env_exp(int(d * SR), 50) * 0.3
+    t = lp(noise(int(0.018 * SR)), 2200) * env_exp(int(0.018 * SR), 200)
+    return mixdown([(body, 0, 1), (knock, 0, 1), (t, 0, tap)], d)
 
 
 @fx('hit')
-def _():  # golpe: cuerpo grave y redondo, chasquido muy corto y filtrado
-    d = 0.16
-    body = sine_drop(330, 150, d, 26) * env_exp(int(d * SR), 22)
-    knock = sine_drop(620, 420, d, 30) * env_exp(int(d * SR), 45) * 0.35
-    tap = lp(noise(int(0.02 * SR)), 2500) * env_exp(int(0.02 * SR), 180)
-    return mixdown([(body, 0, 1), (knock, 0, 1), (tap, 0, 0.3)], d)
+def _(): return _hit(330, 150, 0.3)
+
+
+@fx('hit2')
+def _(): return _hit(290, 130, 0.25)
+
+
+@fx('hit3')
+def _(): return _hit(370, 170, 0.35)
 
 
 @fx('crit')
@@ -212,12 +231,29 @@ def _():  # Portal Rúnico
     return small_verb(mixdown([(sw, 0, 1), (sh, 0, 1), (sp, 0.6, 0.6)], d + 0.4), rt=1.4, amt=0.8)
 
 
+def _bow(f, wood, air, seed):
+    rng = np.random.default_rng(seed)
+    d = 0.32
+    t = T(d)
+    # chasquido de la cuerda: pulso grave corto, sin cola metálica
+    snap = sine_drop(f * 2.2, f, 0.12, 40) * env_exp(int(0.12 * SR), 38)
+    body = lp(S.ks(f, 0.2, bright=0.12, decay=0.97), 1400) * wood
+    # silbido de la flecha que se aleja (sube y se apaga)
+    n = int(0.2 * SR); tt = np.arange(n) / SR
+    whoosh = bp(noise(n), 900 + rng.uniform(-100, 100), 3200) * np.sin(np.pi * tt / 0.2) ** 2 * np.exp(-tt * 6) * air
+    return mixdown([(snap, 0, 0.7), (body, 0, 1), (whoosh, 0.015, 1)], d)
+
+
 @fx('shoot')
-def _():  # arco: cuerda pulsada redonda + aire muy leve
-    d = 0.3
-    tw = lp(S.ks(147, 0.25, bright=0.2, decay=0.985), 2500) * 0.8
-    wh = lp(bp(noise(int(0.15 * SR)), 600, 3000), 2500) * np.sin(np.pi * T(0.15) / 0.15) * 0.18
-    return mixdown([(tw, 0, 1), (wh, 0.02, 1)], d)
+def _(): return _bow(110, 0.8, 0.25, 1)
+
+
+@fx('shoot2')
+def _(): return _bow(98, 0.7, 0.3, 2)
+
+
+@fx('shoot3')
+def _(): return _bow(124, 0.75, 0.22, 3)
 
 
 @fx('magic')
@@ -233,6 +269,59 @@ def _():  # orbe arcano: nota de cristal con ataque suave
 def _():  # paso sobre tierra
     d = 0.08
     return bp(noise(int(d * SR)), 200, 1800) * env_exp(int(d * SR), 50) * 0.5
+
+
+@fx('fireshot')
+def _():  # flecha ígnea: soplo de fuego que sube + chisporroteo
+    d = 0.45
+    t = T(d)
+    roar = lp(bp(noise(len(t)), 200, 1600), 1800) * np.sin(np.pi * t / d) ** 1.5
+    crack = np.zeros(len(t))
+    rng = np.random.default_rng(4)
+    for k in rng.integers(0, len(t) - 400, 14): crack[k:k + 300] += bp(noise(300), 1500, 4000) * env_exp(300, 90) * rng.uniform(0.2, 0.5)
+    tone = sine_drop(180, 260, d, -3) * np.sin(np.pi * t / d) * 0.25
+    return mixdown([(roar, 0, 0.9), (crack, 0, 0.6), (tone, 0, 1)], d)
+
+
+@fx('arrowrain')
+def _():  # lluvia de flechas: varios silbidos cortos y golpes sordos escalonados
+    rng = np.random.default_rng(7)
+    parts = []
+    for i in range(6):
+        n = int(0.12 * SR); tt = np.arange(n) / SR
+        wh = bp(noise(n), 1200 + rng.uniform(-200, 300), 4000) * np.sin(np.pi * tt / 0.12) ** 2 * 0.35
+        thud = sine_drop(200, 90, 0.08, 30) * env_exp(int(0.08 * SR), 40) * 0.6
+        t0 = i * 0.045 + rng.uniform(0, 0.02)
+        parts += [(lp(wh, 3500), t0, 1), (thud, t0 + 0.1, 1)]
+    return mixdown(parts, 0.55)
+
+
+@fx('blades')
+def _():  # abanico de dagas: tres cortes metálicos rápidos y brillantes
+    parts = []
+    for i, f in enumerate([2100, 2500, 2300]):
+        sh = chime([f, f * 1.51], 0.18, 26) * 0.35
+        wh = bp(noise(int(0.09 * SR)), 2500, 7000) * env_exp(int(0.09 * SR), 35) * 0.3
+        parts += [(sh, i * 0.05, 1), (wh, i * 0.05, 1)]
+    return small_verb(mixdown(parts, 0.4), amt=0.3)
+
+
+@fx('turret')
+def _():  # torreta: pistón mecánico + pop de chispa
+    d = 0.16
+    click = bp(noise(int(0.012 * SR)), 1500, 5000) * env_exp(int(0.012 * SR), 300)
+    pop = sine_drop(900, 300, 0.1, 40) * env_exp(int(0.1 * SR), 35) * 0.6
+    spark = chime([3100], 0.08, 50) * 0.2
+    return mixdown([(click, 0, 0.8), (pop, 0.01, 1), (spark, 0.02, 1)], d)
+
+
+@fx('web')
+def _():  # telaraña: chasquido pegajoso
+    d = 0.25
+    t = T(d)
+    y = lp(bp(noise(len(t)), 300, 1800), 1500) * env_exp(len(t), 16)
+    gl = sine_drop(400, 160, d, 10) * env_exp(len(t), 14) * 0.4
+    return mixdown([(y, 0, 1), (gl, 0, 1)], d)
 
 
 def main(out_dir):

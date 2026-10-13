@@ -82,7 +82,7 @@ const HERO_ANIM_FR = new Map(); // fotograma recortado en su propio canvas (para
 Object.keys(typeof HERO_ANIM !== 'undefined' ? HERO_ANIM : {}).forEach((id) => {
   const img = new Image();
   img.onload = () => { HERO_ANIM_IMG[id] = img; };
-  img.src = 'img/heroes/anim/' + id + '.png';
+  img.src = 'img/heroes/anim/' + id + '.webp';
 });
 function heroAnimFrame(cls, pose, f) {
   const A = HERO_ANIM[cls], list = A[pose] || A.idle, fr = list[f % list.length], key = cls + '|' + pose + '|' + (f % list.length);
@@ -118,7 +118,7 @@ function drawHeroAnim(g, o) {
   g.scale(face, 1);
   if (HD2D.active && g === ctx) {
     const hpx = Math.max(8, Math.round(c.height * k * SPR.scale));
-    const pi = pixelImage(c, hpx, c.key + '|' + hpx);
+    const pi = smoothImage(c, hpx, c.key + '|' + hpx + '|r', true);
     const kk = (c.height * k) / hpx; // mundo por píxel pixelado
     g.drawImage(pi, -c.ax * k - kk, -c.ay * k - kk, pi.width * kk, pi.height * kk);
   } else {
@@ -137,7 +137,7 @@ function heroArt(cls) {
   if (pa) return { img: pa, right: false, px: false, url: 'img/heroes/' + cls + '.png' };
   return null;
 }
-const HERO_H = 64; // altura en unidades de mundo
+const HERO_H = 84; // altura en unidades de mundo
 
 // ---------- "Rig" de los héroes: torso + dos piernas, para animar a partir de una sola imagen ----------
 // hip: altura de la cadera (fracción de la imagen); cx: separación entre piernas
@@ -491,6 +491,7 @@ function drawPlayer() {
     glow(P.x, P.y - 22, 46, '255,214,110', 0.35 + Math.sin(now * 3) * 0.1);
     if (Math.random() < 0.25) particles.push({ kind: 'glowdot', x: P.x + rand(-12, 12), y: P.y - rand(0, 36), vx: 0, vy: -30, life: 0.7, max: 0.7, rgb: '255,214,110', size: 3, grav: 0 });
   }
+  glow(P.x, P.y - 34, 58, '255,226,180', 0.22); // halo suave: el héroe siempre se distingue
   const br = bestRarity();
   if (br >= 1) {
     const rgb = RARITY_RGB[br];
@@ -1104,7 +1105,7 @@ const MON_IMG = {};
 Object.keys(typeof MON_ANIM !== 'undefined' ? MON_ANIM : {}).forEach((id) => {
   const img = new Image();
   img.onload = () => { MON_IMG[id] = img; };
-  img.src = 'img/monsters/' + id + '.png';
+  img.src = 'img/monsters/' + id + '.webp';
 });
 const MON_FR = new Map();
 const monAnimId = (e) => (e.superDef ? 'S_' + Object.keys(SUPER_BOSSES).find((k) => SUPER_BOSSES[k] === e.superDef) : e.type);
@@ -1146,7 +1147,7 @@ function drawMonsterAnim(e, A0, k, ox, oy) {
   ctx.scale(e.face || 1, 1);
   if (HD2D.active) {
     const hpx = Math.max(8, Math.round(c.height * s * SPR.scale));
-    const pi = pixelImage(c, hpx, c.key + '|' + hpx);
+    const pi = smoothImage(c, hpx, c.key + '|' + hpx);
     const kk = (c.height * s) / hpx;
     ctx.drawImage(pi, -c.ax * s - kk, -c.ay * s - kk, pi.width * kk, pi.height * kk);
   } else ctx.drawImage(c, -c.ax * s, -c.ay * s, c.width * s, c.height * s);

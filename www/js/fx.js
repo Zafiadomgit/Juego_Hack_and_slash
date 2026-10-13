@@ -212,10 +212,10 @@ function renderLighting(lights, ambient, shade = '80,90,130') {
   }
   const g = LIGHT.g;
   // base: color de sombra del mundo con el brillo del ambiente
-  const sc = shade.split(',').map(Number), mx = Math.max(...sc), b = 1 - ambient;
+  const sc = shade.split(',').map(Number), mx = Math.max(...sc), b = 1 - ambient * 0.62; // sombras suaves: se ve el escenario
   g.globalCompositeOperation = 'source-over';
   g.globalAlpha = 1;
-  g.fillStyle = `rgb(${sc.map((c) => Math.round(255 * b * (0.35 + 0.65 * c / mx))).join(',')})`;
+  g.fillStyle = `rgb(${sc.map((c) => Math.round(255 * b * (0.7 + 0.3 * c / mx))).join(',')})`;
   g.fillRect(0, 0, w, h);
   // luces: se suman
   g.globalCompositeOperation = 'lighter';

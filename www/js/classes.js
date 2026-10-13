@@ -188,7 +188,7 @@ const CLASS_KIT = {
           const aa = a + k * 0.16;
           projectiles.push({ team: 'p', kind: 'dagger', look: 'dagger', x: P.x, y: P.y - 8, vx: Math.cos(aa) * 620, vy: Math.sin(aa) * 620, r: 7, dmg: skillDmg(1.3), life: 0.6, pierce: 1, kb: 60, hit: [], poison: { t: 4, dps: skillDmg(0.55) } });
         }
-        SFX.play('shoot');
+        SFX.play('blades');
       }
     },
     ult() {
@@ -390,7 +390,7 @@ function updateMinions(dt) {
         if (m.atkCd <= 0) {
           m.atkCd = 0.38; m.recoil = 1;
           projectiles.push({ team: 'p', kind: 'spark', look: 'spark', x: m.x + Math.cos(m.aim) * 16, y: m.y - 16 + Math.sin(m.aim) * 16, vx: Math.cos(m.aim) * 620, vy: Math.sin(m.aim) * 620, r: 5, dmg: skillDmg(0.75), life: 0.7, pierce: 0, kb: 40, hit: [] });
-          SFX.play('magic');
+          SFX.play('turret');
         }
       }
     } else if (m.kind === 'bomb') {

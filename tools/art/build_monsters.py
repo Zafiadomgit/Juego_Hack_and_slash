@@ -57,7 +57,7 @@ def build(src, www, preview=None):
         for pose, im, px, py, ax, ay in rects:
             atlas.paste(im, (px, py))
             entry.setdefault(pose, []).append([px, py, im.width, im.height, round(ax, 1), round(ay, 1)])
-        atlas.quantize(256, method=Image.Quantize.FASTOCTREE).save(os.path.join(out, mid + '.png'), optimize=True)
+        atlas.save(os.path.join(out, mid + '.webp'), quality=92, method=6)
         data[mid] = entry
         print(mid, atlas.size, {k: len(v) for k, v in entry.items() if k != 'bh'})
         if preview:

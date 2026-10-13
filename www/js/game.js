@@ -54,11 +54,13 @@ resize();
 // ============================================================
 // Efectos grabados (www/audio/sfx/*.ogg, generados con tools/audio/sfx.py). Si un archivo aún no ha cargado
 // se usa el sonido sintetizado de respaldo.
-const SFX_FILES = ['swing', 'hit', 'crit', 'boom', 'coin', 'xp', 'hurt', 'level', 'dash', 'shield', 'baa', 'piou', 'boss', 'die', 'heal', 'click', 'loot', 'legend', 'zaap', 'shoot', 'magic', 'step'];
-const SFX_GAIN = { swing: 0.32, hit: 0.42, crit: 0.6, boom: 0.6, coin: 0.18, xp: 0.07, hurt: 0.65, level: 0.8, dash: 0.35, shield: 0.55, baa: 0.3, piou: 0.25, boss: 0.8, die: 0.8, heal: 0.55, click: 0.4, loot: 0.5, legend: 0.8, zaap: 0.65, shoot: 0.35, magic: 0.32, step: 0.18 };
+const SFX_FILES = ['fireshot', 'arrowrain', 'blades', 'turret', 'web', 'swing2', 'swing3', 'hit2', 'hit3', 'shoot2', 'shoot3', 'swing', 'hit', 'crit', 'boom', 'coin', 'xp', 'hurt', 'level', 'dash', 'shield', 'baa', 'piou', 'boss', 'die', 'heal', 'click', 'loot', 'legend', 'zaap', 'shoot', 'magic', 'step'];
+// variantes que se alternan para que los sonidos repetidos no cansen
+const SFX_VAR = { swing: 3, hit: 3, shoot: 3 };
+const SFX_GAIN = { fireshot: 0.5, arrowrain: 0.45, blades: 0.45, turret: 0.22, web: 0.35, swing2: 0.3, swing3: 0.3, hit2: 0.3, hit3: 0.3, shoot2: 0.24, shoot3: 0.24, swing: 0.3, hit: 0.3, crit: 0.6, boom: 0.6, coin: 0.18, xp: 0.07, hurt: 0.65, level: 0.8, dash: 0.35, shield: 0.55, baa: 0.3, piou: 0.25, boss: 0.8, die: 0.8, heal: 0.55, click: 0.4, loot: 0.5, legend: 0.8, zaap: 0.65, shoot: 0.24, magic: 0.32, step: 0.18 };
 // Separación mínima (s) entre dos reproducciones del mismo efecto: en una pelea hay decenas de golpes,
 // monedas y orbes por segundo, y sonando todos a la vez el resultado es un ruido desagradable
-const SFX_GAP = { hit: 0.06, crit: 0.08, swing: 0.07, coin: 0.09, xp: 0.12, boom: 0.12, shoot: 0.06, magic: 0.07, baa: 0.4, piou: 0.35, hurt: 0.15, dash: 0.1, loot: 0.15 };
+const SFX_GAP = { turret: 0.12, arrowrain: 0.25, hit: 0.06, crit: 0.08, swing: 0.07, coin: 0.09, xp: 0.12, boom: 0.12, shoot: 0.06, magic: 0.07, baa: 0.4, piou: 0.35, hurt: 0.15, dash: 0.1, loot: 0.15 };
 const SFX = {
   ac: null,
   muted: false,
@@ -129,7 +131,9 @@ const SFX = {
     this.lastT[name] = t;
     this.budget++;
     // muestra grabada con una ligera variación de tono para que los golpes no suenen idénticos
-    if (this.sample(name, name === 'click' || name === 'level' || name === 'legend' ? 1 : 0.93 + Math.random() * 0.14)) return;
+    const v = SFX_VAR[name] ? Math.floor(Math.random() * SFX_VAR[name]) : 0;
+    const file = v ? name + (v + 1) : name;
+    if (this.sample(this.bufs[file] ? file : name, name === 'click' || name === 'level' || name === 'legend' ? 1 : 0.9 + Math.random() * 0.2)) return;
     switch (name) {
       case 'swing': this.noise(0.09, 0.07, 2600, 0.8); break;
       case 'shoot': this.tone(700, 0.08, 'triangle', 0.04, 400); break;
@@ -656,7 +660,7 @@ function useSkill(i) {
     const a = aimAt(460);
     P.dir = a; P.aimHold = 0.3; P.shotT = 0.15;
     projectiles.push({ team: 'p', kind: 'explo', x: P.x, y: P.y - 6, vx: Math.cos(a) * 560, vy: Math.sin(a) * 560, r: 8, dmg: skillDmg(2.6), life: 0.8, pierce: 0, kb: 0, hit: [] });
-    SFX.play('shoot');
+    SFX.play('fireshot');
   } else if (cls === 'cra' && i === 1) {
     const t = nearestEnemy(P.x, P.y, 440);
     const tx = t ? t.x : P.x + Math.cos(P.dir) * 160;
@@ -670,7 +674,7 @@ function useSkill(i) {
           particles.push({ kind: 'fallArrow', x: tx + Math.cos(aa) * rr, y: ty + Math.sin(aa) * rr, vx: 0, vy: 0, life: 0.22, max: 0.22, color: '#5d4037', size: 2, grav: 0 });
         }
         aoe(tx, ty, R, skillDmg(1.25), 40);
-        SFX.play('shoot');
+        SFX.play('arrowrain');
       });
     }
   } else if (cls === 'feca' && i === 0) {
@@ -1285,7 +1289,7 @@ function updateBossSpider(e, dt, d, ux, uy, sp) {
     if (e.cd <= 0) {
       const a = Math.atan2(uy, ux), n = e.enraged ? 5 : 3;
       for (let i = 0; i < n; i++) enemyShoot(e, a + (i - (n - 1) / 2) * 0.28, 250, e.dmg * 0.6, 'web', 9, 2.6);
-      e.cd = 0.4; SFX.play('shoot');
+      e.cd = 0.4; SFX.play('web');
     }
     if (e.st <= 0) { e.state = 'move'; e.st = 1.6; }
   } else if (e.state === 'summon') {
@@ -2225,7 +2229,7 @@ function renderRift() {
   const toS = (x, y) => ({ x: (x - cam.x + sx) * zr + W / 2, y: (y - cam.y + sy) * zr + H / 2 });
   const lights = [];
   const ps = toS(P.x, P.y - 20);
-  lights.push({ x: ps.x, y: ps.y, r: 420 * zoom, a: 0.85, rgb: '255,236,208' });
+  lights.push({ x: ps.x, y: ps.y, r: 480 * zoom, a: 0.9, rgb: '255,236,208' });
   lights.push({ x: ps.x, y: ps.y, r: 820 * zoom, a: 0.28, rgb: '255,226,200' }); // luz de relleno suave
   for (const p of projectiles) if (p.kind !== 'arrow' && p.kind !== 'dagger') { const q = toS(p.x, p.y); lights.push({ x: q.x, y: q.y, r: 90 * zoom, a: 0.8, rgb: p.team === 'p' ? '255,200,140' : '210,140,255' }); }
   for (const g of glyphs) { const q = toS(g.x, g.y); lights.push({ x: q.x, y: q.y, r: g.r * 2 * zoom, a: 0.9, rgb: '255,150,80', haze: 0.25 }); }
