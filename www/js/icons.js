@@ -156,7 +156,13 @@ function iconSVG(kind, rarity, size = 48, extra = '', pal) {
 function tintIcon(kind, color, hi, size = 40) {
   return iconSVG(kind, 0, size, 'aria-hidden="true"', { m: '#9aa3ab', ml: hi || '#ffffff', g: color, l: '#7a5233', c: color });
 }
-function itemSVG(it, size = 48) { return iconSVG(itemKind(it), it.rarity, size, 'aria-hidden="true"'); }
+// Las reliquias únicas de la Mazmorra tienen icono pintado propio (img/uniques/<clave>.png); las armas solo si son de filo
+const UNIQUE_BLADES = ['dagger', 'greatsword'];
+function itemSVG(it, size = 48) {
+  if (it.unique && (it.slot !== 'arma' || UNIQUE_BLADES.includes(itemKind(it))))
+    return `<img src="img/uniques/${it.unique}.png" width="${size}" height="${size}" alt="" aria-hidden="true" style="object-fit:contain;filter:drop-shadow(0 0 4px rgba(255,170,60,.55))">`;
+  return iconSVG(itemKind(it), it.rarity, size, 'aria-hidden="true"');
+}
 
 // Silueta vacía de una ranura (gris apagado)
 function slotSVG(slot, size = 40) {

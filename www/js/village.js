@@ -478,7 +478,7 @@ function drawNpc(n) {
   ctx.save();
   ctx.translate(n.x, n.y);
   if (vHero.x > n.x + 20) ctx.scale(-1, 1); // mira hacia el héroe
-  if (!drawVillager(n.id === 'smith' ? 'vil2' : n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
+  if (!drawVillager(n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
     sprite('npc|' + n.id + '|' + fi, 60, 100, 30, 96, () => (n.id === 'merchant' ? artMerchant : artAlchemist)(fi / 8));
   ctx.restore();
   // nombre e indicador flotante

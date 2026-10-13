@@ -15,7 +15,9 @@ WORLD_H = {'tree': 124, 'pillar': 88, 'rock': 46, 'crystal': 58, 'brazier': 52,
            # Villa Candela
            'house': 176, 'stall': 156, 'alchemy': 168, 'well': 100, 'lamp': 74, 'barrel': 30, 'bush': 40,
            'sign': 70, 'cauldron': 42, 'board': 88, 'oak': 128,
-           'merchant': 64, 'alchemist': 76, 'vil0': 60, 'vil1': 54, 'vil2': 66, 'vil3': 44}
+           'merchant': 64, 'alchemist': 76, 'vil0': 60, 'vil1': 54, 'vil2': 66, 'vil3': 44, 'smith': 68,
+           # Mazmorra
+           'bonepile': 30}
 WU_PER_PX = 1.2  # densidad de píxel (≈ la del búfer HD-2D)
 
 SEL = {
@@ -66,6 +68,16 @@ SEL = {
         # vecinos (vil0 granjero, vil1 anciana, vil2 guardia, vil3 niño: mismo orden que VILLAGERS)
         'merchant': ['n2-0/00'], 'alchemist': ['n1-0/00'],
         'vil0': ['n0-0/00'], 'vil1': ['n0-0/02'], 'vil2': ['n0-0/01'], 'vil3': ['n0-0/03'],
+        'smith': ['h-0/00'],
+    },
+    # Mazmorra (solo se usa dentro de la Mazmorra: tree = jaulas, cadalsos y cadenas; rock = rocas y cofres)
+    'dungeon': {
+        'pillar': ['d-3/00', 'd-3/01', 'd-4/00', 'd-4/04', 'd-5/00', 'd-5/01', 'd-5/08', 'd-6/00', 'd-6/01'],
+        'brazier': ['d-3/02', 'd-3/04', 'd-4/01', 'd-4/02', 'd-5/03', 'd-6/02', 'd-6/03'],
+        'crystal': ['d-3/11', 'd-3/16', 'd-4/10', 'd-5/11', 'd-6/11'],
+        'rock': ['d-3/10', 'd-4/11', 'd-4/13', 'd-5/12', 'd-5/13', 'd-6/12', 'd-3/15', 'd-4/15', 'd-5/15', 'd-6/10'],
+        'tree': ['d-3/06', 'd-4/07', 'd-6/08', 'd-5/07', 'd-6/05', 'd-3/13', 'd-4/08'],
+        'bonepile': ['d-3/07', 'd-3/08', 'd-4/09', 'd-5/09', 'd-6/07', 'd-3/03'],
     },
     'abismo': {
         'tree': ['g5-0/00', 'g5-0/03', 'g5-1/01'],

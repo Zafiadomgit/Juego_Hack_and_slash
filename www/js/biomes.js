@@ -56,7 +56,8 @@ const BIOME_TEX = new Map();
 // del ruido procedural. GROUND_TILE = unidades de mundo que ocupa una repetición de la textura.
 const GROUND_TILE = 420;
 const GROUND_IMG = {};
-['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza'].forEach((id) => {
+const GROUND_SIZE = { dungeon: 380 }; // unidades de mundo por repetición (6×6 losas en la Mazmorra)
+['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza', 'dungeon'].forEach((id) => {
   const img = new Image();
   img.onload = () => {
     GROUND_IMG[id] = img;
@@ -74,7 +75,7 @@ function biomeGroundTex(b) {
     c = document.createElement('canvas');
     c.width = img.width; c.height = img.height;
     c.getContext('2d').drawImage(img, 0, 0);
-    c.painted = true; c.patScale = GROUND_TILE / img.width;
+    c.painted = true; c.patScale = (GROUND_SIZE[b.id] || GROUND_TILE) / img.width;
     BIOME_TEX.set(b.id, c);
     return c;
   }

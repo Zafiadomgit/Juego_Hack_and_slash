@@ -2263,7 +2263,7 @@ function renderRift() {
   }
   if (POOL_STYLE[B.pool].light) for (const pl of pools) if (inView(pl.x, pl.y, 200)) { const q = toS(pl.x, pl.y); lights.push({ x: q.x, y: q.y, r: pl.rx * 3 * zoom, a: 0.85, rgb: B.pool === 'lava' ? '255,110,40' : '160,220,255', haze: 0.2 }); }
   for (const h of hazards) if (h.kind === 'fire' || h.kind === 'meteor' || h.kind === 'boom') { const q = toS(h.x, h.y); lights.push({ x: q.x, y: q.y, r: h.r * 2.2 * zoom, a: 0.8, rgb: '255,130,60', haze: 0.2 }); }
-  renderLighting(lights, B.ambient, B.shade);
+  renderLighting(lights, rift && rift.isDungeon ? DUNGEON_LIGHT.ambient : B.ambient, rift && rift.isDungeon ? DUNGEON_LIGHT.shade : B.shade);
   // gradación de color propia de cada mundo
   if (B.tint) { ctx.fillStyle = B.tint; ctx.fillRect(0, 0, W, H); }
   // niebla que se desplaza
@@ -2373,8 +2373,9 @@ function groundChunk(cx, cy) {
   g.scale(gs, gs);
   g.translate(-cx * CHUNK, -cy * CHUNK);
   const B = curBiome();
-  // textura de ruido pintada del bioma (a escala 2:1 para que no se note la repetición)
-  const tex = biomeGroundTex(B);
+  // textura de ruido pintada del bioma (a escala 2:1 para que no se note la repetición); la Mazmorra tiene su propio suelo
+  const DG = rift && rift.isDungeon && GROUND_IMG.dungeon;
+  const tex = biomeGroundTex(DG ? DUNGEON_GROUND : B);
   const pat = g.createPattern(tex, 'repeat');
   if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(tex.patScale || 2.2));
   g.fillStyle = pat;
@@ -2390,7 +2391,7 @@ function groundChunk(cx, cy) {
       for (let i = 0; i < (painted ? 2 : 4); i++) {
         const px = (gx + r2()) * CHUNK, py = (gy + r2()) * CHUNK, pr = 120 + r2() * 200;
         const gr = g.createRadialGradient(px, py, 0, px, py, pr);
-        const col = B.patch[i % 2];
+        const col = (DG ? DUNGEON_GROUND : B).patch[i % 2];
         gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
         g.fillStyle = gr;
         g.beginPath(); g.ellipse(px, py, pr, pr * 0.6, 0, 0, TAU); g.fill();
@@ -2408,6 +2409,7 @@ function groundChunk(cx, cy) {
     for (const d of decos) {
       if (d.x < cx * CHUNK - 40 || d.x > (cx + 1) * CHUNK + 40 || d.y < cy * CHUNK - 40 || d.y > (cy + 1) * CHUNK + 40) continue;
       if (painted && (d.kind === 'blotch' || d.kind === 'pebble')) continue; // la textura pintada ya los trae
+      if (DG) { drawPropDeco(d); continue; }
       if (drawPropDeco(d)) continue;
       if (drawBiomeDeco(d)) continue;
       if (d.kind === 'fern') drawFern(d);

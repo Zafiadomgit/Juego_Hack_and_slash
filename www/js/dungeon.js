@@ -92,7 +92,27 @@ function startDungeon(tier) {
   rift.threat += 3 + Math.floor(tier / 2);
   rift.goal = 60 + tier * 2;
   rift.time += 60;
+  dressDungeon();
   showBanner('Mazmorra · Piso ' + tier, '#ff5ad0', 'Élites por todas partes · Súper Jefe al final');
+}
+
+// Aspecto propio de la Mazmorra: losas rúnicas, columnas, antorchas, jaulas y huesos (img/ground/dungeon.png, img/props/dungeon.png)
+const DUNGEON_GROUND = { id: 'dungeon', patch: ['rgba(150,40,170,0.10)', 'rgba(10,4,20,0.28)'] };
+const DUNGEON_LIGHT = { ambient: 0.52, shade: '70,45,110' };
+function dressDungeon() {
+  // menos «árboles» (jaulas, cofres, cadalsos), más columnas y antorchas; sin charcos del bioma
+  const trees = obstacles.filter((o) => o.kind === 'tree');
+  obstacles = obstacles.filter((o) => o.kind !== 'tree' || trees.indexOf(o) % 3 === 0);
+  obstacles.forEach((o) => { if (o.kind === 'tree') o.s = Math.min(o.s, 1.1); });
+  const cx = WORLD.w / 2, cy = WORLD.h / 2;
+  for (let i = 0; i < 70; i++) {
+    const x = rand(100, WORLD.w - 100), y = rand(100, WORLD.h - 100);
+    if (dist(x, y, cx, cy) < 240 || obstacles.some((o) => dist(x, y, o.x, o.y) < o.r + 90)) continue;
+    obstacles.push(i % 3 ? { kind: 'pillar', x, y, r: 16, s: rand(0.95, 1.25), v: randi(0, 2) } : { kind: 'brazier', x, y, r: 11, ph: rand(0, 6) });
+  }
+  pools = [];
+  decos = decos.filter((d, i) => i % 9 === 0).map((d) => ({ ...d, kind: 'bones' }));
+  groundChunks.clear();
 }
 
 // Recompensas al vencer al jefe de la Mazmorra

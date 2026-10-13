@@ -17,6 +17,7 @@ const PROP_DECO = {
   pantano: { glowshroom: 'shroom' },
   glaciar: { iceshard: 'shard' },
   desierto: { bones: 'skull' },
+  dungeon: { bones: 'bonepile' },
 };
 
 // Número estable a partir de la posición (variante y volteo fijos para cada objeto)
@@ -24,7 +25,7 @@ const propHash = (x, y) => { let h = Math.imul((x * 73) | 0, 0x9e3779b1) ^ Math.
 
 function propFrame(kind, x, y) {
   if (scene !== 'rift') return null;
-  const id = curBiome().id, img = PROP_IMG[id], list = PROP_ATLAS[id] && PROP_ATLAS[id][kind];
+  const id = rift && rift.isDungeon && PROP_IMG.dungeon ? 'dungeon' : curBiome().id, img = PROP_IMG[id], list = PROP_ATLAS[id] && PROP_ATLAS[id][kind];
   if (!img || !list || !list.length) return null;
   const h = propHash(x, y);
   return { img, f: list[Math.floor(h * list.length) % list.length], flip: ((h * 7919) % 1) < 0.5 };
@@ -56,7 +57,7 @@ function drawPropSprite(o, kind) {
   const h = blitProp(fr, o.x, o.y, scale);
   if (kind === 'brazier') {
     const fl = 0.8 + Math.sin(now * 13 + o.ph) * 0.12 + Math.sin(now * 7.3 + o.ph) * 0.08;
-    glow(o.x, o.y - h * 0.8, 26 * fl, curBiome().id === 'glaciar' ? '120,190,255' : '255,150,60', 0.7);
+    glow(o.x, o.y - h * 0.8, 26 * fl, curBiome().id === 'glaciar' && !rift.isDungeon ? '120,190,255' : rift.isDungeon && o.ph > 3 ? '200,90,255' : '255,150,60', 0.7);
     if (Math.random() < 0.25) particles.push({ kind: 'glowdot', x: o.x + rand(-4, 4), y: o.y - h * 0.85, vx: rand(-8, 8), vy: rand(-60, -30), life: 0.6, max: 0.6, rgb: '255,170,70', size: 3, grav: 0 });
   }
   return true;
@@ -65,7 +66,7 @@ function drawPropSprite(o, kind) {
 // Detalles del suelo (se pintan una vez en los trozos de suelo cacheados)
 function drawPropDeco(d) {
   if (scene !== 'rift') return false;
-  const map = PROP_DECO[curBiome().id];
+  const map = PROP_DECO[rift && rift.isDungeon && PROP_IMG.dungeon ? 'dungeon' : curBiome().id];
   const kind = map && map[d.kind];
   if (!kind) return false;
   const fr = propFrame(kind, d.x, d.y);
