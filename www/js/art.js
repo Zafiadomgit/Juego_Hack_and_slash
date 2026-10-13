@@ -101,7 +101,7 @@ function heroAnimPose(cls, o) {
   if (o.hurt > 0) return ['hurt', 0];
   const atk = o.swing > 0 ? 1 - o.swing / 0.2 : o.shot > 0 ? 1 - o.shot / 0.15 : -1;
   if (atk >= 0) return ['attack', Math.min(A.attack.length - 1, Math.floor(atk * A.attack.length))];
-  if (o.moving) return ['walk', Math.floor(o.walkT * 11) % A.walk.length];
+  if (o.moving) return ['walk', Math.floor(o.walkT * 9) % A.walk.length];
   return ['idle', Math.floor(o.t * 4) % A.idle.length];
 }
 // Dibuja un fotograma con los pies en (o.x, o.y); true si se ha podido
@@ -113,8 +113,11 @@ function drawHeroAnim(g, o) {
   const k = HERO_H * 0.95 / HERO_ANIM[cls].bh; // unidades de mundo por píxel del atlas
   const face = Math.cos(o.dir) >= 0 ? 1 : -1;
   g.save();
-  g.translate(o.x, o.y);
+  // zancada: pequeño rebote y balanceo encima de los fotogramas de caminar
+  const stride = pose === 'walk' ? o.walkT * 12 : 0;
+  g.translate(o.x, o.y - (pose === 'walk' ? Math.abs(Math.sin(stride)) * 2.6 : 0));
   g.globalAlpha = o.alpha ?? 1;
+  if (pose === 'walk') g.rotate(Math.sin(stride) * 0.045 + face * 0.05);
   g.scale(face, 1);
   if (HD2D.active && g === ctx) {
     const hpx = Math.max(8, Math.round(c.height * k * SPR.scale));

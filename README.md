@@ -99,3 +99,7 @@ En Android Studio: *Build → Build App Bundle(s) / APK(s) → Build APK(s)*, o 
 También desde terminal: `npm run apk` → `android/app/build/outputs/apk/debug/app-debug.apk`.
 
 Si cambias algo dentro de `www/`, vuelve a ejecutar `npx cap sync android` antes de compilar.
+
+## Créditos
+
+- Efectos de sonido basados en los packs CC0 de **Kenney** (www.kenney.nl): RPG Audio, Impact Sounds, Interface Sounds, Sci-Fi Sounds y Casino Audio. Se generan con `tools/audio/kenney_sfx.py`.
