@@ -1,0 +1,157 @@
+/* Fendaria — Mazmorra, reliquias únicas y Ruptura de Límite.
+ * La Mazmorra tiene pisos (1…20) cada vez más duros: monstruos de nivel superior al de tu mejor Grieta,
+ * muchas élites y un Súper Jefe al final. Allí caen las Esencias de Ruptura (para la Ruptura de Límite de
+ * los héroes) y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
+ */
+'use strict';
+
+// ============================================================
+// Reliquias únicas
+// ============================================================
+const UNIQUES = {
+  eclipse: { slot: 'arma', name: 'del Eclipse', color: '#ff6a3d', desc: '+25% de daño y +8% de crítico' },
+  sangre: { slot: 'arma', name: 'Colmillo Sangriento', color: '#e0303a', desc: 'Robas un 6% del daño que haces como vida' },
+  corona: { slot: 'sombrero', name: 'Corona del Rey Ceniza', color: '#ffb040', desc: '+30% de PV máximos' },
+  manto: { slot: 'capa', name: 'Manto del Vacío', color: '#9c5bd8', desc: '-15% de daño recibido y +12% de velocidad' },
+  eco: { slot: 'amuleto', name: 'Amuleto del Eco', color: '#5fd0ff', desc: 'Tus hechizos se recargan un 30% más rápido' },
+  verdugo: { slot: 'anillo', name: 'Anillo del Verdugo', color: '#ff4a6a', desc: 'Los críticos hacen un 60% más de daño' },
+  viento: { slot: 'botas', name: 'Botas del Viento Eterno', color: '#8fe8c0', desc: '+1 esquiva y +20% de velocidad' },
+  avaro: { slot: 'cinturon', name: 'Faja del Rey Avaro', color: '#ffd54f', desc: '+60% de ámbar y +40% de experiencia' },
+};
+const uniqueOn = (k) => !!(S && SLOTS.some((s) => S.equip[s] && S.equip[s].unique === k));
+function makeUnique(lvl, key) {
+  key = key || pick(Object.keys(UNIQUES));
+  const U = UNIQUES[key];
+  const it = makeItem(S.cls, lvl, 3, { slot: U.slot });
+  for (const k of Object.keys(it.stats)) it.stats[k] = Math.max(1, Math.round(it.stats[k] * (k === 'crit' || k === 'res' ? 1.2 : 1.35)));
+  it.base = { ...it.stats };
+  it.name = U.slot === 'arma' ? `${pick(CLASSES[S.cls].weapon.names)} ${U.name}` : U.name;
+  it.unique = key;
+  it.value = Math.round(it.value * 2.5);
+  return it;
+}
+
+// ============================================================
+// Ruptura de Límite
+// ============================================================
+const LB_MAX = 5;
+const LB_COST = [5, 10, 18, 28, 40];       // Esencias de Ruptura
+const LB_LEVEL = [15, 25, 35, 45, 55];     // nivel de héroe necesario
+const LB_PERKS = ['+12% de daño y PV', '+12% de daño y PV · refinado máximo +11', '+12% de daño y PV · ¡4.º hueco de gema!', '+12% de daño y PV · refinado máximo +13', '+12% de daño y PV · refinado máximo +15 y aura de Ruptura'];
+const lbRank = () => (S && S.lb) || 0;
+const essence = () => (S && S.ess) || 0;
+const ESS_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L12 6 L8 15 L4 6 Z" fill="#ff5ad0" stroke="#3a0a30" stroke-width="1.2"/><path d="M8 1 L10 6 L8 11 Z" fill="#ffd0f4" opacity="0.8"/></svg>';
+const refineMax = () => 10 + [0, 1, 1, 3, 3, 5][lbRank()];
+
+// ============================================================
+// Mazmorra
+// ============================================================
+const DUNGEON_MAX = 20;
+const dungeonOpen = () => S && S.maxFaille >= 8; // tras vencer al Súper Jefe del Bosque Ceniciento
+const dungeonLevel = (tier) => Math.max(1, (S.maxFaille || 1)) + tier;
+const dungeonEss = (tier) => 2 + tier;
+const uniqueChance = (tier) => Math.min(0.7, 0.3 + tier * 0.03);
+
+function openDungeon() {
+  state = 'dungeon';
+  buildDungeon();
+  showOverlay('dungeon');
+  SFX.play('click');
+}
+function closeDungeon() { state = 'hub'; buildHub(); showOverlay('hub'); }
+function buildDungeon() {
+  const D = S.dungeon || { max: 0 };
+  $('dgRes').innerHTML = `${ESS_SVG} ${essence()} Esencias · Ruptura ${lbRank()}/${LB_MAX}`;
+  if (!dungeonOpen()) {
+    $('dgList').innerHTML = '<div class="dg-lock">🔒 La Mazmorra se abre al vencer al Súper Jefe del Bosque Ceniciento.<br><small>Allí caen reliquias únicas y Esencias de Ruptura para romper el límite de tus héroes.</small></div>';
+    return;
+  }
+  const rows = [];
+  for (let t = 1; t <= Math.min(DUNGEON_MAX, D.max + 1); t++) {
+    const first = t > D.max, B = BIOMES[(t - 1) % BIOMES.length];
+    rows.push(`<div class="dg-row ${first ? 'new' : ''}">
+      <div class="dg-n">${t}</div>
+      <div class="dg-txt"><b>Piso ${t} · ${B.name}</b>
+        <span>Monstruos nivel ${dungeonLevel(t) * 2 + 4} · muchas élites · Súper Jefe ${SUPER_BOSSES[B.id].name.split(',')[0]}</span>
+        <span class="dg-rw">${ESS_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Esencias${first ? ' (primera vez ×2)' : ''} · <b style="color:#ffb040">Reliquia única ${first ? '¡asegurada!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${FRAG_SVG} ${10 * t}</span></div>
+      <button class="btn big" data-t="${t}">Entrar</button></div>`);
+  }
+  $('dgList').innerHTML = rows.reverse().join('');
+}
+$('dgList').addEventListener('click', (ev) => { const b = ev.target.closest('button[data-t]'); if (b) startDungeon(+b.dataset.t); });
+$('btnDgClose').addEventListener('click', closeDungeon);
+$('btnDungeon').addEventListener('click', openDungeon);
+
+function startDungeon(tier) {
+  const b = (tier - 1) % BIOMES.length;
+  persist();
+  startNode(b, 1, 2);
+  rift.isDungeon = true;
+  rift.tier = tier;
+  rift.level = dungeonLevel(tier);
+  rift.threat += 3 + Math.floor(tier / 2);
+  rift.goal = 60 + tier * 2;
+  rift.time += 60;
+  showBanner('Mazmorra · Piso ' + tier, '#ff5ad0', 'Élites por todas partes · Súper Jefe al final');
+}
+
+// Recompensas al vencer al jefe de la Mazmorra
+function dungeonVictory(e) {
+  const D = S.dungeon || (S.dungeon = { max: 0 });
+  const t = rift.tier, first = t > D.max;
+  const ess = dungeonEss(t) * (first ? 2 : 1);
+  S.ess = essence() + ess;
+  S.frag = frags() + 10 * t;
+  if (first || Math.random() < uniqueChance(t)) {
+    const it = makeUnique(itemLevel() + 2);
+    dropPickup(e.x, e.y, 'item', { item: it });
+    later(1.6, () => showBanner('¡Reliquia única!', UNIQUES[it.unique].color, it.name + ' · ' + UNIQUES[it.unique].desc));
+  }
+  D.max = Math.max(D.max, t);
+  rift.dungeonEss = ess;
+  later(3.2, () => { subBanner = { text: `+${ess} Esencias de Ruptura · +${10 * t} Fragmentos`, t: 3, max: 3 }; });
+  persist();
+}
+
+// ============================================================
+// Pestaña «Ruptura» en el Tablón
+// ============================================================
+QUEST_TABS.splice(2, 0, ['limit', 'Ruptura']);
+const _buildQuests = buildQuests;
+function buildLimitTab() {
+  const r = lbRank(), maxed = r >= LB_MAX, cards = [];
+  const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0);
+  cards.push(sealCard({ act: 'limit', icon: bigIcon('⟁' + r, 'radial-gradient(#ffd0f4,#a01a7a)'), name: maxed ? 'Límite roto' : `Ruptura ${r + 1}`, color: '#ff8ae0',
+    sub: `${CLASSES[S.cls].name} · ${r}/${LB_MAX}`,
+    desc: maxed ? 'Tu héroe ha superado todos sus límites.' : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvl}.</b>`}`,
+    price: cost, can: !maxed && lvlOk && essence() >= cost, done: maxed }));
+  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Ruptura ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Nivel ${LB_LEVEL[i]} · ${LB_COST[i]} Esencias`, desc: p, done: true, doneTxt: r > i ? '✔ Activa' : 'Bloqueada' })));
+  $('questList').className = 'shop-grid gesta-grid';
+  $('questList').innerHTML = cards.join('').replace(new RegExp(SEAL_SVG.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), ESS_SVG);
+  $('questAmber').innerHTML = ESS_SVG + ' ' + fmtNum(essence());
+  $('questNote').textContent = 'Las Esencias de Ruptura solo caen en la Mazmorra (Portal Rúnico → Mazmorra).';
+}
+buildQuests = function () {
+  const tab = questTab;
+  if (tab === 'limit') { questTab = 'quests'; _buildQuests(); questTab = 'limit'; }
+  else return _buildQuests();
+  // repintar pestañas con la de Ruptura activa
+  $('questTabs').innerHTML = QUEST_TABS.map(([id, label]) => `<button data-tab="${id}" class="${questTab === id ? 'on' : ''}">${label}</button>`).join('');
+  buildLimitTab();
+};
+const _gestaAction = gestaAction;
+gestaAction = function (act) {
+  if (act !== 'limit') return _gestaAction(act);
+  const r = lbRank();
+  if (r >= LB_MAX) return;
+  if (S.level < LB_LEVEL[r]) { showToast('questToast', `Necesitas nivel ${LB_LEVEL[r]}`, false); return; }
+  if (essence() < LB_COST[r]) { showToast('questToast', 'Te faltan Esencias de Ruptura: consíguelas en la Mazmorra', false); SFX.play('hurt'); return; }
+  S.ess -= LB_COST[r];
+  S.lb = r + 1;
+  if (S.lb === 3) { while (S.gemSlots.length < GEM_SLOTS + 1) S.gemSlots.push(null); }
+  if (P) recalc();
+  persist();
+  showToast('questToast', `¡Ruptura de Límite ${S.lb}! ${LB_PERKS[r]}`);
+  SFX.play('legend');
+  buildQuests();
+};

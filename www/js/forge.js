@@ -7,8 +7,8 @@
 
 const REFINE_MAX = 10;
 const REFINE_STEP = 0.1;                                   // +10% de stats por nivel de refinado
-const REFINE_CHANCE = [1, 1, 1, 1, 1, 0.85, 0.7, 0.55, 0.42, 0.3]; // probabilidad de pasar de +n a +n+1
-const FRAG_SALVAGE = [1, 3, 8, 20];                        // fragmentos al desguazar según calidad
+const REFINE_CHANCE = [1, 1, 1, 1, 1, 0.85, 0.7, 0.55, 0.42, 0.3, 0.25, 0.22, 0.2, 0.18, 0.15]; // probabilidad de pasar de +n a +n+1
+const FRAG_SALVAGE = [1, 3, 8, 20, 60]; // el último: reliquias únicas                        // fragmentos al desguazar según calidad
 const FRAG_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9 L7 2 L13 5 L12 12 L6 14 Z" fill="#8fb7d8" stroke="#1d2a3a" stroke-width="1.2"/><path d="M7 2 L9 8 L6 14 M9 8 L13 5" stroke="#e8f4ff" stroke-width="0.8" fill="none" opacity="0.7"/></svg>';
 const frags = () => (S && S.frag) || 0;
 
@@ -59,7 +59,7 @@ function forgeDone(msg, good = true, sfx = 'level') {
 // ---------- Acciones ----------
 function doRefine(ref) {
   const it = forgeGet(ref);
-  if (!it || (it.refine || 0) >= REFINE_MAX) return;
+  if (!it || (it.refine || 0) >= refineMax()) return;
   const c = refineCost(it), r = it.refine || 0;
   if (!payCost(c)) return;
   if (Math.random() < REFINE_CHANCE[r]) {
@@ -69,7 +69,7 @@ function doRefine(ref) {
 }
 function doAscend(ref) {
   const it = forgeGet(ref);
-  if (!it || it.rarity >= 3 || it.set) return;
+  if (!it || it.rarity >= 3 || it.set || it.unique) return;
   if (!payCost(ascendCost(it))) return;
   const b = itemBase(it), k = RARITY[it.rarity + 1].mul / RARITY[it.rarity].mul;
   for (const s of Object.keys(b)) b[s] = Math.max(1, Math.round(b[s] * (s === 'crit' || s === 'res' ? Math.min(k, 1.35) : k)));
@@ -87,7 +87,7 @@ function doAscend(ref) {
 }
 function doReforge(ref) {
   const it = forgeGet(ref);
-  if (!it || it.set) return;
+  if (!it || it.set || it.unique) return;
   if (!payCost(reforgeCost(it))) return;
   const fresh = makeItem(S.cls, it.level, it.rarity, { slot: it.slot });
   it.base = { ...fresh.stats };
@@ -100,14 +100,14 @@ function doSalvage(ref) {
   const it = S.bag[+k];
   if (!it) return;
   S.bag.splice(+k, 1);
-  const n = FRAG_SALVAGE[it.rarity] * (1 + (it.refine || 0) * 0.5);
+  const n = FRAG_SALVAGE[it.unique ? 4 : it.rarity] * (1 + (it.refine || 0) * 0.5);
   S.frag = frags() + Math.round(n);
   forgeDone(`+${Math.round(n)} Fragmentos`, true, 'coin');
 }
 function salvageUpTo(maxRarity) {
   let n = 0, got = 0;
   S.bag = S.bag.filter((it) => {
-    if (it.rarity > maxRarity || it.set) return true;
+    if (it.rarity > maxRarity || it.set || it.unique) return true;
     n++; got += FRAG_SALVAGE[it.rarity] * (1 + (it.refine || 0) * 0.5);
     return false;
   });
@@ -128,16 +128,16 @@ function buildSmith() {
   const items = forgeItems();
   if (shopTab === 'refine') {
     for (const { ref, it, where } of items) {
-      const r = it.refine || 0, maxed = r >= REFINE_MAX, c = refineCost(it);
+      const r = it.refine || 0, maxed = r >= refineMax(), c = refineCost(it);
       offers.push(smithOffer({ act: 'refine:' + ref, sold: maxed }, it, {
-        sub: `${where} · ${RARITY[it.rarity].name} · +${r}/${REFINE_MAX}`,
+        sub: `${where} · ${RARITY[it.rarity].name} · +${r}/${refineMax()}`,
         desc: maxed ? 'Refinado al máximo' : `+${r} → <b style="color:#ffd76a">+${r + 1}</b>: +${Math.round(REFINE_STEP * 100)}% a todas sus propiedades · éxito ${Math.round(REFINE_CHANCE[r] * 100)}%`,
         price: c.amber, can: !maxed && canPay(c), priceHTML: costHTML(c) }));
     }
     $('shopNote').innerHTML = 'Hasta +5 el refinado nunca falla; después puede fallar, pero el objeto no se pierde.';
   } else if (shopTab === 'ascend') {
     for (const { ref, it, where } of items) {
-      if (it.set) continue;
+      if (it.set || it.unique) continue;
       const maxed = it.rarity >= 3, c = ascendCost(it);
       offers.push(smithOffer({ act: 'ascend:' + ref, sold: maxed }, it, {
         sub: `${where} · ${RARITY[it.rarity].name}`,
@@ -147,7 +147,7 @@ function buildSmith() {
     $('shopNote').innerHTML = 'Sube la calidad de tus armas y piezas favoritas sin esperar a que caigan mejores. (Las piezas de conjunto no se pueden ascender.)';
   } else if (shopTab === 'reforge') {
     for (const { ref, it, where } of items) {
-      if (it.set) continue;
+      if (it.set || it.unique) continue;
       const c = reforgeCost(it);
       const top = Object.entries(it.stats).slice(0, 3).map(([k, v]) => `+${v} ${STAT_INFO[k].name.replace('% ', '')}`).join(' · ');
       offers.push(smithOffer({ act: 'reforge:' + ref }, it, { sub: `${where} · ${RARITY[it.rarity].name}`, desc: `Ahora: ${top}. Se vuelven a tirar todas sus propiedades (conserva calidad, nivel y refinado)`, price: c.amber, can: canPay(c), priceHTML: costHTML(c) }));

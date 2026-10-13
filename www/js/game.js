@@ -223,8 +223,9 @@ function migrateSlot(s) {
   if (!s.shop) s.shop = null;
   // gemas engarzadas (antes estaban todas activas): se engarzan las primeras que tuviera
   if (!Array.isArray(s.gemSlots)) s.gemSlots = (s.dofus || []).slice(0, GEM_SLOTS);
-  while (s.gemSlots.length < GEM_SLOTS) s.gemSlots.push(null);
-  s.seals = s.seals || 0; s.trans = s.trans || 0; s.frag = s.frag || 0;
+  while (s.gemSlots.length < GEM_SLOTS + ((s.lb || 0) >= 3 ? 1 : 0)) s.gemSlots.push(null);
+  s.seals = s.seals || 0; s.trans = s.trans || 0; s.frag = s.frag || 0; s.ess = s.ess || 0; s.lb = s.lb || 0;
+  if (!s.dungeon) s.dungeon = { max: 0 };
   s.forge = Object.assign({}, s.forge || {});
   migrateMap(s);
   return s;
@@ -497,19 +498,20 @@ function derived() {
   const has = (d) => gemOn(d);
   const sb = activeSetBonus();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (has('titan') ? 1.1 : 1) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (has('titan') ? 1.1 : 1) * (uniqueOn('corona') ? 1.3 : 1) * (1 + 0.12 * lbRank()) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
     power: 8 + S.level * 1.2 + t.dmg,
-    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (has('titan') ? 1.1 : 1) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
+    dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (has('titan') ? 1.1 : 1) * (uniqueOn('eclipse') ? 1.25 : 1) * (1 + 0.12 * lbRank()) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: (1 + t.int * 0.015) * (has('obsidiana') ? 1.25 : 1),
-    critDmg: has('vacio') ? 1.4 : 1,
+    critDmg: (has('vacio') ? 1.4 : 1) * (uniqueOn('verdugo') ? 1.6 : 1),
+    cdMul: uniqueOn('eco') ? 0.7 : 1,
     hpRegen: has('musgo') ? 0.01 : 0,
-    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transRank() >= 7 ? 0.05 : 0)),
+    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transRank() >= 7 ? 0.05 : 0) + (uniqueOn('eclipse') ? 0.08 : 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)) * (has('brasa') ? 1.12 : 1),
-    speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1),
-    xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (1 + (sb.xpP || 0)),
+    speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1) * (uniqueOn('manto') ? 1.12 : 1) * (uniqueOn('viento') ? 1.2 : 1),
+    xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (uniqueOn('avaro') ? 1.4 : 1) * (1 + (sb.xpP || 0)),
     paRegen: (1 / 1.25) * (1 + t.sab * 0.005) * (has('ocre') ? 1.3 : 1) * (1 + (sb.regenP || 0)) * (1 + 0.06 * (S.up.energia || 0)),
-    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0) + 0.02 * (S.up.piel || 0) + (has('escarcha') ? 0.12 : 0)),
-    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)) * (1 + 0.05 * (S.up.fortuna || 0)) * (has('ambar') ? 1.4 : 1),
+    armor: Math.min(0.75, t.res * 0.01 + (boostOn('piedra') ? 0.25 : 0) + (sb.armorP || 0) + 0.02 * (S.up.piel || 0) + (has('escarcha') ? 0.12 : 0) + (uniqueOn('manto') ? 0.15 : 0)),
+    kamaMul: (1 + (t.pros + t.sue * 0.5) * 0.01) * (boostOn('fortuna') ? 1.5 : 1) * (1 + (sb.kamaP || 0)) * (1 + 0.05 * (S.up.fortuna || 0)) * (has('ambar') ? 1.4 : 1) * (uniqueOn('avaro') ? 1.6 : 1),
     magnet: 80 * (1 + Math.min(1.5, t.pros * 0.004)) * (1 + 0.25 * (S.up.iman || 0)) * (has('ambar') ? 1.3 : 1),
     t,
   };
@@ -531,7 +533,7 @@ function createPlayer() {
     dir: 0, aimHold: 0,
     hp: 1, maxHp: 0,
     pa: 6, maxPa: 6,
-    pm: 3 + (S.up.reflejos || 0), maxPm: 3 + (S.up.reflejos || 0), pmRegen: 1 / 2.2,
+    pm: 3 + (S.up.reflejos || 0) + (uniqueOn('viento') ? 1 : 0), maxPm: 3 + (S.up.reflejos || 0) + (uniqueOn('viento') ? 1 : 0), pmRegen: 1 / 2.2,
     atkCd: 0, skillCd: [0, 0], panCd: 0,
     invul: 0, shield: 0, shieldT: 0,
     dashT: 0, dashVx: 0, dashVy: 0,
@@ -621,7 +623,7 @@ function useSkill(i) {
   const sk = P.C.skills[i];
   if (P.skillCd[i] > 0 || P.pa < sk.cost || P.lock > 0 || P.jump || P.cast) return;
   P.pa -= sk.cost;
-  P.skillCd[i] = sk.cd;
+  P.skillCd[i] = sk.cd * (P.cdMul || 1);
   const cls = P.cls;
   if (CLASS_KIT[cls]) { CLASS_KIT[cls].skill(i); return; }
 
@@ -1481,7 +1483,7 @@ function spawnPack() {
   const types = riftTypes(rift.level);
   // los primeros segundos sin crujidores
   const early = rift.elapsed < 20;
-  const eliteIdx = rift.elapsed > 15 && Math.random() < Math.min(0.45, 0.12 + rift.threat * 0.03) ? 0 : -1;
+  const eliteIdx = rift.isDungeon ? (Math.random() < 0.8 ? 0 : -1) : rift.elapsed > 15 && Math.random() < Math.min(0.45, 0.12 + rift.threat * 0.03) ? 0 : -1;
   for (let i = 0; i < n; i++) {
     let type = weightedPick(types);
     if (early && type === 'craqueleur') type = 'bouftou';
@@ -1584,6 +1586,7 @@ function updateSuper(e, dt) {
 }
 
 function spawnGuardian() {
+  if (rift.isDungeon) { rift.bossSpawned = true; spawnSuperBoss(); return; }
   MUSIC.play('boss', { fade: 0.8 });
   rift.bossSpawned = true;
   const type = curBiome().boss;
@@ -1634,14 +1637,17 @@ function guardianDefeated(e) {
   obstacles = obstacles.filter((o) => !o.gone);
   later(1.2, () => { rift.zaap = { x: zx, y: zy }; poof(zx, zy - 30); SFX.play('zaap'); });
   MUSIC.play('victory', { loop: false, fade: 0.3, then: rift.biome.id });
-  // Sellos de Gesta por primeras victorias importantes
-  const prevC = mapProg().c[nodeKey(rift.b, rift.n)] || 0;
-  if (rift.isSuper && !prevC) later(2, () => gainSeals(5, 'primer Súper Jefe'));
-  else if (!rift.isSuper && rift.d === 2 && prevC < 3) later(2, () => gainSeals(2, 'primera victoria en Difícil'));
-  markCleared(rift.b, rift.n, rift.d);
-  S.maxFaille = Math.max(S.maxFaille, highestLevel());
-  autoAdvance();
-  if (rift.isSuper && rift.b + 1 < BIOMES.length) later(3, () => showBanner('¡Nuevo mundo desbloqueado!', '#7cff8a', BIOMES[rift.b + 1].name));
+  if (rift.isDungeon) dungeonVictory(e);
+  else {
+    // Sellos de Gesta por primeras victorias importantes
+    const prevC = mapProg().c[nodeKey(rift.b, rift.n)] || 0;
+    if (rift.isSuper && !prevC) later(2, () => gainSeals(5, 'primer Súper Jefe'));
+    else if (!rift.isSuper && rift.d === 2 && prevC < 3) later(2, () => gainSeals(2, 'primera victoria en Difícil'));
+    markCleared(rift.b, rift.n, rift.d);
+    S.maxFaille = Math.max(S.maxFaille, highestLevel());
+    autoAdvance();
+    if (rift.isSuper && rift.b + 1 < BIOMES.length) later(3, () => showBanner('¡Nuevo mundo desbloqueado!', '#7cff8a', BIOMES[rift.b + 1].name));
+  }
   persist();
 }
 
@@ -1999,7 +2005,7 @@ function drawHUD() {
 
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
-  text(rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
+  text(rift.isDungeon ? `Mazmorra · Piso ${rift.tier}` : rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
   text(rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
@@ -2449,7 +2455,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'quests', 'pause', 'end', 'dead'];
+const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'quests', 'dungeon', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -2756,7 +2762,7 @@ function openGems(slot) {
   const where = (k) => (GEMS[k].src === 'super' ? 'cualquier Súper Jefe' : 'el Guardián de ' + BIOMES.find((b) => b.id === GEMS[k].src).name);
   card.innerHTML = `<div class="gem-panel" role="dialog">
     <header><b>Gemas Ancestrales</b><span>${S.dofus.length}/${Object.keys(GEMS).length}</span><button class="sh-close" id="gpClose">✕</button></header>
-    <p class="gp-help">Engarza hasta ${GEM_SLOTS} gemas: solo las engarzadas dan su bonus y puedes cambiarlas cuando quieras. Se consiguen al vencer al Guardián del mundo de cada gema (mira en el mapa la probabilidad).</p>
+    <p class="gp-help">Engarza hasta ${S.gemSlots.length} gemas: solo las engarzadas dan su bonus y puedes cambiarlas cuando quieras. Se consiguen al vencer al Guardián del mundo de cada gema (mira en el mapa la probabilidad).</p>
     <div class="gp-slots">${S.gemSlots.map((k, i) => `<button data-gs="${i}" class="${i === gemSel ? 'on' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}">${k ? iconSVGColor(GEMS[k].color, 26) + '<small>' + GEMS[k].name + '</small>' : '<small>Hueco libre</small>'}</button>`).join('')}</div>
     <div class="gp-list">${Object.keys(GEMS).map((k) => {
       const own = S.dofus.includes(k), on = S.gemSlots.includes(k);
@@ -3115,7 +3121,7 @@ function itemCardHTML(it, eq, priBtn, secBtn, lines) {
       <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 52)}</div>
       <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
         <h2>${it.name}</h2>
-        <span class="rar">${SD ? 'Pieza de conjunto' : R.name}</span>
+        <span class="rar">${SD ? 'Pieza de conjunto' : it.unique ? '<b style="color:' + UNIQUES[it.unique].color + '">★ Reliquia única</b>' : R.name}</span>${it.unique ? `<span class="uniq" style="color:${UNIQUES[it.unique].color}">${UNIQUES[it.unique].desc}</span>` : ''}
         <span class="meta">${SLOT_INFO[it.slot].name} · Nivel ${it.level}</span>
       </div>
     </div>
@@ -3384,10 +3390,11 @@ function finishRift() {
   if (rift.d >= 1) trackDaily('hard');
   SFX.play('zaap');
   persist();
-  $('endTitle').textContent = rift.isSuper ? `¡${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} derrotado!` : `Grieta ${rift.n} (${rift.D.name}) cerrada`;
+  $('endTitle').textContent = rift.isDungeon ? `Mazmorra · Piso ${rift.tier} superado` : rift.isSuper ? `¡${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} derrotado!` : `Grieta ${rift.n} (${rift.D.name}) cerrada`;
   $('endStats').innerHTML = riftRows([
     ['Bonus de tiempo', rift.bonus ? '+' + rift.bonus + ' ámbar' : '—'],
     ...(rift.dofus ? [[GEMS[rift.dofus].name, '★']] : []),
+    ...(rift.dungeonEss ? [['Esencias de Ruptura', '+' + rift.dungeonEss]] : []),
     ...(rift.setDrop ? [['Pieza de conjunto', SETS[rift.biome.id].name]] : []),
   ]);
   showOverlay('end');

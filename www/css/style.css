@@ -579,3 +579,15 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .mi-gems span small { grid-column: 2; font-size: 11px; color: #c8bfa6; }
 .mi-gems span.have { opacity: .55; }
 .mi-gl { font-size: 12px; color: #ecd18a; font-weight: 800; margin-top: 6px; }
+
+/* Mazmorra y reliquias únicas */
+.dg-help { margin: 6px 12px; font-size: 12.5px; color: #c8bfa6; line-height: 1.35; }
+.dg-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 8px; border: 2px solid #4a3a5a; background: linear-gradient(180deg, rgba(40, 20, 44, .9), rgba(18, 12, 26, .9)); }
+.dg-row.new { border-color: #ff8ae0; box-shadow: 0 0 12px rgba(255, 90, 210, .25); }
+.dg-n { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(#ffd0f4, #a01a7a); color: #2a0a20; font: 900 18px Cinzel, serif; }
+.dg-txt { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.dg-txt b { font-family: Cinzel, serif; color: #f2e2b4; font-size: 15px; }
+.dg-txt span { font-size: 12px; color: #c8bfa6; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.dg-row .btn { margin: 0; width: auto; padding: 8px 16px; flex: none; }
+.dg-lock { padding: 24px; text-align: center; color: #c8bfa6; font-size: 15px; }
+.icard .uniq { font-size: 12px; font-weight: 800; }

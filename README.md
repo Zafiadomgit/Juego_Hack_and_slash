@@ -30,7 +30,9 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
    - **Trascendencia** del héroe: 10 rangos (+5% daño y +5% PV cada uno) con hitos: definitiva un 30% más rápida (rango 3), empezar cada Grieta con la definitiva al 50% (rango 5), +5% crítico (rango 7) y, en el rango 10, definitiva un 50% más fuerte y un aura dorada.
    - **Forja**: cada ranura de equipo sube hasta 5★ (+12% a los stats de la pieza por estrella). Las estrellas son de la ranura y se conservan al cambiar de pieza.
    - **Armería de Gesta**: Arma de Gesta (150 sellos) y Pieza de Gesta (90) —legendarias exclusivas, +20% de stats— y Gemas Ancestrales (220).
-9. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
+9. **Mazmorra** (Portal Rúnico → 🗝 Mazmorra, tras vencer al Súper Jefe del Bosque Ceniciento): 20 pisos cada vez más duros, llenos de élites y con un Súper Jefe al final. Sueltan **reliquias únicas** (legendarias con un poder exclusivo: Eclipse, Colmillo Sangriento, Corona del Rey Ceniza, Manto del Vacío, Amuleto del Eco, Anillo del Verdugo, Botas del Viento Eterno, Faja del Rey Avaro; la primera vez que superas un piso la reliquia está asegurada), Fragmentos y **Esencias de Ruptura**.
+10. **Ruptura de Límite** (Tablón → Ruptura): 5 rangos por héroe que se pagan con Esencias de Ruptura; cada uno da +12% de daño y PV, y además suben el refinado máximo hasta +15, abren un 4.º hueco de gema y, al final, un aura de Ruptura.
+11. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
 
 ### Controles
 

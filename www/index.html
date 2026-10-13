@@ -66,6 +66,7 @@
       <div id="fLabel" class="pp-info"></div>
       <div class="pp-btns">
         <button id="btnMap" class="btn">🗺 Elegir Grieta</button>
+        <button id="btnDungeon" class="btn">🗝 Mazmorra</button>
         <button id="btnPortalGo" class="btn big">⚔ Entrar</button>
       </div>
     </div>
@@ -137,6 +138,19 @@
     <div id="questToast" class="sh-toast"></div>
   </div>
 
+  <!-- Mazmorra -->
+  <div id="dungeon" class="overlay sheet-ov">
+    <div class="sheet quest-sheet">
+      <header class="sh-head">
+        <span class="sh-name">🗝 Mazmorra</span>
+        <span id="dgRes" class="sh-amber" style="margin-left:auto"></span>
+        <button id="btnDgClose" class="sh-close" aria-label="Cerrar">✕</button>
+      </header>
+      <p class="dg-help">Pisos cada vez más duros, plagados de élites y con un Súper Jefe al final. Aquí caen las <b style="color:#ffb040">reliquias únicas</b> y las <b style="color:#ff8ae0">Esencias de Ruptura</b> para romper el límite de tus héroes (Tablón → Ruptura).</p>
+      <div id="dgList" class="quest-list"></div>
+    </div>
+  </div>
+
   <!-- Pausa -->
   <!-- Mapa de Grietas -->
   <div id="map" class="overlay sheet-ov">
@@ -201,5 +215,6 @@
   <script src="js/classes.js"></script>
   <script src="js/game.js"></script>
   <script src="js/forge.js"></script>
+  <script src="js/dungeon.js"></script>
 </body>
 </html>
