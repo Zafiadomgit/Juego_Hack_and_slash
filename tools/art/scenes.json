@@ -1,0 +1,14 @@
+{
+  "modelo": "7b592283-e8a7-4c5a-9ba6-d18c31f258b9",
+  "ancho": 1536, "alto": 704, "num": 2,
+  "estilo": "Hand-painted fantasy RPG world map region seen from a high bird's-eye angle, wide panoramic landscape, rich painterly detail, Octopath Traveler and Final Fantasy concept art style, soft atmospheric lighting, open ground in the middle for map markers.",
+  "negativo": "text, letters, labels, watermark, signature, frame, border, compass, people, characters, UI, grid",
+  "trabajos": {
+    "map_ceniza": "The Ashen Forest: a burned dark forest of charred black trees and grey ash ground, glowing orange embers and small lava cracks, drifting smoke, a few surviving red autumn trees, a winding dirt trail from left to right, warm ember glow.",
+    "map_pantano": "The Shadow Swamp: murky green bog with twisted mangrove trees draped in moss, glowing green pools and giant mushrooms, wooden boardwalks winding left to right, low eerie fog, fireflies.",
+    "map_glaciar": "The Runic Glacier: snowy frozen mountains and blue glacier ice fields, frozen pine trees, ancient glowing blue rune stones in the snow, an icy trail winding left to right, cold clear light, snowfall.",
+    "map_desierto": "The Amber Desert: golden sand dunes and sandstone mesas, ancient half-buried ruins and pillars, glowing amber crystals, a caravan trail winding left to right, hot sunset light.",
+    "map_abismo": "The Volcanic Abyss: black obsidian rock wasteland with rivers of glowing lava, floating purple void crystals and dark rifts in the ground, a basalt path winding left to right, purple and red ominous glow.",
+    "title_bg": "Epic key art panorama: a cozy medieval fantasy village at dusk with timber houses and warm lanterns in the foreground, a giant glowing blue runic portal in the village square, and in the sky above a huge jagged magical rift tearing the clouds open with violet light, distant mountains, cinematic, no characters."
+  }
+}

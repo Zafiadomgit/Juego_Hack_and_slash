@@ -1,0 +1,24 @@
+{
+  "modelo": "7b592283-e8a7-4c5a-9ba6-d18c31f258b9",
+  "ancho": 1024, "alto": 1024, "num": 2,
+  "estilo": "Painted JRPG dialogue portrait, head and shoulders bust, centered, facing the viewer at three-quarter angle, detailed digital painting in the style of Octopath Traveler and Final Fantasy Tactics character art, rich colors, soft rim light, dark plain vignette background.",
+  "negativo": "text, letters, watermark, signature, frame, border, multiple characters, cropped head, full body, photo, 3d render, blurry, deformed hands",
+  "trabajos": {
+    "hero_iop": "Kara the Helmbreaker: young fierce woman warrior, long chestnut brown hair in a high ponytail, determined grin, white fur collar over a red cloak, steel pauldrons and leather armor, a riveted battle axe resting on her shoulder, warm forge light.",
+    "hero_cra": "Teo the Hawkeye: young male ranger with messy light brown hair, sharp focused hazel eyes, dark green hooded cloak and leather tunic, quiver of arrows on his back, a brown hawk perched on his shoulder, forest green light.",
+    "hero_feca": "Elara the Runist: young blonde woman mage with a wide-brimmed pointed navy-blue wizard hat with gold trim, navy blue robe with golden runic embroidery, holding a wooden staff topped with a glowing blue crystal, gentle but clever expression, glowing blue runes floating around her.",
+    "hero_sombra": "Nyx the Shadow: lithe female assassin in a dark purple hood and black face mask covering her mouth, only sharp violet eyes visible, dark leather armor, a curved green-glowing dagger raised near her face, wisps of shadow smoke, moody purple light.",
+    "hero_domadora": "Ayla the Beast Tamer: tanned young woman with long dark brown dreadlocks and blue tribal face paint, fur and bone necklace, wild calm eyes, holding a spirit staff with a glowing blue gem, a grey wolf's head beside her shoulder, cool moonlight.",
+    "hero_artificiera": "Brina the Artificer: cheerful young woman inventor with short wavy brown hair, brass goggles pushed up on her forehead, soot smudge on her cheek, leather work vest with pouches and tools, holding a round black bomb with a lit sparkling fuse, mischievous smile, warm amber light.",
+    "hero_berserker": "Brann the Berserker: huge muscular bald northern warrior with a thick black beard, bare chest covered in red runic war paint tattoos, scars, furious glowing eyes, fur shoulder wrap, a massive greatsword with red ribbons on his shoulder, red battle glow.",
+    "ivo": "Master Ivo the Alchemist: ancient kind wizard with a long flowing white beard and bushy eyebrows, wise tired eyes hiding a secret, tall pointed purple hat and purple robe with silver stars, holding a small glowing green potion flask, candlelit alchemy shelves blurred behind.",
+    "brunilda": "Brunilda the Merchant: stout middle-aged woman shopkeeper with rosy cheeks and red hair tied in a bun under a kerchief, sly confident smirk, green dress with a white apron and a coin purse, holding a golden coin up between two fingers, warm market light.",
+    "tobias": "Tobias the Blacksmith: big burly bald middle-aged man with a short grey beard and thick forearms, leather blacksmith apron over a sooty shirt, holding a heavy hammer, glowing orange embers and anvil sparks behind him, gruff but kind face.",
+    "morvhal": "Morvhal the Locksmith, an ancient sorcerer villain: pale gaunt handsome face with glowing violet eyes and a cruel smile, deep black and purple hooded robe embroidered with silver keyholes and runes, a ring of floating ornate dark keys circling him, purple void energy, ominous.",
+    "boss_ceniza": "The Ash King, a colossal corrupted boar monster: black charred hide with glowing lava cracks, burning flaming mane, huge curved ivory tusks, furious red glowing eyes, smoke and embers, purple corruption runes on its forehead, monster portrait.",
+    "boss_pantano": "The Swamp Mother, a giant corrupted spider queen monster: dark mossy chitin covered in swamp weeds, many glowing green eyes, dripping green venom from her fangs, a crown of bone on her head, misty green swamp, purple corruption runes, monster portrait.",
+    "boss_glaciar": "The Titan of Eternal Winter, a massive ice golem: body of cracked blue glacier ice and frost, jagged icicle crown, glowing cold white-blue eyes, frost breath, a purple corruption sigil burning in its chest, monster portrait.",
+    "boss_desierto": "The Amber Phoenix, a majestic corrupted firebird: blazing orange and golden feathers, flaming crest, sharp beak, glowing amber eyes streaked with purple corruption, wings of fire spreading behind its head, monster portrait.",
+    "boss_abismo": "The Archmage of the Void, a corrupted elderly sorcerer: tall dark purple hood shadowing his face, one eye glowing violet and one eye pleading human, long grey beard, holding a trident staff crackling with void lightning, possessed and suffering, ominous purple light."
+  }
+}

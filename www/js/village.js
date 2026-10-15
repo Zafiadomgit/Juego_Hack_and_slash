@@ -35,7 +35,7 @@ function buildVillage() {
   add({ kind: 'sign', x: 70, y: 235 }, 8);
   for (const [x, y] of [[-390, 110], [-372, 132], [-250, 150], [380, 150], [395, 128]]) add({ kind: 'barrel', x, y, v: (x * 7) & 1 }, 13);
   for (const [x, y] of [[-238, -40], [238, -40], [-130, 120], [130, 120], [-150, -205], [150, -205]]) { add({ kind: 'lamp', x, y }, 7); VILLAGE.lamps.push({ x, y: y - 62 }); }
-  add({ kind: 'portalbase', x: PORTAL.x, y: PORTAL.y + 2 }, 42, -6);
+  SL.push({ x: PORTAL.x, y: PORTAL.y - 6, r: 58 }); // tarima del Portal
   // vallas con flores al sur
   for (let x = -640; x <= -200; x += 44) add({ kind: 'fence', x, y: 310 });
   for (let x = 200; x <= 640; x += 44) add({ kind: 'fence', x, y: 310 });
@@ -336,13 +336,6 @@ function artCauldronBase() {
   g.fillStyle = '#2a2a34'; g.beginPath(); g.ellipse(0, -28, 20, 6, 0, 0, TAU); g.fill();
 }
 
-function artPortalBase() {
-  const g = ctx;
-  for (const [ry, col] of [[30, '#5e564c'], [26, '#857a6c'], [22, '#9a9080']]) { g.fillStyle = col; g.beginPath(); g.ellipse(0, -(30 - ry) * 0.8, ry * 2.3, ry, 0, 0, TAU); g.fill(); }
-  g.fillStyle = '#6b6258';
-  for (let i = 0; i < 10; i++) { const a = (i / 10) * TAU; g.fillRect(Math.cos(a) * 62 - 5, -4 + Math.sin(a) * 25 - 3, 10, 6); }
-}
-
 // ---------- Personajes no jugables ----------
 function artMerchant(p) {
   const g = ctx;
@@ -415,7 +408,6 @@ const V_ART = {
   bush: (o) => ['vbush' + o.v, 46, 40, 23, 37, () => artBush(o.v)],
   sign: () => ['vsign', 76, 66, 38, 63, artSign],
   cauldron: () => ['vcaul', 46, 40, 23, 37, artCauldronBase],
-  portalbase: () => ['vpbase', 150, 70, 75, 40, artPortalBase],
 };
 
 function drawVillageProp(o) {
@@ -427,7 +419,7 @@ function drawVillageProp(o) {
   }
   if (o.kind === 'tree') { drawTree(o); return; }
   const A = V_ART[o.kind](o);
-  if (o.kind !== 'portalbase' && o.kind !== 'fence') shadow(o.x, o.y + 1, A[1] * 0.35);
+  if (o.kind !== 'fence') shadow(o.x, o.y + 1, A[1] * 0.35);
   ctx.save();
   ctx.translate(o.x, o.y);
   sprite(A[0], A[1], A[2], A[3], A[4], A[5]);
@@ -500,7 +492,7 @@ function villageTap(sx, sy) {
   const hz = zoom;
   const wx = (sx - W / 2) / hz + vCam.x, wy = (sy - H / 2) / hz + vCam.y;
   for (const n of NPCS) if (Math.abs(wx - n.x) < 34 && wy > n.y - 100 && wy < n.y + 14) { vHero.target = { x: n.x + (vHero.x < n.x ? -34 : 34), y: n.y + 26 }; vHero.pending = n; return; } // se coloca a su lado
-  if (dist(wx, wy, PORTAL.x, PORTAL.y - 40) < 50) { vHero.target = { x: PORTAL.x, y: PORTAL.y + 44 }; vHero.pending = 'portal'; return; }
+  if (dist(wx, wy, PORTAL.x, PORTAL.y - 100) < 90) { vHero.target = { x: PORTAL.x, y: PORTAL.y + 44 }; vHero.pending = 'portal'; return; }
   vHero.target = { x: clamp(wx, VB.x0, VB.x1), y: clamp(wy, VB.y0, VB.y1) }; vHero.pending = null;
 }
 
@@ -581,7 +573,7 @@ function renderVillage() {
   }
   // ventanas encendidas y chispas del portal
   for (const w of VILLAGE.windows) glow(w.x + 8, w.y + 9, 26, '255,190,90', 0.35);
-  glow(PORTAL.x, PORTAL.y - 46, 70, '110,200,255', 0.5 + Math.sin(now * 2) * 0.1);
+  glow(PORTAL.x, PORTAL.y - 100, 110, '110,200,255', 0.5 + Math.sin(now * 2) * 0.1);
   for (const f of VILLAGE.fx) {
     const a = f.life / f.max;
     if (f.k === 'smoke') { ctx.globalAlpha = 0.35 * a; circle(f.x, f.y, f.r, '#c8c4c0'); }
@@ -598,7 +590,7 @@ function renderVillage() {
   if (S) { const q = toS(vHero.x, vHero.y - 20); lights.push({ x: q.x, y: q.y, r: 200 * hz, a: 0.55, rgb: '255,238,212' }); }
   for (const l of VILLAGE.lamps) { const q = toS(l.x + (PROP_IMG.villa ? 0 : 11), l.y + 5); lights.push({ x: q.x, y: q.y, r: 175 * hz, a: 0.75, rgb: '255,165,85', haze: 0.35 }); }
   for (const w of VILLAGE.windows) { const q = toS(w.x + 8, w.y + 20); lights.push({ x: q.x, y: q.y, r: 95 * hz, a: 0.75, rgb: '255,190,110', haze: 0.2 }); }
-  { const q = toS(PORTAL.x, PORTAL.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
+  { const q = toS(PORTAL.x, PORTAL.y - 100); lights.push({ x: q.x, y: q.y, r: 300 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
   { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
   for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.75, rgb: '255,226,190' }); }
   renderLighting(lights, 0.5, '84,96,150');
@@ -675,7 +667,7 @@ function villageLife(dt) {
   }
   for (const c of LIFE.clouds) { c.x += c.v * dt; if (c.x > 1100) { c.x = -1100; c.y = rand(-500, 500); } }
   // chispas que suben del Portal
-  if (Math.random() < dt * 8) VILLAGE.fx.push({ k: 'spark', x: PORTAL.x + rand(-40, 40), y: PORTAL.y + rand(-6, 10), vx: rand(-6, 6), vy: rand(-55, -30), life: 1.6, max: 1.6, r: 2 });
+  if (Math.random() < dt * 8) VILLAGE.fx.push({ k: 'spark', x: PORTAL.x + rand(-55, 55), y: PORTAL.y + rand(-6, 12), vx: rand(-6, 6), vy: rand(-55, -30), life: 1.6, max: 1.6, r: 2 });
   // humo de chimeneas y luciérnagas
   for (const s of VILLAGE.smoke) {
     s.t -= dt;

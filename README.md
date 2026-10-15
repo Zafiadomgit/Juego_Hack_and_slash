@@ -2,7 +2,7 @@
 
 Un hack & slash (ARPG) para Android: cruza el Portal Rúnico de Villa Candela, cierra las *Grietas*, derrota al Guardián y equípate con su botín.
 
-Todo el arte del juego se dibuja por código (sin assets de terceros).
+El arte combina dibujo por código con ilustraciones generadas para el juego con Leonardo.ai (`tools/art/leonardo.py` y los `.json` de prompts junto a él): retratos pintados de los diálogos, mapas de cada mundo, fondo del título y el Portal Rúnico. Sin assets de terceros.
 
 Estilo visual **HD-2D** (inspirado en Octopath Traveler): el mundo se dibuja como pixel art en baja resolución y encima se aplican luz dinámica, bloom y desenfoque tipo maqueta.
 

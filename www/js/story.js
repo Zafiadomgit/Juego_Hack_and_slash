@@ -3,12 +3,12 @@
  * tierra que hoy está al otro lado de las Grietas. Morvhal está forzándolos desde dentro y ha corrompido a sus guardianes
  * (los Súper Jefes). Cada Súper Jefe vencido libera un Sello; con los cinco, Morvhal huye a la Mazmorra (contenido final).
  *
- * Retratos: si existe img/portraits/<id>.png (y está en PORTRAITS) se usa; si no, se recorta el sprite del personaje.
+ * Retratos: si existe img/portraits/<id>.webp (y está en PORTRAITS) se usa; si no, se recorta el sprite del personaje.
  */
 'use strict';
 
-// Retratos pintados disponibles en img/portraits (ids: hero_<clase>, ivo, brunilda, tobias, morvhal, boss_<bioma>)
-const PORTRAITS = [];
+// Retratos pintados disponibles en img/portraits (ver PORTRAIT_IDS en art.js)
+const PORTRAITS = PORTRAIT_IDS;
 
 const CHAPTERS = [
   { title: 'Ceniza y juramento', goal: 'Cierra las Grietas del Bosque Ceniciento y derrota al Rey Ceniza' },
@@ -218,7 +218,7 @@ function spritePortrait(kind) {
 }
 // devuelve { src, mode }: mode 'paint' (retrato pintado), 'hero' (arte de cuerpo entero, encuadrado arriba), 'pixel' o 'sil'
 function portraitFor(sp) {
-  if (PORTRAITS.includes(sp.id)) return { src: 'img/portraits/' + sp.id + '.png', mode: 'paint' };
+  if (PORTRAITS.includes(sp.id)) return { src: portraitUrl(sp.id), mode: 'paint' };
   if (sp.hero) { const a = heroArt(S.cls); if (a) return { src: a.url, mode: 'hero' }; }
   if (sp.sprite) { const s = spritePortrait(sp.sprite); if (s) return { src: s, mode: 'pixel' }; }
   return { src: silhouette(sp.aura || '200,200,220', sp.hidden), mode: 'sil' };

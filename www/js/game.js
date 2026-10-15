@@ -1940,8 +1940,10 @@ function drawHUD() {
   circle(px, py, 26 * s, '#1f2a4a', '#c9b27a', 3 * s);
   ctx.save();
   ctx.beginPath(); ctx.arc(px, py, 24 * s, 0, Math.PI * 2); ctx.clip();
-  const art = heroArt(P.cls);
-  if (art) {
+  const art = heroArt(P.cls), pimg = PORTRAIT_IMG['hero_' + P.cls];
+  if (pimg) {
+    ctx.drawImage(pimg, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
+  } else if (art) {
     // retrato: la cabeza del arte del héroe
     const img = art.img, sw = img.width * (art.px ? 0.36 : 0.5), sx0 = img.width * (art.px ? 0.36 : 0.25);
     ctx.imageSmoothingEnabled = !art.px;
@@ -2038,7 +2040,20 @@ function drawHUD() {
     const w = Math.min(W * 0.42, 340 * s), x = W / 2 - w / 2, y = pad + 18 * s;
     text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ecd18a', 'center', 900);
     roundRect(x, y + 2 * s, w, 12 * s, 6 * s, 'rgba(0,0,0,0.65)', '#c9b27a', 2);
-    roundRect(x + 2, y + 2 * s + 2, (w - 4) * Math.max(0, bossRef.hp / bossRef.maxHp), 12 * s - 4, 4 * s, '#d84315');
+    const hk = Math.max(0, bossRef.hp / bossRef.maxHp);
+    if (hk > 0) {
+      const gr = ctx.createLinearGradient(0, y + 2 * s, 0, y + 14 * s);
+      gr.addColorStop(0, bossRef.enraged ? '#ff6e40' : '#ff8a50'); gr.addColorStop(1, bossRef.enraged ? '#b71c1c' : '#bf360c');
+      roundRect(x + 2, y + 2 * s + 2, (w - 4) * hk, 12 * s - 4, 4 * s, gr);
+    }
+    // retrato del Súper Jefe junto a la barra
+    const bp = rift && rift.isSuper && PORTRAIT_IMG['boss_' + rift.biome.id];
+    if (bp) {
+      const r = 20 * s, cx = x - r - 6 * s, cy = y + 6 * s;
+      ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.clip();
+      ctx.drawImage(bp, cx - r, cy - r, r * 2, r * 2); ctx.restore();
+      circle(cx, cy, r, null, bossRef.enraged ? '#ff5252' : '#c9b27a', 2.5 * s);
+    }
   }
 
   // racha
@@ -2473,7 +2488,8 @@ function buildMenu() {
     const art = heroArt(id);
     const b = document.createElement('button');
     b.className = selectedClass === id ? 'on' : '';
-    b.innerHTML = `${art ? `<img src="${art.url}" alt="">` : ''}<span>${C.name}<small>${slot ? `Nivel ${slot.level}` : C.role}</small></span>`;
+    const pic = PORTRAIT_IDS.includes('hero_' + id) ? portraitUrl('hero_' + id) : art && art.url;
+    b.innerHTML = `${pic ? `<img src="${pic}" alt=""${art && pic === art.url ? '' : ' class="pt"'}>` : ''}<span>${C.name}<small>${slot ? `Nivel ${slot.level}` : C.role}</small></span>`;
     b.addEventListener('click', () => { SFX.init(); SFX.play('click'); selectedClass = id; confirmNew = false; buildMenu(); });
     list.appendChild(b);
   }
@@ -2587,51 +2603,6 @@ function autoAdvance() {
   else if (n < LEVELS_PER_BIOME) m.sel = { b, n: n + 1, d: 0 };
   else m.sel = { b, n: 'S', d: 0 };
 }
-const MAP_BG = new Map();
-function mapBackground(B) {
-  if (MAP_BG.has(B.id)) return MAP_BG.get(B.id);
-  const c = document.createElement('canvas');
-  c.width = 900; c.height = 420;
-  const g = c.getContext('2d');
-  const pat = g.createPattern(biomeGroundTex(B), 'repeat');
-  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(1.6));
-  g.fillStyle = pat; g.fillRect(0, 0, 900, 420);
-  let seed = B.id.length * 777;
-  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  for (let i = 0; i < 10; i++) {
-    const x = rnd() * 900, y = rnd() * 420, r = 80 + rnd() * 160, col = B.patch[i % 2];
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
-    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
-  }
-  const st = POOL_STYLE[B.pool];
-  const saved = ctx;
-  ctx = g;
-  try {
-    for (let i = 0; i < 6; i++) {
-      const x = rnd() * 900, y = 60 + rnd() * 320, rx = 30 + rnd() * 40;
-      const gr = g.createRadialGradient(x, y, 2, x, y, rx);
-      gr.addColorStop(0, st.stops[0]); gr.addColorStop(0.4, st.stops[1]); gr.addColorStop(0.8, st.stops[2]); gr.addColorStop(1, st.stops[3]);
-      g.fillStyle = st.rim; g.beginPath(); g.ellipse(x, y, rx + 5, rx * 0.45 + 4, 0, 0, TAU); g.fill();
-      g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx, rx * 0.45, 0, 0, TAU); g.fill();
-    }
-    const trees = [];
-    for (let i = 0; i < 46; i++) trees.push([rnd() * 900, rnd() * 440, 0.55 + rnd() * 0.4]);
-    trees.sort((a, b) => a[1] - b[1]);
-    for (const [x, y, sc] of trees) {
-      g.save(); g.translate(x, y); g.scale(sc, sc);
-      g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(0, 2, 22, 8, 0, 0, TAU); g.fill();
-      treeArt(B.tree, rnd() < 0.5 ? 1 : 0, 0);
-      g.restore();
-    }
-  } finally { ctx = saved; }
-  const v = g.createRadialGradient(450, 210, 120, 450, 210, 520);
-  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
-  g.fillStyle = v; g.fillRect(0, 0, 900, 420);
-  const url = c.toDataURL('image/jpeg', 0.85);
-  MAP_BG.set(B.id, url);
-  return url;
-}
 function openMap() {
   mapView = mapSel().b;
   buildMap();
@@ -2670,8 +2641,9 @@ function buildMap() {
   html.push(`<div class="mf-set" style="color:${SETS[B.id].color}">Conjunto ${SETS[B.id].name}: ${cnt}/${SLOTS.length} equipadas</div>`);
   const field = $('mapField');
   field.style.setProperty('--mbg', `rgb(${B.ground[2].join(',')})`);
-  field.style.backgroundImage = `url(${mapBackground(B)})`;
+  field.style.backgroundImage = `radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 40%, rgba(4,6,14,.6)), url(img/maps/${B.id}.webp)`;
   field.style.backgroundSize = 'cover';
+  field.classList.toggle('locked', !biomeUnlocked(b));
   field.innerHTML = html.join('');
   buildMapInfo();
 }
@@ -2694,7 +2666,7 @@ function buildMapInfo() {
     return `<button data-d="${k}" style="--dc:${D.color}" class="${k === d ? 'on' : ''}" ${un ? '' : 'disabled'}>${un ? '' : '🔒 '}${D.name}${done ? ' <span class="ck">✔</span>' : ''}</button>`;
   }).join('')}</div>`;
   box.innerHTML = `
-    <h3>${isS ? '☠ Súper Jefe' : 'Grieta ' + n}</h3>
+    ${isS ? `<div class="mi-boss"><img src="${portraitUrl('boss_' + B.id)}" alt=""><div><h3>☠ Súper Jefe</h3><b style="color:rgb(${SUPER_BOSSES[B.id].aura})">${boss}</b></div></div>` : `<h3>Grieta ${n}</h3>`}
     <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
     ${diffs}
     ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
@@ -3213,6 +3185,7 @@ function openShop(kind = 'merchant') {
   SHOP_TABS = SHOPS[kind].tabs;
   if (!SHOP_TABS.some((t) => t[0] === shopTab)) shopTab = SHOP_TABS[0][0];
   $('shopTitle').textContent = SHOPS[kind].title;
+  $('shopPort').src = portraitUrl({ merchant: 'brunilda', alchemist: 'ivo', smith: 'tobias' }[kind] || 'brunilda');
   if (!S.shop || S.shop.rifts !== S.rifts) genStock();
   state = 'shop';
   $('shopCard').classList.remove('show');

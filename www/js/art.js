@@ -133,6 +133,13 @@ function drawHeroAnim(g, o) {
   return true;
 }
 
+// Retratos pintados (img/portraits/<id>.webp): diálogos, HUD, jefes y selección de héroe
+const PORTRAIT_IDS = ['hero_iop', 'hero_cra', 'hero_feca', 'hero_sombra', 'hero_domadora', 'hero_artificiera', 'hero_berserker',
+  'ivo', 'brunilda', 'tobias', 'morvhal', 'boss_ceniza', 'boss_pantano', 'boss_glaciar', 'boss_desierto', 'boss_abismo'];
+const portraitUrl = (id) => 'img/portraits/' + id + '.webp';
+const PORTRAIT_IMG = {};
+for (const id of PORTRAIT_IDS) { const im = new Image(); im.onload = () => { PORTRAIT_IMG[id] = im; }; im.src = portraitUrl(id); }
+
 // Arte del héroe a usar: pixel art en HD-2D; si no, el pintado (o el pixel art si no hay pintado)
 function heroArt(cls) {
   const px = HERO_PX[cls], pa = HERO_ART[cls];
@@ -1491,41 +1498,66 @@ function drawGem(g, x, y, s, color, t) {
   g.restore();
 }
 
+// Portal Rúnico: arco de piedra pintado (img/props/portal.webp) con un vórtice animado en el hueco
+const PORTAL_IMG = new Image();
+PORTAL_IMG.src = 'img/props/portal.webp';
+const PORTAL_H = 230; // altura en unidades de mundo
+// hueco del arco, en fracciones de la imagen (x0, y0, x1, y1)
+const PORTAL_HOLE = [166 / 507, 281 / 891, 341 / 507, 598 / 891];
 function drawPortal(x, y, t) {
-  shadow(x, y + 4, 46);
-  ctx.save();
-  ctx.translate(x, y);
-  ctx.lineWidth = 2; ctx.strokeStyle = OUTLINE;
-  // base de piedra
-  ctx.fillStyle = '#9e9e9e';
-  ctx.beginPath(); ctx.ellipse(0, 0, 46, 16, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#bdbdbd';
-  ctx.beginPath(); ctx.ellipse(0, -4, 38, 12, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-  // anillo
-  ctx.lineWidth = 9; ctx.strokeStyle = '#8d8d8d';
-  ctx.beginPath(); ctx.ellipse(0, -46, 30, 40, 0, 0, Math.PI * 2); ctx.stroke();
-  ctx.lineWidth = 2; ctx.strokeStyle = OUTLINE;
-  ctx.beginPath(); ctx.ellipse(0, -46, 34.5, 44.5, 0, 0, Math.PI * 2); ctx.stroke();
-  ctx.beginPath(); ctx.ellipse(0, -46, 25.5, 35.5, 0, 0, Math.PI * 2); ctx.stroke();
-  // portal
-  const grd = ctx.createRadialGradient(0, -46, 2, 0, -46, 26);
-  grd.addColorStop(0, 'rgba(255,255,255,0.95)');
-  grd.addColorStop(0.5, 'rgba(110,200,255,0.75)');
-  grd.addColorStop(1, 'rgba(40,120,220,0.4)');
-  ctx.fillStyle = grd;
-  ctx.beginPath(); ctx.ellipse(0, -46, 25, 35, 0, 0, Math.PI * 2); ctx.fill();
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)'; ctx.lineWidth = 1.5;
-  for (let i = 0; i < 3; i++) {
-    const a = t * 2 + i * 2.1;
-    ctx.beginPath(); ctx.ellipse(0, -46, 8 + i * 6, 12 + i * 8, 0, a, a + 2.2); ctx.stroke();
+  const im = PORTAL_IMG, k = PORTAL_H / 891, w = 507 * k;
+  const left = x - w / 2, top = y + PORTAL_H * 0.06 - PORTAL_H;
+  const hx0 = left + PORTAL_HOLE[0] * w, hx1 = left + PORTAL_HOLE[2] * w;
+  const hy0 = top + PORTAL_HOLE[1] * PORTAL_H, hy1 = top + PORTAL_HOLE[3] * PORTAL_H;
+  const hw = (hx1 - hx0) / 2, cx = x, cy = (hy0 + hy1) / 2 + 6;
+  const g = ctx;
+  shadow(x, y + 4, 70);
+  // vórtice (detrás del marco)
+  g.save();
+  g.beginPath(); g.moveTo(hx0 - 2, hy1 + 4); g.lineTo(hx0 - 2, hy0 + hw); g.arc(cx, hy0 + hw, hw + 2, Math.PI, 0); g.lineTo(hx1 + 2, hy1 + 4); g.closePath();
+  g.clip();
+  const R = (hy1 - hy0) * 0.75;
+  let gr = g.createRadialGradient(cx, cy, 2, cx, cy, R);
+  gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.12, '#b8f0ff'); gr.addColorStop(0.4, '#3aa8f0'); gr.addColorStop(0.75, '#2a3fb8'); gr.addColorStop(1, '#1a0f4a');
+  g.fillStyle = gr; g.fillRect(hx0 - 4, hy0 - 4, hw * 2 + 8, hy1 - hy0 + 10);
+  // brazos en espiral que giran hacia dentro
+  g.globalCompositeOperation = 'lighter';
+  for (let arm = 0; arm < 4; arm++) {
+    g.beginPath();
+    for (let s = 0; s <= 1.0001; s += 0.04) {
+      const a = t * 2.4 + arm * (Math.PI / 2) + s * 5.5, r = R * (1 - s) * 0.95;
+      const px = cx + Math.cos(a) * r * 0.62, py = cy + Math.sin(a) * r;
+      if (s === 0) g.moveTo(px, py); else g.lineTo(px, py);
+    }
+    g.strokeStyle = arm % 2 ? 'rgba(170,140,255,0.55)' : 'rgba(150,230,255,0.6)'; g.lineWidth = 5; g.stroke();
+    g.strokeStyle = 'rgba(255,255,255,0.35)'; g.lineWidth = 1.6; g.stroke();
   }
-  // runas
-  ctx.fillStyle = '#4fc3f7';
-  for (let i = 0; i < 6; i++) {
-    const a = (i / 6) * Math.PI * 2 + t * 0.3;
-    circle(Math.cos(a) * 30, -46 + Math.sin(a) * 40, 2, '#b3e5fc');
+  // motas absorbidas por el vórtice
+  for (let i = 0; i < 14; i++) {
+    const ph = (t * 0.45 + i / 14) % 1, a = i * 2.4 + t * 1.5 + ph * 4, r = R * (1 - ph);
+    g.globalAlpha = Math.sin(ph * Math.PI);
+    circle(cx + Math.cos(a) * r * 0.62, cy + Math.sin(a) * r, 1.4 + (1 - ph) * 1.6, '#e8fbff');
   }
-  ctx.restore();
+  g.globalAlpha = 1;
+  const core = 0.75 + Math.sin(t * 3) * 0.15;
+  gr = g.createRadialGradient(cx, cy, 0, cx, cy, hw * 0.9);
+  gr.addColorStop(0, `rgba(255,255,255,${core})`); gr.addColorStop(1, 'rgba(120,200,255,0)');
+  g.fillStyle = gr; g.fillRect(cx - hw, cy - hw, hw * 2, hw * 2);
+  g.restore();
+  // marco de piedra (los cristales flotan un poco)
+  if (im.complete && im.naturalWidth) g.drawImage(im, left, top + Math.sin(t * 1.2) * 0.6, w, PORTAL_H);
+  // brillo de la gema de la clave y de las runas
+  g.save();
+  g.globalCompositeOperation = 'lighter';
+  const pulse = 0.55 + Math.sin(t * 2.2) * 0.25;
+  gr = g.createRadialGradient(x, top + 0.235 * PORTAL_H, 0, x, top + 0.235 * PORTAL_H, 34);
+  gr.addColorStop(0, `rgba(140,230,255,${pulse})`); gr.addColorStop(1, 'rgba(140,230,255,0)');
+  g.fillStyle = gr; g.fillRect(x - 34, top + 0.235 * PORTAL_H - 34, 68, 68);
+  // haz de luz hacia el cielo
+  gr = g.createLinearGradient(0, top - 140, 0, top + 0.24 * PORTAL_H);
+  gr.addColorStop(0, 'rgba(120,200,255,0)'); gr.addColorStop(1, `rgba(140,220,255,${0.22 + pulse * 0.12})`);
+  g.fillStyle = gr; g.fillRect(x - 5, top - 140, 10, 140 + 0.24 * PORTAL_H);
+  g.restore();
 }
 
 function drawFern(d) {

@@ -1,0 +1,9 @@
+{
+  "modelo": "7b592283-e8a7-4c5a-9ba6-d18c31f258b9",
+  "ancho": 1024, "alto": 1024, "num": 4,
+  "estilo": "Detailed pixel art game asset, HD-2D style like Octopath Traveler, three-quarter top-down view, single isolated object centered, on a solid flat pure magenta (#ff00ff) background.",
+  "negativo": "text, watermark, signature, frame, border, characters, people, scenery, ground, grass, shadow on background, gradient background, swirl inside the arch",
+  "trabajos": {
+    "portal": "A towering ancient runic stone portal gate: a massive tall pointed arch made of weathered dark grey carved stone blocks standing on a round three-step stone dais, the arch keystone holds a large glowing blue crystal, glowing cyan runes carved along both pillars, two small floating blue crystals beside it, gold metal ornaments, the inside of the arch is completely empty and open showing the flat magenta background through it."
+  }
+}
