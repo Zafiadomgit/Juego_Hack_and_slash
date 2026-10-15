@@ -9,6 +9,7 @@ const VG = { x0: -760, y0: -540, w: 1520, h: 1120 }; // suelo pre-renderizado
 const VILLAGE = { built: false, props: [], solids: [], npcs: [], lamps: [], windows: [], smoke: [], fx: [], ground: null, groundScale: 0 };
 const vHero = { x: 0, y: 40, dir: Math.PI / 2, walkT: 0, moving: false, target: null, pending: null };
 let vNear = null, vNearShown = undefined, vCam = { x: 0, y: 0 };
+let nearNeighbor = () => null; // aldeano con quien hablar (sidequests.js)
 
 const NPCS = [
   { id: 'merchant', name: 'Brunilda', title: 'Mercader', x: -212, y: 132, prompt: '💬 Hablar con Brunilda · Equipo', color: '#ffcf7a' },
@@ -534,6 +535,7 @@ function updateVillage(dt) {
   vNear = null;
   for (const n of NPCS) if (dist(vHero.x, vHero.y, n.x, n.y + 10) < 80) vNear = n;
   if (!vNear && dist(vHero.x, vHero.y, PORTAL.x, PORTAL.y + 30) < 80) vNear = 'portal';
+  if (!vNear) vNear = nearNeighbor();
   if (vNear !== vNearShown) { vNearShown = vNear; updateHubPrompt(); }
   vCam.x = lerp(vCam.x, clamp(vHero.x, VB.x0 + 200, VB.x1 - 200), 1 - Math.exp(-6 * dt));
   vCam.y = lerp(vCam.y, clamp(vHero.y - 30, VB.y0 + 80, VB.y1 - 120), 1 - Math.exp(-6 * dt));

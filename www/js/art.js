@@ -135,7 +135,7 @@ function drawHeroAnim(g, o) {
 
 // Retratos pintados (img/portraits/<id>.webp): diálogos, HUD, jefes y selección de héroe
 const PORTRAIT_IDS = ['hero_iop', 'hero_cra', 'hero_feca', 'hero_sombra', 'hero_domadora', 'hero_artificiera', 'hero_berserker',
-  'ivo', 'brunilda', 'tobias', 'morvhal', 'boss_ceniza', 'boss_pantano', 'boss_glaciar', 'boss_desierto', 'boss_abismo'];
+  'ivo', 'brunilda', 'tobias', 'morvhal', 'rufo', 'matilde', 'bertin', 'pip', 'boss_ceniza', 'boss_pantano', 'boss_glaciar', 'boss_desierto', 'boss_abismo'];
 const portraitUrl = (id) => 'img/portraits/' + id + '.webp';
 const PORTRAIT_IMG = {};
 for (const id of PORTRAIT_IDS) { const im = new Image(); im.onload = () => { PORTRAIT_IMG[id] = im; }; im.src = portraitUrl(id); }

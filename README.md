@@ -32,7 +32,8 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
    - **Armería de Gesta**: Arma de Gesta (150 sellos) y Pieza de Gesta (90) —legendarias exclusivas, +20% de stats— y Gemas Ancestrales (220).
 9. **Mazmorra** (Portal Rúnico → 🗝 Mazmorra, tras vencer al Súper Jefe del Bosque Ceniciento): 20 pisos cada vez más duros, llenos de élites y con un Súper Jefe al final. Sueltan **reliquias únicas** (legendarias con un poder exclusivo: Eclipse, Colmillo Sangriento, Corona del Rey Ceniza, Manto del Vacío, Amuleto del Eco, Anillo del Verdugo, Botas del Viento Eterno, Faja del Rey Avaro; la primera vez que superas un piso la reliquia está asegurada), Fragmentos y **Esencias de Ruptura**.
 10. **Ruptura de Límite** (Tablón → Ruptura): 5 rangos por héroe que se pagan con Esencias de Ruptura; cada uno da +12% de daño y PV, y además suben el refinado máximo hasta +15, abren un 4.º hueco de gema y, al final, un aura de Ruptura.
-11. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
+11. **Encargos de los vecinos**: Rufo el granjero, la abuela Matilde, el sargento Bertín y el pequeño Pip pasean por la plaza; un «!» sobre su cabeza indica un encargo nuevo y un «?» que ya puedes entregarlo. Cada uno tiene una cadena de 3 encargos que se abren según el capítulo de la trama (derrotar monstruos de un mundo, élites, Guardianes, eventos, ámbar…) y recompensan con ámbar, Fragmentos, Sellos de Gesta, elixires y equipo. Los activos aparecen en la tarjeta del pueblo.
+12. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
 
 ### Controles
 
@@ -57,6 +58,8 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/hd2d.js          Estilo HD-2D: búfer pixelado, bloom y tilt-shift
   js/village.js       Villa Candela: pueblo caminable, vecinos y tiendas
   js/content.js       Definitivas, misiones diarias y eventos de Grieta
+  js/story.js         Trama del Acto I y cuadros de diálogo
+  js/sidequests.js    Encargos de los vecinos
   js/classes.js       Clases nuevas: Sombra, Domadora, Artificiera y Berserker
 audio/ (en www)       Música (.ogg en bucle) y efectos de sonido
 tools/audio/          Sintetizador y compositor de la banda sonora (Python)

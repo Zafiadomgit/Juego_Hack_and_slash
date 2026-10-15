@@ -1,0 +1,14 @@
+{
+ "modelo": "7b592283-e8a7-4c5a-9ba6-d18c31f258b9",
+ "ancho": 1024,
+ "alto": 1024,
+ "num": 2,
+ "estilo": "Painted JRPG dialogue portrait, head and shoulders bust, centered, facing the viewer at three-quarter angle, detailed digital painting in the style of Octopath Traveler and Final Fantasy Tactics character art, rich colors, soft rim light, dark plain vignette background.",
+ "negativo": "text, letters, watermark, signature, frame, border, multiple characters, cropped head, full body, photo, 3d render, blurry, deformed hands, white background, circle frame, round border, medallion",
+ "trabajos": {
+  "rufo": "Rufo the Farmer: sunburnt middle-aged peasant man with a wide straw hat, short dark brown hair and stubble, blue linen shirt, holding a wooden hoe over his shoulder, worried honest face, golden wheat field at dusk blurred behind.",
+  "matilde": "Grandma Matilde: kind elderly village woman with grey-blonde hair in a bun, wrinkled smiling face, red wool shawl, carrying a wicker basket of bread and herbs, warm cottage kitchen light behind.",
+  "bertin": "Sergeant Bertin, village guard: stern weathered man with a short black beard, an old dented steel kettle helmet, grey padded gambeson with a small tabard, holding a spear, tired but loyal eyes, torchlit wall behind.",
+  "pip": "Pip, a village boy: cheerful freckled 10-year-old boy with messy auburn hair, green tunic, a wooden toy sword in his hand, big curious eyes and a gap-toothed grin, sunny village street blurred behind."
+ }
+}
