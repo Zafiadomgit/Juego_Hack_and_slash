@@ -13,8 +13,8 @@ const STORE_CFG = {
   fullId: 'fendaria_full', // producto de pago único (y entitlement «full»)
 };
 const CLOUD_CFG = {
-  url: '', // https://<proyecto>.supabase.co
-  key: '', // clave publicable de Supabase (pública por diseño; los datos los protege RLS). Vacía: nube desactivada
+  url: 'https://bdvmdorswzzkoigrctco.supabase.co',
+  key: '', // clave publicable de Supabase (pública por diseño; los datos los protege RLS). Vacía: nube desactivada (Supabase → Project Settings → API Keys)
 };
 
 const COSMETICS = [
