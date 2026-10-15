@@ -58,7 +58,7 @@ function mapProg() {
 }
 const clearedDiffs = (b, n) => mapProg().c[nodeKey(b, n)] || 0;
 const superDone = (b) => clearedDiffs(b, 'S') > 0;
-const biomeUnlocked = (b) => b === 0 || superDone(b - 1);
+const biomeUnlocked = (b) => b === 0 || (superDone(b - 1) && isFull()); // isFull: store.js (Edición Completa)
 function nodeUnlocked(b, n) {
   if (!biomeUnlocked(b)) return false;
   if (n === 'S') return clearedDiffs(b, LEVELS_PER_BIOME) > 0;

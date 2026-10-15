@@ -567,6 +567,7 @@ function renderVillage() {
   for (const o of list) {
     if (o === heroO) {
       shadow(vHero.x, vHero.y + 1, 13);
+      drawCosmetics(vHero.x, vHero.y, vHero.moving);
       drawHero(ctx, S.cls, { x: vHero.x, y: vHero.y, dir: vHero.dir, walkT: vHero.walkT, moving: vHero.moving, swing: 0, swingSide: 1, shot: 0, t: now });
     } else if (o === portalO) drawPortal(PORTAL.x, PORTAL.y, now);
     else if (o.kind === 'walker') drawWalker(o.w);

@@ -361,6 +361,7 @@ goHub = function () {
           buildHub();
           if (b === BIOMES.length - 1) showStoryCard('Fin del Acto I', 'La Mazmorra del Cerrajero te espera bajo el Portal Rúnico');
           else showStoryCard('Capítulo ' + (b + 2), CHAPTERS[b + 1].title);
+          if (b === 0 && !isFull()) setTimeout(() => { if (state === 'hub') openPremium('full'); }, 4300); // fin de la parte gratuita
         },
       })) return;
     }

@@ -69,7 +69,7 @@ const refineMax = () => 10 + [0, 1, 1, 3, 3, 5][lbRank()];
 // Mazmorra
 // ============================================================
 const DUNGEON_MAX = 20;
-const dungeonOpen = () => S && S.maxFaille >= 8; // tras vencer al Súper Jefe del Bosque Ceniciento
+const dungeonOpen = () => S && S.maxFaille >= 8 && isFull(); // tras vencer al Súper Jefe del Bosque Ceniciento (Edición Completa)
 const dungeonLevel = (tier) => Math.max(1, (S.maxFaille || 1)) + tier;
 const dungeonEss = (tier) => 2 + tier;
 const uniqueChance = (tier) => Math.min(0.7, 0.3 + tier * 0.03);
