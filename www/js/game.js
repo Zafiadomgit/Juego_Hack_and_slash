@@ -1689,7 +1689,7 @@ function updateProjectiles(dt) {
         if (dist(p.x, p.y, e.x, e.y - e.r * 0.4) < p.r + e.r) {
           if (p.kind === 'explo') { explode(p); p.life = -1; break; }
           p.hit.push(e);
-          damageEnemy(e, p.dmg, { kb: p.kb, fx: p.x - p.vx, fy: p.y - p.vy, poison: p.poison });
+          damageEnemy(e, p.dmg, { kb: p.kb, fx: p.x - p.vx, fy: p.y - p.vy, poison: p.poison, src: p.src });
           p.pierce--;
           if (p.pierce < 0) { p.life = -1; break; }
         }
@@ -2253,6 +2253,7 @@ function renderRift() {
   for (const k of pickups) if (k.type === 'item' && k.item.rarity >= 2) { const q = toS(k.x, k.y); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7, rgb: RARITY_RGB[k.item.rarity] }); }
   for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.55, rgb: e.boss ? '255,120,90' : hexRgb(e.elite.color) }); }
   if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * zoom, a: 1, rgb: '120,200,255', haze: 0.35 }); }
+  if (typeof boonLights === 'function') boonLights(lights, toS);
   for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1, rgb: '255,220,140', haze: 0.3 }); }
   if (riftEvent && !riftEvent.done && (riftEvent.kind === 'chest' || riftEvent.kind === 'altar')) { const q = toS(riftEvent.x, riftEvent.y - 30); lights.push({ x: q.x, y: q.y, r: 170 * zoom, a: 0.9, rgb: riftEvent.kind === 'chest' ? '255,210,110' : '120,200,255', haze: 0.3 }); }
   for (const m of minions) if (m.kind === 'turret' || m.kind === 'spirit' || m.kind === 'shell') { const q = toS(m.x, m.y - 16); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7, rgb: m.kind === 'spirit' ? '140,200,255' : '255,180,90' }); }
