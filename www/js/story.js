@@ -218,8 +218,9 @@ function spritePortrait(kind) {
 }
 // devuelve { src, mode }: mode 'paint' (retrato pintado), 'hero' (arte de cuerpo entero, encuadrado arriba), 'pixel' o 'sil'
 function portraitFor(sp) {
+  if (sp.img) return { src: sp.img, mode: 'paint' };
   if (PORTRAITS.includes(sp.id)) return { src: 'img/portraits/' + sp.id + '.png', mode: 'paint' };
-  if (sp.hero) { const a = heroArt(S.cls); if (a) return { src: a.url, mode: 'hero' }; }
+  if (sp.hero) { const f = heroFaceURL(S.cls); if (f) return { src: f, mode: 'pixel face' }; const a = heroArt(S.cls); if (a) return { src: a.url, mode: 'hero' }; }
   if (sp.sprite) { const s = spritePortrait(sp.sprite); if (s) return { src: s, mode: 'pixel' }; }
   return { src: silhouette(sp.aura || '200,200,220', sp.hidden), mode: 'sil' };
 }

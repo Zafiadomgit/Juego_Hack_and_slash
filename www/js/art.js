@@ -64,11 +64,21 @@ function blob(g, fill, stroke) { if (fill) { g.fillStyle = fill; g.fill(); } if 
 // ============================================================
 // Arte pintado de los héroes (si existe la imagen se usa en lugar del dibujo vectorial)
 const HERO_ART = {};
-['iop'].forEach((id) => {
+[].forEach((id) => { // los héroes rediseñados solo usan el sprite pixel art (img/heroes/px)
   const img = new Image();
   img.onload = () => { HERO_ART[id] = img; if (typeof onHeroArtLoaded === 'function') onHeroArtLoaded(); };
   img.src = 'img/heroes/' + id + '.png';
 });
+// Centro de la cara [x, y, lado] en img/heroes/px/<clase>.png (retratos del HUD y de los diálogos)
+const HERO_FACE = { iop: [92, 88, 74], cra: [124, 58, 74], feca: [64, 96, 70], sombra: [113, 72, 78], domadora: [55, 58, 74], artificiera: [60, 60, 74], berserker: [118, 62, 84] };
+function heroFaceURL(cls, k = 1.9) {
+  const img = HERO_PX[cls], f = HERO_FACE[cls];
+  if (!img || !f) return null;
+  const sz = Math.round(f[2] * k), c = document.createElement('canvas');
+  c.width = c.height = sz;
+  c.getContext('2d').drawImage(img, f[0] - sz / 2, f[1] - sz * 0.38, sz, sz, 0, 0, sz, sz);
+  return c.toDataURL();
+}
 // Sprites pixel art de los héroes (estilo HD-2D); miran a su derecha
 const HERO_PX = {};
 ['iop', 'cra', 'feca'].forEach((id) => {

@@ -1943,9 +1943,10 @@ function drawHUD() {
   const art = heroArt(P.cls);
   if (art) {
     // retrato: la cabeza del arte del héroe
-    const img = art.img, sw = img.width * (art.px ? 0.36 : 0.5), sx0 = img.width * (art.px ? 0.36 : 0.25);
+    const img = art.img, fc = art.px && HERO_FACE[P.cls];
+    const sw = fc ? fc[2] * 1.15 : img.width * 0.5, sx0 = fc ? fc[0] - sw / 2 : img.width * 0.25, sy0 = fc ? fc[1] - sw * 0.45 : 0;
     ctx.imageSmoothingEnabled = !art.px;
-    ctx.drawImage(img, sx0, 0, sw, sw, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
+    ctx.drawImage(img, sx0, sy0, sw, sw, px - 24 * s, py - 24 * s, 48 * s, 48 * s);
     ctx.imageSmoothingEnabled = true;
   } else {
     ctx.translate(px, py + 30 * s);

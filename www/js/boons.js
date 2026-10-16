@@ -13,7 +13,7 @@ const GODS = {
   escudo: { name: 'Aldemar', title: 'dios de los Escudos', color: '#6fc3ff', rgb: '111,195,255', sym: '⛨', quote: 'Un muro no ataca, pequeño. Pero nunca cae.' },
   veneno: { name: 'Nharas', title: 'diosa de las Sombras', color: '#9be05a', rgb: '155,224,90', sym: '☠', quote: 'La muerte más dulce es la que tarda en llegar…' },
   tiempo: { name: 'Kronael', title: 'dios del Tiempo', color: '#c9a8ff', rgb: '201,168,255', sym: '⌛', quote: 'Tic. Tac. Tus enemigos ya llegan tarde.' },
-  suerte: { name: 'Felizar', title: 'dios de la Suerte', color: '#ffd54f', rgb: '255,213,79', sym: '🎲', quote: '¿Te apuestas una vida a que esto sale bien? ¡Miau!' },
+  suerte: { name: 'Felizar', title: 'diosa de la Suerte', color: '#ffd54f', rgb: '255,213,79', sym: '🎲', quote: '¿Te apuestas una vida a que esto sale bien? ¡Miau!' },
   cura: { name: 'Lunessa', title: 'diosa de la Sanación', color: '#ff8ac8', rgb: '255,138,200', sym: '✚', quote: 'Mientras yo te mire, ninguna herida es para siempre.' },
   bestias: { name: 'Drakhon', title: 'dios de las Bestias', color: '#ffa860', rgb: '255,168,96', sym: '🐉', quote: 'Nunca peleas solo. La manada camina contigo.' },
   riqueza: { name: 'Orvald', title: 'dios de la Riqueza', color: '#e0b060', rgb: '224,176,96', sym: '💰', quote: 'Todo brilla si cavas lo bastante hondo. ¡Todo!' },
@@ -22,12 +22,17 @@ const GODS = {
   fiesta: { name: 'Panzo', title: 'dios de la Fiesta', color: '#8fd0d0', rgb: '143,208,208', sym: '🍶', quote: '¡Un brindis! …y luego un barril en la cabeza de alguien.' },
 };
 
-const BOON_SLOTS = { atk: 'Ataque', skill: 'Habilidad', dash: 'Esquiva', pas: 'Pasiva' };
+// retratos pintados (img/gods/<id>.webp)
+const GOD_IMG = {};
+for (const id of Object.keys(GODS)) { const im = new Image(); im.onload = () => { GOD_IMG[id] = im; }; im.src = 'img/gods/' + id + '.webp'; }
+
+const BOON_SLOTS = { atk: 'Ataque', skill: 'Habilidad', dash: 'Esquiva', cast: 'Sello', pas: 'Pasiva', duo: 'Dúo' };
 const BOON_RARITY = [
   { name: 'Común', color: '#d8d4c4', mul: 1, w: 60 },
   { name: 'Rara', color: '#5fb8ff', mul: 1.4, w: 28 },
   { name: 'Épica', color: '#c77dff', mul: 1.8, w: 10 },
   { name: 'Heroica', color: '#ff7a3d', mul: 2.3, w: 2 },
+  { name: 'Dúo', color: '#7cffb0', mul: 1, w: 0 },
 ];
 const pct = (v) => Math.round(v * 100) + '%';
 
@@ -126,14 +131,15 @@ function spawnAltar() {
 function rollRarity() {
   const luck = has('ojoCertero') || has('tiradaDados') ? 4 : 0; // los favoritos de la suerte encuentran más rarezas
   let r = Math.random() * (100 + luck), acc = 0;
-  for (let i = BOON_RARITY.length - 1; i >= 0; i--) { acc += BOON_RARITY[i].w + (i ? luck / 3 : 0); if (r < acc) return i; }
+  for (let i = 3; i >= 0; i--) { acc += BOON_RARITY[i].w + (i ? luck / 3 : 0); if (r < acc) return i; }
   return 0;
 }
 let boonOffer = null;
 function openBoonPick(al) {
   const b = bst();
-  const list = Object.keys(BOONS).filter((id) => BOONS[id].god === al.god);
+  const list = Object.keys(BOONS).filter((id) => BOONS[id].god === al.god && BOONS[id].slot !== 'duo').sort(() => Math.random() - 0.5).slice(0, 3);
   boonOffer = { al, prev: state, opts: list.map((id) => ({ id, r: b.owned[id] ? b.owned[id].r : rollRarity() })) };
+  if (typeof injectDuo === 'function') injectDuo(boonOffer.opts, al.god);
   state = 'boon';
   clearInput();
   const G = GODS[al.god];
@@ -141,14 +147,14 @@ function openBoonPick(al) {
     const B = BOONS[o.id], R = BOON_RARITY[o.r], own = b.owned[o.id];
     const lvl = own ? own.lvl + 1 : 1;
     const x = boonX(o.id, o.r, lvl);
-    const repl = B.slot !== 'pas' && b.slots[B.slot] && b.slots[B.slot] !== o.id ? `<div class="bp-repl">Reemplaza: ${BOONS[b.slots[B.slot]].name}</div>` : '';
+    const repl = B.slot !== 'pas' && B.slot !== 'duo' && b.slots[B.slot] && b.slots[B.slot] !== o.id ? `<div class="bp-repl">Reemplaza: ${BOONS[b.slots[B.slot]].name}</div>` : '';
     return `<button class="bp-card" data-k="${k}" style="--c:${G.color};--r:${R.color}">
       <div class="bp-top"><span class="bp-slot">${BOON_SLOTS[B.slot]}</span><span class="bp-rar">${own ? 'Nivel ' + lvl : R.name}</span></div>
       <div class="bp-name">${B.name}</div>
       <div class="bp-desc">${B.d(x)}</div>${repl}</button>`;
   };
   $('boonPick').innerHTML = `<div class="bp-box" style="--c:${G.color}">
-    <div class="bp-head"><div class="bp-sym" style="background:radial-gradient(circle at 40% 35%, #fff8, ${G.color} 45%, #0008)">${G.sym}</div>
+    <div class="bp-head"><div class="bp-por"><img src="img/gods/${al.god}.webp" alt=""></div>
       <div><b>${G.name}</b><small>${G.title}</small><i>«${G.quote}»</i></div></div>
     <div class="bp-cards">${boonOffer.opts.map(card).join('')}</div></div>`;
   $('boonPick').classList.add('show');
@@ -158,9 +164,10 @@ function chooseBoon(k) {
   const o = boonOffer.opts[k], b = bst(), B = BOONS[o.id];
   if (b.owned[o.id]) b.owned[o.id].lvl++;
   else {
-    if (B.slot !== 'pas' && b.slots[B.slot]) delete b.owned[b.slots[B.slot]];
+    const slotted = B.slot !== 'pas' && B.slot !== 'duo';
+    if (slotted && b.slots[B.slot]) delete b.owned[b.slots[B.slot]];
     b.owned[o.id] = { r: o.r, lvl: 1 };
-    if (B.slot !== 'pas') b.slots[B.slot] = o.id;
+    if (slotted) b.slots[B.slot] = o.id;
   }
   b.altars = b.altars.filter((a) => a !== boonOffer.al);
   $('boonPick').classList.remove('show');
@@ -180,7 +187,7 @@ function buildBoonBar() {
   if (!b || !Object.keys(b.owned).length) { el.innerHTML = ''; el.classList.remove('show'); return; }
   el.innerHTML = Object.entries(b.owned).map(([id, o]) => {
     const B = BOONS[id], G = GODS[B.god];
-    return `<span title="${B.name}" style="--c:${G.color};--r:${BOON_RARITY[o.r].color}">${G.sym}${o.lvl > 1 ? `<i>${o.lvl}</i>` : ''}</span>`;
+    return `<span title="${B.name}" style="--c:${G.color};--r:${BOON_RARITY[o.r].color};background-image:url(img/gods/${B.god}.webp)">${o.lvl > 1 ? `<i>${o.lvl}</i>` : ''}</span>`;
   }).join('');
   el.classList.add('show');
 }
@@ -369,7 +376,7 @@ function boonUpdate(dt) {
       if (!S.story.seen.boons && typeof playDialog === 'function') {
         S.story.seen.boons = 1;
         const G = GODS[al.god];
-        SPEAKERS['god_' + al.god] = { name: G.name + ', ' + G.title, color: G.color, aura: G.rgb };
+        SPEAKERS['god_' + al.god] = { name: G.name + ', ' + G.title, color: G.color, aura: G.rgb, img: 'img/gods/' + al.god + '.webp' };
         playDialog([
           ['god_' + al.god, 'Soy ' + G.name + ', uno de los Doce. Los dioses de Fendaria no podemos cruzar las Grietas…'],
           ['god_' + al.god, '…pero sí podemos prestarte nuestro poder mientras estés dentro. Elige bien: mi bendición se desvanece cuando sales.'],
@@ -465,8 +472,13 @@ drawDecals = function () {
     ctx.strokeStyle = G.color; ctx.lineWidth = 2; ctx.beginPath(); ctx.ellipse(0, 0, 34, 14, 0, 0, TAU); ctx.stroke();
     ctx.fillStyle = '#4a4458'; ctx.fillRect(-12, -30, 24, 30); ctx.fillStyle = '#6a6478'; ctx.fillRect(-15, -34, 30, 6);
     ctx.restore();
-    glow(al.x, al.y - 58 + bob, 34, G.rgb, 0.9);
-    ctx.save(); ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(G.sym, al.x, al.y - 58 + bob); ctx.restore();
+    glow(al.x, al.y - 62 + bob, 40, G.rgb, 0.9);
+    const gi = GOD_IMG[al.god];
+    if (gi) {
+      ctx.save(); ctx.beginPath(); ctx.arc(al.x, al.y - 62 + bob, 22, 0, TAU); ctx.clip();
+      ctx.drawImage(gi, al.x - 22, al.y - 84 + bob, 44, 44); ctx.restore();
+      ctx.strokeStyle = G.color; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(al.x, al.y - 62 + bob, 22, 0, TAU); ctx.stroke();
+    } else { ctx.save(); ctx.font = '22px serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(G.sym, al.x, al.y - 62 + bob); ctx.restore(); }
     if (Math.random() < 0.3) particles.push({ kind: 'glowdot', x: al.x + rand(-20, 20), y: al.y - rand(0, 20), vx: 0, vy: rand(-60, -30), life: 0.8, max: 0.8, rgb: G.rgb, size: 3, grav: 0 });
   }
   for (const s of b.spirits) {
