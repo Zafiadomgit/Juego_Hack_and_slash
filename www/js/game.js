@@ -172,6 +172,8 @@ function loadAudio(url) {
 // ============================================================
 // Música: pistas en bucle con fundido cruzado (www/audio/music, generadas con tools/audio/compose.py)
 // ============================================================
+// mundos sin pista propia: usan la de un mundo parecido
+const MUSIC_ALIAS = {};
 const MUSIC = {
   ac: null, out: null, cur: null, want: null, vol: 0.55, duck: 1,
   attach(ac, master) {
@@ -184,7 +186,7 @@ const MUSIC = {
     if (this.cur && this.cur.name === name && !opts.restart) return;
     const token = {};
     this.token = token;
-    loadAudio('audio/music/' + name + '.ogg').then((buf) => {
+    loadAudio('audio/music/' + (MUSIC_ALIAS[name] || name) + '.ogg').then((buf) => {
       if (this.token !== token) return; // llegó otra petición mientras cargaba
       const c = this.ac, fade = opts.fade ?? 1.2, now = c.currentTime;
       const src = c.createBufferSource(), g = c.createGain();
@@ -1183,7 +1185,7 @@ function updateBossBouftou(e, dt, d, ux, uy, sp) {
       const n = e.enraged ? 4 : 3;
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2;
-        const m = spawnEnemy(Math.random() < 0.3 ? 'tofu' : 'bouftou', e.x + Math.cos(a) * 70, e.y + Math.sin(a) * 70);
+        const m = spawnEnemy(rift.biome.id === 'ceniza' || !rift.biome.minion ? (Math.random() < 0.3 ? 'tofu' : 'bouftou') : rift.biome.minion, e.x + Math.cos(a) * 70, e.y + Math.sin(a) * 70);
         poof(m.x, m.y);
       }
       e.state = 'move'; e.st = 2;
@@ -1226,7 +1228,7 @@ function updateBossTofu(e, dt, d, ux, uy, sp) {
       const n = e.enraged ? 6 : 4;
       for (let i = 0; i < n; i++) {
         const a = (i / n) * Math.PI * 2;
-        const m = spawnEnemy('tofu', e.x + Math.cos(a) * 60, e.y + Math.sin(a) * 60);
+        const m = spawnEnemy(rift.biome.minion || 'tofu', e.x + Math.cos(a) * 60, e.y + Math.sin(a) * 60);
         poof(m.x, m.y);
       }
       e.state = 'move'; e.st = 1.8;
@@ -1487,7 +1489,7 @@ function spawnPack() {
   const eliteIdx = rift.isDungeon ? (Math.random() < 0.8 ? 0 : -1) : rift.elapsed > 15 && Math.random() < Math.min(0.45, 0.12 + rift.threat * 0.03) ? 0 : -1;
   for (let i = 0; i < n; i++) {
     let type = weightedPick(types);
-    if (early && type === 'craqueleur') type = 'bouftou';
+    if (early && ENEMIES[type].hp > 100) type = Object.keys(rift.biome.weights).find((k) => ENEMIES[k].hp <= 100) || type;
     const e = spawnEnemy(type, p.x + rand(-50, 50), p.y + rand(-50, 50), { elite: i === eliteIdx });
     poof(e.x, e.y);
   }
@@ -1564,11 +1566,12 @@ function updateSuper(e, dt) {
   if (e.sCd > 0 || e.spawnT > 0) return;
   e.sCd = [7, 5.5, 4][e.phase];
   const n = 5 + e.phase * 3;
+  if (typeof SUPER_MOVES !== 'undefined' && SUPER_MOVES[sd.move]) { SUPER_MOVES[sd.move](e, 1 + e.phase); return; }
   if (sd.move === 'meteor') {
     for (let i = 0; i < n; i++) { const a = rand(0, TAU), r = i === 0 ? 0 : rand(60, 220); addHazard('meteor', P.x + Math.cos(a) * r, P.y + Math.sin(a) * r, 64, 1.0 + i * 0.1, e.dmg * 1.2, { src: e }); }
   } else if (sd.move === 'brood') {
     for (let i = 0; i < 2 + e.phase; i++) { const a = rand(0, TAU); addHazard('web', P.x + Math.cos(a) * rand(0, 160), P.y + Math.sin(a) * rand(0, 160), 90, 0.4, 0, { linger: 5, src: e }); }
-    for (let i = 0; i < 3 + e.phase * 2; i++) { const a = (i / 5) * TAU; const m = spawnEnemy('arakne', e.x + Math.cos(a) * 70, e.y + Math.sin(a) * 70); poof(m.x, m.y); }
+    for (let i = 0; i < 3 + e.phase * 2; i++) { const a = (i / 5) * TAU; const m = spawnEnemy(rift.biome.id === 'pantano' ? 'arakne' : rift.biome.minion || 'arakne', e.x + Math.cos(a) * 70, e.y + Math.sin(a) * 70); poof(m.x, m.y); }
   } else if (sd.move === 'nova') {
     for (const [R, t] of [[150, 0.7], [270, 1.0], [390, 1.3]].slice(0, 1 + e.phase)) {
       const cnt = Math.round(R / 22);

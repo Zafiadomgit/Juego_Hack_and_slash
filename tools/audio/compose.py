@@ -170,6 +170,22 @@ TRACKS = {
                    bass=('bass', -1, 0.5, [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]), melodies=[('brass', 0.26, 55, 72, 4, 81)],
                    drums=[('taiko', 0.85, 'X..x..X.X..x..X.'), ('kick', 0.5, 'X...X...X...X...'), ('snare', 0.25, '....X.......X...')],
                    crash_every=4, rt=2.4),
+    # Ciudad Hundida: melancólico y acuático (la dórico), marimba y celesta, coro lejano
+    'hundida': dict(bpm=88, bars=16, root=57, scale='dorian', prog=[0, 6, 3, 4, 0, 6, 5, 4], seed=101,
+                    pads=[('choir', 0, 0.3), ('strings', -1, 0.25)], arps=[('celesta', 1, 0.22, [0, 2, 1, 3, 2, 1, 0, 2], 0.5)],
+                    bass=('bass', -1, 0.35, [2, 2]), melodies=[('flute', 0.26, 64, 83, 4, 103), ('bell', 0.1, 76, 90, 8, 104)],
+                    drums=[('doum', 0.3, 'X.......X..x....'), ('tek', 0.12, '....x.......x...')], rt=3.6),
+    # Bosque de Cristal: brillante y extraño (si lidio), campanas, arpa y cuerdas
+    'cristal': dict(bpm=100, bars=16, root=59, scale='lydian', prog=[0, 1, 4, 5, 0, 1, 3, 4], seed=107,
+                    pads=[('strings', 0, 0.35), ('choir', 0, 0.15)], arps=[('harp', 1, 0.24, [0, 1, 2, 3, 2, 1, 2, 3], 0.25)],
+                    bass=('pizz', -1, 0.4, [1, 1, 1, 1]), melodies=[('bell', 0.2, 71, 90, 4, 109), ('flute', 0.2, 66, 85, 8, 110)],
+                    drums=[('tek', 0.18, 'x.x.x.x.x.x.x.x.'), ('doum', 0.35, 'X.....X.....X...')], rt=3.0),
+    # Ciudadela del Cerrajero: marcial y siniestro (do# menor armónica), coro, metales y tambores
+    'ciudadela': dict(bpm=132, bars=16, root=49, scale='harm', prog=[0, 1, 5, 4, 0, 1, 3, 4], seed=113,
+                      pads=[('choir', 0, 0.4), ('strings', -1, 0.3)], arps=[('spic', 0, 0.26, [0, 1, 0, 2, 0, 1, 0, 3], 0.25)],
+                      bass=('bass', -1, 0.55, [0.5] * 8), melodies=[('brass', 0.3, 56, 73, 2, 117), ('choir', 0.12, 61, 78, 8, 118)],
+                      drums=[('taiko', 0.8, 'X..X..X.X..X..X.'), ('kick', 0.5, 'X...X...X...X...'), ('snare', 0.3, '....X.......X.X.')],
+                      crash_every=4, timpani_every=8, rt=2.4),
     # Guardianes: combate rápido (la menor armónica)
     'boss': dict(bpm=150, bars=16, root=57, scale='harm', prog=[0, 5, 6, 4], seed=23,
                  pads=[('strings', -1, 0.3)], arps=[('spic', 0, 0.28, [0, 0, 1, 0, 2, 0, 1, 0], 0.25)],
@@ -193,7 +209,9 @@ TRACKS = {
 
 def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
+    only = sys.argv[2:]  # opcional: solo estas pistas
     for name, spec in TRACKS.items():
+        if only and name not in only: continue
         wav = os.path.join(out_dir, name + '.wav')
         dur = render_track(spec, wav)
         ogg = os.path.join(out_dir, name + '.ogg')

@@ -952,14 +952,14 @@ function drawEnemy(e) {
     ctx.globalAlpha = 1 - e.spawnT / 0.35;
   }
   // telegrafías en el suelo
-  if (e.type === 'craqueleur' && e.state === 'wind') {
+  if (e.ai === 'slammer' && e.state === 'wind') {
     teleCircle(e.x, e.y, 110, 1 - e.st / e.max);
   }
-  if ((e.type === 'bouftouRoyal' || e.type === 'reinaTeje') && e.state === 'leap') {
-    const k = 1 - e.st / e.max, R = e.type === 'reinaTeje' ? 150 : 170;
+  if ((e.ai === 'boss' || e.ai === 'bossSpider') && e.state === 'leap') {
+    const k = 1 - e.st / e.max, R = e.ai === 'bossSpider' ? 150 : 170;
     teleCircle(e.tx, e.ty, R, k);
   }
-  if (e.type === 'hechicero' && (e.state === 'cast' || e.state === 'spiral')) {
+  if (e.ai === 'bossMage' && (e.state === 'cast' || e.state === 'spiral')) {
     ctx.save();
     ctx.translate(e.x, e.y); ctx.scale(1, 0.45); ctx.rotate(now * 2);
     ctx.globalCompositeOperation = 'lighter';
@@ -967,7 +967,7 @@ function drawEnemy(e) {
     for (let i = 0; i < 6; i++) { const a = (i / 6) * TAU; circle(Math.cos(a) * e.r * 2.2, Math.sin(a) * e.r * 2.2, 4, 'rgba(230,180,255,0.9)'); }
     ctx.restore();
   }
-  if (e.type === 'tofuRoyal' && e.state === 'wind') {
+  if (e.ai === 'bossTofu' && e.state === 'wind') {
     teleLine(e.x, e.y, Math.atan2(e.cdy || 0, e.cdx || 1), 420, 56, 1 - e.st / (e.max || 0.8));
   }
   if (e.elite) {
@@ -977,8 +977,8 @@ function drawEnemy(e) {
     circle(0, 0, e.r + 10 + Math.sin(now * 6) * 2, null, e.elite.color, 4);
     ctx.restore();
   }
-  if ((e.type === 'bouftou' || e.type === 'bouftouRoyal') && e.state === 'wind') {
-    teleLine(e.x, e.y, Math.atan2(e.cdy || 0, e.cdx || 1), e.type === 'bouftouRoyal' ? 270 : 170, e.r * 1.6, 1 - e.st / 0.6);
+  if ((e.ai === 'charger' || e.ai === 'boss') && e.state === 'wind') {
+    teleLine(e.x, e.y, Math.atan2(e.cdy || 0, e.cdx || 1), e.boss ? 270 : 170, e.r * 1.6, 1 - e.st / 0.6);
   }
 
   // estela de la embestida
@@ -1212,7 +1212,7 @@ function drawMonsterBody(e) {
   if (e.atkT > 0) { const kk = Math.sin((1 - e.atkT / 0.25) * Math.PI) * e.r * 0.55 * (e.atkDir || 1); lx = Math.cos(e.atkA) * kk; ly = Math.sin(e.atkA) * kk * 0.6; }
   // flotar (espíritus) y corretear (arañas)
   if (e.ct === undefined) {
-    if (e.type === 'tofu') ly -= 3 + Math.sin(e.t * 6 + e.seed) * 3;
+    if (e.type === 'tofu' || e.D.float) ly -= 3 + Math.sin(e.t * 6 + e.seed) * 3;
     if (e.type === 'hechicero') ly -= 6 + Math.sin(e.t * 2) * 5;
   }
   ctx.save();

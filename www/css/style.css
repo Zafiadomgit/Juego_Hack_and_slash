@@ -693,3 +693,6 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .hub-btns { gap: 12px; }
 .ibtn { display: inline-flex; align-items: center; gap: 6px; }
 .ibtn img { width: 24px; height: 24px; image-rendering: pixelated; }
+.hub-card .hubQuest { grid-column: 1 / -1; margin-top: 3px; font-size: 11px; color: #c9c3ae; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hub-card .hubQuest b { color: #ffb070; }
+.bp-reroll { margin: 10px auto 0; display: block; }

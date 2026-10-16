@@ -410,7 +410,7 @@ const WARES = {
   } },
   vigor: { name: 'Corazón de Grieta', icon: '❤', d: '<b>+15%</b> de vida máxima hasta salir de la Grieta.', k: 10, ok: () => true, buy: () => { bst().vigor = (bst().vigor || 0) + 0.15; recalc(); heal(Math.round(P.maxHp * 0.15)); } },
 };
-const warePrice = (id) => Math.round(WARES[id].k * (6 + rift.level * 3));
+function warePrice(id) { return Math.round(WARES[id].k * (6 + rift.level * 3)); }
 function spawnMerchant() {
   const b = bst();
   let x = P.x, y = P.y;

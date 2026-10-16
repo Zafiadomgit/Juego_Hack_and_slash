@@ -18,6 +18,8 @@ const PROP_DECO = {
   glaciar: { iceshard: 'shard' },
   desierto: { bones: 'skull' },
   dungeon: { bones: 'bonepile' },
+  cristal: { glowshroom: 'shroom' },
+  ciudadela: { bones: 'bonepile' },
 };
 
 // Número estable a partir de la posición (variante y volteo fijos para cada objeto)
@@ -57,7 +59,7 @@ function drawPropSprite(o, kind) {
   const h = blitProp(fr, o.x, o.y, scale);
   if (kind === 'brazier') {
     const fl = 0.8 + Math.sin(now * 13 + o.ph) * 0.12 + Math.sin(now * 7.3 + o.ph) * 0.08;
-    glow(o.x, o.y - h * 0.8, 26 * fl, curBiome().id === 'glaciar' && !rift.isDungeon ? '120,190,255' : rift.isDungeon && o.ph > 3 ? '200,90,255' : '255,150,60', 0.7);
+    glow(o.x, o.y - h * 0.8, 26 * fl, rift.isDungeon ? (o.ph > 3 ? '200,90,255' : '255,150,60') : ({ glaciar: '120,190,255', hundida: '90,190,255', cristal: '210,170,255', ciudadela: '200,90,255' })[curBiome().id] || '255,150,60', 0.7);
     if (Math.random() < 0.25) particles.push({ kind: 'glowdot', x: o.x + rand(-4, 4), y: o.y - h * 0.85, vx: rand(-8, 8), vy: rand(-60, -30), life: 0.6, max: 0.6, rgb: '255,170,70', size: 3, grav: 0 });
   }
   return true;

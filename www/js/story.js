@@ -16,7 +16,10 @@ const CHAPTERS = [
   { title: 'El invierno que no termina', goal: 'Sube al Glaciar Rúnico y vence al Titán del Invierno Eterno' },
   { title: 'Las arenas de ámbar', goal: 'Cruza el Desierto de Ámbar y apaga al Fénix corrompido' },
   { title: 'El Cerrajero', goal: 'Desciende al Abismo del Vacío y derrota al Archimago' },
-  { title: 'La Cámara del Cerrajero', goal: 'Persigue a Morvhal piso a piso en la Mazmorra' },
+  { title: 'La ciudad bajo el mar', goal: 'Desciende a la Ciudad Hundida y derrota a Nereth, Heraldo de la Marea', act: 2 },
+  { title: 'El bosque que canta', goal: 'Atraviesa el Bosque de Cristal y vence a Lysara, Heraldo del Prisma', act: 2 },
+  { title: 'La Ciudadela del Cerrajero', goal: 'Asalta la Ciudadela y derrota a Morvhal, el Cerrajero', act: 3 },
+  { title: 'Epílogo: la llave rota', goal: 'Las Grietas se calman. Explora la Mazmorra en busca de reliquias', act: 3 },
 ];
 
 // Voz de cada héroe en los momentos clave
@@ -123,13 +126,71 @@ const SCENES = {
     ['hero', () => heroLine('boss')],
   ],
   win4: [
-    ['ivo', 'Lo has conseguido. Los cinco Sellos brillan otra vez. Las Grietas… se están calmando.'],
-    ['hero', 'Morvhal no murió. Lo sentí escapar hacia abajo, más hondo que el Abismo.'],
-    ['ivo', 'La Cámara del Cerrajero. Una prisión bajo las prisiones, piso tras piso. La Orden la llamaba la Mazmorra.'],
-    ['ivo', 'Allí guardaba las reliquias que robó a los reyes antiguos. Y allí se esconde ahora, recuperando fuerzas.'],
-    ['tobias', 'Reliquias de reyes, ¿eh? Tráemelas y verás de lo que es capaz este yunque.'],
+    ['ivo', 'Lo has conseguido. Los cinco Sellos brillan otra vez.'],
+    ['hero', 'Pero Morvhal no murió. Lo sentí escapar… y no estaba solo.'],
+    ['god_tiempo', 'No lo estaba, pequeña luz. Soy Kronael. Los Doce hemos observado tu viaje desde el otro lado.'],
+    ['god_tiempo', 'Morvhal tiene dos Heraldos. Al romperse los Sellos abrieron Grietas nuevas: una bajo el mar, otra en un bosque de cristal.'],
+    ['god_tiempo', 'Mientras ellos vivan, Morvhal puede reconstruir su Ciudadela. Ciérrales el paso, y nosotros te abriremos la puerta final.'],
+    ['ivo', '¿Un dios… en mi plaza? Trescientos años y aún me sorprendo.'],
+    ['tobias', 'Y bajo el Portal sigue la Mazmorra, llena de reliquias de reyes. Tráemelas y verás de lo que es capaz este yunque.'],
     ['brunilda', 'Villa Candela te debe la vida, {hero}. Aunque te lo seguiré cobrando todo.'],
-    ['ivo', 'Descansa. Cuando estés listo, el Portal te llevará a la Mazmorra. Morvhal te estará esperando.'],
+  ],
+  enter5: [
+    ['voz', 'Bienvenido a Aelmar, la ciudad que el mar se tragó. Mi señor la hundió hace trescientos años.'],
+    ['nereth', 'Soy Nereth, Heraldo de la Marea. Cada ola que rompe aquí lleva un pedazo de la Ciudadela de Morvhal.'],
+    ['hero', 'Entonces cortaré las olas.'],
+    ['god_escudo', 'Aldemar te acompaña, {hero}. El agua no aplasta lo que no se dobla.'],
+  ],
+  boss5: [
+    ['nereth', 'La marea siempre vuelve. Siempre. Y esta vez te arrastrará con ella.'],
+    ['hero', () => heroLine('boss')],
+  ],
+  win5: [
+    ['ivo', 'El mar se ha retirado de la Grieta. Uno de los Heraldos ha caído.'],
+    ['god_cura', 'Soy Lunessa. Nereth era un pescador de Aelmar al que Morvhal prometió devolver a su familia. Ahora descansa.'],
+    ['hero', 'Morvhal compra a la gente con lo que más quieren.'],
+    ['god_cura', 'Así compró también a Lysara, la cantora del bosque. Ve con cuidado: su canto convierte la carne en cristal.'],
+    ['tobias', 'Cristal, ¿eh? Pues afila bien, que el cristal se raya.'],
+  ],
+  enter6: [
+    ['lysara', '¿Oyes eso? Es el bosque cantando. Antes era de madera y hojas. Ahora es eterno, como yo.'],
+    ['hero', 'Eterno y muerto.'],
+    ['lysara', 'Morvhal me dio lo que los dioses me negaron: que nada que amo vuelva a marchitarse.'],
+    ['god_bosque', 'Silvano escucha, {hero}. Este bosque era mío. Libéralo y te daré la fuerza de sus raíces.'],
+  ],
+  boss6: [
+    ['lysara', 'Quédate. Conviértete en cristal conmigo. Serás bello para siempre.'],
+    ['hero', () => heroLine('boss')],
+  ],
+  win6: [
+    ['ivo', 'Los dos Heraldos han caído. Puedo sentirlo: la Ciudadela ya no tiene muros que la protejan.'],
+    ['god_ira', '¡Ja! Soy Brakkar. Hace siglos que no veía a un mortal pelear así. Los Doce abrimos la última Grieta para ti.'],
+    ['god_tiempo', 'Al otro lado está la Ciudadela del Cerrajero. Morvhal te espera con su Carcelero y con su llave.'],
+    ['ivo', '{hero}… la llave de Morvhal abre cualquier puerta. Incluso la que separa este mundo de la Fendaria Antigua.'],
+    ['ivo', 'Si la gira, las Grietas no se cerrarán nunca. Rómpela.'],
+    ['brunilda', 'Y vuelve. Que me debes una espada con tu nombre.'],
+  ],
+  enter7: [
+    ['morvhal', 'Has llegado. Ni la Orden llegó tan lejos.'],
+    ['morvhal', 'Mira a tu alrededor: esta Ciudadela es una cerradura del tamaño de una montaña. Y yo tengo la llave.'],
+    ['hero', () => heroLine('final')],
+    ['morvhal', 'Antes tendrás que pasar por mi Carcelero. Él guarda a todos los que se me opusieron… incluidos los doce runistas.'],
+  ],
+  boss7: [
+    ['morvhal', 'Trescientos años girando una cerradura. No voy a soltarla ahora.'],
+    ['god_tiempo', 'Los Doce estamos contigo, {hero}. Por primera vez, todos a la vez.'],
+    ['hero', () => heroLine('boss')],
+    ['morvhal', '¡ENTONCES ABRIRÉ LA PUERTA CONTIGO DENTRO!'],
+  ],
+  win7: [
+    ['morvhal', 'La llave… se rompe. No. No…'],
+    ['god_tiempo', 'Se acabó, Morvhal. El tiempo que robaste vuelve a su sitio.'],
+    ['ivo', '{hero}. Las Grietas se están cerrando. Todas. Lo has conseguido.'],
+    ['ivo', 'Y yo… siento cómo pasan los años. Trescientos de golpe. No te preocupes: es lo justo. Por fin descansaré.'],
+    ['god_cura', 'Todavía no, viejo amigo. Lunessa te concede los años que te quedan, como un mortal más. Vívelos.'],
+    ['tobias', 'Una llave rota de Cerrajero… voy a necesitar una forja más grande.'],
+    ['brunilda', 'Espada con tu nombre, {hero}. De las caras. Invita la casa… por esta vez.'],
+    ['god_ira', 'Las Grietas menores seguirán abriéndose de vez en cuando, y la Mazmorra está llena de reliquias. ¡Que no se te oxide el arma!'],
   ],
   dungeon: [
     ['ivo', 'Esto es la Cámara del Cerrajero. Cada piso es más hondo… y más peligroso que el anterior.'],
@@ -146,6 +207,10 @@ const CHATTER = {
     'Trescientos años… y yo pensando que Ivo se teñía la barba.',
     'Si vuelves del Abismo, prometo ponerle tu nombre a una espada. A una barata, pero con tu nombre.',
     'Desde que los Sellos brillan, vienen mercaderes de todo el reino. ¡La competencia! Compra ahora, antes de que me arruine.',
+    '¿Una ciudad entera bajo el mar? Si ves cofres, ábrelos. Si ves perlas, son mías.',
+    'Cristal que canta… ¿se podrá vender? Pregunto por un cliente.',
+    'No pienso decirte que tengas cuidado en la Ciudadela. Te lo diré cuando vuelvas, que da mala suerte.',
+    'Ahora que las Grietas se calman, el negocio de las reliquias está que arde. ¡La Mazmorra, querido, la Mazmorra!',
   ],
   alchemist: [
     'El ámbar de las Grietas es luz cristalizada. Con él preparo elixires… y otras cosas que es mejor no preguntar.',
@@ -154,6 +219,10 @@ const CHATTER = {
     'Gracias por no mirarme raro desde que lo sabes. Bueno, menos raro que antes.',
     'El Archimago me enseñó a leer runas. Era un buen hombre. Libéralo, {hero}.',
     'He vivido trescientos años esperando este final. Ahora resulta que solo era el principio.',
+    'Aelmar… la ciudad hundida. Allí nací yo, ¿sabes? Hace mucho. Si ves la torre del faro, salúdala de mi parte.',
+    'El canto de Lysara convierte la carne en cristal. Bebe antes de entrar: los elixires ayudan.',
+    'Los doce runistas… el Carcelero los guarda. Si vuelves con ellos, te deberé algo más que gratitud.',
+    'Cada día me salen canas nuevas. ¡Qué maravilla! Siéntate, que te preparo algo.',
   ],
   smith: [
     'Tráeme lo que no uses: lo fundo en Fragmentos. Con Fragmentos refino tus armas. Así funciona el mundo.',
@@ -162,6 +231,10 @@ const CHATTER = {
     'Kara, la de la herrería del este… su padre me enseñó todo lo que sé. Gente de hierro, aquella.',
     'Si vuelves del Abismo con el arma rota, te forjo otra gratis. Si no vuelves… bueno, no pienso en eso.',
     'Las reliquias de la Mazmorra no se pueden ascender ni reforjar. Pero refinarlas… eso sí. Tráemelas.',
+    'El salitre se come el acero. Pásate después de la Ciudad Hundida y te lo dejo como nuevo.',
+    'Cristal contra acero… gana el que golpea primero. Refina eso.',
+    'Te he dejado el mejor temple de mi vida en esa arma. No me la traigas rota.',
+    'Con la llave de Morvhal fundida voy a hacer algo grande. Todavía no sé qué. Algo grande.',
   ],
 };
 
@@ -360,7 +433,9 @@ goHub = function () {
       if (superDone(b) && playScene('win' + b, { b }, {
         onEnd: () => {
           buildHub();
-          if (b === BIOMES.length - 1) showStoryCard('Fin del Acto I', 'La Mazmorra del Cerrajero te espera bajo el Portal Rúnico');
+          if (b === BIOMES.length - 1) showStoryCard('Fin', 'Morvhal ha caído. La Mazmorra guarda aún sus reliquias');
+          else if (b === 4) showStoryCard('Acto II · Los Heraldos', CHAPTERS[5].title);
+          else if (b === 6) showStoryCard('Acto III · El Cerrajero', CHAPTERS[7].title);
           else showStoryCard('Capítulo ' + (b + 2), CHAPTERS[b + 1].title);
         },
       })) return;
@@ -386,7 +461,7 @@ villageInteract = function (what) {
   const who = what && what.id && NPC_SPEAKER[what.id];
   if (!who) return _villageInteract(what);
   vHero.target = null; vHero.pending = null;
-  const ch = Math.min(storyChapter(), 5);
+  const ch = Math.min(storyChapter(), 8);
   playDialog([[who, CHATTER[what.id][ch]]], {
     choices: [
       { label: what.id === 'smith' ? '⚒ Herrería' : what.id === 'alchemist' ? '⚗ Elixires y mejoras' : '🛒 Comerciar', fn: () => _villageInteract(what) },
@@ -402,7 +477,7 @@ buildHub = function () {
   const ch = Math.min(storyChapter(), CHAPTERS.length - 1);
   const card = $('hubChar');
   const old = card.querySelector('.hubStory'); if (old) old.remove();
-  card.insertAdjacentHTML('beforeend', `<button class="hubStory" type="button" title="${CHAPTERS[ch].goal}"><b>📖 ${ch < 5 ? 'Cap. ' + (ch + 1) : 'Epílogo'}</b><span>${CHAPTERS[ch].goal}</span></button>`);
+  card.insertAdjacentHTML('beforeend', `<button class="hubStory" type="button" title="${CHAPTERS[ch].goal}"><b>📖 ${ch < 8 ? 'Cap. ' + (ch + 1) : 'Epílogo'}</b><span>${CHAPTERS[ch].goal}</span></button>`);
   card.querySelector('.hubStory').onclick = (ev) => { ev.currentTarget.classList.toggle('open'); };
 };
 
@@ -410,7 +485,7 @@ buildHub = function () {
 function showStoryCard(title, sub) {
   const el = document.createElement('div');
   el.className = 'story-card';
-  el.innerHTML = `<small>Fendaria · Acto I</small><b>${title}</b><span>${sub}</span>`;
+  el.innerHTML = `<small>Fendaria · Acto ${['I', 'I', 'I', 'I', 'I', 'II', 'II', 'III', 'III'][Math.min(storyChapter(), 8)]}</small><b>${title}</b><span>${sub}</span>`;
   document.body.appendChild(el);
   SFX.play('legend');
   setTimeout(() => el.classList.add('out'), 3200);

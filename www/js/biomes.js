@@ -56,8 +56,8 @@ const BIOME_TEX = new Map();
 // del ruido procedural. GROUND_TILE = unidades de mundo que ocupa una repetición de la textura.
 const GROUND_TILE = 420;
 const GROUND_IMG = {};
-const GROUND_SIZE = { dungeon: 380, ceniza: 600, pantano: 600, glaciar: 600, desierto: 600, abismo: 600 }; // unidades de mundo por repetición (6×6 losas en la Mazmorra)
-['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza', 'dungeon', 'grass', 'path'].forEach((id) => {
+const GROUND_SIZE = { dungeon: 380, ceniza: 600, pantano: 600, glaciar: 600, desierto: 600, abismo: 600, hundida: 600, cristal: 600, ciudadela: 600 }; // unidades de mundo por repetición (6×6 losas en la Mazmorra)
+['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza', 'dungeon', 'grass', 'path', 'hundida', 'cristal', 'ciudadela'].forEach((id) => {
   const img = new Image();
   img.onload = () => {
     GROUND_IMG[id] = img;
