@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "preferences": {
+    "flow": {
+      "value": "automation",
+      "confirmed_in": [
+        "cinematicas"
+      ],
+      "updated_at": "2026-10-16T17:30:15.306Z"
+    },
+    "storyboard": {
+      "value": "yes",
+      "confirmed_in": [
+        "cinematicas"
+      ],
+      "updated_at": "2026-10-16T17:30:15.379Z"
+    }
+  },
+  "sightings": {}
+}
