@@ -696,3 +696,38 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .hub-card .hubQuest { grid-column: 1 / -1; margin-top: 3px; font-size: 11px; color: #c9c3ae; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .hub-card .hubQuest b { color: #ffb070; }
 .bp-reroll { margin: 10px auto 0; display: block; }
+
+/* ---------- Interfaz 2.ª generación: iconos pintados, venta en lote, mapa ---------- */
+.pico { display: block; image-rendering: auto; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .7)); pointer-events: none; }
+.pico.ghost { opacity: .22; filter: grayscale(1) brightness(1.4); }
+.sh-grid { grid-template-columns: repeat(auto-fill, minmax(54px, 1fr)); grid-auto-rows: 54px; gap: 6px; }
+.cell { border-radius: 10px; }
+.cell .pico { width: 86%; height: 86%; }
+.cell.r1 .pico, .slot.r1 .pico { filter: drop-shadow(0 0 4px rgba(79, 180, 240, .7)); }
+.cell.r2 .pico, .slot.r2 .pico { filter: drop-shadow(0 0 5px rgba(192, 124, 240, .8)); }
+.cell.r3 .pico, .slot.r3 .pico { filter: drop-shadow(0 0 7px rgba(255, 170, 60, .95)); }
+.slot .pico { width: 82%; height: 82%; }
+.cell .up { right: 3px; top: 1px; font-size: 13px; color: #9cff6a; }
+.cell .chk { display: none; position: absolute; left: 3px; top: 2px; width: 18px; height: 18px; border-radius: 50%; font: 900 12px/18px Nunito, sans-serif; font-style: normal; text-align: center; background: #141b30; color: #141b30; border: 2px solid #8d90a8; }
+#bagGrid .cell .chk { display: block; }
+#bagGrid .cell.picked { outline: 3px solid #ffd54f; outline-offset: -1px; filter: brightness(1.15); }
+#bagGrid .cell.picked .chk { background: #ffd54f; border-color: #ffd54f; }
+#bagGrid .cell.prot { opacity: .75; }
+.sell-bar { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.sell-chips { display: flex; gap: 4px; flex-wrap: wrap; align-items: center; font-size: 12px; color: #c9c3ae; }
+.sell-chips button { padding: 3px 8px; border-radius: 12px; border: 1px solid #7d7660; background: #1d2644; color: #ece8dc; font: 700 12px Garamond, Georgia, serif; cursor: pointer; }
+.sell-go { display: flex; gap: 6px; }
+.sell-go .sh-sell { flex: 1; }
+.sell-go .sh-sell.auto:not([disabled]) { border-color: #ffd54f; color: #2a1a0c; background: linear-gradient(180deg, #ffe38a, #e0a830); }
+.sell-go .sh-sell svg { width: 14px; height: 14px; vertical-align: -2px; }
+.hgem { display: inline-block; width: 16px; height: 16px; }
+.mi-gems .pico { flex: none; }
+.gp-slots .pico, .gp-list .pico { margin: auto; }
+/* mapa */
+.map-tabs button.wtab { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px 3px 4px; }
+.wmed { border-radius: 50%; flex: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .7)); }
+.map-tabs button.lock .wmed { filter: grayscale(1) brightness(.6); }
+.mnode { background: radial-gradient(circle at 40% 30%, #6a6a7a, #2a2a38 70%); border: 3px solid #d6bf86; box-shadow: 0 5px 0 #141018, 0 8px 14px rgba(0, 0, 0, .6), inset 0 2px 0 rgba(255, 255, 255, .25); text-shadow: 0 2px 2px #000; }
+.mnode.sel { border-color: #ffd76a; }
+.mnode.boss { overflow: visible; padding: 0; }
+.mnode.boss img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; display: block; }

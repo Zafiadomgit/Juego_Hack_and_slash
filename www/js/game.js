@@ -2531,7 +2531,7 @@ function buildHub() {
   $('hubChar').innerHTML = `
     <div class="hc-face" style="${face ? `background-image:url(${face})` : ''}"><b>${S.level}</b></div>
     <div class="hc-main">
-      <div class="hc-name">${C.name}${transRank() ? ` <i>✦${transRank()}</i>` : ''}<span class="hc-gems">${S.gemSlots.map((k) => `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</span></div>
+      <div class="hc-name">${C.name}${transRank() ? ` <i>✦${transRank()}</i>` : ''}<span class="hc-gems">${S.gemSlots.map((k) => k && typeof gemImg === 'function' ? `<span class="hgem" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 16)}</span>` : `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</span></div>
       <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
       <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span><span>${SEAL_SVG}${fmtNum(seals())}</span><span>🧪${S.pan}/${panMax()}</span><span>🎒${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
     </div>`;
@@ -2711,7 +2711,7 @@ function buildMapInfo() {
     ${diffs}
     ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
     <div class="mi-gl">Gemas que puedes conseguir aquí</div>
-    <div class="mi-gems">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 18)}<b>${GEMS[k].name}</b><small>${S.dofus.includes(k) ? '✔ ya la tienes' : GEMS[k].desc}</small></span>`).join('')}</div>
+    <div class="mi-gems">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].desc}">${gemImg(k, 26)}<b>${GEMS[k].name}</b><small>${S.dofus.includes(k) ? '✔ ya la tienes' : GEMS[k].desc}</small></span>`).join('')}</div>
     <div class="mi-rows">
       <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
@@ -2778,11 +2778,11 @@ function openGems(slot) {
   card.innerHTML = `<div class="gem-panel" role="dialog">
     <header><b>Gemas Ancestrales</b><span>${S.dofus.length}/${Object.keys(GEMS).length}</span><button class="sh-close" id="gpClose">✕</button></header>
     <p class="gp-help">Engarza hasta ${S.gemSlots.length} gemas: solo las engarzadas dan su bonus y puedes cambiarlas cuando quieras. Se consiguen al vencer al Guardián del mundo de cada gema (mira en el mapa la probabilidad).</p>
-    <div class="gp-slots">${S.gemSlots.map((k, i) => `<button data-gs="${i}" class="${i === gemSel ? 'on' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}">${k ? iconSVGColor(GEMS[k].color, 26) + '<small>' + GEMS[k].name + '</small>' : '<small>Hueco libre</small>'}</button>`).join('')}</div>
+    <div class="gp-slots">${S.gemSlots.map((k, i) => `<button data-gs="${i}" class="${i === gemSel ? 'on' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}">${k ? gemImg(k, 26) + '<small>' + GEMS[k].name + '</small>' : '<small>Hueco libre</small>'}</button>`).join('')}</div>
     <div class="gp-list">${Object.keys(GEMS).map((k) => {
       const own = S.dofus.includes(k), on = S.gemSlots.includes(k);
       return `<div class="gp-gem ${own ? '' : 'locked'} ${on ? 'on' : ''}" style="--c:${GEMS[k].color}">
-        ${iconSVGColor(own ? GEMS[k].color : '#3a3f55', 30)}
+        ${gemImg(k, 34, own)}
         <div><b>${GEMS[k].name}</b><span>${GEMS[k].desc}</span><small>${own ? (on ? 'Engarzada' : 'En tu colección') : 'Se consigue con ' + where(k)}</small></div>
         ${own ? `<button data-g="${k}" class="btn">${on ? 'Quitar' : 'Engarzar'}</button>` : ''}
       </div>`;
@@ -2893,7 +2893,7 @@ function buildInventory(justEquipped) {
       ${slotHTML('arma', '', 44)}
       <button class="gems-label" id="btnGems">GEMAS ${S.dofus.length}/${Object.keys(GEMS).length}</button>
       ${S.gemSlots.map((k, i) => k
-        ? `<button class="gem got" data-gs="${i}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${iconSVGColor(GEMS[k].color, 22)}</button>`
+        ? `<button class="gem got" data-gs="${i}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 22)}</button>`
         : `<button class="gem" data-gs="${i}" title="Hueco libre: toca para engarzar una gema">+</button>`).join('')}
     </div>`;
   $('btnGems').onclick = () => openGems();
@@ -2909,7 +2909,7 @@ function buildInventory(justEquipped) {
   }
 
   // botón de equipamiento rápido: avisa cuántas mejoras hay en la bolsa
-  { const n = bestGearPlan().changes.length, b = $('btnAutoEquip'); b.textContent = n ? `⚡ Equipar lo mejor (${n})` : '⚡ Equipar lo mejor'; b.classList.toggle('ready', n > 0); }
+  { const n = bestGearPlan().changes.length, b = $('btnAutoEquip'); if (b) { b.textContent = n ? `⚡ Equipar lo mejor (${n})` : '⚡ Equipar lo mejor'; b.classList.toggle('ready', n > 0); } }
 
   // características
   const pts = $('shPoints');
