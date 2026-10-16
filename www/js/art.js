@@ -900,6 +900,52 @@ const MONSTER_ART = {
 };
 const ANIM_FRAMES = 12;
 
+// ---------- Avisos de ataque (estilo rúnico): círculo y franja en el suelo ----------
+// k: progreso de la carga (0 → 1). Se dibujan en el plano del suelo con un brillo suave, no con bloques planos.
+function teleCircle(x, y, R, k, rgb = '255,90,50', squash = 0.6) {
+  ctx.save();
+  ctx.translate(x, y); ctx.scale(1, squash);
+  const g = ctx.createRadialGradient(0, 0, R * 0.2, 0, 0, R);
+  g.addColorStop(0, `rgba(${rgb},0.04)`); g.addColorStop(0.8, `rgba(${rgb},0.16)`); g.addColorStop(1, `rgba(${rgb},0.3)`);
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.fill();
+  // relleno que crece hasta el borde
+  ctx.fillStyle = `rgba(${rgb},${0.12 + k * 0.18})`; ctx.beginPath(); ctx.arc(0, 0, R * k, 0, TAU); ctx.fill();
+  ctx.globalCompositeOperation = 'lighter';
+  // anillo rúnico discontinuo que gira
+  ctx.lineWidth = 3; ctx.strokeStyle = `rgba(${rgb},${0.55 + k * 0.4})`;
+  ctx.setLineDash([R * 0.18, R * 0.07]); ctx.lineDashOffset = -now * 40;
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.lineWidth = 1.5; ctx.strokeStyle = `rgba(255,230,200,${0.25 + k * 0.5})`;
+  ctx.beginPath(); ctx.arc(0, 0, R * 0.86, 0, TAU); ctx.stroke();
+  // marcas del borde
+  for (let i = 0; i < 8; i++) {
+    const a = (i / 8) * TAU + now * 0.6;
+    ctx.beginPath(); ctx.moveTo(Math.cos(a) * R * 0.88, Math.sin(a) * R * 0.88); ctx.lineTo(Math.cos(a) * R * 1.04, Math.sin(a) * R * 1.04); ctx.stroke();
+  }
+  ctx.restore();
+}
+function teleLine(x, y, ang, L, w, k, rgb = '255,90,50') {
+  ctx.save();
+  ctx.translate(x, y); ctx.rotate(ang);
+  const g = ctx.createLinearGradient(0, -w / 2, 0, w / 2);
+  g.addColorStop(0, `rgba(${rgb},0)`); g.addColorStop(0.5, `rgba(${rgb},0.22)`); g.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.fillStyle = g; ctx.fillRect(0, -w / 2, L, w);
+  ctx.globalCompositeOperation = 'lighter';
+  // bordes finos
+  ctx.strokeStyle = `rgba(${rgb},${0.35 + k * 0.4})`; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(0, -w / 2); ctx.lineTo(L, -w / 2); ctx.moveTo(0, w / 2); ctx.lineTo(L, w / 2); ctx.stroke();
+  // flechas que avanzan; se encienden según la carga
+  const step = Math.max(26, w * 0.7), off = (now * 120) % step, cw = w * 0.32;
+  ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (let d = off; d < L - 8; d += step) {
+    const lit = d / L < k;
+    ctx.strokeStyle = lit ? `rgba(255,220,180,0.9)` : `rgba(${rgb},0.45)`;
+    ctx.beginPath(); ctx.moveTo(d - cw * 0.6, -cw); ctx.lineTo(d, 0); ctx.lineTo(d - cw * 0.6, cw); ctx.stroke();
+  }
+  ctx.restore();
+}
+
 function drawEnemy(e) {
   if (e.spawnT > 0) {
     ctx.save();
@@ -907,14 +953,11 @@ function drawEnemy(e) {
   }
   // telegrafías en el suelo
   if (e.type === 'craqueleur' && e.state === 'wind') {
-    const k = 1 - e.st / e.max;
-    circle(e.x, e.y, 110, 'rgba(255,80,40,0.12)', 'rgba(255,80,40,0.6)', 2);
-    circle(e.x, e.y, 110 * k, 'rgba(255,80,40,0.25)');
+    teleCircle(e.x, e.y, 110, 1 - e.st / e.max);
   }
   if ((e.type === 'bouftouRoyal' || e.type === 'reinaTeje') && e.state === 'leap') {
     const k = 1 - e.st / e.max, R = e.type === 'reinaTeje' ? 150 : 170;
-    circle(e.tx, e.ty, R, 'rgba(255,60,30,0.12)', 'rgba(255,60,30,0.7)', 3);
-    circle(e.tx, e.ty, R * k, 'rgba(255,60,30,0.22)');
+    teleCircle(e.tx, e.ty, R, k);
   }
   if (e.type === 'hechicero' && (e.state === 'cast' || e.state === 'spiral')) {
     ctx.save();
@@ -925,18 +968,7 @@ function drawEnemy(e) {
     ctx.restore();
   }
   if (e.type === 'tofuRoyal' && e.state === 'wind') {
-    const k = 1 - e.st / (e.max || 0.8);
-    const L = 420, w = 56;
-    ctx.save();
-    ctx.translate(e.x, e.y);
-    ctx.rotate(Math.atan2(e.cdy || 0, e.cdx || 1));
-    ctx.fillStyle = 'rgba(255,40,30,0.18)';
-    ctx.fillRect(0, -w / 2, L, w);
-    ctx.fillStyle = 'rgba(255,40,30,0.35)';
-    ctx.fillRect(0, -w / 2, L * k, w);
-    ctx.strokeStyle = 'rgba(255,80,60,0.8)'; ctx.lineWidth = 2;
-    ctx.strokeRect(0, -w / 2, L, w);
-    ctx.restore();
+    teleLine(e.x, e.y, Math.atan2(e.cdy || 0, e.cdx || 1), 420, 56, 1 - e.st / (e.max || 0.8));
   }
   if (e.elite) {
     ctx.save();
@@ -946,16 +978,7 @@ function drawEnemy(e) {
     ctx.restore();
   }
   if ((e.type === 'bouftou' || e.type === 'bouftouRoyal') && e.state === 'wind') {
-    ctx.save();
-    ctx.strokeStyle = 'rgba(255,50,50,0.5)';
-    ctx.lineWidth = e.r * 1.2;
-    ctx.lineCap = 'round';
-    ctx.beginPath();
-    ctx.moveTo(e.x, e.y);
-    const L = e.type === 'bouftouRoyal' ? 270 : 170;
-    ctx.lineTo(e.x + (e.cdx || 0) * L, e.y + (e.cdy || 0) * L);
-    ctx.stroke();
-    ctx.restore();
+    teleLine(e.x, e.y, Math.atan2(e.cdy || 0, e.cdx || 1), e.type === 'bouftouRoyal' ? 270 : 170, e.r * 1.6, 1 - e.st / 0.6);
   }
 
   // estela de la embestida
@@ -1058,11 +1081,7 @@ function drawHazard(h) {
   const col = HAZ_COL[h.kind];
   if (!h.fired) {
     const k = 1 - h.t / h.max;
-    ctx.save();
-    ctx.translate(h.x, h.y); ctx.scale(1, h.kind === 'meteor' || h.kind === 'slam' ? 0.75 : 0.8);
-    circle(0, 0, h.r, `rgba(${col},0.12)`, `rgba(${col},${0.5 + k * 0.4})`, 2.5);
-    circle(0, 0, h.r * k, `rgba(${col},0.28)`);
-    ctx.restore();
+    teleCircle(h.x, h.y, h.r, k, col, h.kind === 'meteor' || h.kind === 'slam' ? 0.75 : 0.8);
     if (h.kind === 'meteor') {
       // la roca ardiente cae del cielo
       const fz = (1 - k) * 260;

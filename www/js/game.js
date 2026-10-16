@@ -1924,6 +1924,9 @@ function text(str, x, y, size, color, align = 'left', weight = 800, stroke = tru
   ctx.fillText(str, x, y);
 }
 
+// iconos pintados de la interfaz (img/ui)
+const UI_ICON = {};
+for (const n of ['bag', 'pause', 'potion']) { const im = new Image(); im.onload = () => { UI_ICON[n] = im; }; im.src = 'img/ui/' + n + '.png'; }
 function drawHUD() {
   const s = ui;
   const pad = 12 * s;
@@ -1994,12 +1997,12 @@ function drawHUD() {
   });
 
   // botones pausa / bolsa
-  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(0,0,0,0.45)', '#c9b27a', 2);
-  ctx.fillStyle = '#efece2';
-  ctx.fillRect(L.pause.x - 6 * s, L.pause.y - 7 * s, 4 * s, 14 * s);
-  ctx.fillRect(L.pause.x + 2 * s, L.pause.y - 7 * s, 4 * s, 14 * s);
-  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(0,0,0,0.45)', '#c9b27a', 2);
-  text('🎒', L.bag.x, L.bag.y + 1, 18 * s, '#fff', 'center', 400, false);
+  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(10,14,30,0.6)', '#c9b27a', 2);
+  if (UI_ICON.pause) ctx.drawImage(UI_ICON.pause, L.pause.x - L.pause.r * 0.8, L.pause.y - L.pause.r * 0.8, L.pause.r * 1.6, L.pause.r * 1.6);
+  else { ctx.fillStyle = '#efece2'; ctx.fillRect(L.pause.x - 6 * s, L.pause.y - 7 * s, 4 * s, 14 * s); ctx.fillRect(L.pause.x + 2 * s, L.pause.y - 7 * s, 4 * s, 14 * s); }
+  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(10,14,30,0.6)', '#c9b27a', 2);
+  if (UI_ICON.bag) ctx.drawImage(UI_ICON.bag, L.bag.x - L.bag.r * 0.85, L.bag.y - L.bag.r * 0.85, L.bag.r * 1.7, L.bag.r * 1.7);
+  else text('🎒', L.bag.x, L.bag.y + 1, 18 * s, '#fff', 'center', 400, false);
   if (S.points > 0) {
     circle(L.bag.x + L.bag.r * 0.75, L.bag.y - L.bag.r * 0.7, 8 * s, '#e53935');
     text(String(S.points), L.bag.x + L.bag.r * 0.75, L.bag.y - L.bag.r * 0.7, 9 * s, '#fff', 'center', 900, false);
@@ -2101,7 +2104,8 @@ function drawControls() {
       ctx.fillStyle = 'rgba(0,0,0,0.55)';
       ctx.fill();
     }
-    text(label, b.x, b.y - (sub ? 4 * s : 0), b.r * 0.75, '#fff', 'center', 900);
+    if (label && typeof label === 'object') ctx.drawImage(label, b.x - b.r * 0.62, b.y - b.r * 0.78, b.r * 1.24, b.r * 1.24);
+    else text(label, b.x, b.y - (sub ? 4 * s : 0), b.r * 0.75, '#fff', 'center', 900);
     if (sub) text(sub, b.x, b.y + b.r * 0.5, 10 * s, '#81d4fa', 'center', 900);
     ctx.restore();
   };
@@ -2115,7 +2119,7 @@ function drawControls() {
   }
   const pmk = P.pm >= 1 ? 0 : 1 - (P.pm % 1);
   btn(L.dash, '»', String(Math.floor(P.pm)), '#66bb6a', pmk, P.pm >= 1, false);
-  btn(L.pan, '🧪', String(S.pan), '#7cc457', 0, S.pan > 0, false);
+  btn(L.pan, UI_ICON.potion || '🧪', String(S.pan), '#7cc457', 0, S.pan > 0, false);
   // definitiva: anillo de carga y brillo cuando está lista
   const uk = clamp((P.ult || 0) / 100, 0, 1), ub = L.ult;
   if (uk >= 1) { ctx.save(); ctx.globalAlpha = 0.35 + Math.sin(now * 6) * 0.2; circle(ub.x, ub.y, ub.r + 7 * s, 'rgba(255,214,110,0.5)'); ctx.restore(); }
@@ -2533,7 +2537,7 @@ function buildHub() {
   $('fLabel').innerHTML = (sel.n === 'S' ? `☠ ${SUPER_BOSSES[fb.id].name}` : `Grieta ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>`) +
     `<small>${fb.name} · Recomendado nivel ${rec}</small>` +
     (S.level + 2 < rec ? `<small class="warn">⚠ Tu nivel (${S.level}) es bajo para esta Grieta</small>` : '');
-  $('btnInv').innerHTML = '🎒<span>Personaje</span>' + (S.points > 0 ? `<i class="badge">${S.points}</i>` : '');
+  $('btnInv').innerHTML = '<img src="img/ui/bag.png" alt=""><span>Personaje</span>' + (S.points > 0 ? `<i class="badge">${S.points}</i>` : '');
   updateHubPrompt();
 }
 

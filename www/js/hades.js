@@ -236,7 +236,7 @@ function openChoice(head, opts, onPick) {
   $('choicePick').innerHTML = `<div class="bp-box" style="--c:${head.color}">
     <div class="bp-head"><div class="bp-por bp-icon">${head.icon}</div><div><b>${head.title}</b><small>${head.sub}</small><i>«${head.quote}»</i></div></div>
     <div class="bp-cards">${opts.map((o, k) => `<button class="bp-card" data-k="${k}" style="--c:${head.color};--r:${o.color || head.color}">
-      <div class="bp-top"><span class="bp-slot">${o.tag}</span><span class="bp-rar">${o.icon || ''}</span></div>
+      <div class="bp-top"><span class="bp-slot"${o.can === false ? ' style="opacity:.6"' : ''}>${o.tag}</span><span class="bp-rar">${o.icon || ''}</span></div>
       <div class="bp-name">${o.name}</div><div class="bp-desc">${o.d}</div></button>`).join('')}</div></div>`;
   $('choicePick').classList.add('show');
   SFX.play('legend');
@@ -391,4 +391,98 @@ drawControls = function () {
     if (ready) { ctx.globalAlpha = 0.5 + Math.sin(now * 14) * 0.3; text('Ω', bt.x, bt.y - bt.r - 16 * s, 18 * s, '#ffd76a', 'center', 900); }
     ctx.restore();
   }
+};
+
+// ============================================================
+// Mercader errante: tienda de ámbar dentro de la Grieta (aparece al 40 % de la barra)
+// ============================================================
+const WARES = {
+  cura: { name: 'Cataplasma', icon: '✚', d: 'Recupera el <b>50%</b> de tu vida.', k: 6, ok: () => P.hp < P.maxHp, buy: () => heal(Math.round(P.maxHp * 0.5)) },
+  pocion: { name: 'Poción extra', icon: '🧪', d: 'Una <b>poción</b> más para esta Grieta.', k: 5, ok: () => S.pan < panMax(), buy: () => { S.pan = Math.min(panMax(), S.pan + 1); } },
+  bendicion: { name: 'Ofrenda a los Doce', icon: '✦', d: 'Un dios te ofrece una <b>bendición</b> ahora mismo.', k: 14, ok: () => true, buy: () => {
+    const b = bst(), al = { x: P.x, y: P.y, god: pick(Object.keys(GODS).filter((g) => g !== b.lastGod)), t: 0 };
+    b.lastGod = al.god; b.altars.push(al); later(0.1, () => openBoonPick(al));
+  } },
+  martillo: { name: 'Golpe de martillo', icon: '⚒', d: 'Una mejora del <b>Martillo de Tobías</b> para tu arma.', k: 16, ok: () => Object.keys(HAMMERS).some((h) => !bst().hammers[h]), buy: () => later(0.1, openHammer) },
+  pulir: { name: 'Pulir bendición', icon: '💎', d: 'Sube de <b>rareza</b> una de tus bendiciones al azar.', k: 12, ok: () => Object.values(bst().owned).some((o) => o.r < 3), buy: () => {
+    const c = Object.entries(bst().owned).filter(([, o]) => o.r < 3); const [id, o] = pick(c); o.r++; recalc(); buildBoonBar();
+    addText(P.x, P.y - 60, BOONS[id].name + ' → ' + BOON_RARITY[o.r].name, BOON_RARITY[o.r].color, 1.1);
+  } },
+  vigor: { name: 'Corazón de Grieta', icon: '❤', d: '<b>+15%</b> de vida máxima hasta salir de la Grieta.', k: 10, ok: () => true, buy: () => { bst().vigor = (bst().vigor || 0) + 0.15; recalc(); heal(Math.round(P.maxHp * 0.15)); } },
+};
+const warePrice = (id) => Math.round(WARES[id].k * (6 + rift.level * 3));
+function spawnMerchant() {
+  const b = bst();
+  let x = P.x, y = P.y;
+  for (let k = 0; k < 20; k++) {
+    const a = rand(0, TAU), d = rand(170, 240);
+    x = clamp(P.x + Math.cos(a) * d, 80, WORLD.w - 80); y = clamp(P.y + Math.sin(a) * d, 80, WORLD.h - 80);
+    if (!obstacles.some((o) => dist(x, y, o.x, o.y) < o.r + 60)) break;
+  }
+  const stock = Object.keys(WARES).sort(() => Math.random() - 0.5).slice(0, 3);
+  b.merchant = { x, y, stock, sold: {}, near: false };
+  showBanner('Mercader errante', '#ffcf7a', 'Cambia tu ámbar por ayuda dentro de la Grieta');
+  SFX.play('coin');
+}
+function openMerchant() {
+  const b = bst(), m = b.merchant;
+  const opts = m.stock.map((id) => {
+    const W = WARES[id], price = warePrice(id), sold = m.sold[id], can = !sold && S.kamas >= price && W.ok();
+    return { id, tag: sold ? 'Vendido' : `${fmtNum(price)} ámbar`, icon: W.icon, name: W.name, d: W.d + (can || sold ? '' : ' <span style="color:#ff8a80">No disponible</span>'), color: can ? '#ffcf7a' : '#555a70', can };
+  });
+  opts.push({ id: 'salir', tag: 'Seguir', icon: '➜', name: 'Seguir luchando', d: `Tienes <b>${fmtNum(S.kamas)}</b> ámbar.`, color: '#8d90a8', can: true });
+  openChoice({ icon: '🪙', title: 'Mercader errante', sub: 'Tienda de la Grieta', quote: '¿Ámbar? Lo acepto todo, viajero… menos excusas.', color: '#ffcf7a' }, opts, (o) => {
+    if (o.id === 'salir' || !o.can) return;
+    const price = warePrice(o.id);
+    S.kamas -= price; m.sold[o.id] = true;
+    WARES[o.id].buy();
+    SFX.play('coin');
+    addText(P.x, P.y - 50, '-' + fmtNum(price) + ' ámbar', '#ffcf7a', 1);
+    if (o.id !== 'bendicion' && o.id !== 'martillo') later(0.25, () => { if (state === 'play') openMerchant(); }); // seguir comprando
+  });
+}
+const _boonUpdate2 = boonUpdate;
+boonUpdate = function (dt) {
+  _boonUpdate2(dt);
+  const b = bst();
+  if (!b || state !== 'play' || rift.isSuper) return;
+  if (!b.merchant && !rift.bossSpawned && rift.progress / rift.goal >= 0.4) spawnMerchant();
+  const m = b.merchant;
+  if (m) {
+    const d = dist(P.x, P.y, m.x, m.y);
+    if (d < 46 && !m.inside) { m.inside = true; openMerchant(); }
+    else if (d > 80) m.inside = false;
+  }
+};
+const _recalc3 = recalc;
+recalc = function () {
+  _recalc3();
+  const b = P && bst();
+  if (b && b.vigor) { const r = P.hp / P.maxHp; P.maxHp = Math.round(P.maxHp * (1 + b.vigor)); P.hp = Math.round(P.maxHp * r); }
+};
+const _drawDecals3 = drawDecals;
+drawDecals = function () {
+  _drawDecals3();
+  const b = scene === 'rift' && bst(), m = b && b.merchant;
+  if (!m) return;
+  const img = PROP_IMG.villa, f = PROP_ATLAS.villa && PROP_ATLAS.villa.merchant && PROP_ATLAS.villa.merchant[0];
+  glow(m.x, m.y - 30, 70, '255,207,122', 0.4);
+  ctx.save(); ctx.fillStyle = 'rgba(10,8,20,0.4)'; ctx.beginPath(); ctx.ellipse(m.x, m.y + 2, 30, 10, 0, 0, TAU); ctx.fill(); ctx.restore();
+  // alfombra con mercancía
+  ctx.save(); ctx.translate(m.x + 30, m.y);
+  ctx.fillStyle = '#7a2a2a'; ctx.beginPath(); ctx.ellipse(0, 0, 24, 9, 0, 0, TAU); ctx.fill();
+  ctx.strokeStyle = '#e0b060'; ctx.lineWidth = 1.5; ctx.stroke();
+  circle(-8, -5, 4, '#ff6a6a', '#2a1010', 1); circle(4, -6, 4, '#7ad8ff', '#10202a', 1); circle(12, -3, 3, '#ffd76a', '#2a2010', 1);
+  ctx.restore();
+  if (img && f) {
+    const w = f[2] * PROP_WU_PER_PX, h = f[3] * PROP_WU_PER_PX;
+    ctx.drawImage(img, f[0], f[1], f[2], f[3], m.x - w / 2, m.y - h + 2, w, h);
+  } else circle(m.x, m.y - 20, 14, '#ffcf7a', '#2a2010', 2);
+  ctx.save(); ctx.font = '18px serif'; ctx.textAlign = 'center'; ctx.fillText('🪙', m.x, m.y - 84 + Math.sin(now * 3) * 3); ctx.restore();
+};
+const _boonLights2 = boonLights;
+boonLights = function (lights, toS) {
+  _boonLights2(lights, toS);
+  const b = scene === 'rift' && bst();
+  if (b && b.merchant) { const q = toS(b.merchant.x, b.merchant.y - 30); lights.push({ x: q.x, y: q.y, r: 160 * zoom, a: 0.9, rgb: '255,207,122', haze: 0.3 }); }
 };
