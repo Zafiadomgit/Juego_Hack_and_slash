@@ -191,21 +191,21 @@ const hqDone = () => !!(S && S.hq && S.hq.stage === 2);
     return d;
   };
 }
+function checkHeroQuest(tries = 0) {
+  const q = heroQuest(); if (!q || !S) return;
+  if (state === 'dialog' || dlg) { if (tries < 40) setTimeout(() => checkHeroQuest(tries + 1), 800); return; }
+  if (state !== 'hub') return;
+  const st = hqState();
+  if (st.stage === 0 && superDone(q.after)) {
+    st.stage = 1; st.base = nodesCleared(q.target); persist();
+    playDialog(q.start, { onEnd: () => { showStoryCard('Misión de ' + CLASS_LORE[S.cls].hero, q.title); buildHub(); } });
+  } else if (st.stage === 1 && nodesCleared(q.target) > (st.base || 0)) {
+    st.stage = 2; persist(); if (P) recalc();
+    playDialog(q.end, { onEnd: () => { showStoryCard('Misión cumplida', q.title + ' · +10% de daño y vida'); buildHub(); } });
+  }
+}
 const _goHubQ = goHub;
-goHub = function () {
-  _goHubQ();
-  setTimeout(() => {
-    const q = heroQuest(); if (!q || state !== 'hub' || !S || dlg) return;
-    const st = hqState();
-    if (st.stage === 0 && superDone(q.after)) {
-      st.stage = 1; st.base = nodesCleared(q.target); persist();
-      playDialog(q.start, { onEnd: () => { showStoryCard('Misión de ' + CLASS_LORE[S.cls].hero, q.title); buildHub(); } });
-    } else if (st.stage === 1 && nodesCleared(q.target) > (st.base || 0)) {
-      st.stage = 2; persist(); if (P) recalc();
-      playDialog(q.end, { onEnd: () => { showStoryCard('Misión cumplida', q.title + ' · +10% de daño y vida'); buildHub(); } });
-    }
-  }, 1600);
-};
+goHub = function () { _goHubQ(); setTimeout(checkHeroQuest, 1600); };
 const _buildHubQ = buildHub;
 buildHub = function () {
   _buildHubQ();

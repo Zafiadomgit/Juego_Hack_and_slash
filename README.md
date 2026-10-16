@@ -34,7 +34,9 @@ Al abrir el juego por primera vez se reproduce un **video de presentación** (se
 10. **Ruptura de Límite** (Tablón → Ruptura): 5 rangos por héroe que se pagan con Esencias de Ruptura; cada uno da +12% de daño y PV, y además suben el refinado máximo hasta +15, abren un 4.º hueco de gema y, al final, un aura de Ruptura.
 11. **Trama (Acto I «El Cerrajero»)**: cuadros de diálogo con retrato en la villa y dentro de las Grietas. Morvhal, el Cerrajero, fuerza los cinco Sellos que lo encerraron y ha corrompido a los Súper Jefes; cada uno que vences libera un Sello y abre el capítulo siguiente. Los vecinos hablan según el capítulo y la tarjeta del pueblo muestra el objetivo actual.
 12. **Bendiciones de los Doce** (inspiradas en los dones de Hades II): al llenar la barra de una Grieta un 25 %, 55 % y 85 % aparece el **Altar** de uno de los doce dioses (Ira, Puntería, Escudos, Sombras, Tiempo, Suerte, Sanación, Bestias, Riqueza, Bosque, Sangre y Fiesta; en el Súper Jefe, uno al empezar). El dios ofrece tres bendiciones y eliges una. Huecos: **Ataque**, **Habilidad** y **Esquiva** (una por hueco; la nueva reemplaza a la anterior) y **Pasivas** sin límite. Rarezas Común, Rara, Épica y Heroica; si te ofrecen una que ya tienes, sube de nivel. Duran solo esa Grieta: cada partida es una combinación distinta (veneno + marca, escudos al esquivar, espíritus que disparan, barriles explosivos, segundo aliento…).
-13. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
+13. **Actos II y III**: tras los cinco Sellos se abren la **Ciudad Hundida**, el **Bosque de Cristal** y la **Ciudadela del Cerrajero**, cada una con monstruos, Guardián y Súper Jefe propios (Nereth, Lysara y Morvhal). Los Doce dioses participan en la trama y cada héroe tiene su **misión personal** (+10% de daño y vida).
+14. **Ámbar**: dentro de las Grietas, el **Mercader errante**; en la villa, los **Pactos** de Maese Ivo (re-tirar bendiciones, favor de los Doce, desafío a la muerte, segunda puerta, regateo y ofrenda inicial).
+15. Cada nivel da **5 puntos de característica** que repartes desde la bolsa 🎒. Cada característica muestra lo que te da ahora mismo, y el botón **?** explica todas.
 
 ### Controles
 
@@ -64,6 +66,8 @@ www/                  El juego (HTML5 Canvas + JavaScript, sin dependencias)
   js/dungeon.js       Mazmorra, reliquias únicas y Ruptura de Límite
   js/story.js         Trama del Acto I y cuadros de diálogo
   js/boons.js         Bendiciones de los Doce (dioses, altares y efectos en combate)
+  js/hades.js         Dúos, ataques Ω, Sello, puertas, martillo y Mercader errante
+  js/worlds.js        Mundos de los Actos II y III, misiones de héroe y Pactos
 audio/ (en www)       Música (.ogg en bucle) y efectos de sonido
 tools/audio/          Sintetizador y compositor de la banda sonora (Python)
   js/game.js          Lógica: combate, IA, Grietas, botín, HUD, interfaz
