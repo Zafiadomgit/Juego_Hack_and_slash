@@ -2519,12 +2519,15 @@ function goHub() {
 function buildHub() {
   const C = CLASSES[S.cls];
   const nx = xpNext(S.level);
+  const face = typeof heroFaceURL === 'function' ? heroFaceURL(S.cls, 1.3) : null;
+  const boosts = Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0);
   $('hubChar').innerHTML = `
-    <div class="hubName">${C.name} <span>nivel ${S.level}${transRank() ? ` · <b style="color:#ffd76a">✦${transRank()} ${TRANS_TITLES[transRank()]}</b>` : ''}</span></div>
-    <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
-    <div class="hubRow"><span>${AMBER_SVG} ${fmtNum(S.kamas)} ámbar</span><span>${SEAL_SVG} ${fmtNum(seals())}</span><span>🧪 ${S.pan}/${panMax()}</span><span>🎒 ${S.bag.length}/${bagMax()}</span></div>
-    ${Object.keys(ELIXIRS).some((k) => S.boosts[k] > 0) ? `<div class="hubBoosts">Elixires para la próxima Grieta: ${Object.keys(ELIXIRS).filter((k) => S.boosts[k] > 0).map((k) => `<span style="color:${ELIXIRS[k].hi}">${ELIXIRS[k].name.replace('Elixir ', '')}${S.boosts[k] > 1 ? ' ×' + S.boosts[k] : ''}</span>`).join(', ')}</div>` : ''}
-    <div class="dofusRow">${S.gemSlots.map((k) => `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</div>`;
+    <div class="hc-face" style="${face ? `background-image:url(${face})` : ''}"><b>${S.level}</b></div>
+    <div class="hc-main">
+      <div class="hc-name">${C.name}${transRank() ? ` <i>✦${transRank()}</i>` : ''}<span class="hc-gems">${S.gemSlots.map((k) => `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</span></div>
+      <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
+      <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span><span>${SEAL_SVG}${fmtNum(seals())}</span><span>🧪${S.pan}/${panMax()}</span><span>🎒${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
+    </div>`;
   const sel = mapSel();
   const fb = BIOMES[sel.b], rec = recLevel(sel.b, sel.n, sel.d), DF = DIFFS[sel.n === 'S' ? 2 : sel.d];
   $('fLabel').innerHTML = (sel.n === 'S' ? `☠ ${SUPER_BOSSES[fb.id].name}` : `Grieta ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>`) +

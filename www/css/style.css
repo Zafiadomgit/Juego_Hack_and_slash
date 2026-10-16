@@ -409,7 +409,7 @@ h1.title span { color: #ecd18a; }
 .overlay.hubhud { background: transparent; pointer-events: none; display: none; padding: 0; }
 .overlay.hubhud.show { display: block; }
 .hubhud > * { pointer-events: auto; position: absolute; }
-.hub-card { left: max(10px, env(safe-area-inset-left)); top: 10px; width: 250px; padding: 8px 12px 6px; border: 1px solid #c9b27a; border-radius: 5px;
+.hub-card { left: max(10px, env(safe-area-inset-left)); top: 10px; width: 236px; padding: 6px 8px 6px 6px; display: grid; grid-template-columns: 46px 1fr; column-gap: 8px; align-items: center; border: 1px solid #c9b27a; border-radius: 5px;
   background: linear-gradient(180deg, rgba(30, 40, 72, 0.9), rgba(14, 19, 38, 0.9)); box-shadow: inset 0 0 0 2px rgba(8, 11, 22, 0.8), 0 6px 18px rgba(0, 0, 0, 0.5); }
 .hub-card .hubName { font-size: 17px; }
 .hub-card .hubRow { font-size: 12.5px; }
@@ -429,7 +429,7 @@ h1.title span { color: #ecd18a; }
 .hub-prompt.show { display: block; }
 .hub-hint { left: 50%; bottom: 8px; transform: translateX(-50%); font-size: 12px; color: #e2dfd4; text-shadow: 0 1px 2px #000; white-space: nowrap; opacity: .85; pointer-events: none !important; }
 .hub-prompt.show ~ .hub-hint { display: none; }
-@media (max-width: 700px) { .hub-card { width: 210px; } .hub-sel { width: 220px !important; } .hbtn { width: 50px; height: 50px; font-size: 19px; } }
+@media (max-width: 700px) { .hub-card { width: 220px; } .hub-sel { width: 220px !important; } .hbtn { width: 50px; height: 50px; font-size: 19px; } }
 
 .offer .buy { font-family: Garamond, Georgia, serif !important; }
 
@@ -665,3 +665,21 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .boon-bar span.hm { display: grid; place-items: center; font-size: 14px; background: radial-gradient(circle at 40% 35%, #fff5, #8a5a30 55%, #000a); }
 .dlg-port.face img { top: 0; left: 0; width: 100%; height: 100%; transform: none; }
 .dlg-box.right .dlg-port.face img { transform: scaleX(-1); }
+
+/* tarjeta compacta del pueblo */
+.hc-face { width: 46px; height: 46px; border-radius: 50%; border: 2px solid #c9b27a; background: #1f2a4a center / cover no-repeat; position: relative; image-rendering: pixelated; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6); }
+.hc-face b { position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); min-width: 18px; padding: 0 4px; border-radius: 8px; background: #d6bf86; color: #141b30; font: 900 11px Nunito, sans-serif; text-align: center; }
+.hc-main { min-width: 0; }
+.hc-name { display: flex; align-items: center; gap: 6px; font-family: Cinzel, serif; font-weight: 900; font-size: 14px; color: #ecd18a; white-space: nowrap; }
+.hc-name i { font-style: normal; color: #ffd76a; font-size: 12px; }
+.hc-gems { display: flex; gap: 3px; margin-left: auto; }
+.hc-gems .egg { width: 8px; height: 8px; margin: 1px; border-width: 1px; }
+.hub-card .xpbar { height: 4px; margin: 3px 0 4px; }
+.hc-res { display: flex; gap: 8px; font-size: 12px; font-weight: 800; white-space: nowrap; }
+.hc-res span { display: inline-flex; align-items: center; gap: 2px; }
+.hc-res svg { width: 13px; height: 13px; }
+.hub-card .hubStory { grid-column: 1 / -1; margin: 6px 0 0; padding: 4px 6px 0; border: 0; border-top: 1px solid rgba(201, 178, 122, 0.3); background: none; color: inherit; font: inherit; text-align: left;
+  display: flex; gap: 6px; align-items: baseline; font-size: 11.5px; line-height: 1.25; cursor: pointer; overflow: hidden; }
+.hub-card .hubStory b { flex: none; display: inline; font-size: 11.5px; }
+.hub-card .hubStory span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hub-card .hubStory.open span { white-space: normal; }

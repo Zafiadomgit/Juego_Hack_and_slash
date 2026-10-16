@@ -402,7 +402,8 @@ buildHub = function () {
   const ch = Math.min(storyChapter(), CHAPTERS.length - 1);
   const card = $('hubChar');
   const old = card.querySelector('.hubStory'); if (old) old.remove();
-  card.insertAdjacentHTML('beforeend', `<div class="hubStory"><b>📖 ${ch < 5 ? 'Capítulo ' + (ch + 1) : 'Epílogo'} · ${CHAPTERS[ch].title}</b><span>${CHAPTERS[ch].goal}</span></div>`);
+  card.insertAdjacentHTML('beforeend', `<button class="hubStory" type="button" title="${CHAPTERS[ch].goal}"><b>📖 ${ch < 5 ? 'Cap. ' + (ch + 1) : 'Epílogo'}</b><span>${CHAPTERS[ch].goal}</span></button>`);
+  card.querySelector('.hubStory').onclick = (ev) => { ev.currentTarget.classList.toggle('open'); };
 };
 
 // Cartel grande de capítulo

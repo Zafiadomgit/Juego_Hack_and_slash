@@ -1501,7 +1501,35 @@ function drawGem(g, x, y, s, color, t) {
   g.restore();
 }
 
+// Portal Rúnico pintado (img/props/portal.png): base de piedra con escalones, anillo de runas y vórtice
+const PORTAL_IMG = { img: null };
+(() => { const im = new Image(); im.onload = () => { PORTAL_IMG.img = im; }; im.src = 'img/props/portal.png'; })();
+function drawRunicPortal(x, y, t) {
+  const im = PORTAL_IMG.img, k = 1.05, w = im.width * k, h = im.height * k;
+  const cy = y - 78 * k; // centro del vórtice
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,8,20,0.4)'; ctx.beginPath(); ctx.ellipse(x, y + 6, w * 0.48, w * 0.17, 0, 0, TAU); ctx.fill();
+  ctx.drawImage(im, x - 79 * k, y - 157 * k, w, h);
+  // vórtice animado encima del pintado
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.translate(x, cy);
+  ctx.scale(1, 1.75);
+  for (let i = 0; i < 4; i++) {
+    const a = -t * (1.6 + i * 0.35) + i * 1.6, r = 6 + i * 6;
+    ctx.strokeStyle = `rgba(${i % 2 ? '170,240,255' : '90,200,255'},${0.55 - i * 0.08})`;
+    ctx.lineWidth = 3 - i * 0.4;
+    ctx.beginPath(); ctx.arc(0, 0, r, a, a + 2.4); ctx.stroke();
+  }
+  const pulse = 0.35 + Math.sin(t * 3) * 0.15;
+  const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 26);
+  g.addColorStop(0, `rgba(230,255,255,${pulse + 0.25})`); g.addColorStop(1, 'rgba(60,170,255,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, 26, 0, TAU); ctx.fill();
+  ctx.restore();
+  // runas que suben
+  if (scene === 'rift' && Math.random() < 0.25) particles.push({ kind: 'glowdot', x: x + rand(-60, 60), y: y + rand(-6, 10), vx: rand(-6, 6), vy: rand(-70, -35), life: 1.2, max: 1.2, rgb: '120,220,255', size: 3, grav: 0 });
+}
 function drawPortal(x, y, t) {
+  if (PORTAL_IMG.img) { drawRunicPortal(x, y, t); return; }
   shadow(x, y + 4, 46);
   ctx.save();
   ctx.translate(x, y);
