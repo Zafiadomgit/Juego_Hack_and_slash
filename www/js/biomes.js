@@ -57,7 +57,7 @@ const BIOME_TEX = new Map();
 const GROUND_TILE = 420;
 const GROUND_IMG = {};
 const GROUND_SIZE = { dungeon: 380, ceniza: 600, pantano: 600, glaciar: 600, desierto: 600, abismo: 600 }; // unidades de mundo por repetición (6×6 losas en la Mazmorra)
-['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza', 'dungeon'].forEach((id) => {
+['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'plaza', 'dungeon', 'grass', 'path'].forEach((id) => {
   const img = new Image();
   img.onload = () => {
     GROUND_IMG[id] = img;

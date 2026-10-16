@@ -13,8 +13,8 @@ from scipy import ndimage
 WORLD_H = {'tree': 124, 'pillar': 88, 'rock': 46, 'crystal': 58, 'brazier': 52,
            'fern': 22, 'bones': 20, 'shroom': 22, 'skull': 26, 'shard': 20,
            # Villa Candela
-           'house': 176, 'stall': 156, 'alchemy': 168, 'well': 100, 'lamp': 74, 'barrel': 30, 'bush': 40,
-           'sign': 70, 'cauldron': 42, 'board': 88, 'oak': 128,
+           'house': 190, 'stall': 130, 'alchemy': 150, 'well': 100, 'lamp': 74, 'barrel': 30, 'bush': 40,
+           'sign': 70, 'cauldron': 42, 'board': 92, 'oak': 150, 'forge': 120,
            'merchant': 64, 'alchemist': 76, 'vil0': 60, 'vil1': 54, 'vil2': 66, 'vil3': 44, 'smith': 68,
            # Mazmorra
            'bonepile': 30}
@@ -54,21 +54,22 @@ SEL = {
         'skull': ['g4-0/08', 'g4-1/14'],
     },
     'villa': {
-        'house': ['v-1/00', 'v-1/01', 'v-3/00', 'v-2/03', 'v-1/03'],
-        'stall': ['v-2/01'],
-        'alchemy': ['v-1/02'],
-        'well': ['v-3/07'],
+        'house': ['vh-0/00', 'vh-0/01', 'vh-0/02', 'vh-0/03'],
+        'stall': ['vs-0/00'],
+        'alchemy': ['vs-0/01'],
+        'forge': ['vs-0/02'],
+        'well': ['vs-0/04'],
         'lamp': ['v-1/04', 'v-1/09', 'v-3/09'],
         'barrel': ['v-3/15', 'v-3/14', 'v-3/12'],
         'bush': ['v-1/10'],
         'sign': ['v-2/11'],
         'cauldron': ['v-3/17'],
-        'board': ['v-3/10'],
-        'oak': ['v-3/13', 'v-2/09', 'v-0/10'],
+        'board': ['vs-0/05'],
+        'oak': ['vs-0/03', 'v-3/13', 'v-2/09'],
         # vecinos (vil0 granjero, vil1 anciana, vil2 guardia, vil3 niño: mismo orden que VILLAGERS)
-        'merchant': ['n2-0/00'], 'alchemist': ['n1-0/00'],
-        'vil0': ['n0-0/00'], 'vil1': ['n0-0/02'], 'vil2': ['n0-0/01'], 'vil3': ['n0-0/03'],
-        'smith': ['h-0/00'],
+        'merchant': ['nn-merchant/00'], 'alchemist': ['nn-alchemist/00'],
+        'vil0': ['nn-vil0/00'], 'vil1': ['nn-vil1/00'], 'vil2': ['nn-vil2/00'], 'vil3': ['nn-vil3/00'],
+        'smith': ['nn-smith/00'],
     },
     # Mazmorra (solo se usa dentro de la Mazmorra: tree = jaulas, cadalsos y cadenas; rock = rocas y cofres)
     'dungeon': {
@@ -98,6 +99,8 @@ def clean(im):
     purple = (rgb[:, :, 0] > rgb[:, :, 1] + 25) & (rgb[:, :, 2] > rgb[:, :, 1] + 15) & (np.abs(rgb[:, :, 0] - rgb[:, :, 2]) < 70)
     edge = al & ~ndimage.binary_erosion(al, iterations=3)
     al &= ~(purple & edge)
+    # restos del fondo magenta encerrados dentro del objeto (bajo toldos, entre telas)
+    al &= ~((rgb[:, :, 0] > 185) & (rgb[:, :, 2] > 185) & (rgb[:, :, 1] < 95))
     lab, n = ndimage.label(al)
     if n > 1:
         sizes = ndimage.sum(al, lab, range(1, n + 1))

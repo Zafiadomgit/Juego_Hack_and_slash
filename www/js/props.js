@@ -83,8 +83,8 @@ function villaFrame(kind, x, y) {
   return { img, f: list[Math.floor(h * list.length) % list.length], flip: kind !== 'sign' && kind !== 'board' && ((h * 7919) % 1) < 0.5 };
 }
 // fracción de la altura del sprite que queda por debajo del punto de apoyo (mitad del rombo de la base)
-const VILLA_SINK = { house: 0.13, stall: 0.13, alchemy: 0.12, well: 0.05, oak: 0.05 };
-const VILLA_KIND = { house: 'house', stall: 'stall', alchemy: 'alchemy', well: 'well', lamp: 'lamp', barrel: 'barrel', bush: 'bush', sign: 'sign', cauldron: 'cauldron' };
+const VILLA_SINK = { house: 0.13, stall: 0.1, alchemy: 0.08, well: 0.05, oak: 0.05, forge: 0.08 };
+const VILLA_KIND = { forge: 'forge', house: 'house', stall: 'stall', alchemy: 'alchemy', well: 'well', lamp: 'lamp', barrel: 'barrel', bush: 'bush', sign: 'sign', cauldron: 'cauldron' };
 // Dibuja un elemento del pueblo con sprite pintado; devuelve false si no hay sprite
 function drawVillaSprite(o) {
   const kind = o.kind === 'tree' ? 'oak' : o.kind === 'board' ? 'board' : VILLA_KIND[o.kind];
