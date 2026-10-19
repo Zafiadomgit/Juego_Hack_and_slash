@@ -324,7 +324,6 @@ boonUpdate = function (dt) {
   updateSeals(dt);
   if (has('manadaDorada')) for (const s of b.spirits) s.cd -= dt;
   if (has('venenoParalizante')) for (const e of enemies) if (!e.dead && e.dot) e.slowT = Math.max(e.slowT, 0.2);
-  for (const d of b.doors) if (dist(P.x, P.y, d.x, d.y) < 44) { takeDoor(d); break; }
 };
 
 const _buildBoonBar = buildBoonBar;
@@ -393,7 +392,7 @@ drawControls = function () {
 };
 
 // ============================================================
-// Mercader errante: tienda de ámbar dentro de la Grieta (aparece al 40 % de la barra)
+// Mercader errante: tienda de ámbar (aparece tras derrotar al Guardián, junto al Portal; ver camp.js)
 // ============================================================
 const WARES = {
   cura: { name: 'Cataplasma', icon: '✚', d: 'Recupera el <b>50%</b> de tu vida.', k: 6, ok: () => P.hp < P.maxHp, buy: () => heal(Math.round(P.maxHp * 0.5)) },
@@ -440,19 +439,6 @@ function openMerchant() {
     if (o.id !== 'bendicion' && o.id !== 'martillo') later(0.25, () => { if (state === 'play') openMerchant(); }); // seguir comprando
   });
 }
-const _boonUpdate2 = boonUpdate;
-boonUpdate = function (dt) {
-  _boonUpdate2(dt);
-  const b = bst();
-  if (!b || state !== 'play' || rift.isSuper) return;
-  if (!b.merchant && !rift.bossSpawned && rift.progress / rift.goal >= 0.4) spawnMerchant();
-  const m = b.merchant;
-  if (m) {
-    const d = dist(P.x, P.y, m.x, m.y);
-    if (d < 46 && !m.inside) { m.inside = true; openMerchant(); }
-    else if (d > 80) m.inside = false;
-  }
-};
 const _recalc3 = recalc;
 recalc = function () {
   _recalc3();

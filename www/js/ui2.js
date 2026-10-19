@@ -107,6 +107,7 @@ buildInventory = function (justEquipped) {
 };
 const _closeInventoryU = closeInventory;
 closeInventory = function () { sellMode = false; sellSel.clear(); return _closeInventoryU(); };
+$('btnInvClose').removeEventListener('click', _closeInventoryU); $('btnInvClose').addEventListener('click', () => closeInventory());
 
 // ============================================================
 // Mapa: medallones de los mundos y retratos de los jefes

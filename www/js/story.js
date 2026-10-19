@@ -319,7 +319,14 @@ function fillText(s) { return hasText(s).replace(/\{hero\}/g, CLASS_LORE[S.cls].
 
 // lines: [[quién, texto]], o: { ctx, choices: [{label, fn}], onEnd }
 function playDialog(lines, o = {}) {
+  // sin duplicados (tocar al vecino y su botón a la vez) y nunca encima de otro panel
+  if ((dlg && dlg.lines === lines) || dlgQ.some((q) => q[0] === lines)) return;
   if (dlg) { dlgQ.push([lines, o]); return; }
+  if (['end', 'dead', 'pause', 'inv', 'shop', 'map', 'quests', 'boon'].includes(state)) {
+    const tries = (o._tries || 0) + 1;
+    if (tries < 40) setTimeout(() => playDialog(lines, Object.assign(o, { _tries: tries })), 500);
+    return;
+  }
   dlg = { lines, o, i: -1, prev: state, typing: false, full: '', shown: 0 };
   state = 'dialog';
   clearInput();
@@ -460,6 +467,7 @@ const _villageInteract = villageInteract;
 villageInteract = function (what) {
   const who = what && what.id && NPC_SPEAKER[what.id];
   if (!who) return _villageInteract(what);
+  if (dlg || state !== 'hub') return;
   vHero.target = null; vHero.pending = null;
   const ch = Math.min(storyChapter(), 8);
   playDialog([[who, CHATTER[what.id][ch]]], {

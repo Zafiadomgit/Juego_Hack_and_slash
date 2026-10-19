@@ -135,6 +135,17 @@ function rollRarity() {
   return 0;
 }
 let boonOffer = null;
+// abre la elección del altar (la primera vez el dios se presenta)
+function touchAltar(al) {
+  if (!S.story || !S.story.seen || S.story.seen.boons || typeof playDialog !== 'function') return openBoonPick(al);
+  S.story.seen.boons = 1;
+  const G = GODS[al.god];
+  SPEAKERS['god_' + al.god] = { name: G.name + ', ' + G.title, color: G.color, aura: G.rgb, img: 'img/gods/' + al.god + '.webp' };
+  playDialog([
+    ['god_' + al.god, 'Soy ' + G.name + ', uno de los Doce. Los dioses de Fendaria no podemos cruzar las Grietas…'],
+    ['god_' + al.god, '…pero sí podemos prestarte nuestro poder mientras estés dentro. Elige bien: mi bendición se desvanece cuando sales.'],
+  ], { onEnd: () => { if (state === 'play') openBoonPick(al); } });
+}
 function openBoonPick(al) {
   const b = bst();
   const list = Object.keys(BOONS).filter((id) => BOONS[id].god === al.god && BOONS[id].slot !== 'duo').sort(() => Math.random() - 0.5).slice(0, 3);
@@ -369,22 +380,7 @@ function boonUpdate(dt) {
   // altares: 25 %, 55 % y 85 % de la barra (en el Súper Jefe, uno al empezar)
   const th = rift.isSuper ? [0] : [0.25, 0.55, 0.85];
   if (b.given < th.length && rift.progress / rift.goal >= th[b.given] && (!rift.bossSpawned || rift.isSuper)) spawnAltar();
-  for (const al of b.altars) {
-    al.t += dt;
-    if (dist(P.x, P.y, al.x, al.y) < 46) {
-      if (!S.story || !S.story.seen) { openBoonPick(al); break; }
-      if (!S.story.seen.boons && typeof playDialog === 'function') {
-        S.story.seen.boons = 1;
-        const G = GODS[al.god];
-        SPEAKERS['god_' + al.god] = { name: G.name + ', ' + G.title, color: G.color, aura: G.rgb, img: 'img/gods/' + al.god + '.webp' };
-        playDialog([
-          ['god_' + al.god, 'Soy ' + G.name + ', uno de los Doce. Los dioses de Fendaria no podemos cruzar las Grietas…'],
-          ['god_' + al.god, '…pero sí podemos prestarte nuestro poder mientras estés dentro. Elige bien: mi bendición se desvanece cuando sales.'],
-        ], { onEnd: () => { if (state === 'play') openBoonPick(al); } });
-      } else openBoonPick(al);
-      break;
-    }
-  }
+  for (const al of b.altars) al.t += dt; // se activan con el botón de interacción (camp.js)
   if (b.magT > 0) { b.magT -= dt; P.magnet = (P.baseMagnet || P.magnet) * 6; if (b.magT <= 0) P.magnet = P.baseMagnet || P.magnet; }
   const bd = basicDmg();
   for (const z of b.zones) {
