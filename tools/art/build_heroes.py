@@ -17,13 +17,14 @@ CLASSES = ['iop', 'cra', 'feca', 'sombra', 'domadora', 'artificiera', 'berserker
 KEEP = {
     'iop': {'attack': [0, 1, 2]},
     'cra': {'walk': [1, 2, 3, 4, 5], 'idle': [1, 2], 'attack': [0, 1, 2]},
-    'feca': {'walk': [1, 2, 3, 4, 5], 'idle': [0, 1, 2], 'attack': [0, 1]},
+    'feca': {'walk': [1, 2, 3, 4, 5], 'idle': [0, 1, 2], 'attack': [0, 1, 2]},
     'artificiera': {'attack': [0, 1]},
     'berserker': {'attack': [0, 1, 2], 'hurt': [0]},
 }
 FLIP = {'artificiera': {'walk': [5]}}
 CLIP_FWD = {'cra': 0.8, 'feca': 1.7, 'berserker': 1.0, 'iop': 0.85, 'domadora': 1.0}
-GRID = {'cra': {'walk': 6}}  # hojas cuyos fotogramas se tocan: se cortan en N columnas iguales
+# hojas cuyos fotogramas se tocan: N columnas iguales, o lista de cortes (fracción del ancho)
+GRID = {'cra': {'walk': 6}, 'feca': {'attack': [0.26, 0.72]}}
 PX_H = 300  # altura del arte de cuerpo entero (menú, diálogos)
 
 
@@ -44,10 +45,11 @@ def build(src, www):
             n = GRID.get(cls, {}).get(pose)
             if n:
                 import tempfile
-                im = Image.open(path).convert('RGB'); cw = im.width / n; fr = []
-                for k in range(n):
+                im = Image.open(path).convert('RGB'); fr = []
+                xs = [0] + [int(c * im.width) for c in n] + [im.width] if isinstance(n, list) else [int(k * im.width / n) for k in range(n + 1)]
+                for k in range(len(xs) - 1):
                     tmp = os.path.join(tempfile.gettempdir(), f'col_{cls}_{k}.png')
-                    im.crop((int(k * cw), 0, int((k + 1) * cw), im.height)).save(tmp)
+                    im.crop((xs[k], 0, xs[k + 1], im.height)).save(tmp)
                     fr.append(max(frames(tmp), key=lambda f: f['img'].width * f['img'].height))
             else:
                 fr = frames(path)
