@@ -31,13 +31,15 @@ let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 // Calidad adaptativa: si el móvil no llega a ~45 FPS se baja la resolución interna
 // nivel 0: todo; 1: sin desenfoque de maqueta; 2: resolución 1x y luces más baratas; 3: píxel más grande
 const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0 };
+// unidades de mundo visibles en el lado corto de la pantalla (look.js las cambia según la escena)
+const VIEW = { units: 420 };
 function resize() {
   DPR = Math.min(window.devicePixelRatio || 1, QUALITY.maxDpr);
   W = window.innerWidth;
   H = window.innerHeight;
   canvas.width = Math.floor(W * DPR);
   canvas.height = Math.floor(H * DPR);
-  zoom = Math.min(W, H) / 420; // ~420 unidades de mundo en el lado corto
+  zoom = Math.min(W, H) / VIEW.units;
   ui = clamp(Math.min(W, H) / 400, 0.8, 1.6);
   spriteScaleUpdate(HD2D.on ? zoom / hd2dPixSize() : zoom * DPR);
   SPR.cache.clear();
@@ -2411,6 +2413,7 @@ function groundChunk(cx, cy) {
       }
     }
   }
+  if (typeof riftPatches === 'function') riftPatches(g, cx, cy, DG ? DUNGEON_GROUND : B); // manchas de suelo (look.js)
   for (let i = 0; i < (painted ? 0 : 500); i++) {
     g.fillStyle = rnd() < 0.5 ? 'rgba(0,0,0,0.12)' : `rgba(${B.grain.join(',')},0.08)`;
     const sz = 1 + rnd() * 2;

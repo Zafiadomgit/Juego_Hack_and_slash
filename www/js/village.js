@@ -5,7 +5,7 @@
 'use strict';
 
 const VB = { x0: -640, x1: 640, y0: -400, y1: 440 }; // zona caminable
-const VG = { x0: -760, y0: -540, w: 1520, h: 1120 }; // suelo pre-renderizado
+const VG = { x0: -960, y0: -700, w: 1920, h: 1400 }; // suelo pre-renderizado
 const VILLAGE = { built: false, props: [], solids: [], npcs: [], lamps: [], windows: [], smoke: [], fx: [], ground: null, groundScale: 0 };
 const vHero = { x: 0, y: 40, dir: Math.PI / 2, walkT: 0, moving: false, target: null, pending: null };
 let vNear = null, vNearShown = undefined, vCam = { x: 0, y: 0 };
@@ -74,6 +74,7 @@ function villageGround() {
     gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
     g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rr, rr * 0.6, 0, 0, TAU); g.fill();
   }
+  if (typeof villagePatches === 'function') villagePatches(g); // manchas de tierra, pasto seco y empedrado (look.js)
   // caminos de tierra
   let dirt = null;
   if (GROUND_IMG.path) { dirt = g.createPattern(GROUND_IMG.path, 'repeat'); if (dirt.setTransform) dirt.setTransform(new DOMMatrix().scale(300 / GROUND_IMG.path.width)); }
@@ -548,8 +549,11 @@ function updateVillage(dt) {
   for (const n of NPCS) if (dist(vHero.x, vHero.y, n.x, n.y + 10) < 80) vNear = n;
   if (!vNear && dist(vHero.x, vHero.y, PORTAL.x, PORTAL.y + 30) < 80) vNear = 'portal';
   if (vNear !== vNearShown) { vNearShown = vNear; updateHubPrompt(); }
-  vCam.x = lerp(vCam.x, clamp(vHero.x, VB.x0 + 200, VB.x1 - 200), 1 - Math.exp(-6 * dt));
-  vCam.y = lerp(vCam.y, clamp(vHero.y - 30, VB.y0 + 80, VB.y1 - 120), 1 - Math.exp(-6 * dt));
+  // la cámara no enseña más allá del suelo pintado
+  const hw = W / (2 * zoom) + 10, hh = H / (2 * zoom) + 10;
+  const cxa = VG.x0 + hw, cxb = VG.x0 + VG.w - hw, cya = VG.y0 + hh, cyb = VG.y0 + VG.h - hh;
+  vCam.x = lerp(vCam.x, cxa < cxb ? clamp(vHero.x, cxa, cxb) : 0, 1 - Math.exp(-6 * dt));
+  vCam.y = lerp(vCam.y, cya < cyb ? clamp(vHero.y - 30, cya, cyb) : 0, 1 - Math.exp(-6 * dt));
   villageLife(dt);
 }
 
