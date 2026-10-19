@@ -1,6 +1,6 @@
 """Fendaria — héroes rediseñados (2.ª generación): atlas de animación y arte de cuerpo entero.
 
-Uso: python3 build_heroes.py <carpeta_hojas> <salida_www>
+Uso: python3 build_heroes.py <carpeta_hojas>[:<otra>...] <salida_www>   (la primera carpeta con la hoja gana)
   <carpeta_hojas> contiene, por clase, <clase>_base-0.jpg (diseño) y <clase>_<pose>-0.jpg (walk, idle, attack, hurt),
   todas con fondo magenta liso (generadas con Leonardo, ver README).
 Escribe <www>/img/heroes/anim/<clase>.webp, <www>/img/heroes/px/<clase>.png y <www>/js/anim_data.js
@@ -22,27 +22,45 @@ KEEP = {
     'berserker': {'attack': [0, 1, 2], 'hurt': [0]},
 }
 FLIP = {'artificiera': {'walk': [5]}}
+# ajustes de las hojas nuevas (rejillas de 12-16 fotogramas)
+FRESH_KEEP = {'feca': {'walk': [0, 1, 2, 3, 4, 6, 7, 8, 10, 11]}}
 CLIP_FWD = {'cra': 0.8, 'feca': 1.7, 'berserker': 1.0, 'iop': 0.85, 'domadora': 1.0}
 # hojas cuyos fotogramas se tocan: N columnas iguales, o lista de cortes (fracción del ancho)
 GRID = {'cra': {'walk': 6}, 'feca': {'attack': [0.26, 0.72]}}
 PX_H = 300  # altura del arte de cuerpo entero (menú, diálogos)
 
 
+def by_rows(fr):
+    """Hojas en rejilla: ordena los fotogramas por filas y, dentro de cada fila, de izquierda a derecha."""
+    if len(fr) < 2: return fr
+    hs = sorted(f['img'].height for f in fr); gap = hs[len(hs) // 2] * 0.5
+    fr = sorted(fr, key=lambda f: f['y'])
+    rows, cur = [], [fr[0]]
+    for f in fr[1:]:
+        if f['y'] - cur[-1]['y'] > gap: rows.append(cur); cur = [f]
+        else: cur.append(f)
+    rows.append(cur)
+    return [f for r in rows for f in sorted(r, key=lambda f: f['x'])]
+
+
 def build(src, www):
+    srcs = src.split(':')  # varias carpetas: la primera que tenga la hoja gana
     out_dir = os.path.join(www, 'img/heroes/anim'); os.makedirs(out_dir, exist_ok=True)
     px_dir = os.path.join(www, 'img/heroes/px'); os.makedirs(px_dir, exist_ok=True)
     data = {}
     for cls in CLASSES:
         # arte de cuerpo entero a partir del diseño base
-        base = frames(os.path.join(src, f'{cls}_base-0.jpg'))
+        base = frames(next(os.path.join(d, f'{cls}_base-0.jpg') for d in srcs if os.path.exists(os.path.join(d, f'{cls}_base-0.jpg'))))
         b = max(base, key=lambda f: f['img'].width * f['img'].height)
         s = PX_H / b['img'].height
         shrink(b['img'], s).save(os.path.join(px_dir, cls + '.png'), optimize=True)
         placed = []
         for pose in ['walk', 'idle', 'attack', 'hurt']:
-            path = os.path.join(src, f'{cls}_{pose}-0.jpg')
-            if not os.path.exists(path): continue
-            n = GRID.get(cls, {}).get(pose)
+            path = next((os.path.join(d, f'{cls}_{pose}-0.jpg') for d in srcs if os.path.exists(os.path.join(d, f'{cls}_{pose}-0.jpg'))), None)
+            if not path: continue
+            fresh = len(srcs) > 1 and path.startswith(srcs[0])  # hoja nueva: sin los ajustes de las antiguas
+            cfg = lambda T: (FRESH_KEEP.get(cls, {}) if T is KEEP else {}) if fresh else T.get(cls, {})
+            n = cfg(GRID).get(pose)
             if n:
                 import tempfile
                 im = Image.open(path).convert('RGB'); fr = []
@@ -52,10 +70,10 @@ def build(src, www):
                     im.crop((xs[k], 0, xs[k + 1], im.height)).save(tmp)
                     fr.append(max(frames(tmp), key=lambda f: f['img'].width * f['img'].height))
             else:
-                fr = frames(path)
-            for i in FLIP.get(cls, {}).get(pose, []):
+                fr = by_rows(frames(path)) if fresh else frames(path)
+            for i in cfg(FLIP).get(pose, []):
                 f = fr[i]; f['img'] = f['img'].transpose(Image.FLIP_LEFT_RIGHT); f['ax'] = f['img'].width - 1 - f['ax']
-            keep = KEEP.get(cls, {}).get(pose)
+            keep = cfg(KEEP).get(pose)
             if keep is not None: fr = [fr[i] for i in keep if i < len(fr)]
             # escala común de la pose a partir de la altura del cuerpo (mediana)
             sc = BODY_PX / float(np.median([f['bh'] for f in fr]))
