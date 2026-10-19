@@ -141,7 +141,6 @@ const SEAL_CD = 9;
 const _buttonLayout = buttonLayout;
 buttonLayout = function () {
   const L = _buttonLayout(), s = ui;
-  L.cast = { x: L.attack.x - 58 * s, y: L.attack.y - 176 * s, r: 25 * s };
   return L;
 };
 const _hitButton = hitButton;

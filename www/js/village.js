@@ -32,7 +32,6 @@ function buildVillage() {
   add({ kind: 'alchemy', x: 300, y: 92 }, 58, -12);
   add({ kind: 'cauldron', x: 372, y: 118 }, 20);
   add({ kind: 'well', x: -405, y: -40 }, 30);
-  add({ kind: 'sign', x: 70, y: 235 }, 8);
   add({ kind: 'forge', x: 215, y: 300 }, 30, -8); // fragua de Tobías
   for (const [x, y] of [[-390, 110], [-372, 132], [-250, 150], [380, 150], [395, 128]]) add({ kind: 'barrel', x, y, v: (x * 7) & 1 }, 13);
   for (const [x, y] of [[-238, -40], [238, -40], [-130, 120], [130, 120], [-150, -205], [150, -205]]) { add({ kind: 'lamp', x, y }, 7); VILLAGE.lamps.push({ x, y: y - 62 }); }

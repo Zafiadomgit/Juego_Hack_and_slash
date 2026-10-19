@@ -353,17 +353,20 @@ const input = {
 
 function buttonLayout() {
   const s = ui;
-  const m = 18 * s;
-  const ax = W - m - 52 * s, ay = H - m - 52 * s;
+  const m = 16 * s;
+  const ax = W - m - 48 * s, ay = H - m - 48 * s;
+  // dos arcos alrededor del ataque (estilo Hades): habilidades y esquiva cerca, el resto por fuera
+  const at = (deg, R, r) => ({ x: ax + Math.cos(deg * Math.PI / 180) * R * s, y: ay + Math.sin(deg * Math.PI / 180) * R * s, r: r * s });
   return {
-    attack: { x: ax, y: ay, r: 48 * s },
-    s0: { x: ax - 108 * s, y: ay + 14 * s, r: 34 * s },
-    s1: { x: ax - 82 * s, y: ay - 86 * s, r: 34 * s },
-    dash: { x: ax + 6 * s, y: ay - 118 * s, r: 28 * s },
-    pan: { x: ax - 182 * s, y: ay + 24 * s, r: 24 * s },
-    ult: { x: ax - 172 * s, y: ay - 64 * s, r: 30 * s },
-    pause: { x: W - 30 * s, y: 30 * s, r: 22 * s },
-    bag: { x: W - 82 * s, y: 30 * s, r: 22 * s },
+    attack: { x: ax, y: ay, r: 46 * s },
+    s0: at(186, 104, 30),
+    s1: at(223, 104, 30),
+    dash: at(260, 104, 27),
+    pan: at(190, 176, 22),
+    ult: at(218, 178, 27),
+    cast: at(247, 176, 23),
+    pause: { x: W - 28 * s, y: 28 * s, r: 20 * s },
+    bag: { x: W - 76 * s, y: 28 * s, r: 20 * s },
   };
 }
 
@@ -2022,7 +2025,9 @@ function drawHUD() {
   if (pk > 0) roundRect(rx - pw + 1.5, ry + 10.5 * s, (pw - 3) * pk, 5 * s, 3 * s, rift.bossSpawned ? '#ff7043' : '#ffb300');
 
   // minimapa (radar)
-  const mr = 30 * s, mx = rx - mr, my = ry + 26 * s + mr;
+  const mr = 26 * s, mx = rx - mr, my = ry + 44 * s + mr;
+  text('☠ ' + rift.kills, rx, ry + 29 * s, 11 * s, '#efece2', 'right', 800);
+  text('◆ ' + fmtNum(S.kamas), rx - pw, ry + 29 * s, 11 * s, '#ecd18a', 'left', 900);
   circle(mx, my, mr, 'rgba(10,14,28,0.6)', '#c9b27a', 2);
   ctx.save();
   ctx.beginPath(); ctx.arc(mx, my, mr - 2, 0, Math.PI * 2); ctx.clip();
@@ -2037,8 +2042,6 @@ function drawHUD() {
   if (riftEvent && !riftEvent.done && (riftEvent.kind === 'chest' || riftEvent.kind === 'altar')) { const ex = mx + (riftEvent.x - P.x) * ms, ey = my + (riftEvent.y - P.y) * ms; circle(clamp(ex, mx - mr + 5, mx + mr - 5), clamp(ey, my - mr + 5, my + mr - 5), 3.5 * s, RIFT_EVENTS[riftEvent.kind].color, '#fff', 1.5); }
   ctx.restore();
   drawStar(mx, my, 3.5 * s, '#fff');
-  text(S.kamas + ' ámbar', mx - mr - 8 * s, my - 8 * s, 13 * s, '#ecd18a', 'right', 900);
-  text('☠ ' + rift.kills, mx - mr - 8 * s, my + 10 * s, 11 * s, '#efece2', 'right', 800);
 
   // jefe
   if (bossRef && !bossRef.dead) {
