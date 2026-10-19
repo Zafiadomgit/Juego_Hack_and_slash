@@ -1,55 +1,32 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=1920, height=1080" />
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <title>Fendaria · Cinemáticas</title>
+    <script src="assets/js/gsap.min.js"></script>
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      html,
-      body {
-        margin: 0;
-        width: 1920px;
-        height: 1080px;
-        overflow: hidden;
-        background: #0a0a0a;
-      }
-      #root {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-      }
-      #title {
-        color: #f4f4f5;
-        font-size: 72px;
-        font-weight: 600;
-        letter-spacing: -0.03em;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1920px; height: 1080px; overflow: hidden; background: #040308; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; }
     </style>
   </head>
   <body>
-    <div
-      id="root"
-      data-composition-id="main"
-      data-start="0"
-      data-duration="10"
-      data-width="1920"
-      data-height="1080"
-    >
-      <h1 id="title" class="clip" data-start="0" data-duration="10" data-track-index="0">Title</h1>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="120" data-width="1920" data-height="1080">
+      <div id="c1-prologo" data-composition-id="c1-prologo" data-composition-src="compositions/c1-prologo.html" data-start="0" data-duration="24" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="c2-sello" data-composition-id="c2-sello" data-composition-src="compositions/c2-sello.html" data-start="24" data-duration="24" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="c3-ivo" data-composition-id="c3-ivo" data-composition-src="compositions/c3-ivo.html" data-start="48" data-duration="24" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="c4-heraldos" data-composition-id="c4-heraldos" data-composition-src="compositions/c4-heraldos.html" data-start="72" data-duration="24" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <div id="c5-final" data-composition-id="c5-final" data-composition-src="compositions/c5-final.html" data-start="96" data-duration="24" data-track-index="0" data-width="1920" data-height="1080"></div>
+      <audio id="c1-prologo-music" src="assets/audio/c1.ogg" data-start="0" data-duration="24" data-track-index="1" data-volume="0.9"></audio>
+      <audio id="c2-sello-music" src="assets/audio/c2.ogg" data-start="24" data-duration="24" data-track-index="1" data-volume="0.9"></audio>
+      <audio id="c3-ivo-music" src="assets/audio/c3.ogg" data-start="48" data-duration="24" data-track-index="1" data-volume="0.9"></audio>
+      <audio id="c4-heraldos-music" src="assets/audio/c4.ogg" data-start="72" data-duration="24" data-track-index="1" data-volume="0.9"></audio>
+      <audio id="c5-final-music" src="assets/audio/c5.ogg" data-start="96" data-duration="24" data-track-index="1" data-volume="0.9"></audio>
     </div>
     <script>
       const tl = gsap.timeline({ paused: true });
-      // Example: tl.fromTo("#title", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6 }, 0);
       window.__timelines["main"] = tl;
-      tl.seek(0);
     </script>
   </body>
 </html>
