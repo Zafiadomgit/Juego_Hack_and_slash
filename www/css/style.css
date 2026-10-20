@@ -832,3 +832,29 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .offer { min-height: 118px; height: auto; overflow: visible; }
 .offer > * { flex-shrink: 0; }
 .offer .buy { height: 34px; min-height: 34px; }
+
+/* Herrería 2: runas de forja */
+.runed { position: relative; display: inline-flex; }
+.runed > i { position: absolute; right: -5px; bottom: -5px; width: 17px; height: 17px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 10px;
+  background: #0c0f1c; border: 1.5px solid var(--c); box-shadow: 0 0 6px var(--c); }
+.rune-desc { display: block; margin-top: 4px; font-size: 11.5px; line-height: 1.3; color: #e8e2d0; }
+.icard .rune-desc { margin: 6px 0; padding: 6px 8px; border-radius: 8px; background: rgba(0, 0, 0, 0.3); }
+.rune-list { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px; }
+.rune-list span { display: grid; grid-template-columns: 24px 1fr; column-gap: 6px; padding: 6px 8px; border-radius: 9px; border: 1px solid var(--c); background: rgba(0, 0, 0, 0.3); }
+.rune-list i { grid-row: span 2; font-style: normal; font-size: 18px; align-self: center; }
+.rune-list b { color: var(--c); font-size: 12.5px; }
+.rune-list small { font-size: 11px; color: #cfcab8; }
+/* Mejoras de Ivo */
+.up-pips { display: flex; gap: 3px; margin-top: 5px; }
+.up-pips i { flex: 1; height: 6px; border-radius: 3px; background: #2a3150; }
+.up-pips i.on { background: linear-gradient(#ffe08a, #d7a14a); box-shadow: 0 0 5px rgba(255, 210, 120, 0.6); }
+.up-pips.bar { height: 6px; border-radius: 3px; background: #2a3150; overflow: hidden; }
+.up-pips.bar b { display: block; height: 100%; background: linear-gradient(90deg, #d7a14a, #ffe08a); }
+.offer.reco { border-color: #ffd76a; box-shadow: 0 0 14px rgba(255, 215, 106, 0.45), inset 0 0 0 1px #070a14; position: relative; }
+.reco-tag { position: absolute; top: -9px; right: 10px; padding: 1px 8px; border-radius: 8px; background: #ffd76a; color: #2a1a0c; font: 900 10.5px Garamond, Georgia, serif; }
+/* cabecera de tienda con muchas pestañas: se desplazan en vez de pisar el ámbar */
+#shop .sh-head { gap: 8px; }
+#shop .shop-tabs { flex: 1 1 auto; min-width: 0; overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+#shop .shop-tabs::-webkit-scrollbar { display: none; }
+#shop .shop-tabs button { flex: none; }
+#shop .sh-amber { flex: none; margin-left: 4px !important; }
