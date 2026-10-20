@@ -9,7 +9,7 @@
 
 const RUN_KEEP = ['owned', 'slots', 'hammers', 'vigor', 'lastGod', 'revived', 'lives', 'rerolls'];
 function nextRunNode(b, n) {
-  if (n === 'S') return b + 1 < BIOMES.length ? { b: b + 1, n: 1 } : null;
+  if (n === 'S') return null; // el Súper Jefe cierra la expedición: a la villa, a ver su cinemática
   return { b, n: n < LEVELS_PER_BIOME ? n + 1 : 'S' };
 }
 const runDepth = () => (rift && rift.run ? rift.run.depth : 0);
@@ -38,7 +38,8 @@ function openRunPick() {
   $('rpInfo').textContent = `Expedición · ${d} Grieta${d > 1 ? 's' : ''} superada${d > 1 ? 's' : ''} · ${nb} bendicion${nb === 1 ? '' : 'es'}`;
   const B = BIOMES[nx.b];
   $('rpNext').innerHTML = (nx.n === 'S' ? `<b style="color:#ff7a5a">Súper Jefe</b> de ${B.name}` : `${B.name} · Grieta ${nx.n}`) +
-    ' · conservas bendiciones, vida y definitivo. <span style="color:#ff9a7a">Los monstruos serán más duros</span>';
+    ' · conservas bendiciones, vida y definitivo. <span style="color:#ff9a7a">Los monstruos serán más duros</span>' +
+    (nx.n === 'S' ? '<br><span style="color:#ffe08a">Vencer al Súper Jefe cierra la expedición y vuelves a la villa</span>' : '');
   runPrev = state; state = 'runpick'; runT = performance.now();
   clearInput();
   $('runPick').classList.add('show');
