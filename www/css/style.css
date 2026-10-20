@@ -900,3 +900,18 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .tal-soon { margin: auto; max-width: 420px; text-align: center; font-size: 15px; color: #ecd18a; }
 @media (max-width: 700px) { .tal-grid { grid-template-columns: 1fr; } .tb { grid-template-columns: 1fr; } .tn { width: 38px; height: 38px; font-size: 16px; } }
 .tn.key .ic { transform: rotate(-45deg); }
+/* talentos v2: 8 nodos por rama y encrucijadas */
+.tb { grid-template-columns: 96px 1fr; }
+.tn { width: 38px; height: 38px; font-size: 16px; }
+.tn.cap { width: 44px; height: 44px; }
+.tn.key { border-radius: 10px; }
+.tn.mini { width: 28px; height: 28px; font-size: 13px; }
+.tn.mini.key { transform: rotate(45deg); }
+.tn.mini .tp { display: none; }
+.tx { flex: none; display: flex; flex-direction: column; align-items: center; gap: 1px; }
+.tx em { font-style: normal; font-size: 9px; color: #aeb0c4; line-height: 1; }
+.tal-tree { padding: 6px 8px; gap: 2px; }
+.tal-sp { color: #aeb0c4; font-size: 12px; }
+.ti-alt { font-size: 11.5px; color: #aeb0c4; line-height: 1.3; padding-top: 4px; border-top: 1px dashed rgba(255, 255, 255, 0.15); }
+.ti-alt b { color: #ecd18a; }
+.tb-h small { display: block; }
