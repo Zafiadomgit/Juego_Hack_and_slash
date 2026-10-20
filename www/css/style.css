@@ -796,3 +796,21 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .sh-doll .bottom { justify-content: center; left: 66px; right: 66px; gap: 6px; }
 .sh-doll .slot { width: 52px; height: 52px; }
 .sh-grid { padding-bottom: 6px; mask-image: linear-gradient(180deg, #000 calc(100% - 14px), transparent); }
+
+/* mapa de Grietas: panel lateral que no se pisa y nodos de piedra */
+.map-info > * { flex: none; }
+.map-info #btnMapGo { position: sticky; bottom: 0; margin-top: auto; box-shadow: 0 -10px 14px #0f1526; }
+.map-field { image-rendering: auto; }
+.mnode { border-color: #e2c98c; background: radial-gradient(circle at 40% 30%, #5a5a6e, #2a2a38 60%, #16161e); box-shadow: 0 5px 0 #0c0c12, 0 8px 14px rgba(0, 0, 0, 0.6); text-shadow: 0 2px 2px #000; }
+.mnode.sel { border-color: #ffd76a; }
+.map-field .mf-title { font-size: 18px; padding: 4px 12px; border-radius: 6px; background: rgba(10, 8, 6, 0.55); border: 1px solid rgba(236, 209, 138, 0.4); }
+.map-field .mf-set { padding: 3px 10px; border-radius: 6px; background: rgba(10, 8, 6, 0.6); }
+.map-info .mi-chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.map-info .mi-chips span { position: relative; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid var(--c); background: rgba(0, 0, 0, 0.35); box-shadow: 0 0 8px color-mix(in srgb, var(--c) 60%, transparent); }
+.map-info .mi-chips span.have { opacity: 0.55; box-shadow: none; }
+.map-info .mi-chips span i { position: absolute; right: -4px; bottom: -4px; font-style: normal; font-size: 11px; color: #7cff8a; text-shadow: 0 1px 2px #000; }
+.map-info .mi-chips small { font-size: 11.5px; color: #aeb0c4; }
+.map-info .mi-more summary { cursor: pointer; font: 800 12.5px Garamond, Georgia, serif; color: #ecd18a; list-style: none; }
+.map-info .mi-more summary::before { content: '▸ '; }
+.map-info .mi-more[open] summary::before { content: '▾ '; }
+.map-info .mi-more > * + * { margin-top: 6px; }

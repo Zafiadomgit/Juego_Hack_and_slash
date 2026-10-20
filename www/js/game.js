@@ -2606,50 +2606,78 @@ function autoAdvance() {
   else m.sel = { b, n: 'S', d: 0 };
 }
 const MAP_BG = new Map();
+// Fondo del mapa al estilo de la villa: suelo del mundo por manchas, camino de tierra entre las Grietas
+// y los mismos objetos pintados que hay dentro (árboles, rocas, cristales)
 function mapBackground(B) {
   if (MAP_BG.has(B.id)) return MAP_BG.get(B.id);
+  const Wc = 900, Hc = 420;
   const c = document.createElement('canvas');
-  c.width = 900; c.height = 420;
+  c.width = Wc; c.height = Hc;
   const g = c.getContext('2d');
-  const pat = g.createPattern(biomeGroundTex(B), 'repeat');
-  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(1.6));
-  g.fillStyle = pat; g.fillRect(0, 0, 900, 420);
-  let seed = B.id.length * 777;
+  const tex = biomeGroundTex(B);
+  const pat = g.createPattern(tex, 'repeat');
+  if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(1.2));
+  g.fillStyle = pat; g.fillRect(0, 0, Wc, Hc);
+  let seed = B.id.length * 777 + 13;
   const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  for (let i = 0; i < 10; i++) {
-    const x = rnd() * 900, y = rnd() * 420, r = 80 + rnd() * 160, col = B.patch[i % 2];
-    const gr = g.createRadialGradient(x, y, 0, x, y, r);
-    gr.addColorStop(0, col); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
-    g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+  if (typeof paintPatches === 'function') {
+    const tp = (img, k) => { const p = g.createPattern(img, 'repeat'); if (p.setTransform) p.setTransform(new DOMMatrix().scale(k)); return p; };
+    paintPatches(g, rnd, { x0: 0, y0: 0, w: Wc, h: Hc }, 16, [
+      { fill: tp(tex, 2.2), tint: B.patch[0].replace(/[\d.]+\)$/, '0.45)'), r: [40, 90] },
+      { fill: tp(tex, 0.7), tint: B.patch[1].replace(/[\d.]+\)$/, '0.4)'), rim: 'rgba(0,0,0,0.18)', r: [30, 70] },
+    ]);
   }
-  const st = POOL_STYLE[B.pool];
-  const saved = ctx;
-  ctx = g;
-  try {
-    for (let i = 0; i < 6; i++) {
-      const x = rnd() * 900, y = 60 + rnd() * 320, rx = 30 + rnd() * 40;
-      const gr = g.createRadialGradient(x, y, 2, x, y, rx);
-      gr.addColorStop(0, st.stops[0]); gr.addColorStop(0.4, st.stops[1]); gr.addColorStop(0.8, st.stops[2]); gr.addColorStop(1, st.stops[3]);
-      g.fillStyle = st.rim; g.beginPath(); g.ellipse(x, y, rx + 5, rx * 0.45 + 4, 0, 0, TAU); g.fill();
-      g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx, rx * 0.45, 0, 0, TAU); g.fill();
+  // camino de tierra con la misma curva que el del SVG
+  const P = MAP_POS.map(([x, y]) => [x / 100 * Wc, y / 100 * Hc]);
+  const road = (w, style) => {
+    g.strokeStyle = style; g.lineWidth = w; g.lineCap = 'round'; g.lineJoin = 'round';
+    g.beginPath(); g.moveTo(P[0][0], P[0][1]);
+    for (let i = 1; i < P.length; i++) { const [x0, y0] = P[i - 1], [x1, y1] = P[i]; g.bezierCurveTo(x0 + (x1 - x0) * 0.5, y0, x0 + (x1 - x0) * 0.5, y1, x1, y1); }
+    g.stroke();
+  };
+  road(30, 'rgba(30,20,10,0.45)');
+  if (GROUND_IMG.path) { const dp = g.createPattern(GROUND_IMG.path, 'repeat'); if (dp.setTransform) dp.setTransform(new DOMMatrix().scale(0.5)); road(22, dp); }
+  else road(22, '#7a5a3a');
+  road(22, 'rgba(255,220,160,0.08)');
+  // objetos del mundo, sin pisar el camino
+  const nearRoad = (x, y) => {
+    for (let i = 1; i < P.length; i++) for (let t = 0; t <= 1; t += 0.1) {
+      const [x0, y0] = P[i - 1], [x1, y1] = P[i];
+      if (Math.hypot(x - (x0 + (x1 - x0) * t), y - (y0 + (y1 - y0) * (t * t * (3 - 2 * t)))) < 44) return true;
     }
-    const trees = [];
-    for (let i = 0; i < 46; i++) trees.push([rnd() * 900, rnd() * 440, 0.55 + rnd() * 0.4]);
-    trees.sort((a, b) => a[1] - b[1]);
-    for (const [x, y, sc] of trees) {
-      g.save(); g.translate(x, y); g.scale(sc, sc);
-      g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(0, 2, 22, 8, 0, 0, TAU); g.fill();
-      treeArt(B.tree, rnd() < 0.5 ? 1 : 0, 0);
-      g.restore();
-    }
-  } finally { ctx = saved; }
-  const v = g.createRadialGradient(450, 210, 120, 450, 210, 520);
-  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
-  g.fillStyle = v; g.fillRect(0, 0, 900, 420);
-  const url = c.toDataURL('image/jpeg', 0.85);
+    return false;
+  };
+  const img = PROP_IMG[B.id], A = PROP_ATLAS[B.id];
+  if (!img || !A) return URL_PENDING(c);
+  const kinds = [['tree', 0.55, 78], ['rock', 0.2, 30], ['crystal', 0.1, 40], ['pillar', 0.1, 60], ['fern', 0.05, 18]].filter((k) => A[k[0]] && A[k[0]].length);
+  const tot = kinds.reduce((s2, k) => s2 + k[1], 0);
+  const items = [];
+  for (let i = 0; i < 70; i++) {
+    const x = rnd() * Wc, y = 10 + rnd() * (Hc + 40);
+    if (nearRoad(x, y)) continue;
+    let r = rnd() * tot, K = kinds[0];
+    for (const k of kinds) { if (r < k[1]) { K = k; break; } r -= k[1]; }
+    const list = A[K[0]], f = list[Math.floor(rnd() * list.length)];
+    items.push({ x, y, f, h: K[2] * (0.8 + rnd() * 0.45), flip: rnd() < 0.5 });
+  }
+  items.sort((a2, b2) => a2.y - b2.y);
+  for (const it of items) {
+    const [sx, sy, sw, sh] = it.f, k = it.h / sh, w = sw * k;
+    g.fillStyle = 'rgba(0,0,0,0.28)'; g.beginPath(); g.ellipse(it.x, it.y, w * 0.4, w * 0.13, 0, 0, TAU); g.fill();
+    g.save(); g.translate(it.x, it.y); if (it.flip) g.scale(-1, 1);
+    g.drawImage(img, sx, sy, sw, sh, -w / 2, -it.h + 2, w, it.h);
+    g.restore();
+  }
+  // luz cálida en el centro y bordes en sombra
+  const v = g.createRadialGradient(Wc / 2, Hc * 0.55, 80, Wc / 2, Hc / 2, 560);
+  v.addColorStop(0, 'rgba(255,200,120,0.10)'); v.addColorStop(0.5, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.6)');
+  g.fillStyle = v; g.fillRect(0, 0, Wc, Hc);
+  const url = c.toDataURL('image/jpeg', 0.86);
   MAP_BG.set(B.id, url);
   return url;
 }
+// sin el atlas del mundo cargado todavía: se usa un fondo provisional y no se guarda
+function URL_PENDING(c) { return c.toDataURL('image/jpeg', 0.8); }
 function openMap() {
   mapView = mapSel().b;
   buildMap();
@@ -2675,8 +2703,7 @@ function buildMap() {
     d += ` C${x0 + (x1 - x0) * 0.5},${y0} ${x0 + (x1 - x0) * 0.5},${y1} ${x1},${y1}`;
   }
   const html = [`<svg class="mf-bg" viewBox="0 0 100 100" preserveAspectRatio="none">
-      <path d="${d}" fill="none" stroke="rgba(0,0,0,.55)" stroke-width="11" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="#e8c88a" stroke-width="4" stroke-dasharray="2 9" vector-effect="non-scaling-stroke" stroke-linecap="round"/>
+      <path d="${d}" fill="none" stroke="#f2d79a" stroke-width="3" stroke-dasharray="2 10" vector-effect="non-scaling-stroke" stroke-linecap="round" opacity=".75"/>
     </svg>`, `<div class="mf-title">${B.name}</div>`];
   nodes.forEach((n, i) => {
     const un = nodeUnlocked(b, n), cd = clearedDiffs(b, n), isS = n === 'S';
@@ -2689,7 +2716,7 @@ function buildMap() {
   const field = $('mapField');
   field.style.setProperty('--mbg', `rgb(${B.ground[2].join(',')})`);
   field.style.backgroundImage = `url(${mapBackground(B)})`;
-  field.style.backgroundSize = 'cover';
+  field.style.backgroundSize = '100% 100%'; // el camino pintado coincide con los nodos
   field.innerHTML = html.join('');
   buildMapInfo();
 }
@@ -2716,12 +2743,14 @@ function buildMapInfo() {
     <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
     ${diffs}
     ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
-    <div class="mi-gl">Gemas que puedes conseguir aquí</div>
-    <div class="mi-gems">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].desc}">${gemImg(k, 26)}<b>${GEMS[k].name}</b><small>${S.dofus.includes(k) ? '✔ ya la tienes' : GEMS[k].desc}</small></span>`).join('')}</div>
     <div class="mi-rows">
-      <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
       <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
+    </div>
+    <div class="mi-chips">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 20)}${S.dofus.includes(k) ? '<i>✔</i>' : ''}</span>`).join('')}<small>${gemsFor(B.id, isS).every((k) => S.dofus.includes(k)) ? 'Gemas de aquí: todas tuyas' : 'Gemas que puedes conseguir'}</small></div>
+    <details class="mi-more"><summary>Más detalles</summary>
+    <div class="mi-rows">
+      <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
       <span>Pensada para equipo</span><b>${['<span style="color:' + RARITY[0].color + '">Común</span>', '<span style="color:' + RARITY[1].color + '">Raro</span> o mejor', '<span style="color:' + RARITY[3].color + '">Legendario</span>'][d]}</b>
       <span>Ámbar y XP</span><b>×${DF.reward}</b>
       <span>Calidad del botín</span><b>${rarityRangeText(DF)}</b>
@@ -2731,6 +2760,7 @@ function buildMapInfo() {
 
     <div class="mi-set" style="--sc:${SD.color}"><div class="t">Conjunto ${SD.name} (${cnt}/${SLOTS.length})</div>
       ${[2, 4, 6].map((k) => `<div class="${cnt >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
+    </details>
     <button id="btnMapGo" class="btn big">${isS ? '☠ Desafiar al Súper Jefe' : '🌀 Entrar en la Grieta'}</button>`;
 }
 $('mapTabs').addEventListener('click', (ev) => {
