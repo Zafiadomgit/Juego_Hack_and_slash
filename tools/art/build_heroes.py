@@ -27,6 +27,19 @@ FRESH_KEEP = {'feca': {'walk': [0, 1, 2, 3, 4, 6, 7, 8, 10, 11]}}
 CLIP_FWD = {'cra': 0.8, 'feca': 1.7, 'berserker': 1.0, 'iop': 0.85, 'domadora': 1.0}
 # hojas cuyos fotogramas se tocan: N columnas iguales, o lista de cortes (fracción del ancho)
 GRID = {'cra': {'walk': 6}, 'feca': {'attack': [0.26, 0.72]}}
+# hojas en rejilla con efectos que unen fotogramas: columnas de cada fila (cada celda es un fotograma)
+CELLS = {
+    'artificiera': {'attack': [3, 3], 'cast': [3, 3]}, 'berserker': {'cast': [4, 4, 4]}, 'cra': {'cast': [3, 3]},
+    'domadora': {'attack': [3, 3, 3], 'cast': [3, 3]}, 'feca': {'attack': [4, 3], 'cast': [3, 3]},
+    'iop': {'attack': [3, 3], 'cast': [3, 3]}, 'sombra': {'attack': [4, 3], 'cast': [3, 3]},
+}
+# fotogramas elegidos de las hojas en celdas (índice de celda en orden de lectura)
+CELL_KEEP = {
+    'artificiera': {'attack': [2, 0, 1, 3], 'cast': [0, 1, 3, 4, 5]}, 'berserker': {'cast': [0, 1, 2, 3, 8, 6]},
+    'cra': {'cast': [0, 1, 3, 4, 5]}, 'domadora': {'attack': [1, 0, 4, 7], 'cast': [0, 1, 2, 4]},
+    'feca': {'attack': [0, 1, 5, 4], 'cast': [0, 1, 2, 4, 5]}, 'iop': {'attack': [0, 2, 3, 4, 5], 'cast': [0, 1, 2, 3, 4, 5]},
+    'sombra': {'attack': [0, 1, 2, 3, 4, 5], 'cast': [0, 1, 2, 3, 4, 5]},
+}
 PX_H = 300  # altura del arte de cuerpo entero (menú, diálogos)
 
 
@@ -55,13 +68,28 @@ def build(src, www):
         s = PX_H / b['img'].height
         shrink(b['img'], s).save(os.path.join(px_dir, cls + '.png'), optimize=True)
         placed = []
-        for pose in ['walk', 'idle', 'attack', 'hurt']:
+        for pose in ['walk', 'idle', 'attack', 'hurt', 'cast']:
             path = next((os.path.join(d, f'{cls}_{pose}-0.jpg') for d in srcs if os.path.exists(os.path.join(d, f'{cls}_{pose}-0.jpg'))), None)
             if not path: continue
-            fresh = len(srcs) > 1 and path.startswith(srcs[0])  # hoja nueva: sin los ajustes de las antiguas
+            fresh = len(srcs) > 1 and not path.startswith(srcs[-1])  # hoja nueva: sin los ajustes de las antiguas
             cfg = lambda T: (FRESH_KEEP.get(cls, {}) if T is KEEP else {}) if fresh else T.get(cls, {})
             n = cfg(GRID).get(pose)
-            if n:
+            cells = CELLS.get(cls, {}).get(pose) if '/hero2' in path else None
+            if cells:
+                import tempfile
+                im = Image.open(path).convert('RGB'); fr = []
+                rh = im.height / len(cells)
+                for r, nc in enumerate(cells):
+                    for k in range(nc):
+                        tmp = os.path.join(tempfile.gettempdir(), f'cell_{cls}_{pose}_{r}_{k}.png')
+                        box = (int(k * im.width / nc), int(r * rh), int((k + 1) * im.width / nc), int((r + 1) * rh))
+                        im.crop(box).save(tmp)
+                        try: got = frames(tmp)
+                        except Exception: continue
+                        fr.append(max(got, key=lambda f: f['bh'] * f['img'].width ** 0.3))
+                keep = CELL_KEEP.get(cls, {}).get(pose)
+                if keep is not None: fr = [fr[i] for i in keep if i < len(fr)]
+            elif n:
                 import tempfile
                 im = Image.open(path).convert('RGB'); fr = []
                 xs = [0] + [int(c * im.width) for c in n] + [im.width] if isinstance(n, list) else [int(k * im.width / n) for k in range(n + 1)]
@@ -71,9 +99,9 @@ def build(src, www):
                     fr.append(max(frames(tmp), key=lambda f: f['img'].width * f['img'].height))
             else:
                 fr = by_rows(frames(path)) if fresh else frames(path)
-            for i in cfg(FLIP).get(pose, []):
+            for i in ([] if cells else cfg(FLIP).get(pose, [])):
                 f = fr[i]; f['img'] = f['img'].transpose(Image.FLIP_LEFT_RIGHT); f['ax'] = f['img'].width - 1 - f['ax']
-            keep = cfg(KEEP).get(pose)
+            keep = None if cells else cfg(KEEP).get(pose)
             if keep is not None: fr = [fr[i] for i in keep if i < len(fr)]
             # escala común de la pose a partir de la altura del cuerpo (mediana)
             sc = BODY_PX / float(np.median([f['bh'] for f in fr]))
