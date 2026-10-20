@@ -332,3 +332,15 @@ function castFlourish() {
   }
   glow(P.x, P.y - 24, 50, f.rgb, 0.5);
 }
+
+// ---------- pantalla de inicio: chispas que suben desde la Grieta ----------
+(function () {
+  const box = document.querySelector('#title .t-sparks');
+  if (!box) return;
+  let h = '';
+  for (let i = 0; i < 34; i++) {
+    const w = Math.random() < 0.35 ? ' class="w"' : '';
+    h += `<i${w} style="left:${(Math.random() * 100).toFixed(1)}%;--dx:${(Math.random() * 120 - 60).toFixed(0)}px;animation-duration:${(6 + Math.random() * 8).toFixed(1)}s;animation-delay:${(-Math.random() * 12).toFixed(1)}s;transform:scale(${(0.5 + Math.random()).toFixed(2)})"></i>`;
+  }
+  box.innerHTML = h;
+})();

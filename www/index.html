@@ -3,9 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#1b2e12" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <title>Fendaria</title>
+  <title>Fendaria · Las Grietas Rúnicas</title>
+  <link rel="icon" type="image/png" href="img/icon-192.png" />
+  <link rel="apple-touch-icon" href="img/icon-192.png" />
+  <meta name="theme-color" content="#070b18" />
+  <meta name="description" content="Fendaria: Las Grietas Rúnicas — hack and slash de fantasía en pixel art HD." />
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
@@ -15,14 +18,16 @@
 
   <!-- Pantalla de título: toca para empezar -->
   <div id="title" class="overlay titlescr">
+    <div class="t-bg"></div><div class="t-shade"></div><div class="t-sparks"></div>
     <div class="t-rays"></div>
     <img class="t-logo" src="img/logo.png" alt="Fendaria · Las Grietas Rúnicas" />
     <div class="t-tap">Toca para empezar</div>
-    <div class="t-ver">v1.0</div>
+    <div class="t-ver">v1.1</div>
   </div>
 
   <!-- Menú principal -->
   <div id="start" class="overlay startscr">
+    <div class="t-bg dim"></div><div class="t-shade"></div>
     <img class="s-logo" src="img/logo.png" alt="Fendaria" />
     <nav class="s-menu">
       <button id="stContinue">Continuar<small id="stContinueSub"></small></button>
