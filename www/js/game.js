@@ -847,8 +847,8 @@ function spawnEnemy(type, x, y, o = {}) {
   // dificultad ajustada al equipo que se consigue en esa dificultad: un Jabalí aguanta DF.hits golpes
   // del héroe de referencia y el héroe aguanta DF.die golpes de Jabalí (ver refPlayer)
   const ref = refPlayer(S ? S.cls : 'iop', F, rift ? rift.d : 0);
-  const hpMul = (DF.hits * ref.hit / ENEMIES.bouftou.hp) * (sup ? 3.2 : 1) * rand(0.95, 1.05);
-  const dmgMul = (ref.ehp / DF.die / ENEMIES.bouftou.dmg) * (sup ? 1.3 : 1);
+  const hpMul = (DF.hits * ref.hit / ENEMIES.bouftou.hp) * (sup ? 4 : D.boss ? 1.3 : 1) * rand(0.95, 1.05);
+  const dmgMul = (ref.ehp / DF.die / ENEMIES.bouftou.dmg) * (sup ? 1.45 : D.boss ? 1.15 : 1);
   const hp = Math.round(D.hp * hpMul * (elite ? 3.5 : 1));
   const e = {
     type, D, x, y, r: D.r * (elite ? elite.size || 1.15 : 1) * (sup ? 1.45 : 1),
@@ -1491,7 +1491,7 @@ function spawnPack() {
   const types = riftTypes(rift.level);
   // los primeros segundos sin crujidores
   const early = rift.elapsed < 20;
-  const eliteIdx = rift.isDungeon ? (Math.random() < 0.8 ? 0 : -1) : rift.elapsed > 15 && Math.random() < Math.min(0.45, 0.12 + rift.threat * 0.03) ? 0 : -1;
+  const eliteIdx = rift.isDungeon ? (Math.random() < 0.8 ? 0 : -1) : rift.elapsed > 15 && Math.random() < Math.min(0.5, 0.18 + rift.threat * 0.035) ? 0 : -1;
   for (let i = 0; i < n; i++) {
     let type = weightedPick(types);
     if (early && ENEMIES[type].hp > 100) type = Object.keys(rift.biome.weights).find((k) => ENEMIES[k].hp <= 100) || type;
@@ -1666,10 +1666,10 @@ function updateRift(dt) {
   if (!rift.bossDead) rift.time -= dt;
   if (!rift.bossSpawned) {
     rift.spawnT -= dt;
-    const cap = Math.min(60, 26 + rift.threat * 3);
+    const cap = Math.min(72, 32 + rift.threat * 4);
     if (rift.spawnT <= 0 && enemies.length < cap) {
       spawnPack();
-      rift.spawnT = rand(1.3, 2.3) * Math.max(0.45, 1 - rift.threat * 0.05);
+      rift.spawnT = rand(1.05, 1.85) * Math.max(0.4, 1 - rift.threat * 0.05);
     }
   }
   if (rift.zaap && dist(P.x, P.y, rift.zaap.x, rift.zaap.y - 10) < 34) finishRift();
