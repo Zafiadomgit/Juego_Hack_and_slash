@@ -2767,8 +2767,8 @@ let invPrev = null; // valores anteriores, para animar lo que sube
 const fmtNum = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 const AMBER_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L14 6 L11.5 15 L4.5 15 L2 6 Z" fill="#f0a030" stroke="#7a4a10" stroke-width="1.2"/></svg>';
 const SLOT_POS = {
-  sombrero: 'left: 6px; top: 6px', amuleto: 'left: 6px; top: 66px', anillo: 'left: 6px; top: 126px',
-  capa: 'right: 6px; top: 6px', cinturon: 'right: 6px; top: 66px', botas: 'right: 6px; top: 126px',
+  arma: 'left: 8px; top: 8px', sombrero: 'left: 8px; top: 66px', amuleto: 'left: 8px; top: 124px', anillo: 'left: 8px; top: 182px',
+  capa: 'right: 8px; top: 8px', cinturon: 'right: 8px; top: 66px', botas: 'right: 8px; top: 124px',
 };
 const BAG_TABS = [['all', 'Todo'], ['weapon', 'Armas'], ['armor', 'Ropa'], ['jewel', 'Joyas']];
 const tabMatch = (tab, it) => tab === 'all' || (tab === 'weapon' ? it.slot === 'arma' : tab === 'jewel' ? it.slot === 'amuleto' || it.slot === 'anillo' : it.slot !== 'arma' && it.slot !== 'amuleto' && it.slot !== 'anillo');
@@ -2896,7 +2896,6 @@ function buildInventory(justEquipped) {
     ${heroDollHTML()}
     ${Object.keys(SLOT_POS).map((s) => slotHTML(s, SLOT_POS[s])).join('')}
     <div class="bottom">
-      ${slotHTML('arma', '', 44)}
       <button class="gems-label" id="btnGems">GEMAS ${S.dofus.length}/${Object.keys(GEMS).length}</button>
       ${S.gemSlots.map((k, i) => k
         ? `<button class="gem got" data-gs="${i}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 22)}</button>`
