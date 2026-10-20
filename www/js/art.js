@@ -1177,6 +1177,21 @@ function monFrame(id, pose, i, filt, bid) {
   }
   return c;
 }
+// silueta de un fotograma en un color (para destellos)
+const MON_SIL = new Map();
+function monSilhouette(c, rgb) {
+  const key = c.key + '|' + rgb;
+  let o = MON_SIL.get(key);
+  if (o) return o;
+  o = document.createElement('canvas'); o.width = c.width; o.height = c.height;
+  const g = o.getContext('2d');
+  g.drawImage(c, 0, 0);
+  g.globalCompositeOperation = 'source-in';
+  g.fillStyle = `rgb(${rgb})`; g.fillRect(0, 0, o.width, o.height);
+  if (MON_SIL.size > 400) MON_SIL.clear();
+  MON_SIL.set(key, o);
+  return o;
+}
 function drawMonsterAnim(e, A0, k, ox, oy) {
   const id = monAnimId(e), A = MON_ANIM[id];
   const [pose, i] = monPose(e, A);
@@ -1193,13 +1208,13 @@ function drawMonsterAnim(e, A0, k, ox, oy) {
     const kk = (c.height * s) / hpx;
     ctx.drawImage(pi, -c.ax * s - kk, -c.ay * s - kk, pi.width * kk, pi.height * kk);
   } else ctx.drawImage(c, -c.ax * s, -c.ay * s, c.width * s, c.height * s);
-  // destello al recibir daño y brillo rojo en furia
+  // destello al recibir daño (silueta clara, sin filtros: va igual en todos los móviles) y brillo rojo en furia.
+  // Los jefes reciben muchos golpes seguidos: su destello es más suave para que no se queden «en blanco».
   if (e.flash > 0 || e.enraged) {
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.globalAlpha *= e.flash > 0 ? 0.55 : 0.18 + Math.sin(now * 8) * 0.08;
-    ctx.filter = e.flash > 0 ? 'brightness(2.2) saturate(0)' : 'sepia(1) saturate(6) hue-rotate(-30deg)';
-    ctx.drawImage(c, -c.ax * s, -c.ay * s, c.width * s, c.height * s);
-    ctx.filter = 'none';
+    const hit = e.flash > 0, big = e.boss || e.superDef;
+    const sil = monSilhouette(c, hit ? '255,246,230' : '255,60,30');
+    ctx.globalAlpha *= hit ? (big ? 0.32 : 0.6) * Math.min(1, e.flash / 0.1) : 0.16 + Math.sin(now * 8) * 0.07;
+    ctx.drawImage(sil, -c.ax * s, -c.ay * s, c.width * s, c.height * s);
   }
   ctx.restore();
 }

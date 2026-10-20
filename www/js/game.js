@@ -872,7 +872,7 @@ function damageEnemy(e, base, o = {}) {
   const armor = e.elite && e.elite.armor ? e.elite.armor : 0;
   const dmg = Math.max(1, Math.round(base * (crit ? (P.C.critMul || 1.8) * (P.critDmg || 1) : 1) * rand(0.9, 1.1) * (1 - armor)));
   e.hp -= dmg;
-  e.flash = 0.1;
+  if (!(e.boss || e.superDef) || e.flash < -0.12) e.flash = 0.1; // los jefes no encadenan destellos
   if (o.poison) e.dot = { t: o.poison.t, dps: o.poison.dps, tick: 0.5 };
   stealLife(dmg);
   if (o.quiet) {
