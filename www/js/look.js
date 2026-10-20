@@ -120,12 +120,11 @@ function villagePatches(g) {
 // las Grietas: manchas deterministas por celda del mundo (sin cortes entre trozos)
 function riftPatches(g, cx, cy, B) {
   if (rift && rift.isDungeon) return;
-  const tex = biomeGroundTex(B), dirt = GROUND_IMG.path;
+  const tex = biomeGroundTex(B);
   const kinds = [
     { fill: texPat(g, tex, (tex.patScale || 2.2) * tex.width * 0.55), tint: B.patch[0].replace(/[\d.]+\)$/, '0.45)'), r: [60, 150] },
     { fill: texPat(g, tex, (tex.patScale || 2.2) * tex.width * 1.6), tint: B.patch[1].replace(/[\d.]+\)$/, '0.4)'), rim: 'rgba(0,0,0,0.18)', r: [50, 120] },
   ];
-  if (dirt && (B.id === 'ceniza' || B.id === 'pantano')) kinds.push({ fill: texPat(g, dirt, 300), tint: 'rgba(40,30,20,0.25)', rim: 'rgba(40,26,14,0.35)', r: [40, 100] });
   for (let gx = cx - 1; gx <= cx + 1; gx++) for (let gy = cy - 1; gy <= cy + 1; gy++) {
     let s = (gx * 48611 + gy * 96769 + 13) | 0;
     const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
@@ -194,3 +193,35 @@ buildVillage = function () {
   lookProps();
 };
 if (VILLAGE.built) lookProps(); // la villa ya se construyó para el fondo del menú
+
+// ============================================================
+// Grietas con la densidad de la villa: muro de bosque en los bordes, arboledas y más luces cálidas
+// ============================================================
+const _genRiftL = genRift;
+genRift = function () {
+  _genRiftL();
+  if (rift && rift.isDungeon) return;
+  const b = curBiome(), cx = WORLD.w / 2, cy = WORLD.h / 2;
+  const free = (x, y, d) => !obstacles.some((o) => dist(x, y, o.x, o.y) < o.r + d);
+  const tree = (x, y, s, r) => obstacles.push({ kind: 'tree', tk: b.tree, x, y, r, s, hue: Math.random() < 0.6 ? 1 : 0 });
+  // muro de bosque en el borde (dos filas al tresbolillo; apenas estorban)
+  for (let t = 0; t < WORLD.w; t += 95) for (const row of [0, 1]) {
+    const o = 20 + row * 70, j = () => rand(-25, 25), s = () => rand(1.0, 1.5);
+    tree(t + j() + row * 45, o + j(), s(), 10); tree(t + j() + row * 45, WORLD.h - o + j(), s(), 10);
+    tree(o + j(), t + j() + row * 45, s(), 10); tree(WORLD.w - o + j(), t + j() + row * 45, s(), 10);
+  }
+  // arboledas: grupos apretados con un brasero o un cristal al lado (luz cálida como los faroles de la villa)
+  const nG = b.tree === 'spire' ? 7 : 11;
+  for (let g = 0; g < nG; g++) {
+    let gx = 0, gy = 0, ok = false;
+    for (let k = 0; k < 30 && !ok; k++) { gx = rand(300, WORLD.w - 300); gy = rand(300, WORLD.h - 300); ok = dist(gx, gy, cx, cy) > 420 && free(gx, gy, 160); }
+    if (!ok) continue;
+    const n = randi(5, 9);
+    for (let i = 0; i < n; i++) {
+      const a = rand(0, TAU), d = rand(0, 120), x = gx + Math.cos(a) * d, y = gy + Math.sin(a) * d * 0.7;
+      if (free(x, y, 20)) tree(x, y, rand(0.85, 1.35), 20);
+    }
+    const a = rand(0, TAU), lx = gx + Math.cos(a) * 165, ly = gy + Math.sin(a) * 110;
+    if (free(lx, ly, 30)) obstacles.push(Math.random() < 0.65 ? { kind: 'brazier', x: lx, y: ly, r: 11, ph: rand(0, 6) } : { kind: 'crystal', x: lx, y: ly, r: 13, s: rand(0.9, 1.3), hue: b.crystalHue ?? 0, ph: rand(0, 6) });
+  }
+};
