@@ -826,3 +826,9 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 #inv.mode-stats #shStatRows { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
 #inv.mode-stats .sh-derived { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 14px; font-size: 13px; }
 @media (max-width: 700px) { .sh-modes button { padding: 4px 8px; font-size: 12px; } #inv.mode-stats #shStatRows { grid-template-columns: 1fr; } }
+
+/* tiendas: la tarjeta crece con su texto (el botón ya no se monta sobre la de abajo) */
+.shop-grid { grid-auto-rows: max-content; align-items: stretch; }
+.offer { min-height: 118px; height: auto; overflow: visible; }
+.offer > * { flex-shrink: 0; }
+.offer .buy { height: 34px; min-height: 34px; }

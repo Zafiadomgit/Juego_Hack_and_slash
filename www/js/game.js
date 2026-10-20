@@ -3319,7 +3319,7 @@ function buildShop() {
   } else {
     for (const k of Object.keys(UPGRADES)) {
       const U = UPGRADES[k], lv = S.up[k] || 0, maxed = lv >= U.max, price = U.cost(lv);
-      const [kind, col, hi] = UPGRADE_ICON[k];
+      const [kind, col, hi] = UPGRADE_ICON[k] || ['crystal', '#d9a8ff', '#f4e4ff']; // los Pactos (worlds.js) no traen icono propio
       offers.push(offerHTML({ act: 'up:' + k, sold: maxed, icon: tintIcon(kind, col, hi, 40), rc: col, rb: col + '55',
         name: U.name, nameColor: hi, sub: `Mejora permanente · ${lv}/${U.max}`, subColor: '#cdb58a',
         desc: maxed ? 'Nivel máximo alcanzado' : U.desc(lv), price, can: !maxed && S.kamas >= price }));
