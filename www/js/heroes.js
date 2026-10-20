@@ -114,6 +114,7 @@ useSkill = function (i) {
   _useSkillH(i);
   if (!P || P.skillCd[i] === before) return;
   P.castAnim = 0.5; // pose de lanzar (si la hoja existe)
+  castFlourish();
   if (sigOn() && P.cls === 'feca' && P.sig.runes.length < 3) {
     P.sig.runes.push({ a: rand(0, TAU), born: now });
     sparks(P.x, P.y - 20, 8, '#bfe8ff', 200);
@@ -285,3 +286,49 @@ function hsLiveFrame(t) {
   g.drawImage(c, 70 - c.ax * sc, 136 - c.ay * sc, c.width * sc, c.height * sc);
 }
 requestAnimationFrame(hsLiveFrame);
+
+// ---------- el arma se nota según su rareza: brillo en la mano, estela al atacar y halo en los proyectiles ----------
+const WPN_FX = [null, { rgb: '120,200,255', n: 0.4 }, { rgb: '210,150,255', n: 0.7 }, { rgb: '255,180,70', n: 1 }];
+const wpnFx = () => { const w = S && S.equip && S.equip.arma; return w ? WPN_FX[w.rarity] : null; };
+const _updatePlayerW = updatePlayer;
+updatePlayer = function (dt) {
+  _updatePlayerW(dt);
+  const f = wpnFx();
+  if (!f || scene !== 'rift') return;
+  const face = Math.cos(P.dir) >= 0 ? 1 : -1;
+  // motas que salen del arma (en la mano, delante del héroe)
+  if (Math.random() < f.n * dt * 30) particles.push({ kind: 'glowdot', x: P.x + face * rand(8, 22), y: P.y - rand(18, 44), vx: rand(-10, 10), vy: -rand(20, 50), life: 0.6, max: 0.6, rgb: f.rgb, size: f === WPN_FX[3] ? 6 : 5, grav: 0 });
+  // estela del golpe
+  if (P.swingT > 0.05) for (let i = 0; i < 4; i++) {
+    const a = P.dir + rand(-0.9, 0.9), r = rand(30, 80);
+    particles.push({ kind: 'glowdot', x: P.x + Math.cos(a) * r, y: P.y - 16 + Math.sin(a) * r, vx: Math.cos(a) * 40, vy: Math.sin(a) * 40, life: 0.35, max: 0.35, rgb: f.rgb, size: 5, grav: 0 });
+  }
+  // halo de los proyectiles
+  for (const p of projectiles) if (p.team === 'p' && !p.gold && Math.random() < f.n) particles.push({ kind: 'glowdot', x: p.x, y: p.y, vx: 0, vy: 0, life: 0.28, max: 0.28, rgb: f.rgb, size: 5, grav: 0 });
+};
+const _drawPlayerW = drawPlayer;
+drawPlayer = function () {
+  _drawPlayerW();
+  const f = wpnFx();
+  if (!f || scene !== 'rift' || !P) return;
+  const face = Math.cos(P.dir) >= 0 ? 1 : -1;
+  glow(P.x + face * 16, P.y - 30, f === WPN_FX[3] ? 40 : 30, f.rgb, 0.5 + Math.sin(now * 5) * 0.15);
+};
+
+// ---------- destello propio de cada héroe al lanzar cualquier habilidad ----------
+const CAST_FX = {
+  iop: { rgb: '255,130,50', vfx: null }, cra: { rgb: '255,214,90', vfx: null }, feca: { rgb: '130,200,255', vfx: 'runeBlue', size: 150, flat: true },
+  sombra: { rgb: '170,120,240', vfx: 'smoke', size: 120 }, domadora: { rgb: '140,230,120', vfx: 'wolf', size: 110 },
+  artificiera: { rgb: '255,170,60', vfx: null }, berserker: { rgb: '255,60,50', vfx: 'rage', size: 130 },
+};
+function castFlourish() {
+  const f = CAST_FX[P.cls];
+  if (!f || scene !== 'rift') return;
+  rings.push({ x: P.x, y: P.y, r0: 8, r1: 64, life: 0.3, max: 0.3, color: `rgba(${f.rgb},` });
+  if (f.vfx) spawnVfx(f.vfx, P.x, P.y - (f.flat ? 0 : 24), f.size, f.flat ? { dur: 0.6, flat: true, layer: 'ground' } : { dur: 0.5 });
+  for (let i = 0; i < 12; i++) {
+    const a = rand(0, TAU), sp = rand(60, 160);
+    particles.push({ kind: 'glowdot', x: P.x + Math.cos(a) * 10, y: P.y - 24 + Math.sin(a) * 10, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp * 0.6 - 40, life: 0.5, max: 0.5, rgb: f.rgb, size: 4, grav: 0 });
+  }
+  glow(P.x, P.y - 24, 50, f.rgb, 0.5);
+}
