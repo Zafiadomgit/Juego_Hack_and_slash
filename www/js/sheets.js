@@ -5,7 +5,7 @@
 
 let invMode = 'bag';
 $('shLevel').insertAdjacentHTML('afterend', `<div class="sh-modes" id="shModes">
-  <button data-m="bag" type="button">🎒 Inventario</button><button data-m="stats" type="button">📊 Características</button></div>`);
+  <button data-m="bag" type="button"><img class="pico-ui" src="img/icons/bag.png" width="18" height="18" alt=""> Inventario</button><button data-m="stats" type="button"><img class="pico-ui" src="img/icons/stats.png" width="18" height="18" alt=""> Características</button></div>`);
 function setInvMode(m) {
   invMode = m;
   const inv = $('inv');
@@ -27,7 +27,7 @@ window.addEventListener('keydown', (e) => { if (state === 'inv' && e.key.toLower
 (function () {
   const slots = document.querySelector('#dofusBar .db-slots');
   if (slots) {
-    $('btnInv').insertAdjacentHTML('afterend', '<button id="dbStats" class="db-slot" type="button"><img src="img/ui/gear.png" alt=""><span>Caract.</span></button>');
+    $('btnInv').insertAdjacentHTML('afterend', '<button id="dbStats" class="db-slot" type="button"><img src="img/icons/stats.png" alt=""><span>Caract.</span></button>');
     $('dbStats').addEventListener('click', () => { if (state === 'hub') openInventory('hub', 'stats'); });
   }
   $('btnPauseInv').textContent = '🎒 Inventario';
@@ -40,5 +40,5 @@ buildHub = function () {
   _buildHubS();
   $('btnInv').innerHTML = '<img src="img/ui/bag.png" alt=""><span>Inventario</span>';
   const st = $('dbStats');
-  if (st) st.innerHTML = '<img src="img/ui/gear.png" alt=""><span>Caract.</span>' + (S.points > 0 ? `<i class="badge">${S.points}</i>` : '');
+  if (st) st.innerHTML = '<img src="img/icons/stats.png" alt=""><span>Caract.</span>' + (S.points > 0 ? `<i class="badge">${S.points}</i>` : '');
 };

@@ -2539,7 +2539,7 @@ function buildHub() {
     <div class="hc-main">
       <div class="hc-name">${C.name}${transRank() ? ` <i>✦${transRank()}</i>` : ''}<span class="hc-gems">${S.gemSlots.map((k) => k && typeof gemImg === 'function' ? `<span class="hgem" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 16)}</span>` : `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</span></div>
       <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
-      <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span><span>${SEAL_SVG}${fmtNum(seals())}</span><span>🧪${S.pan}/${panMax()}</span><span>🎒${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
+      <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span><span>${SEAL_SVG}${fmtNum(seals())}</span><span><img class="pico-ui" src="img/icons/potion.png" width="16" height="16" alt="">${S.pan}/${panMax()}</span><span><img class="pico-ui" src="img/icons/bag.png" width="16" height="16" alt="">${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
     </div>`;
   const sel = mapSel();
   const fb = BIOMES[sel.b], rec = recLevel(sel.b, sel.n, sel.d), DF = DIFFS[sel.n === 'S' ? 2 : sel.d];
@@ -2795,7 +2795,7 @@ let invTab = 'all';
 let invPrev = null; // valores anteriores, para animar lo que sube
 
 const fmtNum = (n) => String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-const AMBER_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L14 6 L11.5 15 L4.5 15 L2 6 Z" fill="#f0a030" stroke="#7a4a10" stroke-width="1.2"/></svg>';
+const AMBER_SVG = '<img class="pico-ui cur" src="img/icons/amber.png" width="18" height="18" alt="" aria-hidden="true">';
 const SLOT_POS = {
   arma: 'left: 8px; top: 8px', sombrero: 'left: 8px; top: 66px', amuleto: 'left: 8px; top: 124px', anillo: 'left: 8px; top: 182px',
   capa: 'right: 8px; top: 8px', cinturon: 'right: 8px; top: 66px', botas: 'right: 8px; top: 124px',
@@ -2914,7 +2914,7 @@ function buildInventory(justEquipped) {
   $('shName').textContent = C.name;
   $('shLevel').textContent = 'Nv. ' + S.level;
   $('shXp').style.width = Math.min(100, (S.xp / xpNext(S.level)) * 100) + '%';
-  $('shPower').innerHTML = statIcon('dmg', 18) + ' Poder ' + fmtNum(pw);
+  $('shPower').innerHTML = '<img class="pico-ui" src="img/icons/power.png" width="22" height="22" alt=""> Poder ' + fmtNum(pw);
   $('shAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas);
 
   // muñeco con las ranuras de equipo

@@ -197,6 +197,9 @@ const STAT_ICON = {
   pros: (c = '#ffcf5a') => `<circle cx="8" cy="8" r="6" fill="${c}"/><circle cx="8" cy="8" r="3.4" fill="none" stroke="#8a5a12" stroke-width="1.2"/>`,
 };
 const STAT_COLOR = { vit: '#ff5a4e', sab: '#b48cff', fue: '#d08a48', int: '#ff7a2a', sue: '#4fb4f0', agi: '#6fd05a', dmg: '#e8e2d0', crit: '#ffc04a', res: '#9fb6c8', pros: '#ffcf5a' };
+// iconos pintados (img/icons); el dibujo vectorial queda de respaldo
+const PAINTED_STAT = { vit: 1, sab: 1, fue: 1, int: 1, sue: 1, agi: 1, dmg: 1, crit: 1, res: 1, pros: 1 };
 function statIcon(k, size = 16) {
+  if (PAINTED_STAT[k]) return `<img class="pico-ui" src="img/icons/${k}.png" width="${size + 4}" height="${size + 4}" alt="" aria-hidden="true">`;
   return `<svg viewBox="0 0 16 16" width="${size}" height="${size}" aria-hidden="true">${STAT_ICON[k]()}</svg>`;
 }

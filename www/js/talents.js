@@ -7,6 +7,10 @@
  */
 'use strict';
 
+// iconos pintados (img/talents); si falta alguno se usa el símbolo
+const TALENT_ICON = {"🪓": "axe", "🗡": "dagger", "⚡": "bolt", "✦": "twinslash", "🌀": "whirl", "💥": "burst", "🩸": "blood", "💀": "skull", "🗿": "giant", "🔥": "flame", "✸": "fireburst", "⏳": "hourglass", "🌋": "volcano", "↺": "echo", "★": "energy", "🌬": "breath", "☄": "comet", "🛡": "shield", "❤": "heart", "🌵": "thorns", "✚": "regen", "👢": "boots", "🍷": "wine", "⛰": "mountain", "➶": "bow", "🪶": "feather", "➹": "pierce", "»": "dash", "👁": "eye", "🦌": "stag", "🎯": "target", "☰": "volley", "✹": "powder", "✶": "twinarrow", "☔": "rain", "✨": "spark", "🦅": "hawk", "🌲": "pine", "💨": "gust", "◆": "amber", "🍖": "meat", "🌿": "herb", "✳": "trap", "✺": "rune", "◎": "doublering", "🧘": "meditate", "🔮": "orb", "⛨": "aegis", "🪄": "staff", "💎": "crystal", "🔔": "bell", "☠": "poison", "✧": "thousandcuts", "☾": "moon", "☁": "toxiccloud", "🌑": "eclipse", "👻": "ghost", "🐺": "wolf", "🐾": "paw", "🌕": "fullmoon", "👑": "crown", "🌳": "oak", "💣": "bomb", "🧱": "wall", "⚙": "gear", "🔧": "wrench", "🛠": "tools", "🏆": "trophy", "⚔": "swords", "😡": "rage", "🦇": "bat", "📯": "horn"};
+const talIcon = (ic, cls = '') => (TALENT_ICON[ic] ? `<img class="tal-img ${cls}" src="img/talents/${TALENT_ICON[ic]}.png" alt="" draggable="false">` : ic);
+
 // ---------- Constructores de nodos ----------
 const N = (id, name, icon, max, m, d) => ({ id, name, icon, max, m, d });
 const K = (id, name, icon, fx, d, m) => ({ id, name, icon, max: 1, key: 1, fx, d, m });
@@ -462,7 +466,7 @@ updatePlayer = function (dt) {
 };
 
 // ---------- Interfaz: pestaña Talentos en la ficha del personaje ----------
-$('shModes').insertAdjacentHTML('beforeend', '<button data-m="talents" type="button">🌳 Talentos</button>');
+$('shModes').insertAdjacentHTML('beforeend', '<button data-m="talents" type="button"><img class="pico-ui" src="img/icons/talents.png" width="18" height="18" alt=""> Talentos</button>');
 document.querySelector('#inv .sh-body').insertAdjacentHTML('beforeend', '<section id="shTalents" class="sh-talents"></section>');
 let talSel = null;
 function talNodeBtn(br, n, i, key, o, cls) {
@@ -472,7 +476,7 @@ function talNodeBtn(br, n, i, key, o, cls) {
   const st = r >= o.max ? 'max' : r ? 'got' : can ? 'can' : lock ? 'lock' : 'off';
   const rank = o.max > 1 ? `<span class="tv-r">${r}/${o.max}</span>` : '';
   return `<button class="tv-n ${cls} ${n.cap ? 'cap' : ''} ${st} ${other ? 'gone' : ''} ${talSel === key ? 'sel' : ''}" data-k="${key}" title="${o.name}">
-    <span class="tv-ring"></span><span class="tv-ic">${o.icon}</span>${rank}</button>`;
+    <span class="tv-ring"></span><span class="tv-ic">${talIcon(o.icon)}</span>${rank}</button>`;
 }
 function buildTalents() {
   const box = $('shTalents'), T = talTree();
@@ -488,7 +492,7 @@ function buildTalents() {
       return line + `<span class="tv-fork ${lit ? 'done' : ''}">${n.choice.map((o) => talNodeBtn(br, n, i, br.id + '.' + n.id + '.' + o.id, o, 'half')).join('<b>o</b>')}</span>`;
     }).join('');
     return `<div class="tv-row" style="--c:${br.color}">
-      <div class="tv-crest"><span class="tv-emb">${br.icon}</span><span class="tv-nm">${br.name}<small>${spent} pts</small></span>
+      <div class="tv-crest"><span class="tv-emb">${talIcon(br.icon)}</span><span class="tv-nm">${br.name}<small>${spent} pts</small></span>
         <span class="tv-bar" title="Culmen: ${CAP_NEED} puntos"><i style="width:${capPct}%"></i></span></div>
       <div class="tv-path">${nodes}</div></div>`;
   }).join('');
@@ -499,16 +503,16 @@ function buildTalents() {
   const segs = SO.max > 1 ? `<div class="ti-segs">${Array.from({ length: SO.max }, (_, k) => `<i class="${k < r ? 'on' : ''}"></i>`).join('')}</div>` : '';
   const alt = SN.choice ? SN.choice.find((o) => o !== SO) : null;
   box.innerHTML = `<div class="tv-head"><b>Talentos</b>
-      <span class="tv-pts ${pts ? 'has' : ''}"><i>✦</i>${pts}<small>punto${pts === 1 ? '' : 's'}</small></span>
+      <span class="tv-pts ${pts ? 'has' : ''}"><i><img class="pico-ui" src="img/icons/talents.png" width="16" height="16" alt=""></i>${pts}<small>punto${pts === 1 ? '' : 's'}</small></span>
       <small class="tv-sp">${talSpent()} gastados · uno por nivel</small>
       <button id="talReset" class="tv-reset" ${talSpent() && invReturn === 'hub' ? '' : 'disabled'} title="Gratis en Villa Candela">↺ Reiniciar</button></div>
     <div class="tv-grid"><div class="tv-tree">${rows}</div>
       <aside class="tv-info" style="--c:${SB.color}">
-        <div class="ti-top"><span class="ti-medal ${r ? 'got' : ''} ${SN.cap ? 'cap' : ''}">${SO.icon}</span>
+        <div class="ti-top"><span class="ti-medal ${r ? 'got' : ''} ${SN.cap ? 'cap' : ''}">${talIcon(SO.icon)}</span>
           <div><div class="ti-n">${SO.name}</div><span class="ti-chip">${kind}</span><span class="ti-br">${SB.name}</span></div></div>
         <div class="ti-d">${SO.d}</div>
         ${segs}
-        ${alt ? `<div class="ti-alt"><span>o bien</span><b>${alt.icon} ${alt.name}</b>${alt.d}</div>` : ''}
+        ${alt ? `<div class="ti-alt"><span>o bien</span><b>${talIcon(alt.icon, 'sm')} ${alt.name}</b>${alt.d}</div>` : ''}
         <button id="talLearn" class="ti-learn" ${can ? '' : 'disabled'}>${r >= SO.max ? '✔ Aprendido' : r ? `Mejorar · rango ${r + 1}` : 'Aprender'}</button>
         ${why ? `<small class="ti-why">${why}</small>` : ''}</aside></div>`;
   for (const b of box.querySelectorAll('.tv-n')) b.onclick = () => { talSel = b.dataset.k; SFX.play('click'); buildTalents(); };
@@ -536,5 +540,5 @@ const _buildInventoryT = buildInventory;
 buildInventory = function (j) {
   _buildInventoryT(j);
   const b = $('shModes') && $('shModes').querySelector('[data-m="talents"]');
-  if (b && S) b.innerHTML = '🌳 Talentos' + (talTree() && talPoints() ? ` <i class="badge">${talPoints()}</i>` : '');
+  if (b && S) b.innerHTML = '<img class="pico-ui" src="img/icons/talents.png" width="18" height="18" alt=""> Talentos' + (talTree() && talPoints() ? ` <i class="badge">${talPoints()}</i>` : '');
 };

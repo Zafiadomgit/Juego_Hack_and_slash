@@ -9,7 +9,7 @@ const REFINE_MAX = 10;
 const REFINE_STEP = 0.1;                                   // +10% de stats por nivel de refinado
 const REFINE_CHANCE = [1, 1, 1, 1, 1, 0.85, 0.7, 0.55, 0.42, 0.3, 0.25, 0.22, 0.2, 0.18, 0.15]; // probabilidad de pasar de +n a +n+1
 const FRAG_SALVAGE = [1, 3, 8, 20, 60]; // el último: reliquias únicas                        // fragmentos al desguazar según calidad
-const FRAG_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 9 L7 2 L13 5 L12 12 L6 14 Z" fill="#8fb7d8" stroke="#1d2a3a" stroke-width="1.2"/><path d="M7 2 L9 8 L6 14 M9 8 L13 5" stroke="#e8f4ff" stroke-width="0.8" fill="none" opacity="0.7"/></svg>';
+const FRAG_SVG = '<img class="pico-ui cur" src="img/icons/frag.png" width="18" height="18" alt="" aria-hidden="true">';
 const frags = () => (S && S.frag) || 0;
 
 // ---------- Modelo ----------

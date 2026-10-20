@@ -117,7 +117,7 @@ const dailyReady = () => { const d = ensureDaily(); return d ? d.list.filter((q)
 // Sellos de Gesta: la moneda de las misiones. Sirven para lo que el ámbar no compra:
 // trascender al héroe, forjar estrellas en el equipo y la Armería de Gesta.
 // ============================================================
-const SEAL_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="#7a3fb8" stroke="#2a1040" stroke-width="1.2"/><path d="M8 3.6 L9.2 6.6 L12.4 6.8 L9.9 8.8 L10.7 11.9 L8 10.2 L5.3 11.9 L6.1 8.8 L3.6 6.8 L6.8 6.6 Z" fill="#f2d27a"/></svg>';
+const SEAL_SVG = '<img class="pico-ui cur" src="img/icons/seal.png" width="18" height="18" alt="" aria-hidden="true">';
 const seals = () => (S && S.seals) || 0;
 function gainSeals(n, why) {
   if (!S || n <= 0) return;
