@@ -1042,3 +1042,18 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .pico-ui { display: inline-block; vertical-align: middle; object-fit: contain; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.6)); margin-top: -2px; }
 .sh-modes .pico-ui { width: 18px; height: 18px; margin-right: 2px; }
 .stat > .pico-ui { flex: none; }
+
+/* Expedición continua: elección en el Portal */
+.run-pick { position: fixed; inset: 0; z-index: 60; display: none; align-items: center; justify-content: center; background: rgba(6,8,16,.55); }
+.run-pick.show { display: flex; }
+.rp-box { width: min(440px, calc(100vw - 32px)); background: linear-gradient(#1d2236, #121626); border: 2px solid #c9a35a; border-radius: 14px; padding: 14px; box-shadow: 0 10px 40px rgba(0,0,0,.6); }
+.rp-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; text-align: center; }
+.rp-head b { font-family: 'Cinzel', serif; font-size: 20px; color: #ffe08a; }
+.rp-head small { color: #b9c0d8; font-size: 12px; }
+.rp-opt { display: flex; gap: 12px; align-items: center; width: 100%; text-align: left; margin-top: 8px; padding: 10px 12px; border-radius: 10px; border: 1px solid #3a4262; background: #20263c; color: #eef; cursor: pointer; font-family: inherit; }
+.rp-opt i { font-style: normal; font-size: 26px; width: 34px; text-align: center; }
+.rp-opt span { display: flex; flex-direction: column; gap: 2px; }
+.rp-opt b { font-size: 15px; }
+.rp-opt small { font-size: 11.5px; color: #aab3cc; line-height: 1.3; }
+.rp-opt.go { border-color: #ff9a5a; background: linear-gradient(90deg, #3a2418, #22263a); }
+.rp-opt:active { transform: scale(.98); }

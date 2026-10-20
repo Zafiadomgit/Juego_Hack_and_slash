@@ -159,7 +159,7 @@ function actLabel(t) {
   if (t.kind === 'altar') { const G = GODS[t.al.god]; return t.al.carry ? `✦ Ofrenda de ${G.name}` : `✦ Bendición de ${G.name}`; }
   if (t.kind === 'door') return t.d.god ? `✦ Cruzar: bendición de ${GODS[t.d.god].name}` : `${REWARDS[t.d.kind].icon} Cruzar: ${REWARDS[t.d.kind].name}`;
   if (t.kind === 'merchant') return '🪙 Comerciar con la mercader';
-  return '🌀 Volver a Villa Candela';
+  return '🌀 Cruzar el Portal';
 }
 function doInteract() {
   const t = actTarget;
