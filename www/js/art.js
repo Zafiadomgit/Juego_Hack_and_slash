@@ -106,11 +106,19 @@ function heroAnimFrame(cls, pose, f) {
   return c;
 }
 // Elige pose y fotograma según lo que hace el héroe
+// fotograma de la hoja de ataque en el que sale el disparo (el proyectil nace en ese instante)
+const SHOT_RELEASE = { cra: 4, feca: 1, artificiera: 1, sombra: 2 };
 function heroAnimPose(cls, o) {
-  const A = HERO_ANIM[cls];
+  const A = HERO_ANIM[cls], n = A.attack.length;
   if (o.hurt > 0) return ['hurt', 0];
-  const atk = o.swing > 0 ? 1 - o.swing / 0.2 : o.shot > 0 ? 1 - o.shot / 0.15 : -1;
-  if (atk >= 0) return ['attack', Math.min(A.attack.length - 1, Math.floor(atk * A.attack.length))];
+  if (o.swing > 0) return ['attack', Math.min(n - 1, Math.floor((1 - o.swing / 0.2) * n))];
+  const R = Math.min(SHOT_RELEASE[cls] ?? 0, n - 1);
+  if (o.shot > 0) return ['attack', Math.min(n - 1, R + Math.floor((1 - o.shot / 0.15) * (n - R)))]; // soltar y recoger
+  // disparando sin parar: entre disparo y disparo vuelve a tensar/cargar (fotogramas anteriores al de soltar)
+  if (o.firing && o.aim > -0.15 && R > 0 && !o.moving) {
+    const lo = R > 1 ? 1 : 0, k = clamp((0.3 - o.aim - 0.15) / 0.17, 0, 0.999);
+    return ['attack', lo + Math.floor(k * (R - lo))];
+  }
   if (o.moving) return ['walk', Math.floor(o.walkT * Math.max(8, A.walk.length * 1.45)) % A.walk.length];
   return ['idle', Math.floor(o.t * 4) % A.idle.length];
 }
@@ -537,6 +545,7 @@ function drawPlayer() {
   drawHero(ctx, P.cls, {
     x: 0, y: 0, dir: P.dir, walkT: P.walkT, moving: P.moving && P.lock <= 0,
     swing: P.swingT, swingSide: P.swingSide, shot: P.shotT, hurt: P.hurtFlash, t: now, alpha: blink ? 0.45 : 1,
+    aim: P.aimHold, firing: input.attack || (typeof keyboardAttack === 'function' && keyboardAttack()),
   });
   ctx.restore();
   if (P.hurtFlash > 0) {

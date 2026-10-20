@@ -170,7 +170,16 @@ function doInteract() {
   else if (t.kind === 'merchant') openMerchant();
   else leaveRift();
 }
-$('riftAct').addEventListener('pointerdown', (ev) => { ev.stopPropagation(); ev.preventDefault(); doInteract(); });
+// «click» y no «pointerdown»: si el panel se abriera al apoyar el dedo, el click de levantarlo
+// caería sobre la tarjeta que aparece debajo (compra o cierre sin querer en Android)
+$('riftAct').addEventListener('pointerdown', (ev) => ev.stopPropagation());
+$('riftAct').addEventListener('click', (ev) => { ev.stopPropagation(); doInteract(); });
+// por si acaso: los paneles ignoran toques durante 0,35 s tras abrirse
+const PANEL_T = {};
+for (const id of ['choicePick', 'boonPick']) {
+  new MutationObserver(() => { if ($(id).classList.contains('show')) PANEL_T[id] = performance.now(); }).observe($(id), { attributes: true, attributeFilter: ['class'] });
+  $(id).addEventListener('click', (ev) => { if (performance.now() - (PANEL_T[id] || 0) < 350) { ev.stopImmediatePropagation(); ev.preventDefault(); } }, true);
+}
 window.addEventListener('keydown', (e) => { const k = e.key.toLowerCase(); if ((k === 'e' || k === 'enter') && state === 'play' && actTarget) doInteract(); });
 
 const _boonUpdateC = boonUpdate;

@@ -2473,7 +2473,7 @@ function drawVignette(low) {
 // Interfaz (DOM)
 // ============================================================
 const $ = (id) => document.getElementById(id);
-const overlays = ['intro', 'title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'quests', 'dungeon', 'pause', 'end', 'dead'];
+const overlays = ['title', 'start', 'menu', 'hub', 'map', 'inv', 'shop', 'quests', 'dungeon', 'pause', 'end', 'dead'];
 function showOverlay(id) {
   for (const o of overlays) $(o).classList.toggle('show', o === id);
 }
@@ -3455,7 +3455,7 @@ function enterFullscreen() {
 
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) { pauseGame(); persist(); if (SFX.ac) SFX.ac.suspend(); }
-  else if (SFX.ac && state !== 'title' && state !== 'intro') SFX.ac.resume();
+  else if (SFX.ac && state !== 'title') SFX.ac.resume();
 });
 
 // Botón "atrás" de Android (Capacitor)
@@ -3472,7 +3472,6 @@ try {
       else if (state === 'hub') { persist(); S = null; showStart(); }
       else if (state === 'menu') showStart();
       else if (state === 'start') showTitle();
-      else if (state === 'intro') endIntro();
       else if (state === 'title') App.exitApp();
     });
   }
@@ -3482,25 +3481,8 @@ try {
 if (document.fonts && document.fonts.load) ['900 20px Cinzel', '800 20px Garamond', '700 20px Garamond'].forEach((f) => document.fonts.load(f).catch(() => {}));
 function onHeroArtLoaded() { if (state === 'menu') buildMenu(); }
 
-// ---------- Presentación → Toca para empezar → Menú principal → Elegir héroe ----------
+// ---------- Toca para empezar → Menú principal → Elegir héroe ----------
 let menuMode = 'new', confirmNew = false;
-function playIntro() {
-  state = 'intro'; scene = 'hub'; S = null;
-  showOverlay('intro');
-  MUSIC.stop(0.5);
-  const v = $('introVid');
-  v.currentTime = 0; v.muted = false;
-  $('introSound').classList.remove('show');
-  const p = v.play();
-  // si el navegador no deja reproducir con sonido, se reproduce en silencio y se ofrece activarlo
-  if (p && p.catch) p.catch(() => { v.muted = true; $('introSound').classList.add('show'); v.play().catch(() => endIntro()); });
-}
-function endIntro() {
-  const v = $('introVid');
-  v.pause();
-  try { localStorage.setItem('fendaria.introSeen', '1'); } catch (e) { /* ignorar */ }
-  showTitle();
-}
 function showTitle() { state = 'title'; scene = 'hub'; S = null; showOverlay('title'); MUSIC.play('title'); }
 function showStart() {
   state = 'start'; scene = 'hub'; S = null;
@@ -3521,18 +3503,14 @@ function openClassMenu(mode) {
   buildMenu();
   showOverlay('menu');
 }
-$('introVid').addEventListener('ended', endIntro);
-$('intro').addEventListener('click', (ev) => { if (ev.target.id === 'introSound') return; endIntro(); });
-$('introSound').addEventListener('click', () => { const v = $('introVid'); v.muted = false; $('introSound').classList.remove('show'); });
 $('title').addEventListener('click', () => { SFX.init(); SFX.play('zaap'); enterFullscreen(); showStart(); });
 $('stContinue').addEventListener('click', () => { if (!SAVE.last || !SAVE.slots[SAVE.last]) return; SFX.init(); SFX.play('click'); S = migrateSlot(SAVE.slots[SAVE.last]); goHub(); });
 $('stNew').addEventListener('click', () => { SFX.init(); SFX.play('click'); openClassMenu('new'); });
-$('stIntro').addEventListener('click', () => { SFX.play('click'); playIntro(); });
+$('stIntro').addEventListener('click', () => { SFX.init(); SFX.play('click'); playCine('prologo', null); }); // cine.js
 $('btnMenuBack').addEventListener('click', () => { SFX.play('click'); showStart(); });
 window.addEventListener('keydown', (e) => {
   const k = e.key.toLowerCase();
-  if (state === 'intro' && (k === 'escape' || k === 'enter' || k === ' ')) endIntro();
-  else if (state === 'title' && (k === 'enter' || k === ' ')) $('title').click();
+  if (state === 'title' && (k === 'enter' || k === ' ')) $('title').click();
   else if (state === 'start') {
     const btns = [...document.querySelectorAll('.s-menu button')].filter((b) => !b.disabled);
     let i = btns.findIndex((b) => b.classList.contains('sel'));
@@ -3542,11 +3520,8 @@ window.addEventListener('keydown', (e) => {
   } else if (state === 'menu' && k === 'escape') showStart();
 });
 
-// Arranque: la presentación solo se reproduce sola la primera vez (luego está en el menú)
-let introSeen = false;
-try { introSeen = localStorage.getItem('fendaria.introSeen') === '1'; } catch (e) { /* ignorar */ }
+// Arranque: directo a la pantalla de título (el prólogo se ve como cinemática al empezar partida)
 if (location.hash === '#test') openClassMenu('switch');
-else if (!introSeen) playIntro();
 else showTitle();
 requestAnimationFrame(frame);
 $('btnMute').textContent = 'Sonido: ' + (SFX.muted ? 'OFF' : 'ON');
