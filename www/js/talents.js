@@ -467,9 +467,12 @@ document.querySelector('#inv .sh-body').insertAdjacentHTML('beforeend', '<sectio
 let talSel = null;
 function talNodeBtn(br, n, i, key, o, cls) {
   const r = talRank(key), can = talCan(key), prev = i === 0 || nodeRank(br, br.nodes[i - 1]) > 0;
-  const lock = !r && !can && (!prev || (n.cap && branchSpent(br) < CAP_NEED) || (n.choice && nodeRank(br, n) > 0));
-  const pips = o.max > 1 ? `<span class="tp">${Array.from({ length: o.max }, (_, k) => `<i class="${k < r ? 'on' : ''}"></i>`).join('')}</span>` : '';
-  return `<button class="tn ${cls} ${o.key ? 'key' : ''} ${n.cap ? 'cap' : ''} ${r ? 'got' : ''} ${can ? 'can' : ''} ${lock ? 'lock' : ''} ${talSel === key ? 'sel' : ''}" data-k="${key}" title="${o.name}"><span class="ic">${o.icon}</span>${pips}</button>`;
+  const other = n.choice && nodeRank(br, n) > 0 && !r;
+  const lock = !r && !can && (!prev || (n.cap && branchSpent(br) < CAP_NEED) || other);
+  const st = r >= o.max ? 'max' : r ? 'got' : can ? 'can' : lock ? 'lock' : 'off';
+  const rank = o.max > 1 ? `<span class="tv-r">${r}/${o.max}</span>` : '';
+  return `<button class="tv-n ${cls} ${n.cap ? 'cap' : ''} ${st} ${other ? 'gone' : ''} ${talSel === key ? 'sel' : ''}" data-k="${key}" title="${o.name}">
+    <span class="tv-ring"></span><span class="tv-ic">${o.icon}</span>${rank}</button>`;
 }
 function buildTalents() {
   const box = $('shTalents'), T = talTree();
@@ -477,28 +480,38 @@ function buildTalents() {
   const keys = talKeys(), pts = talPoints();
   if (!talSel || !keys[talSel]) talSel = Object.keys(keys)[0];
   const rows = T.map((br) => {
-    const spent = branchSpent(br);
+    const spent = branchSpent(br), capPct = Math.min(100, (spent / CAP_NEED) * 100);
     const nodes = br.nodes.map((n, i) => {
-      const line = i ? `<b class="tl ${nodeRank(br, n) || nodeRank(br, br.nodes[i - 1]) ? 'on' : ''}"></b>` : '';
+      const lit = nodeRank(br, n) > 0, prevLit = i === 0 || nodeRank(br, br.nodes[i - 1]) > 0;
+      const line = i ? `<i class="tv-l ${lit ? 'on' : prevLit ? 'next' : ''}"></i>` : '';
       if (!n.choice) return line + talNodeBtn(br, n, i, br.id + '.' + n.id, n, '');
-      return line + `<span class="tx">${n.choice.map((o) => talNodeBtn(br, n, i, br.id + '.' + n.id + '.' + o.id, o, 'mini')).join('<em>o</em>')}</span>`;
+      return line + `<span class="tv-fork ${lit ? 'done' : ''}">${n.choice.map((o) => talNodeBtn(br, n, i, br.id + '.' + n.id + '.' + o.id, o, 'half')).join('<b>o</b>')}</span>`;
     }).join('');
-    return `<div class="tb" style="--c:${br.color}"><div class="tb-h"><b>${br.icon} ${br.name}</b><small>${spent} pts${spent < CAP_NEED ? ` · culmen ${CAP_NEED}` : ' · ★★'}</small></div><div class="tb-n">${nodes}</div></div>`;
+    return `<div class="tv-row" style="--c:${br.color}">
+      <div class="tv-crest"><span class="tv-emb">${br.icon}</span><span class="tv-nm">${br.name}<small>${spent} pts</small></span>
+        <span class="tv-bar" title="Culmen: ${CAP_NEED} puntos"><i style="width:${capPct}%"></i></span></div>
+      <div class="tv-path">${nodes}</div></div>`;
   }).join('');
   const { br: SB, n: SN, o: SO, i: SI } = keys[talSel], r = talRank(talSel), can = talCan(talSel);
-  const why = r >= SO.max ? '' : pts < 1 ? 'Sin puntos: ganas uno por nivel' : SN.choice && nodeRank(SB, SN) > 0 ? 'Ya elegiste la otra opción de esta encrucijada (reinicia para cambiar)'
+  const why = r >= SO.max ? '' : pts < 1 ? 'Sin puntos: ganas uno por nivel' : SN.choice && nodeRank(SB, SN) > 0 ? 'Ya elegiste la otra opción (reinicia para cambiar)'
     : SI > 0 && nodeRank(SB, SB.nodes[SI - 1]) < 1 ? 'Primero aprende el anterior de la rama' : SN.cap && branchSpent(SB) < CAP_NEED ? `Necesitas ${CAP_NEED} puntos en ${SB.name} (tienes ${branchSpent(SB)})` : '';
-  const kind = SN.cap ? '★★ Culmen' : SN.choice ? '★ Encrucijada · elige una' : 'Pasivo';
-  box.innerHTML = `<div class="tal-head"><b>Talentos</b><span class="tal-pts ${pts ? 'has' : ''}">${pts} punto${pts === 1 ? '' : 's'}</span><small class="tal-sp">${talSpent()} gastados</small>
-      <button id="talReset" class="sh-sell" ${talSpent() && invReturn === 'hub' ? '' : 'disabled'} title="Gratis en Villa Candela">↺ Reiniciar</button></div>
-    <div class="tal-grid"><div class="tal-tree">${rows}</div>
-      <aside class="tal-info" style="--c:${SB.color}"><div class="ti-n">${SO.icon} ${SO.name}</div>
-        <div class="ti-t">${kind} · ${SB.name} · rango ${r}/${SO.max}</div>
+  const kind = SN.cap ? '★★ Culmen' : SN.choice ? '★ Encrucijada' : 'Pasivo';
+  const segs = SO.max > 1 ? `<div class="ti-segs">${Array.from({ length: SO.max }, (_, k) => `<i class="${k < r ? 'on' : ''}"></i>`).join('')}</div>` : '';
+  const alt = SN.choice ? SN.choice.find((o) => o !== SO) : null;
+  box.innerHTML = `<div class="tv-head"><b>Talentos</b>
+      <span class="tv-pts ${pts ? 'has' : ''}"><i>✦</i>${pts}<small>punto${pts === 1 ? '' : 's'}</small></span>
+      <small class="tv-sp">${talSpent()} gastados · uno por nivel</small>
+      <button id="talReset" class="tv-reset" ${talSpent() && invReturn === 'hub' ? '' : 'disabled'} title="Gratis en Villa Candela">↺ Reiniciar</button></div>
+    <div class="tv-grid"><div class="tv-tree">${rows}</div>
+      <aside class="tv-info" style="--c:${SB.color}">
+        <div class="ti-top"><span class="ti-medal ${r ? 'got' : ''} ${SN.cap ? 'cap' : ''}">${SO.icon}</span>
+          <div><div class="ti-n">${SO.name}</div><span class="ti-chip">${kind}</span><span class="ti-br">${SB.name}</span></div></div>
         <div class="ti-d">${SO.d}</div>
-        ${SN.choice ? `<div class="ti-alt">La otra opción: <b>${SN.choice.find((o) => o !== SO).name}</b> — ${SN.choice.find((o) => o !== SO).d}</div>` : ''}
-        <button id="talLearn" class="sh-sell auto" ${can ? '' : 'disabled'}>${r >= SO.max ? '✔ Aprendido' : 'Aprender'}</button>
+        ${segs}
+        ${alt ? `<div class="ti-alt"><span>o bien</span><b>${alt.icon} ${alt.name}</b>${alt.d}</div>` : ''}
+        <button id="talLearn" class="ti-learn" ${can ? '' : 'disabled'}>${r >= SO.max ? '✔ Aprendido' : r ? `Mejorar · rango ${r + 1}` : 'Aprender'}</button>
         ${why ? `<small class="ti-why">${why}</small>` : ''}</aside></div>`;
-  for (const b of box.querySelectorAll('.tn')) b.onclick = () => { talSel = b.dataset.k; SFX.play('click'); buildTalents(); };
+  for (const b of box.querySelectorAll('.tv-n')) b.onclick = () => { talSel = b.dataset.k; SFX.play('click'); buildTalents(); };
   $('talLearn').onclick = () => {
     if (!talCan(talSel)) return;
     talState()[talSel] = r + 1;
@@ -506,6 +519,8 @@ function buildTalents() {
     persist(); if (P) recalc();
     buildTalents();
     buildInventory();
+    const el = $('shTalents').querySelector(`.tv-n[data-k="${talSel}"]`);
+    if (el) { el.classList.add('pop'); }
   };
   $('talReset').onclick = () => { S.tal = {}; persist(); if (P) recalc(); SFX.play('zaap'); buildTalents(); buildInventory(); };
 }
