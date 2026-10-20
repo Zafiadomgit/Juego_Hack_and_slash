@@ -1065,3 +1065,16 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .hs-live { position: absolute; right: 6px; top: 6px; z-index: 3; width: 96px; background: radial-gradient(circle at 50% 70%, rgba(255,214,140,.16), rgba(10,12,22,.75)); border: 1px solid rgba(255,214,140,.45); border-radius: 10px; text-align: center; pointer-events: none; overflow: hidden; }
 .hs-live canvas { width: 96px; height: 96px; display: block; }
 .hs-live small { display: block; font-size: 10px; color: #ffe0a0; letter-spacing: .5px; padding-bottom: 3px; }
+
+/* barra de la villa: arriba y más compacta (abajo estorbaba al joystick) */
+.dbar { top: max(4px, env(safe-area-inset-top)); bottom: auto; gap: 6px; padding: 3px 6px; border-width: 1.5px; border-radius: 9px; }
+.db-mini { width: 92px; height: 46px; }
+.dbar .hub-card { width: 200px; padding: 0 2px; font-size: 0.88em; }
+.db-slots { gap: 4px; }
+.dbar .db-slot { width: 42px; height: 46px; border-radius: 6px; }
+.dbar .db-slot img { width: 26px; height: 26px; }
+.dbar .db-slot span { font-size: 8.5px; }
+.dbar .db-slot .badge { top: -4px; right: -4px; transform: scale(0.85); }
+.dbar .hub-card .hubStory { top: calc(max(4px, env(safe-area-inset-top)) + 60px); bottom: auto; max-width: 42vw; font-size: 0.9em; }
+#hub .hub-prompt, #hub .portal-panel { bottom: max(14px, env(safe-area-inset-bottom)); }
+@media (max-width: 700px) { .dbar .hub-card { width: 170px; } }
