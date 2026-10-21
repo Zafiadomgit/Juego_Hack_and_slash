@@ -7,15 +7,13 @@
 
 const LEVELS_PER_BIOME = 7;
 
-const DIFFS = [
-  // rar: calidades que pueden caer (la baja y la alta); hi: probabilidad base de la alta
-  // Los monstruos se ajustan al equipo de referencia de cada dificultad (ref = calidad, fill = huecos equipados):
-  //   hits = golpes básicos que aguanta un Jabalí, die = golpes de Jabalí que aguanta el héroe con ese equipo.
-  // En Difícil la referencia es equipo Legendario: incluso con él sigue siendo duro.
-  { id: 'facil',   name: 'Fácil',   color: '#7cc457', hp: 1,   dmg: 1,   lvl: 0, threat: 0, reward: 1,   rarity: 0,  rar: [0, 1], hi: 0.25, set: 0.10, eliteSet: 0,    ref: 0.3, fill: 0.5, hits: 4,   die: 12 },
-  { id: 'medio',   name: 'Medio',   color: '#f0b030', hp: 2.1, dmg: 1.5, lvl: 3, threat: 2, reward: 1.6, rarity: 8,  rar: [1, 2], hi: 0.25, set: 0.30, eliteSet: 0.01, ref: 1.4, fill: 0.9, hits: 6.5, die: 7  },
-  { id: 'dificil', name: 'Difícil', color: '#ff4a3d', hp: 4.2, dmg: 2.2, lvl: 6, threat: 4, reward: 2.5, rarity: 18, rar: [2, 3], hi: 0.25, set: 0.60, eliteSet: 0.03, ref: 3,   fill: 1,   hits: 8,   die: 4.5 },
-];
+// Una sola historia lineal y dura: las tres entradas son iguales (se conservan los índices para no romper
+// partidas guardadas ni el resto del código, que sigue leyendo DIFFS[d]).
+//   hits = golpes básicos que aguanta un Jabalí al héroe de referencia de esa altura de la historia (antes, en Fácil, 4),
+//   die  = golpes de Jabalí que aguanta ese héroe. La referencia sigue el equipo que se consigue jugando
+//   en orden (Raro/Épico); si el héroe va más fuerte, balance.js endurece a los monstruos según su daño real.
+const HARD = { id: 'historia', name: 'Difícil', color: '#ff4a3d', hp: 3, dmg: 2, lvl: 0, threat: 3, reward: 1.8, rarity: 10, rar: [1, 2], hi: 0.3, set: 0.35, eliteSet: 0.015, ref: 0.5, fill: 0.5, hits: 8, die: 5 };
+const DIFFS = [HARD, HARD, HARD];
 
 // Calidad del botín según la dificultad: Fácil = Común/Raro, Medio = Raro/Épico, Difícil = Épico/Legendario
 function rollDiffRarity(DF, bonus = 0) {
@@ -64,7 +62,7 @@ function nodeUnlocked(b, n) {
   if (n === 'S') return clearedDiffs(b, LEVELS_PER_BIOME) > 0;
   return n === 1 || clearedDiffs(b, n - 1) > 0;
 }
-const diffUnlocked = (b, n, d) => nodeUnlocked(b, n) && (n === 'S' ? d === 0 : clearedDiffs(b, n) >= d);
+const diffUnlocked = (b, n) => nodeUnlocked(b, n); // una sola dificultad
 function markCleared(b, n, d) {
   const m = mapProg(), k = nodeKey(b, n);
   m.c[k] = Math.max(m.c[k] || 0, n === 'S' ? 1 : d + 1);

@@ -1098,3 +1098,4 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .t-sparks i.w { background: #ffd58a; box-shadow: 0 0 8px 2px rgba(255, 180, 80, .8); }
 @keyframes sparkUp { 0% { transform: translate(0, 0); opacity: 0; } 10% { opacity: 1; } 100% { transform: translate(var(--dx), -105vh); opacity: 0; } }
 .startscr .s-logo { width: min(46vw, 520px); }
+.mnode .pips i.ok { width: auto; height: auto; border: 0; background: none; color: #7cff8a; font: 900 11px/1 Garamond, serif; font-style: normal; text-shadow: 0 1px 0 #000; }

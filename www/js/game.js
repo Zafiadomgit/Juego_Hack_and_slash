@@ -847,7 +847,7 @@ function spawnEnemy(type, x, y, o = {}) {
   // dificultad ajustada al equipo que se consigue en esa dificultad: un Jabalí aguanta DF.hits golpes
   // del héroe de referencia y el héroe aguanta DF.die golpes de Jabalí (ver refPlayer)
   const ref = refPlayer(S ? S.cls : 'iop', F, rift ? rift.d : 0);
-  const hpMul = (DF.hits * ref.hit / ENEMIES.bouftou.hp) * (sup ? 4 : D.boss ? 1.3 : 1) * rand(0.95, 1.05);
+  const hpMul = (DF.hits * ref.hit / ENEMIES.bouftou.hp) * (sup ? 1.4 : D.boss ? 0.52 : 1) * rand(0.95, 1.05); // jefes relativos a hits=8
   const dmgMul = (ref.ehp / DF.die / ENEMIES.bouftou.dmg) * (sup ? 1.45 : D.boss ? 1.15 : 1);
   const hp = Math.round(D.hp * hpMul * (elite ? 3.5 : 1));
   const e = {
@@ -942,7 +942,7 @@ function killEnemy(e) {
     const a = rand(0, Math.PI * 2), sp = rand(40, 160);
     particles.push({ x: e.x, y: e.y - e.r * 0.5, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0.5, max: 0.5, color: i % 2 ? '#ffffff' : D.blood, size: rand(3, 7), grav: 0 });
   }
-  hitFlash(e.x, e.y - e.r * 0.6, e.r * 1.4 + 10, '255,220,160');
+  hitFlash(e.x, e.y - e.r * 0.6, e.boss ? e.r * 0.7 : e.r * 1.4 + 10, '255,220,160');
   sparks(e.x, e.y - e.r * 0.6, 10, '#ffd9a0', 300);
   embers(e.x, e.y - e.r * 0.6, e.elite || e.boss ? 16 : 5, '255,190,110', e.r);
   rings.push({ x: e.x, y: e.y, r0: 5, r1: e.r * 2.4, life: 0.3, max: 0.3, color: 'rgba(255,220,160,' });
@@ -1487,7 +1487,7 @@ function spawnPos() {
 
 function spawnPack() {
   const p = spawnPos();
-  const n = randi(3 + Math.floor(rift.threat / 3), 5 + Math.floor(rift.threat / 2));
+  const n = randi(5 + Math.floor(rift.threat / 3), 8 + Math.floor(rift.threat / 2));
   const types = riftTypes(rift.level);
   // los primeros segundos sin crujidores
   const early = rift.elapsed < 20;
@@ -1666,10 +1666,10 @@ function updateRift(dt) {
   if (!rift.bossDead) rift.time -= dt;
   if (!rift.bossSpawned) {
     rift.spawnT -= dt;
-    const cap = Math.min(72, 32 + rift.threat * 4);
+    const cap = Math.min(110, 46 + rift.threat * 5);
     if (rift.spawnT <= 0 && enemies.length < cap) {
       spawnPack();
-      rift.spawnT = rand(1.05, 1.85) * Math.max(0.4, 1 - rift.threat * 0.05);
+      rift.spawnT = rand(0.8, 1.4) * Math.max(0.4, 1 - rift.threat * 0.05);
     }
   }
   if (rift.zaap && dist(P.x, P.y, rift.zaap.x, rift.zaap.y - 10) < 34) finishRift();
@@ -2708,7 +2708,7 @@ function buildMap() {
   nodes.forEach((n, i) => {
     const un = nodeUnlocked(b, n), cd = clearedDiffs(b, n), isS = n === 'S';
     const on = sel.b === b && sel.n === n;
-    const pips = isS ? '' : `<span class="pips">${DIFFS.map((D, k) => `<i style="${cd > k ? `background:${D.color};border-color:${D.color}` : ''}"></i>`).join('')}</span>`;
+    const pips = !isS && cd ? '<span class="pips"><i class="ok">✔</i></span>' : ''; // historia lineal: superada o no
     html.push(`<button class="mnode ${isS ? 'boss' : ''} ${un ? '' : 'lock'} ${on ? 'sel' : ''} ${isS && cd ? 'done' : ''}" data-n="${n}" style="left:${pts[i][0]}%;top:${pts[i][1]}%">${un ? (isS ? '☠' : n) : '🔒'}${pips}</button>`);
   });
   const cnt = setCounts()[B.id] || 0;
@@ -2734,15 +2734,11 @@ function buildMapInfo() {
   const boss = isS ? SUPER_BOSSES[B.id].name : ENEMIES[B.boss].name;
   const setCh = isS ? 100 : Math.round(DF.set * 100);
   const cnt = setCounts()[B.id] || 0;
-  const diffs = isS ? '' : `<div class="diffs">${DIFFS.map((D, k) => {
-    const un = diffUnlocked(b, n, k), done = clearedDiffs(b, n) > k;
-    return `<button data-d="${k}" style="--dc:${D.color}" class="${k === d ? 'on' : ''}" ${un ? '' : 'disabled'}>${un ? '' : '🔒 '}${D.name}${done ? ' <span class="ck">✔</span>' : ''}</button>`;
-  }).join('')}</div>`;
+  const diffs = ''; // una sola dificultad: la historia es lineal
   box.innerHTML = `
     <h3>${isS ? '☠ Súper Jefe' : 'Grieta ' + n}</h3>
     <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
     ${diffs}
-    ${!isS && clearedDiffs(b, n) < 2 ? `<div class="mi-sub">Supera una dificultad para desbloquear la siguiente.</div>` : ''}
     <div class="mi-rows">
       <span>Recomendado</span><b class="${S.level + 2 < rec ? 'bad' : ''}">nivel ${rec}+ (tú ${S.level})</b>
       <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
@@ -2751,7 +2747,7 @@ function buildMapInfo() {
     <details class="mi-more"><summary>Más detalles</summary>
     <div class="mi-rows">
       <span>Monstruos</span><b>nivel ${mlo}–${mlo + 4}</b>
-      <span>Pensada para equipo</span><b>${['<span style="color:' + RARITY[0].color + '">Común</span>', '<span style="color:' + RARITY[1].color + '">Raro</span> o mejor', '<span style="color:' + RARITY[3].color + '">Legendario</span>'][d]}</b>
+      <span>Pensada para equipo</span><b><span style="color:${RARITY[3].color}">Legendario</span></b>
       <span>Ámbar y XP</span><b>×${DF.reward}</b>
       <span>Calidad del botín</span><b>${rarityRangeText(DF)}</b>
       <span>Pieza de conjunto</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
@@ -3437,7 +3433,7 @@ function finishRift() {
   state = 'end';
   S.rifts++;
   trackDaily('rift');
-  if (rift.d >= 1) trackDaily('hard');
+  trackDaily('hard');
   SFX.play('zaap');
   persist();
   $('endTitle').textContent = rift.isDungeon ? `Mazmorra · Piso ${rift.tier} superado` : rift.isSuper ? `¡${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} derrotado!` : `Grieta ${rift.n} (${rift.D.name}) cerrada`;

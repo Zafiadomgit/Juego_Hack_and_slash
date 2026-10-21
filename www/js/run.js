@@ -87,7 +87,7 @@ function continueRun() {
   // lo que haría el final de la Grieta, sin pasar por la villa
   S.rifts++;
   trackDaily('rift');
-  if (old.d >= 1) trackDaily('hard');
+  trackDaily('hard');
   S.bestRun = Math.max(S.bestRun || 0, run.depth + 1);
   persist();
   state = 'play';
