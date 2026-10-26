@@ -73,7 +73,7 @@ drawEnemy = function (e) {
   _drawEnemyFeel(e);
   if (e.dead || !WIND_STATES[e.state] || e.spawnT > 0) return;
   if (!(e.boss || e.superDef || e.D.ai === 'charger' || e.D.ai === 'slammer' || e.elite)) return;
-  const y = e.y - e.r * 2.3 - (e.z || 0) - 10, k = 1 + Math.sin(now * 18) * 0.12;
+  const y = e.y - e.r * 2.3 - (e.z || 0) - 10 - (e.mut ? 30 : 0), k = 1 + Math.sin(now * 18) * 0.12; // encima del indicador de mutación
   ctx.save();
   glow(e.x, y, 16, '255,60,40', 0.55);
   text('!', e.x, y, 22 * k, '#ff4a3d', 'center', 900);
