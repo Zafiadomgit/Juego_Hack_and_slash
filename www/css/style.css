@@ -1109,3 +1109,19 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .tut-hint i { font-style: normal; font-size: 22px; width: 30px; height: 30px; display: grid; place-items: center; border-radius: 50%; background: radial-gradient(circle, #3a4a80, #141b30); border: 1px solid #c9b27a; flex: none; }
 .tut-hint b { color: #ffe08a; }
 @keyframes tutIn { from { opacity: 0; transform: translate(-50%, 14px) scale(.9); } to { opacity: 1; transform: translate(-50%, 0); } }
+
+/* Grieta del Día */
+.daily-box { width: min(480px, calc(100vw - 32px)); }
+.dly-mods { display: grid; gap: 6px; margin: 4px 0 8px; }
+.dly-mod { display: flex; gap: 10px; align-items: center; padding: 7px 10px; border-radius: 9px; border: 1px solid rgba(255, 213, 79, .45); background: linear-gradient(90deg, rgba(255, 213, 79, .12), rgba(20, 26, 46, .6)); }
+.dly-mod i { font-style: normal; font-size: 22px; width: 30px; text-align: center; color: #ffd54f; }
+.dly-mod span { display: flex; flex-direction: column; }
+.dly-mod b { color: #ffe9a8; font-size: 15px; }
+.dly-mod small { color: #c8c4b4; font-size: 12px; }
+.dly-stats { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; color: #b9c0d8; padding: 2px 4px 4px; }
+.dly-stats b { color: #f2ead4; text-align: right; }
+.dbar #dbDaily.glow { box-shadow: 0 0 10px rgba(255, 213, 79, .55); border-color: #ffd54f; }
+.daily-box { max-height: calc(100vh - 16px); overflow-y: auto; padding: 10px 12px; }
+.daily-box .rp-opt { margin-top: 6px; padding: 7px 10px; }
+.daily-box .rp-head { margin-bottom: 6px; }
+@media (max-height: 430px) { .dly-mod { padding: 5px 8px; } .dly-mod small { font-size: 11px; } .daily-box .rp-opt small { display: none; } }

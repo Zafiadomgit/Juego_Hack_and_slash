@@ -66,7 +66,7 @@ window.addEventListener('keydown', (e) => { if (state === 'runpick' && e.key ===
 const _leaveRiftR = leaveRift;
 leaveRift = function () {
   if (!rift || !rift.camp || rift.camp.leaving) return;
-  if (rift.isDungeon || !nextRunNode(rift.b, rift.n)) return _leaveRiftR();
+  if (rift.isDungeon || rift.daily || !nextRunNode(rift.b, rift.n)) return _leaveRiftR(); // la Grieta del Día no sigue
   rift.camp.leaving = true;
   openRunPick();
 };
