@@ -1151,3 +1151,9 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .boss-card b { font: 900 clamp(24px, 7vh, 46px)/1.05 Cinzel, serif; color: #fff1e0; text-shadow: 0 3px 0 #200a04, 0 0 20px rgba(0, 0, 0, .9); }
 .boss-card em { font: italic 700 clamp(12px, 2.6vh, 16px) Garamond, Georgia, serif; color: #e8d8c0; }
 @keyframes bcIn { 0% { opacity: 0; transform: translate(-60px, -50%); } 12% { opacity: 1; transform: translate(0, -50%); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(30px, -50%); } }
+.world-bg { position: fixed; inset: 0; z-index: 29; pointer-events: none; opacity: 0; background: #000 center / cover no-repeat; }
+.world-bg::after { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, rgba(0, 0, 0, .15), rgba(0, 0, 0, .65) 85%); }
+.world-bg.show { animation: wbIn 3.1s ease forwards; }
+@keyframes wbIn { 0% { opacity: 0; transform: scale(1.12); } 12% { opacity: 1; } 62% { opacity: 1; } 100% { opacity: 0; transform: scale(1.02); } }
+.mi-art { position: relative; height: 74px; margin: -8px -8px 8px; border-radius: 8px 8px 0 0; background: center 55% / cover no-repeat; box-shadow: inset 0 -30px 30px -10px rgba(14, 19, 38, .95); }
+.mi-art span { position: absolute; left: 10px; bottom: 6px; font: italic 700 12px Garamond, Georgia, serif; color: #f2e6c8; text-shadow: 0 1px 3px #000; }

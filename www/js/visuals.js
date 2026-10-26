@@ -103,7 +103,7 @@ drawProjectile = function (p) {
 };
 
 // ---------- presentaciones ----------
-document.body.insertAdjacentHTML('beforeend', `<div id="cineBars" class="cine-bars"><i></i><i></i></div>
+document.body.insertAdjacentHTML('beforeend', `<div id="worldBg" class="world-bg"></div><div id="cineBars" class="cine-bars"><i></i><i></i></div>
 <div id="worldCard" class="world-card"><small></small><b></b><em></em><span></span></div>
 <div id="bossCard" class="boss-card"><canvas width="220" height="220"></canvas><div><small></small><b></b><em></em></div></div>`);
 let cardTimer = 0;
@@ -117,6 +117,10 @@ function worldCard(B, sub, kicker) {
   el.querySelector('em').textContent = sub;
   el.querySelector('span').textContent = (WORLD_FX[B.id] && WORLD_FX[B.id].sub) || '';
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
+  // la ilustración del mundo llena la pantalla detrás del título y se funde con el juego
+  const bg = $('worldBg');
+  bg.style.backgroundImage = `url(img/worlds/art_${B.id}.webp)`;
+  bg.classList.remove('show'); void bg.offsetWidth; bg.classList.add('show');
   bars(true);
   clearTimeout(cardTimer);
   cardTimer = setTimeout(() => { el.classList.remove('show'); bars(false); }, 2900);
@@ -162,4 +166,60 @@ spawnEnemy = function (type, x, y, o = {}) {
   return e;
 };
 const _goHubW = goHub;
-goHub = function () { _goHubW(); $('worldCard').classList.remove('show'); $('bossCard').classList.remove('show'); bars(false); };
+goHub = function () { _goHubW(); $('worldBg').classList.remove('show'); $('worldCard').classList.remove('show'); $('bossCard').classList.remove('show'); bars(false); };
+
+// ---------- contorno oscuro en los monstruos (se separan del suelo) ----------
+// Se hornea una vez por fotograma en la caché: dibujar cuesta lo mismo que antes.
+const MON_OUT = new Map();
+const _monFrameW = monFrame;
+monFrame = function (id, pose, i, filt, bid) {
+  const c = _monFrameW(id, pose, i, filt, bid);
+  const key = c.key + '|o';
+  let o = MON_OUT.get(key);
+  if (o) return o;
+  const pad = Math.max(2, Math.round(c.height / 34));
+  o = document.createElement('canvas'); o.width = c.width + pad * 2; o.height = c.height + pad * 2;
+  const g = o.getContext('2d');
+  const sil = document.createElement('canvas'); sil.width = c.width; sil.height = c.height;
+  const sg = sil.getContext('2d'); sg.drawImage(c, 0, 0); sg.globalCompositeOperation = 'source-in'; sg.fillStyle = 'rgb(12,8,20)'; sg.fillRect(0, 0, c.width, c.height);
+  g.globalAlpha = 0.85;
+  for (let a = 0; a < 8; a++) g.drawImage(sil, pad + Math.round(Math.cos(a * Math.PI / 4) * pad), pad + Math.round(Math.sin(a * Math.PI / 4) * pad));
+  g.globalAlpha = 1;
+  g.drawImage(c, pad, pad);
+  o.ax = c.ax + pad; o.ay = c.ay + pad; o.key = key;
+  if (MON_OUT.size > 900) MON_OUT.clear();
+  MON_OUT.set(key, o);
+  return o;
+};
+
+// ---------- luces dinámicas: explosiones, hechizos y aros iluminan la escena (los proyectiles ya tienen luz) ----------
+const VFX_LIGHT = { explosion: '255,150,60', runeBlue: '120,190,255', runeFire: '255,120,40', shield: '140,210,255', poison: '140,230,90', heal: '120,255,140', ice: '170,230,255', rage: '255,70,50', smoke: '150,110,220', wolf: '160,220,255' };
+const _boonLightsW = boonLights;
+boonLights = function (lights, toS) {
+  _boonLightsW(lights, toS);
+  if (scene !== 'rift') return;
+  let n = 0;
+  for (const v of vfxList) {
+    const rgb = VFX_LIGHT[v.name];
+    if (!rgb || n > 14) continue;
+    const k = 1 - Math.min(1, v.t / v.dur), q = toS(v.x, v.y);
+    lights.push({ x: q.x, y: q.y, r: v.size * 1.6 * zoom, a: 0.9 * k, rgb, haze: 0.25 }); n++;
+  }
+  for (const r of rings) {
+    if (n > 22) break;
+    const m = /rgba\((\d+,\d+,\d+)/.exec(r.color || '');
+    if (!m) continue;
+    const q = toS(r.x, r.y);
+    lights.push({ x: q.x, y: q.y, r: Math.max(r.r0, r.r1) * 1.3 * zoom, a: 0.6 * (r.life / r.max), rgb: m[1] }); n++;
+  }
+};
+
+// ---------- mapa: la ilustración del mundo como cabecera del panel ----------
+const _buildMapInfoW = buildMapInfo;
+buildMapInfo = function () {
+  _buildMapInfoW();
+  const B = BIOMES[mapView], box = $('mapInfo');
+  if (B && box && WORLD_FX[B.id]) box.insertAdjacentHTML('afterbegin', `<div class="mi-art" style="background-image:url(img/worlds/art_${B.id}.webp)"><span>${WORLD_FX[B.id].sub}</span></div>`);
+};
+// precarga de las ilustraciones (para que la carta no salga en blanco)
+for (const id of Object.keys(WORLD_FX)) { const im = new Image(); im.src = `img/worlds/art_${id}.webp`; }
