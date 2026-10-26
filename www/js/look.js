@@ -9,7 +9,7 @@
 // ============================================================
 // Cámara por escena
 // ============================================================
-const VIEW_UNITS = { hub: 560, rift: 500 };
+const VIEW_UNITS = { hub: 560, rift: 380 }; // en las Grietas, más cerca: héroes y monstruos se leen mejor en el móvil
 function setView(kind) {
   const u = VIEW_UNITS[kind];
   if (VIEW.units === u) return;

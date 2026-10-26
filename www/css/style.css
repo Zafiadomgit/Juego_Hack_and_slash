@@ -1125,3 +1125,29 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .daily-box .rp-opt { margin-top: 6px; padding: 7px 10px; }
 .daily-box .rp-head { margin-bottom: 6px; }
 @media (max-height: 430px) { .dly-mod { padding: 5px 8px; } .dly-mod small { font-size: 11px; } .daily-box .rp-opt small { display: none; } }
+
+/* ---------- Presentaciones: franjas de cine, carta de mundo y entrada de jefe ---------- */
+.cine-bars { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.cine-bars i { position: absolute; left: 0; right: 0; height: 11vh; background: #000; transition: transform .45s cubic-bezier(.2, .8, .2, 1); }
+.cine-bars i:first-child { top: 0; transform: translateY(-100%); }
+.cine-bars i:last-child { bottom: 0; transform: translateY(100%); }
+.cine-bars.show i { transform: none; }
+.world-card { position: fixed; left: 0; right: 0; top: 30%; z-index: 31; display: flex; flex-direction: column; align-items: center; pointer-events: none; opacity: 0; text-align: center; }
+.world-card.show { animation: wcIn 2.9s ease forwards; }
+.world-card small { font: 700 clamp(11px, 2.4vh, 15px) Cinzel, serif; letter-spacing: 8px; color: var(--wc); text-shadow: 0 0 12px rgba(0, 0, 0, .9); }
+.world-card b { font: 900 clamp(30px, 9vh, 62px)/1.05 Cinzel, serif; letter-spacing: 3px; color: #fff4dc;
+  background: linear-gradient(180deg, #ffffff, #f3e2b8 55%, #c9a24a); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 3px 0 #120c04) drop-shadow(0 0 22px rgba(0, 0, 0, .85)); }
+.world-card em { margin-top: 4px; font: italic 700 clamp(13px, 3vh, 18px) Garamond, Georgia, serif; color: #f2e6c8; text-shadow: 0 2px 6px #000; }
+.world-card span { margin-top: 2px; font: 600 clamp(11px, 2.3vh, 14px) Garamond, Georgia, serif; color: rgba(230, 220, 200, .75); text-shadow: 0 2px 6px #000; }
+.world-card::before { content: ''; width: min(60vw, 520px); height: 2px; margin-bottom: 8px; background: linear-gradient(90deg, transparent, var(--wc), transparent); }
+.world-card::after { content: ''; width: min(60vw, 520px); height: 2px; margin-top: 8px; background: linear-gradient(90deg, transparent, var(--wc), transparent); }
+@keyframes wcIn { 0% { opacity: 0; transform: scale(1.12); letter-spacing: 12px; filter: blur(6px); } 14% { opacity: 1; transform: none; filter: none; } 82% { opacity: 1; } 100% { opacity: 0; transform: translateY(-8px); } }
+.boss-card { position: fixed; left: 0; right: 0; top: 50%; z-index: 31; display: flex; align-items: center; justify-content: center; gap: 4px; transform: translateY(-50%); pointer-events: none; opacity: 0; }
+.boss-card.show { animation: bcIn 2.6s cubic-bezier(.2, .8, .2, 1) forwards; }
+.boss-card canvas { width: min(34vh, 220px); height: min(34vh, 220px); filter: drop-shadow(0 0 18px var(--bc)) drop-shadow(0 8px 10px #000); image-rendering: pixelated; }
+.boss-card div { display: flex; flex-direction: column; padding: 8px 18px; border-left: 3px solid var(--bc); background: linear-gradient(90deg, rgba(8, 6, 14, .85), transparent); }
+.boss-card small { font: 700 clamp(11px, 2.4vh, 14px) Cinzel, serif; letter-spacing: 6px; color: var(--bc); }
+.boss-card b { font: 900 clamp(24px, 7vh, 46px)/1.05 Cinzel, serif; color: #fff1e0; text-shadow: 0 3px 0 #200a04, 0 0 20px rgba(0, 0, 0, .9); }
+.boss-card em { font: italic 700 clamp(12px, 2.6vh, 16px) Garamond, Georgia, serif; color: #e8d8c0; }
+@keyframes bcIn { 0% { opacity: 0; transform: translate(-60px, -50%); } 12% { opacity: 1; transform: translate(0, -50%); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(30px, -50%); } }
