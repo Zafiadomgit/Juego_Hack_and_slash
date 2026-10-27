@@ -226,6 +226,37 @@ TRACKS = {
 }
 
 
+# Temas de jefe por mundo: cada Guardián y cada Súper Jefe usa la tonalidad, el leitmotiv (misma semilla
+# de melodía) y el instrumento característico de su mundo, con ritmo de combate.
+WORLDS = ['ceniza', 'pantano', 'glaciar', 'desierto', 'abismo', 'hundida', 'cristal', 'ciudadela']
+DARK = {'major': 'harm', 'lydian': 'dorian'}  # los mundos luminosos se oscurecen para el combate
+
+
+def boss_specs():
+    out = {}
+    for i, w in enumerate(WORLDS):
+        b = TRACKS[w]
+        sig = b['arps'][0][0]                     # instrumento del arpegio del mundo
+        mel = b['melodies'][0]                    # leitmotiv: instrumento, registro y semilla del mundo
+        sc = b['scale']
+        out['boss_' + w] = dict(
+            bpm=max(140, min(156, int(b['bpm'] * 1.35))), bars=16, root=b['root'], scale=DARK.get(sc, sc), prog=b['prog'][:4], seed=300 + i,
+            pads=[('strings', -1, 0.3), ('choir', 0, 0.16)], arps=[(sig, 0, 0.26, [0, 0, 1, 0, 2, 0, 1, 0], 0.25)],
+            bass=('bass', -2, 0.5, [0.5] * 8), melodies=[('brass', 0.28, mel[2] - 2, mel[3] - 2, 2, mel[5]), (mel[0], 0.16, mel[2], mel[3], 8, mel[5] + 1)],
+            drums=[('kick', 0.6, 'X..x..X.X..x..X.'), ('snare', 0.38, '....X.......X..x'), ('hat', 0.15, 'xxxxxxxxxxxxxxxx'), ('taiko', 0.55, 'X.......X.......')],
+            crash_every=4, rt=1.9)
+        out['sb_' + w] = dict(
+            bpm=max(150, min(168, int(b['bpm'] * 1.45))), bars=16, root=b['root'] - 2, scale='harm', prog=[0, 5, 3, 4, 0, 5, 1, 4], seed=400 + i,
+            pads=[('choir', 0, 0.42), ('strings', -1, 0.32)], arps=[(sig, 1, 0.22, [0, 1, 2, 1, 0, 1, 2, 3], 0.25), ('spic', 0, 0.18, [0, 0, 1, 0, 2, 0, 1, 0], 0.25)],
+            bass=('bass', -2, 0.55, [0.5] * 8), melodies=[('brass', 0.32, mel[2] - 3, mel[3] - 3, 2, mel[5]), ('choir', 0.15, mel[2] - 3, mel[3] - 3, 8, mel[5] + 2)],
+            drums=[('kick', 0.65, 'X.x.X.x.X.x.X.xx'), ('snare', 0.4, '....X.......X.X.'), ('taiko', 0.65, 'X...X...X...X...'), ('hat', 0.14, 'xxxxxxxxxxxxxxxx')],
+            crash_every=2, timpani_every=4, rt=2.1)
+    return out
+
+
+TRACKS.update(boss_specs())
+
+
 def main(out_dir):
     os.makedirs(out_dir, exist_ok=True)
     only = sys.argv[2:]  # opcional: solo estas pistas
@@ -234,7 +265,8 @@ def main(out_dir):
         wav = os.path.join(out_dir, name + '.wav')
         dur = render_track(spec, wav)
         ogg = os.path.join(out_dir, name + '.ogg')
-        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', wav, '-c:a', 'libvorbis', '-q:a', '3', ogg], check=True)
+        q = '2' if name.startswith(('boss_', 'sb_')) else '3'  # temas de jefe algo más ligeros
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', wav, '-c:a', 'libvorbis', '-q:a', q, ogg], check=True)
         os.remove(wav)
         print(f'{name:10s} {dur:5.1f}s  {os.path.getsize(ogg) // 1024} KB')
 
