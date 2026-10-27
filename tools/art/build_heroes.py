@@ -35,9 +35,9 @@ CELLS = {
 }
 # fotogramas elegidos de las hojas en celdas (índice de celda en orden de lectura)
 CELL_KEEP = {
-    'artificiera': {'attack': [2, 0, 1, 3], 'cast': [0, 1, 3, 4, 5]}, 'berserker': {'cast': [0, 1, 2, 3, 8, 6]},
+    'artificiera': {'attack': [2, 0, 3], 'cast': [0, 1, 5]}, 'berserker': {'cast': [0, 1, 2, 3, 8, 6]},
     'cra': {'cast': [0, 1, 3, 4, 5]}, 'domadora': {'attack': [1, 0, 4, 7], 'cast': [0, 1, 2, 4]},
-    'feca': {'attack': [0, 1, 5, 4], 'cast': [0, 1, 2, 4, 5]}, 'iop': {'attack': [0, 2, 3, 4, 5], 'cast': [0, 1, 2, 3, 4, 5]},
+    'feca': {'attack': [0, 1, 5, 4], 'cast': [0, 1, 2, 4, 5]}, 'iop': {'attack': [0, 2, 3, 4, 5], 'cast': [0, 1, 5]},
     'sombra': {'attack': [0, 1, 2, 3, 4, 5], 'cast': [0, 1, 2, 3, 4, 5]},
 }
 PX_H = 300  # altura del arte de cuerpo entero (menú, diálogos)

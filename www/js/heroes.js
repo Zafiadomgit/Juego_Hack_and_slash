@@ -87,6 +87,9 @@ basicAttack = function () {
     } else if (s.v === 5) sigReady();
   }
 };
+function stretchSwing(sw0) {
+  if (P.swingT > 0 && P.swingT !== sw0) { P.swingMax = clamp(P.atkCd * 0.9, 0.2, 0.45); P.swingT = P.swingMax; }
+}
 function breakHelm() {
   const s = P.sig;
   s.v = 0; s.t = 0;
@@ -258,6 +261,11 @@ showClassInfo = function (id) {
 const _heroAnimPoseH = heroAnimPose;
 heroAnimPose = function (cls, o) {
   const A = HERO_ANIM[cls];
+  // golpe cuerpo a cuerpo: la animación ocupa todo el intervalo entre golpes (no 0,2 s y luego quieto)
+  if (A && P && cls === P.cls && P.swingMax && o.swing > 0 && !(o.hurt > 0) && !(P.castAnim > 0)) {
+    const n = A.attack.length;
+    return ['attack', Math.min(n - 1, Math.floor((1 - o.swing / P.swingMax) * n))];
+  }
   if (A && A.cast && scene === 'rift' && P && cls === P.cls && P.castAnim > 0 && !(o.hurt > 0)) {
     const n = A.cast.length;
     return ['cast', Math.min(n - 1, Math.floor((1 - P.castAnim / 0.5) * n))];
@@ -337,3 +345,7 @@ function castFlourish() {
   }
   box.innerHTML = h;
 })();
+
+// el golpe cuerpo a cuerpo dura tanto como el intervalo entre golpes (ver heroAnimPose)
+const _basicAttackSw = basicAttack;
+basicAttack = function () { const sw0 = P.swingT; _basicAttackSw(); stretchSwing(sw0); };

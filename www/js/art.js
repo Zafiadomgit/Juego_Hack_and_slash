@@ -168,7 +168,7 @@ function heroArt(cls) {
   if (pa) return { img: pa, right: false, px: false, url: 'img/heroes/' + cls + '.png' };
   return null;
 }
-const HERO_H = 84; // altura en unidades de mundo
+const HERO_H = 104; // altura en unidades de mundo (a la par o algo más que los NPC de la villa)
 
 // ---------- "Rig" de los héroes: torso + dos piernas, para animar a partir de una sola imagen ----------
 // hip: altura de la cadera (fracción de la imagen); cx: separación entre piernas

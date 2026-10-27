@@ -81,6 +81,10 @@ const DAILY_POOL = [
   { id: 'ult', text: (g) => `Usa tu definitiva ${g} veces`, goals: [2, 4], seals: [3, 6] },
   { id: 'event', text: (g) => `Completa ${g} evento${g > 1 ? 's' : ''} de Grieta`, goals: [1, 2, 3], seals: [3, 5, 8] },
 ];
+// medallón pintado de cada misión (img/talents e img/icons)
+const QUEST_ICON = { kill: ['talents/swords', '255,120,90'], elite: ['talents/crown', '255,200,80'], boss: ['talents/skull', '255,90,70'], rift: ['talents/rune', '120,190,255'],
+  hard: ['talents/mountain', '200,160,255'], amber: ['talents/amber', '255,180,60'], ult: ['talents/burst', '255,140,220'], event: ['talents/trophy', '255,214,110'], bonus: ['icons/chest', '255,214,110'] };
+const questMedal = (id) => { const [img, rgb] = QUEST_ICON[id] || QUEST_ICON.event; return `<div class="q-medal" style="--qc:${rgb}"><img src="img/${img}.png" alt=""></div>`; };
 const DAILY_BONUS = 6; // cofre por completar las 3 misiones del día
 const todayKey = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
 const questSeals = (q) => { const def = DAILY_POOL.find((x) => x.id === q.id); return def.seals[Math.max(0, def.goals.indexOf(q.goal))]; };
@@ -194,12 +198,12 @@ function buildQuests() {
   if (questTab === 'quests') {
     list.innerHTML = d.list.map((q, i) => {
       const def = DAILY_POOL.find((x) => x.id === q.id), done = q.prog >= q.goal;
-      return `<div class="quest ${q.claimed ? 'claimed' : done ? 'done' : ''}">
+      return `<div class="quest ${q.claimed ? 'claimed' : done ? 'done' : ''}">${questMedal(q.id)}
         <div class="q-txt"><b>${def.text(q.goal)}</b><span>Recompensa: ${SEAL_SVG} ${questSeals(q)} Sellos de Gesta${def.elixir ? ' + un elixir al azar' : ''}</span>
           <div class="q-bar"><i style="width:${(q.prog / q.goal) * 100}%"></i></div><small>${fmtNum(q.prog)} / ${fmtNum(q.goal)}</small></div>
         <button class="btn" data-q="${i}" ${done && !q.claimed ? '' : 'disabled'}>${q.claimed ? '✔ Cobrada' : done ? 'Reclamar' : 'En curso'}</button></div>`;
-    }).join('') + `<div class="quest bonus ${d.bonus ? 'claimed' : bonusReady(d) ? 'done' : ''}">
-        <div class="q-txt"><b>🎁 Cofre del día</b><span>Completa y cobra las 3 misiones: ${SEAL_SVG} ${DAILY_BONUS} Sellos de Gesta extra</span></div>
+    }).join('') + `<div class="quest bonus ${d.bonus ? 'claimed' : bonusReady(d) ? 'done' : ''}">${questMedal('bonus')}
+        <div class="q-txt"><b>Cofre del día</b><span>Completa y cobra las 3 misiones: ${SEAL_SVG} ${DAILY_BONUS} Sellos de Gesta extra</span></div>
         <button class="btn" data-q="bonus" ${bonusReady(d) ? '' : 'disabled'}>${d.bonus ? '✔ Abierto' : bonusReady(d) ? 'Abrir' : 'Cerrado'}</button></div>`;
     const left = 24 - new Date().getHours();
     $('questNote').innerHTML = `Nuevas misiones en ${left} h · cada héroe tiene las suyas. Los <b>Sellos de Gesta</b> se gastan en Trascendencia, Forja y Armería.`;

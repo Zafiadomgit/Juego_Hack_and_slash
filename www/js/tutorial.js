@@ -129,3 +129,10 @@ function hubHint() {
 }
 const _buildHubTut = buildHub;
 buildHub = function () { _buildHubTut(); if (state === 'hub' && !tutCur) hubHint(); };
+
+// la pista «camina hasta el Portal» se quita en cuanto hay algo cerca con su propio aviso
+(function hubHintWatch() {
+  requestAnimationFrame(hubHintWatch);
+  if (!tutCur || tutCur.icon !== '🌀') return;
+  if (state !== 'hub' || (typeof vNear !== 'undefined' && vNear)) tutShow(null); // junto al Portal (o a un vecino) ya sale su propio aviso
+})();
