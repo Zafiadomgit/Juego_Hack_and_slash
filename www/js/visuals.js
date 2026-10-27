@@ -187,18 +187,21 @@ goHub = function () { _goHubW(); $('worldBg').classList.remove('show'); $('world
 // ---------- contorno oscuro en los monstruos (se separan del suelo) ----------
 // Se hornea una vez por fotograma en la caché: dibujar cuesta lo mismo que antes.
 const MON_OUT = new Map();
+const LIGHT_RIM = { hundida: 'rgb(255,214,150)', cristal: 'rgb(255,236,170)', ciudadela: 'rgb(255,200,120)' };
 const _monFrameW = monFrame;
 monFrame = function (id, pose, i, filt, bid) {
   const c = _monFrameW(id, pose, i, filt, bid);
-  const key = c.key + '|o';
+  // mundos oscuros con monstruos de su mismo tono: contorno claro y cálido en vez de oscuro
+  const light = LIGHT_RIM[bid] && !id.startsWith('S_') && !(ENEMIES[id] && ENEMIES[id].boss);
+  const key = c.key + '|o' + (light ? 'L' + bid : '');
   let o = MON_OUT.get(key);
   if (o) return o;
-  const pad = Math.max(2, Math.round(c.height / 34));
+  const pad = Math.max(2, Math.round(c.height / 26));
   o = document.createElement('canvas'); o.width = c.width + pad * 2; o.height = c.height + pad * 2;
   const g = o.getContext('2d');
   const sil = document.createElement('canvas'); sil.width = c.width; sil.height = c.height;
-  const sg = sil.getContext('2d'); sg.drawImage(c, 0, 0); sg.globalCompositeOperation = 'source-in'; sg.fillStyle = 'rgb(12,8,20)'; sg.fillRect(0, 0, c.width, c.height);
-  g.globalAlpha = 0.85;
+  const sg = sil.getContext('2d'); sg.drawImage(c, 0, 0); sg.globalCompositeOperation = 'source-in'; sg.fillStyle = light ? LIGHT_RIM[bid] : 'rgb(12,8,20)'; sg.fillRect(0, 0, c.width, c.height);
+  g.globalAlpha = light ? 0.95 : 0.85;
   for (let a = 0; a < 8; a++) g.drawImage(sil, pad + Math.round(Math.cos(a * Math.PI / 4) * pad), pad + Math.round(Math.sin(a * Math.PI / 4) * pad));
   g.globalAlpha = 1;
   g.drawImage(c, pad, pad);
@@ -239,3 +242,24 @@ buildMapInfo = function () {
 };
 // precarga de las ilustraciones (para que la carta no salga en blanco)
 for (const id of Object.keys(WORLD_FX)) { const im = new Image(); im.src = `img/worlds/art_${id}.webp`; }
+
+// ---------- legibilidad: marca roja de enemigo bajo los pies (se distingue en cualquier suelo) ----------
+let FOE_RING = null;
+function foeRing() {
+  if (FOE_RING) return FOE_RING;
+  const c = document.createElement('canvas'); c.width = 64; c.height = 26;
+  const g = c.getContext('2d');
+  g.fillStyle = 'rgba(0,0,0,0.42)'; g.beginPath(); g.ellipse(32, 13, 30, 11.5, 0, 0, Math.PI * 2); g.fill();
+  g.strokeStyle = 'rgba(255,70,50,0.85)'; g.lineWidth = 2.2; g.beginPath(); g.ellipse(32, 13, 28.5, 10.5, 0, 0, Math.PI * 2); g.stroke();
+  return (FOE_RING = c);
+}
+const _drawEnemyR = drawEnemy;
+drawEnemy = function (e) {
+  if (scene === 'rift' && !e.dead && e.ct === undefined && !e.goblin) {
+    const rx = e.r * 1.25, ry = rx * 0.4;
+    ctx.globalAlpha = e.spawnT > 0 ? 0.4 : 1;
+    ctx.drawImage(foeRing(), e.x - rx, e.y + 1 - ry, rx * 2, ry * 2);
+    ctx.globalAlpha = 1;
+  }
+  _drawEnemyR(e);
+};

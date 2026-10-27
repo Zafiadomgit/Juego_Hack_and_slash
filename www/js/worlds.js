@@ -69,7 +69,7 @@ BIOMES.push(
 );
 BIOMES[0].minion = 'tofu'; BIOMES[1].minion = 'arakne'; BIOMES[2].minion = 'tofu'; BIOMES[3].minion = 'tofu'; BIOMES[4].minion = 'tofu';
 // los dos primeros mundos del Acto II y el del Acto III usan su propio arte: sin filtro de color
-for (const id of ['hundida', 'cristal', 'ciudadela']) BIOMES.find((b) => b.id === id).mfilter = null;
+for (const id of ['hundida', 'cristal', 'ciudadela']) BIOMES.find((b) => b.id === id).mfilter = 'saturate(1.35) brightness(1.18)'; // resaltan sobre el fondo
 
 // ---------- Súper Jefes ----------
 Object.assign(SUPER_BOSSES, {

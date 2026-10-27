@@ -14,7 +14,7 @@ const BIOMES = [
     weights: { tofu: 4, bouftou: 4, arakne: 3, pissenlit: 2, craqueleur: 1 }, boss: 'bouftouRoyal',
   },
   {
-    id: 'pantano', mfilter: 'hue-rotate(70deg) saturate(0.85)', name: 'Pantano Sombrío',
+    id: 'pantano', mfilter: 'hue-rotate(-45deg) saturate(1.35) brightness(1.1)', name: 'Pantano Sombrío',
     ground: [[38, 52, 40], [50, 66, 48], [26, 36, 30]], grain: [90, 120, 80], patch: ['rgba(20,60,40,0.35)', 'rgba(70,90,40,0.22)'],
     deco: { reeds: 26, lily: 0, glowshroom: 10, grass: 20, pebble: 10, blotch: 24, bones: 4 }, decoCol: ['#4f7a3a', '#3d6630', '#6a8a3a'],
     tree: 'willow', props: { pillar: 10, crystal: 14, brazier: 6 }, pool: 'water', pools: 20, crystalHue: 2,
@@ -22,7 +22,7 @@ const BIOMES = [
     weights: { tofu: 2, bouftou: 2, arakne: 5, pissenlit: 5, craqueleur: 1 }, boss: 'reinaTeje',
   },
   {
-    id: 'glaciar', mfilter: 'hue-rotate(170deg) saturate(0.8) brightness(1.1)', name: 'Glaciar Rúnico',
+    id: 'glaciar', mfilter: 'hue-rotate(-12deg) saturate(1.4) brightness(1.05)', name: 'Glaciar Rúnico',
     ground: [[198, 212, 226], [178, 194, 212], [222, 232, 242]], grain: [255, 255, 255], patch: ['rgba(120,160,210,0.25)', 'rgba(255,255,255,0.35)'],
     deco: { snowdrift: 18, iceshard: 10, pebble: 12, crackline: 4, bones: 4, blotch: 10 }, decoCol: ['#9fb8cc', '#c8dcea', '#7f9ab0'],
     tree: 'pine', props: { pillar: 14, crystal: 24, brazier: 10 }, pool: 'ice', pools: 12, crystalHue: 0,
@@ -30,7 +30,7 @@ const BIOMES = [
     weights: { tofu: 2, bouftou: 3, arakne: 2, pissenlit: 2, craqueleur: 4 }, boss: 'colosoHielo',
   },
   {
-    id: 'desierto', mfilter: 'hue-rotate(18deg) saturate(1.1)', name: 'Desierto de Ámbar',
+    id: 'desierto', mfilter: 'hue-rotate(215deg) saturate(1.3) brightness(1.05)', name: 'Desierto de Ámbar',
     ground: [[196, 154, 90], [214, 176, 108], [170, 130, 72]], grain: [240, 210, 150], patch: ['rgba(150,100,40,0.25)', 'rgba(255,230,170,0.25)'],
     deco: { ripple: 30, bones: 12, pebble: 14, blotch: 14, crackline: 4 }, decoCol: ['#a8844a', '#8a6a38', '#c09a5a'],
     tree: 'spire', props: { pillar: 22, crystal: 12, brazier: 12 }, pool: 'quicksand', pools: 12, crystalHue: 3,
@@ -38,7 +38,7 @@ const BIOMES = [
     weights: { tofu: 5, bouftou: 4, arakne: 2, pissenlit: 1, craqueleur: 2 }, boss: 'tofuRoyal',
   },
   {
-    id: 'abismo', mfilter: 'hue-rotate(-22deg) saturate(1.3) brightness(0.9)', name: 'Abismo Volcánico',
+    id: 'abismo', mfilter: 'hue-rotate(165deg) saturate(1.3) brightness(1.2)', name: 'Abismo Volcánico',
     ground: [[34, 28, 28], [46, 38, 36], [20, 16, 16]], grain: [120, 90, 80], patch: ['rgba(120,30,10,0.3)', 'rgba(0,0,0,0.35)'],
     deco: { crackline: 26, obsidian: 14, pebble: 14, bones: 6, blotch: 14 }, decoCol: ['#3a2a28', '#2a1a18', '#5a3a30'],
     tree: 'dead', props: { pillar: 16, crystal: 8, brazier: 22 }, pool: 'lava', pools: 26, crystalHue: 4,
