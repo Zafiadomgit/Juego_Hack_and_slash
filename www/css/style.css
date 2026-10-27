@@ -1061,10 +1061,14 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 /* Mecánica propia del héroe en la pantalla de selección */
 .hs-sig { border-left: 3px solid var(--sc); background: linear-gradient(90deg, rgba(255,255,255,.07), transparent); padding: 3px 6px; border-radius: 4px; }
 .hs-sig b { color: var(--sc); }
-.hs-art { position: relative; }
-.hs-live { position: absolute; right: 6px; top: 6px; z-index: 3; width: 96px; background: radial-gradient(circle at 50% 70%, rgba(255,214,140,.16), rgba(10,12,22,.75)); border: 1px solid rgba(255,214,140,.45); border-radius: 10px; text-align: center; pointer-events: none; overflow: hidden; }
-.hs-live canvas { width: 96px; height: 96px; display: block; }
-.hs-live small { display: block; font-size: 10px; color: #ffe0a0; letter-spacing: .5px; padding-bottom: 3px; }
+.hs-art { position: relative; --hc: 255,214,140; }
+.hs-aura { position: absolute; left: 50%; bottom: 6%; width: 78%; height: 80%; transform: translateX(-50%); border-radius: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 70%, rgba(var(--hc), .5), rgba(var(--hc), .14) 45%, transparent 70%); animation: auraPulse 3.2s ease-in-out infinite; transition: background .4s; }
+.hs-art .hs-floor { background: radial-gradient(ellipse, rgba(var(--hc), .45), rgba(0, 0, 0, .5) 60%); }
+@keyframes auraPulse { 50% { opacity: .65; transform: translateX(-50%) scale(.94); } }
+.hs-motes { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.hs-motes i { position: absolute; bottom: -6px; width: 4px; height: 4px; border-radius: 50%; background: rgba(var(--hc), 1); box-shadow: 0 0 8px 2px rgba(var(--hc), .7); opacity: 0; animation: moteUp linear infinite; }
+@keyframes moteUp { 0% { transform: translateY(0); opacity: 0; } 15% { opacity: .9; } 100% { transform: translateY(-260px); opacity: 0; } }
 
 /* barra de la villa: arriba y más compacta (abajo estorbaba al joystick) */
 .dbar { top: max(4px, env(safe-area-inset-top)); bottom: auto; gap: 6px; padding: 3px 6px; border-width: 1.5px; border-radius: 9px; }

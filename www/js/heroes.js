@@ -265,27 +265,20 @@ heroAnimPose = function (cls, o) {
   return _heroAnimPoseH(cls, o);
 };
 
-// ---------- selección de héroe: el héroe en acción (andar, atacar, hechizo) ----------
-document.querySelector('.hs-art').insertAdjacentHTML('beforeend', '<div class="hs-live"><canvas id="hsLive" width="150" height="150"></canvas><small>En acción</small></div>');
-let hsLiveT = 0;
-function hsLiveFrame(t) {
-  requestAnimationFrame(hsLiveFrame);
-  const cv = $('hsLive');
-  if (!cv || !cv.offsetParent) return;
-  const cls = selectedClass, A = typeof HERO_ANIM !== 'undefined' && HERO_ANIM[cls];
-  if (!A || !HERO_ANIM_IMG[cls]) return;
-  const seq = [['walk', A.walk.length * 2, 12], ['attack', A.attack.length * 2, 9], ['idle', A.idle.length, 5], ['cast', (A.cast || A.attack).length, 8], ['idle', A.idle.length, 5]];
-  const tot = seq.reduce((s, q) => s + q[1] / q[2], 0), k = (t / 1000) % tot;
-  let acc = 0, pose = 'idle', f = 0;
-  for (const [p, n, fps] of seq) { const d = n / fps; if (k < acc + d) { pose = A[p] ? p : 'attack'; f = Math.floor((k - acc) * fps); break; } acc += d; }
-  const c = heroAnimFrame(cls, pose, f), g = cv.getContext('2d');
-  g.clearRect(0, 0, cv.width, cv.height);
-  const sc = 118 / A.bh;
-  g.imageSmoothingEnabled = false;
-  g.fillStyle = 'rgba(0,0,0,0.35)'; g.beginPath(); g.ellipse(70, 136, 30, 7, 0, 0, TAU); g.fill();
-  g.drawImage(c, 70 - c.ax * sc, 136 - c.ay * sc, c.width * sc, c.height * sc);
-}
-requestAnimationFrame(hsLiveFrame);
+// ---------- selección de héroe: aura del color del héroe y chispas que suben detrás de la ilustración ----------
+(function () {
+  const art = document.querySelector('.hs-art');
+  if (!art) return;
+  let h = '<div class="hs-aura"></div><div class="hs-motes">';
+  for (let i = 0; i < 14; i++) h += `<i style="left:${(8 + Math.random() * 84).toFixed(0)}%;animation-duration:${(3.5 + Math.random() * 3).toFixed(1)}s;animation-delay:${(-Math.random() * 6).toFixed(1)}s"></i>`;
+  art.insertAdjacentHTML('afterbegin', h + '</div>');
+})();
+const _showClassInfoA = showClassInfo;
+showClassInfo = function (id) {
+  _showClassInfoA(id);
+  const art = document.querySelector('.hs-art'), D = SIG[id];
+  if (art && D) art.style.setProperty('--hc', D.color);
+};
 
 // ---------- el arma se nota según su rareza: brillo en la mano, estela al atacar y halo en los proyectiles ----------
 const WPN_FX = [null, { rgb: '120,200,255', n: 0.4 }, { rgb: '210,150,255', n: 0.7 }, { rgb: '255,180,70', n: 1 }];
