@@ -46,11 +46,11 @@ function wxDraw(F, dt) {
       continue;
     }
     const glowy = F.fx === 'ember' || F.fx === 'spore';
-    if (glowy) { ctx.globalAlpha = 0.25 * tw; ctx.fillStyle = `rgba(${p.c},1)`; ctx.beginPath(); ctx.arc(p.x, p.y, p.r * 3, 0, TAU); ctx.fill(); }
+    if (glowy) { ctx.globalAlpha = 0.3 * tw; ctx.drawImage(glowTex(p.c), p.x - p.r * 3, p.y - p.r * 3, p.r * 6, p.r * 6); }
     ctx.globalAlpha = (F.fx === 'sand' ? 0.45 : 0.75) * (glowy ? tw : 1);
     ctx.fillStyle = `rgba(${p.c},1)`;
     if (F.fx === 'sand') ctx.fillRect(p.x, p.y, p.r * 6, p.r * 0.8);
-    else { ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, TAU); ctx.fill(); }
+    else ctx.fillRect(p.x - p.r, p.y - p.r, p.r * 2, p.r * 2); // motas pequeñas: un cuadrado basta y cuesta mucho menos
   }
   ctx.restore();
 }
@@ -85,21 +85,37 @@ drawHUD = function () {
 };
 
 // ---------- proyectiles enemigos con la paleta del mundo ----------
+// Se pintan una vez por mundo y tamaño en una imagen (estela + halo + esfera) y luego solo se copian.
+const SHOT_TEX = new Map();
+function shotTex(F, r) {
+  const key = F.shot[0] + '|' + Math.round(r);
+  let c = SHOT_TEX.get(key);
+  if (c) return c;
+  const R = Math.max(3, Math.round(r)), w = R * 9, h = R * 4;
+  c = document.createElement('canvas'); c.width = w; c.height = h;
+  const g = c.getContext('2d'), cx = w - R * 2, cy = h / 2;
+  let gr = g.createRadialGradient(cx, cy, 0, cx, cy, R * 2);
+  gr.addColorStop(0, `rgba(${F.shot[1]},0.55)`); gr.addColorStop(1, `rgba(${F.shot[1]},0)`);
+  g.fillStyle = gr; g.fillRect(cx - R * 2, 0, R * 4, h);
+  gr = g.createLinearGradient(cx - R * 6, 0, cx, 0);
+  gr.addColorStop(0, `rgba(${F.shot[1]},0)`); gr.addColorStop(1, `rgba(${F.shot[1]},0.75)`);
+  g.fillStyle = gr; g.beginPath(); g.moveTo(cx - R * 6, cy); g.lineTo(cx, cy - R * 0.8); g.lineTo(cx, cy + R * 0.8); g.closePath(); g.fill();
+  g.fillStyle = F.shot[0]; g.strokeStyle = 'rgba(10,8,16,0.85)'; g.lineWidth = 1.5;
+  g.beginPath(); g.arc(cx, cy, R * 0.85, 0, Math.PI * 2); g.fill(); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,0.8)'; g.beginPath(); g.arc(cx - R * 0.2, cy - R * 0.25, R * 0.3, 0, Math.PI * 2); g.fill();
+  c.ox = cx; c.oy = cy;
+  SHOT_TEX.set(key, c);
+  return c;
+}
 const _drawProjectileW = drawProjectile;
 drawProjectile = function (p) {
   const F = wfx();
   if (!F || p.team !== 'e' || p.look || p.kind !== 'seed') return _drawProjectileW(p);
-  const a = Math.atan2(p.vy, p.vx);
-  glow(p.x, p.y, p.r * 3.2, F.shot[1], 0.5);
-  ctx.save();
-  ctx.translate(p.x, p.y); ctx.rotate(a);
-  const g = ctx.createLinearGradient(-p.r * 4, 0, 0, 0);
-  g.addColorStop(0, `rgba(${F.shot[1]},0)`); g.addColorStop(1, `rgba(${F.shot[1]},0.7)`);
-  ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(-p.r * 4, 0); ctx.lineTo(0, -p.r * 0.8); ctx.lineTo(0, p.r * 0.8); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = F.shot[0]; ctx.strokeStyle = 'rgba(10,8,16,0.85)'; ctx.lineWidth = 1.5;
-  ctx.beginPath(); ctx.arc(0, 0, p.r * 0.85, 0, TAU); ctx.fill(); ctx.stroke();
-  ctx.fillStyle = '#fff'; ctx.globalAlpha = 0.8; ctx.beginPath(); ctx.arc(-p.r * 0.2, -p.r * 0.25, p.r * 0.3, 0, TAU); ctx.fill();
-  ctx.restore();
+  const c = shotTex(F, p.r), a = Math.atan2(p.vy, p.vx), cs = Math.cos(a), sn = Math.sin(a);
+  const m = ctx.getTransform();
+  ctx.transform(cs, sn, -sn, cs, p.x, p.y);
+  ctx.drawImage(c, -c.ox, -c.oy);
+  ctx.setTransform(m);
 };
 
 // ---------- presentaciones ----------

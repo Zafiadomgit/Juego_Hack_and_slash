@@ -15,7 +15,17 @@ function circle(x, y, r, fill, stroke, lw) {
   if (fill) { ctx.fillStyle = fill; ctx.fill(); }
   if (stroke) { ctx.strokeStyle = stroke; ctx.lineWidth = lw || 1; ctx.stroke(); }
 }
-function shadow(x, y, rx) { ellipse(x, y, rx, rx * 0.38, 'rgba(0,0,0,0.25)'); }
+// sombra de contacto: textura precalculada (una imagen en vez de un trazado nuevo por unidad y fotograma)
+let SHADOW_TEX = null;
+function shadow(x, y, rx) {
+  if (!SHADOW_TEX) {
+    SHADOW_TEX = document.createElement('canvas'); SHADOW_TEX.width = 64; SHADOW_TEX.height = 24;
+    const g = SHADOW_TEX.getContext('2d');
+    g.fillStyle = 'rgba(0,0,0,0.25)'; g.beginPath(); g.ellipse(32, 12, 31, 11.5, 0, 0, Math.PI * 2); g.fill();
+  }
+  const ry = rx * 0.38;
+  ctx.drawImage(SHADOW_TEX, x - rx, y - ry, rx * 2, ry * 2);
+}
 
 const OUTLINE = '#2a1a0c';
 

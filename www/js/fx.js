@@ -46,6 +46,7 @@ function hitFlash(x, y, size, rgb) {
 }
 
 function sparks(x, y, n, color, speed = 280, dir = 0, spread = Math.PI * 2, grav = 380) {
+  n = Math.max(1, Math.round(n * (typeof QUALITY !== 'undefined' ? QUALITY.fxK : 1)));
   for (let i = 0; i < n; i++) {
     const a = dir + (Math.random() - 0.5) * spread;
     const sp = speed * (0.45 + Math.random() * 0.75);
@@ -219,6 +220,8 @@ function renderLighting(lights, ambient, shade = '80,90,130') {
   g.fillRect(0, 0, w, h);
   // luces: se suman
   g.globalCompositeOperation = 'lighter';
+  // como mucho 40 luces por fotograma (las más grandes); en móviles modestos cada una cuenta
+  if (lights.length > 40) { lights.sort((p, q) => q.r * q.a - p.r * p.a); lights.length = 40; }
   for (const L of lights) {
     const r = L.r / D;
     if (L.x + L.r < 0 || L.x - L.r > W || L.y + L.r < 0 || L.y - L.r > H) continue;

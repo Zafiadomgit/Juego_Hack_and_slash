@@ -30,7 +30,7 @@ let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 
 // Calidad adaptativa: si el móvil no llega a ~45 FPS se baja la resolución interna
 // nivel 0: todo; 1: sin desenfoque de maqueta; 2: resolución 1x y luces más baratas; 3: píxel más grande
-const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0 };
+const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0, pcap: 350, fxK: 1 }; // pcap: tope de partículas; fxK: cuántas chispas
 // unidades de mundo visibles en el lado corto de la pantalla (look.js las cambia según la escena)
 const VIEW = { units: 420 };
 function resize() {
@@ -1844,13 +1844,15 @@ function updateEffects(dt) {
     p.x += p.vx * dt; p.y += p.vy * dt;
   }
   particles = particles.filter((p) => p.life > 0);
-  if (particles.length > 350) particles.splice(0, particles.length - 350);
+  if (particles.length > QUALITY.pcap) particles.splice(0, particles.length - QUALITY.pcap);
   for (const t of texts) {
     t.life -= dt;
     if (t.vy !== undefined) { t.vy += 300 * dt; t.x += t.vx * dt; t.y += t.vy * dt; }
     else t.y -= 38 * dt;
   }
   texts = texts.filter((t) => t.life > 0);
+  // tope de textos flotantes: en combates masivos los más viejos se van (cada texto con contorno es caro)
+  if (texts.length > 45) texts.splice(0, texts.length - 45);
   for (const s of slashes) {
     s.life -= dt;
     if (s.follow && P) { s.x = P.x; s.y = P.y; }
@@ -2034,10 +2036,16 @@ function drawHUD() {
   ctx.save();
   ctx.beginPath(); ctx.arc(mx, my, mr - 2, 0, Math.PI * 2); ctx.clip();
   const ms = mr / 900;
+  // enemigos: cuadraditos (mucho más baratos que un círculo por enemigo); los normales con un solo color
+  ctx.fillStyle = '#ff8a80';
+  const dn = 2.8 * s;
   for (const e of enemies) {
-    if (e.dead) continue;
-    const ex = mx + (e.x - P.x) * ms, ey = my + (e.y - P.y) * ms;
-    circle(ex, ey, e.boss ? 4 * s : e.elite ? 2.6 * s : 1.6 * s, e.boss ? '#ff3d00' : e.elite ? e.elite.color : '#ff8a80');
+    if (e.dead || e.boss || e.elite) continue;
+    ctx.fillRect(mx + (e.x - P.x) * ms - dn / 2, my + (e.y - P.y) * ms - dn / 2, dn, dn);
+  }
+  for (const e of enemies) {
+    if (e.dead || !(e.boss || e.elite)) continue;
+    circle(mx + (e.x - P.x) * ms, my + (e.y - P.y) * ms, e.boss ? 4 * s : 2.6 * s, e.boss ? '#ff3d00' : e.elite.color);
   }
   for (const k of pickups) if (k.type === 'item' || k.type === 'dofus') circle(mx + (k.x - P.x) * ms, my + (k.y - P.y) * ms, 2 * s, k.type === 'dofus' ? '#26c6da' : RARITY[k.item.rarity].color);
   if (rift.zaap) { const zx = mx + (rift.zaap.x - P.x) * ms, zy = my + (rift.zaap.y - P.y) * ms; circle(clamp(zx, mx - mr + 5, mx + mr - 5), clamp(zy, my - mr + 5, my + mr - 5), 4 * s, '#4fc3f7', '#fff', 1.5); }
@@ -2202,7 +2210,7 @@ function renderRift() {
     if (!inView(p.x, p.y)) continue;
     if (p.kind === 'orb') glow(p.x, p.y, 34, '120,200,255', 0.9);
     else if (p.kind === 'explo') glow(p.x, p.y, 30, '255,140,40', 0.9);
-    else if (p.kind === 'seed') glow(p.x, p.y, 16, '200,255,80', 0.6);
+    else if (p.kind === 'seed' && !(rift && rift.biome && typeof WORLD_FX !== 'undefined' && WORLD_FX[rift.biome.id])) glow(p.x, p.y, 16, '200,255,80', 0.6);
     else if (p.kind === 'bolt' || p.kind === 'homing') glow(p.x, p.y, p.r * 3.2, '200,110,255', 0.85);
     else if (p.kind === 'web') glow(p.x, p.y, 20, '210,255,190', 0.4);
     drawProjectile(p);
@@ -2219,26 +2227,38 @@ function renderRift() {
     circle(0, 0, lerp(r.r0, r.r1, k), null, r.color + '0.9)', 5 * (1 - k) + 1);
     ctx.restore();
   }
+  // partículas en dos pasadas: primero las normales y luego las aditivas (un solo cambio de modo de mezcla)
   for (const p of particles) {
+    if (p.kind === 'spark' || p.kind === 'glowdot') continue;
     const a = Math.max(0, p.life / p.max);
     ctx.globalAlpha = a;
     if (p.kind === 'fallArrow') {
       const off = a * 60;
       ctx.strokeStyle = '#5d4037'; ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(p.x - 6, p.y - off - 16); ctx.lineTo(p.x, p.y - off); ctx.stroke();
-      glow(p.x, p.y, 10, '255,200,120', 0.5 * (1 - a));
-    } else if (p.kind === 'spark') {
-      ctx.globalCompositeOperation = 'lighter';
-      ctx.strokeStyle = p.color; ctx.lineWidth = p.size; ctx.lineCap = 'round';
-      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 0.035, p.y - p.vy * 0.035); ctx.stroke();
-      ctx.globalCompositeOperation = 'source-over';
-    } else if (p.kind === 'glowdot') {
-      glow(p.x, p.y, p.size * (0.6 + a * 0.6), p.rgb, a);
     } else {
       ctx.fillStyle = p.color;
       ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
     }
   }
+  ctx.globalCompositeOperation = 'lighter';
+  ctx.lineCap = 'round';
+  for (const p of particles) {
+    const a = Math.max(0, p.life / p.max);
+    if (p.kind === 'glowdot') {
+      const r = p.size * (0.6 + a * 0.6);
+      ctx.globalAlpha = a;
+      ctx.drawImage(glowTex(p.rgb), p.x - r, p.y - r, r * 2, r * 2);
+    } else if (p.kind === 'spark') {
+      ctx.globalAlpha = a;
+      ctx.strokeStyle = p.color; ctx.lineWidth = p.size;
+      ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x - p.vx * 0.035, p.y - p.vy * 0.035); ctx.stroke();
+    } else if (p.kind === 'fallArrow') {
+      const r = 10; ctx.globalAlpha = 0.5 * (1 - a);
+      ctx.drawImage(glowTex('255,200,120'), p.x - r, p.y - r, r * 2, r * 2);
+    }
+  }
+  ctx.globalCompositeOperation = 'source-over';
   ctx.globalAlpha = 1;
   for (const t of texts) {
     ctx.globalAlpha = Math.min(1, (t.life / t.max) * 2.5);
@@ -2362,7 +2382,7 @@ function frame(t) {
 
 // Calidad automática: si el móvil no llega a ~50 FPS se van quitando efectos, de uno en uno
 function adaptQuality(dt) {
-  if ((state !== 'play' && state !== 'hub') || QUALITY.level >= 3) return;
+  if ((state !== 'play' && state !== 'hub') || QUALITY.level >= 4) return;
   QUALITY.samples.push(dt);
   QUALITY.checkT += dt;
   if (QUALITY.checkT < 2.5) return;
@@ -2373,7 +2393,13 @@ function adaptQuality(dt) {
   if (QUALITY.level === 1) HD2D.dof = false;
   if (QUALITY.level === 2) { QUALITY.maxDpr = 1; LIGHT.div = 4; resize(); }
   if (QUALITY.level === 3) { HD2D.pixMul = 1.3; resize(); }
+  if (QUALITY.level === 4) { QUALITY.pcap = 170; QUALITY.fxK = 0.5; } // último recurso: la mitad de partículas y chispas
 }
+// móviles modestos (4 núcleos o menos, o poca memoria): se empieza ya en calidad media
+(function () {
+  const cores = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
+  if (cores <= 4 || mem <= 3) { QUALITY.level = 2; HD2D.dof = false; QUALITY.maxDpr = 1; LIGHT.div = 4; QUALITY.pcap = 260; resize(); }
+})();
 
 // Trozo de suelo: textura + manchas + helechos + guijarros, dibujado una vez
 const CHUNK = 520;
