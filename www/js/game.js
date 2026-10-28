@@ -2768,12 +2768,12 @@ function mapBackground(B) {
   g.fillStyle = pat; g.fillRect(0, 0, Wc, Hc);
   let seed = B.id.length * 777 + 13;
   const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  if (typeof paintPatches === 'function') {
-    const tp = (img, k) => { const p = g.createPattern(img, 'repeat'); if (p.setTransform) p.setTransform(new DOMMatrix().scale(k)); return p; };
-    paintPatches(g, rnd, { x0: 0, y0: 0, w: Wc, h: Hc }, 16, [
-      { fill: tp(tex, 2.2), tint: B.patch[0].replace(/[\d.]+\)$/, '0.45)'), r: [40, 90] },
-      { fill: tp(tex, 0.7), tint: B.patch[1].replace(/[\d.]+\)$/, '0.4)'), rim: 'rgba(0,0,0,0.18)', r: [30, 70] },
-    ]);
+  // variación del suelo con manchas suaves de color (sin bordes recortados)
+  for (let i = 0; i < 22; i++) {
+    const x = rnd() * Wc, y = rnd() * Hc, r = 60 + rnd() * 120, col = B.patch[i % 2], a0 = i % 2 ? 0.34 : 0.28;
+    const gr = g.createRadialGradient(x, y, 0, x, y, r);
+    gr.addColorStop(0, col.replace(/[\d.]+\)$/, a0 + ')')); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
+    g.save(); g.translate(x, y); g.scale(1, 0.6); g.translate(-x, -y); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); g.restore();
   }
   // camino de tierra con la misma curva que el del SVG
   const P = MAP_POS.map(([x, y]) => [x / 100 * Wc, y / 100 * Hc]);
@@ -2783,10 +2783,17 @@ function mapBackground(B) {
     for (let i = 1; i < P.length; i++) { const [x0, y0] = P[i - 1], [x1, y1] = P[i]; g.bezierCurveTo(x0 + (x1 - x0) * 0.5, y0, x0 + (x1 - x0) * 0.5, y1, x1, y1); }
     g.stroke();
   };
-  road(30, 'rgba(30,20,10,0.45)');
-  if (GROUND_IMG.path) { const dp = g.createPattern(GROUND_IMG.path, 'repeat'); if (dp.setTransform) dp.setTransform(new DOMMatrix().scale(0.5)); road(22, dp); }
-  else road(22, '#7a5a3a');
-  road(22, 'rgba(255,220,160,0.08)');
+  road(40, 'rgba(20,14,8,0.45)');
+  road(34, 'rgba(120,96,64,0.9)');
+  if (GROUND_IMG.path) { const dp = g.createPattern(GROUND_IMG.path, 'repeat'); if (dp.setTransform) dp.setTransform(new DOMMatrix().scale(0.5)); road(28, dp); }
+  else road(28, '#7a5a3a');
+  road(10, 'rgba(255,230,170,0.10)');
+  // claro iluminado bajo cada Grieta
+  for (const [x, y] of P) {
+    const gl = g.createRadialGradient(x, y, 0, x, y, 70);
+    gl.addColorStop(0, 'rgba(255,220,150,0.22)'); gl.addColorStop(1, 'rgba(255,220,150,0)');
+    g.fillStyle = gl; g.fillRect(x - 70, y - 70, 140, 140);
+  }
   // objetos del mundo, sin pisar el camino
   const nearRoad = (x, y) => {
     for (let i = 1; i < P.length; i++) for (let t = 0; t <= 1; t += 0.1) {
@@ -2800,13 +2807,18 @@ function mapBackground(B) {
   const kinds = [['tree', 0.55, 78], ['rock', 0.2, 30], ['crystal', 0.1, 40], ['pillar', 0.1, 60], ['fern', 0.05, 18]].filter((k) => A[k[0]] && A[k[0]].length);
   const tot = kinds.reduce((s2, k) => s2 + k[1], 0);
   const items = [];
-  for (let i = 0; i < 70; i++) {
-    const x = rnd() * Wc, y = 10 + rnd() * (Hc + 40);
-    if (nearRoad(x, y)) continue;
-    let r = rnd() * tot, K = kinds[0];
-    for (const k of kinds) { if (r < k[1]) { K = k; break; } r -= k[1]; }
+  const pickK = () => { let r = rnd() * tot; for (const k of kinds) { if (r < k[1]) return k; r -= k[1]; } return kinds[0]; };
+  const put = (x, y, K, big) => {
+    if (nearRoad(x, y)) return;
     const list = A[K[0]], f = list[Math.floor(rnd() * list.length)];
-    items.push({ x, y, f, h: K[2] * (0.8 + rnd() * 0.45), flip: rnd() < 0.5 });
+    items.push({ x, y, f, h: K[2] * (big ? 1.25 : 0.8 + rnd() * 0.45), flip: rnd() < 0.5 });
+  };
+  const treeK = kinds.find((k) => k[0] === 'tree') || kinds[0];
+  // bosquecillos en el borde de arriba y de abajo (marco del mapa) y algunos en los huecos del camino
+  for (let x = -20; x < Wc + 40; x += 34 + rnd() * 26) { put(x, 40 + rnd() * 50, treeK, true); put(x + 15, Hc + 10 - rnd() * 40, treeK, true); }
+  for (let i = 0; i < 9; i++) {
+    const cx = 60 + rnd() * (Wc - 120), cy = 90 + rnd() * (Hc - 150);
+    for (let k = 0; k < 4; k++) put(cx + (rnd() - 0.5) * 90, cy + (rnd() - 0.5) * 40, k ? pickK() : treeK, false);
   }
   items.sort((a2, b2) => a2.y - b2.y);
   for (const it of items) {

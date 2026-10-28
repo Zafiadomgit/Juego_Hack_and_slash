@@ -168,3 +168,11 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .btn.big, .rp-opt.go { border-style: solid !important; border-width: 10px 22px !important; border-image: url(../img/ui/kit/goldbtn.webp) 34 62 fill / 10px 22px / 0 stretch !important; background: none !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important; border-radius: 0 !important; }
 .sh-close, .ach-x, #gpClose, .bt-x { background: url(../img/ui/kit/close.webp) center / contain no-repeat !important; border: none !important; box-shadow: none !important; color: transparent !important; font-size: 0 !important; width: 36px !important; height: 36px !important; }
 .sh-close:active, .ach-x:active { transform: scale(0.92); }
+
+/* Mapa de Grietas: cada Grieta es un medallón de piedra con aro dorado */
+.mnode { width: 50px; height: 50px; border: 0; background: url(../img/ui/kit/socket.webp) center/100% 100% no-repeat, radial-gradient(circle at 40% 30%, #6a6458, #2a2620 70%); border-radius: 50%; box-shadow: 0 6px 10px rgba(0,0,0,.55); color: #fff3cf; font: 900 19px Cinzel, Garamond, serif; text-shadow: 0 2px 2px #000, 0 0 6px rgba(0,0,0,.8); }
+.mnode.lock { background: url(../img/ui/kit/socket.webp) center/100% 100% no-repeat, radial-gradient(circle at 40% 30%, #6a6458, #2a2620 70%); border: 0; filter: grayscale(.7) brightness(.85); opacity: .9; color: #e8dfc8; font-size: 15px; }
+.mnode.sel { filter: none; box-shadow: 0 0 0 3px #ffd76a, 0 0 24px rgba(255,200,90,.85), 0 6px 10px rgba(0,0,0,.55); }
+.mnode.boss { width: 66px; height: 66px; box-shadow: 0 0 0 3px #ff5a48, 0 0 20px rgba(255,80,60,.6), 0 6px 12px rgba(0,0,0,.6); }
+.mnode.boss.done { box-shadow: 0 0 0 3px #ecd18a, 0 6px 12px rgba(0,0,0,.6); }
+.mf-bg path { stroke-width: 0; }
