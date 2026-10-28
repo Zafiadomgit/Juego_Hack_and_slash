@@ -1,0 +1,55 @@
+@@1e7db1j
+No heroes yet
+@@maimav
+${(CLASSES[s.cls] || {}).name || s.cls} · Lv. ${s.level}
+@@1r7ilda
+just now
+@@14i9yk5
+${m} min ago
+@@1jspj7r
+${Math.round(m / 60)} h ago
+@@uksrkz
+${Math.round(m / 1440)} days ago
+@@hrrnpa
+<div class="rp-head"><b>☁ Recover save</b><small>Type your save code. You'll find it in Settings on your other phone.</small></div>
+    <input id="cloudIn" class="cloud-in" maxlength="29" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="XXXX-XXXX-XXXX-XXXX-XXXX">
+    <div id="cloudMsg" class="cloud-msg"></div>
+    <div class="cloud-acts"><button class="btn" data-c="close">Cancel</button><button class="btn big" data-c="find">Search</button></div>
+@@1xnrb78
+The code has 20 letters and numbers.
+@@1f475g
+Searching…
+@@vuktwl
+There's no save with that code.
+@@f8x5vm
+<div class="rp-head"><b>☁ Save found</b><small>Saved ${cloudWhen(res.at)}</small></div>
+      <div class="cloud-sum">${cloudSummary(res.data)}</div>
+      <p class="cloud-warn">It will be loaded on this phone and replace the save that's here now:<br><small>${cloudSummary(SAVE)}</small></p>
+      <div class="cloud-acts"><button class="btn" data-c="close">Cancel</button><button class="btn big" data-c="load">Load this save</button></div>
+@@101hcp9
+No connection. Try again in a moment.
+@@1jt23a
+<div class="rp-head"><b>☁ There's a newer save</b><small>Another phone saved with your code ${cloudWhen(res.at)}</small></div>
+    <div class="cloud-two"><div><small>In the cloud</small>${cloudSummary(res.data)}</div><div><small>On this phone</small>${cloudSummary(SAVE)}</div></div>
+    <div class="cloud-acts"><button class="btn" data-c="keep">Keep this one</button><button class="btn big" data-c="load">Load the cloud save</button></div>
+@@1wyl0e0
+✔ Copied
+@@2mvvz7
+<div class="opt-row cloud-row"><span><b>☁ Cloud save</b><small id="cloudState"></small></span><button id="cloudMore" class="btn" type="button">Your code</button></div>
+@@1f21vhe
+There's a newer save on another phone
+@@g4iam5
+Offline: it will upload when you're back
+@@q37p44
+Saved ${cloudWhen(c.at)}
+@@11wg35d
+Waiting to upload
+@@1glmawp
+Uploads automatically while you play
+@@1liiqgp
+<div class="rp-head"><b>☁ Cloud save</b><small>Your save uploads automatically. Write down this code: it lets you recover your save on another phone.</small></div>
+    <div id="cloudCode" class="cloud-code" data-c="reveal">${CLOUD().code}<i>Tap to show</i></div>
+    <div class="cloud-acts"><button class="btn" data-c="copy">Copy code</button><button class="btn" data-c="restore">Recover another save</button></div>
+    <button class="rp-opt go" data-c="close" type="button"><i>✔</i><span><b>Done</b></span></button>
+@@3oved
+<button id="btnCloudRestore" class="cloud-link" type="button">☁ Played on another phone? Recover your save</button>
