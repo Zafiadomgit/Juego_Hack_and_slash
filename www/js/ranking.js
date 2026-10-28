@@ -36,9 +36,21 @@ const _playerDiedK = playerDied;
 playerDied = function () { const d = rift && rift.daily; _playerDiedK(); if (d) setTimeout(rankSubmit, 1500); };
 setInterval(() => { if (state === 'hub') rankSubmit(); }, 30000);
 
-// tabla (pestaña «Ranking» del panel de Logros)
-let rankCache = null;
+// Tormento: nivel más alto superado (torment.js); se envía al superarlo y se reintenta en la villa
+async function rankSubmitTorment() {
+  const lv = typeof torBest === 'function' ? torBest() : 0;
+  if (!S || !lv || !rankName() || (S.torSent || 0) >= lv) return;
+  try {
+    await rankRpc('submit_torment', { p_player: rankPid(), p_name: rankName(), p_hero: S.cls, p_level: lv });
+    S.torSent = lv; persist();
+  } catch (e) { /* sin red: se reintenta luego */ }
+}
+setInterval(() => { if (state === 'hub') rankSubmitTorment(); }, 30000);
+
+// tabla (pestaña «Ranking» del panel de Logros): Grieta del Día o Tormento
+let rankCache = null, rankMode = 'daily';
 function buildRanking(list) {
+  if (rankMode === 'torment') return buildTormentRanking(list);
   $('achSub').innerHTML = `Grieta del Día · ${dayIso().split('-').reverse().join('/')} · el ranking se reinicia cada día`;
   if (!rankName()) {
     list.innerHTML = `<div class="rank-me">Elige el nombre con el que aparecerás en el ranking mundial:</div>
@@ -51,6 +63,7 @@ function buildRanking(list) {
     return;
   }
   list.innerHTML = '<div class="rank-me">Cargando ranking…</div>';
+  rankSwitch(list);
   rankRpc('get_daily_top', { p_day: dayIso(), p_player: rankPid() }).then((rows) => {
     if (achTab !== 'rank') return;
     rankCache = rows;
@@ -62,5 +75,32 @@ function buildRanking(list) {
       (top.length ? top.map((r) => `<div class="rank-row ${r.is_me ? 'me' : ''}"><span class="pos">${r.pos <= 3 ? ['🥇', '🥈', '🥉'][r.pos - 1] : r.pos}</span><span>${esc(r.name)}</span><span class="hero">${CLASSES[r.hero] ? CLASSES[r.hero].name : ''}</span><span class="sc">${fmtNum(r.score)}</span></div>`).join('')
         : '<div class="rank-me">Nadie ha jugado aún la Grieta de hoy. ¡Sé el primero!</div>') +
       `<div class="rank-name" style="margin-top:8px"><small style="color:#aab3cc">Apareces como «${esc(rankName())}»</small></div>`;
-  }).catch(() => { if (achTab === 'rank') list.innerHTML = '<div class="rank-me">Sin conexión: no se puede cargar el ranking ahora. Tus puntuaciones se enviarán cuando vuelva la red.</div>'; });
+    rankSwitch(list);
+  }).catch(() => { if (achTab === 'rank') { list.innerHTML = '<div class="rank-me">Sin conexión: no se puede cargar el ranking ahora. Tus puntuaciones se enviarán cuando vuelva la red.</div>'; rankSwitch(list); } });
+}
+
+// selector Grieta del Día / Tormento
+function rankSwitch(list) {
+  list.insertAdjacentHTML('afterbegin', `<div class="rank-sw"><button data-rm="daily" class="${rankMode === 'daily' ? 'on' : ''}">☀ Grieta del Día</button><button data-rm="torment" class="${rankMode === 'torment' ? 'on' : ''}">☠ Tormento</button></div>`);
+  for (const b of list.querySelectorAll('[data-rm]')) b.onclick = () => { if (rankMode === b.dataset.rm) return; rankMode = b.dataset.rm; SFX.play('click'); buildRanking(list); };
+}
+function buildTormentRanking(list) {
+  $('achSub').innerHTML = 'Tormento · el nivel más alto superado por cada jugador';
+  list.innerHTML = '<div class="rank-me">Cargando ranking…</div>';
+  rankSwitch(list);
+  rankSubmitTorment();
+  rankRpc('get_torment_top', { p_player: rankPid() }).then((rows) => {
+    if (achTab !== 'rank' || rankMode !== 'torment') return;
+    const me = rows.find((r) => r.is_me);
+    const top = rows.filter((r) => !r.is_me || r.pos <= 50);
+    const esc = (s) => String(s).replace(/[<>&"]/g, '');
+    const mine = typeof torBest === 'function' ? torBest() : 0;
+    list.innerHTML = (me ? `<div class="rank-me">Tu puesto: <b>#${me.pos}</b> de ${fmtNum(me.total)} · Tormento ${ROMAN(me.level)}</div>`
+      : !rankName() ? '<div class="rank-me">Elige tu nombre en la pestaña «Grieta del Día» para aparecer en el ranking.</div>'
+      : mine ? '<div class="rank-me">Enviando tu Tormento…</div>'
+      : `<div class="rank-me">${typeof tormentOpen === 'function' && tormentOpen() ? 'Supera tu primer Tormento (mapa de Grietas) para entrar en el ranking.' : 'Los Niveles de Tormento se abren al derrotar a Morvhal.'}</div>`) +
+      (top.length ? top.map((r) => `<div class="rank-row ${r.is_me ? 'me' : ''}"><span class="pos">${r.pos <= 3 ? ['🥇', '🥈', '🥉'][r.pos - 1] : r.pos}</span><span>${esc(r.name)}</span><span class="hero">${CLASSES[r.hero] ? CLASSES[r.hero].name : ''}</span><span class="sc" style="color:#e6b8ff">☠ ${ROMAN(r.level)}</span></div>`).join('')
+        : '<div class="rank-me">Nadie ha superado aún un Tormento. ¡Sé el primero!</div>');
+    rankSwitch(list);
+  }).catch(() => { if (achTab === 'rank') { list.innerHTML = '<div class="rank-me">Sin conexión: no se puede cargar el ranking ahora.</div>'; rankSwitch(list); } });
 }

@@ -1,0 +1,71 @@
+@@1rdq4hx
+Torment 
+@@r1g51u
+${tormentName(T + 1)} unlocked!
+@@r10s5j
+You beat ${tormentName(T)} · choose the next one on the map
+@@f28md1
+ · epic or legendary loot
+@@141hnn1
+Monsters: health ×${TOR.hp(T).toFixed(1)} · damage ×${TOR.dmg(T).toFixed(1)} · Amber and XP ×${TOR.reward(T).toFixed(2)}${T >= 3 ? ' · botín épico o legendario' : ''}
+@@sqn1wf
+no Torment
+@@39k7nm
+Normal story · best cleared: ${torBest() ? tormentName(torBest()) : 'ningún Tormento'}
+@@187k944
+<div class="tor-row ${T ? 'on' : ''}">
+    <span class="tor-lbl">☠ Torment</span>
+    <button type="button" data-tor="-1" ${T ? '' : 'disabled'}>◀</button><b>${T ? ROMAN(T) : '—'}</b><button type="button" data-tor="1" ${T < mx ? '' : 'disabled'}>▶</button>
+    <small>${info}</small></div>
+@@cgkp7j
+<div id="torToast" class="ach-toast tor"><img src="img/talents/trophy.png" alt=""><span><small>Endgame</small><b>Torment Levels!</b><em>Choose them on the Rift map: tougher monsters, better loot and a world ranking</em></span></div>
+@@1hs4zxh
+Torment
+@@15o7d8f
+Dungeon · Floor ${r.tier} cleared
+@@oy91z2
+Dungeon · Floor ${r.tier}
+@@9lfe2z
+${SUPER_BOSSES[r.biome.id].name.split(',')[0]} defeated!
+@@kkj228
+Super Boss · ${SUPER_BOSSES[r.biome.id].name.split(',')[0]}
+@@13h4db
+Rift ${r.n} closed
+@@1oydyx7
+Fell in Rift ${r.n}
+@@1ja5v4k
+${r.run.depth + 1} Rifts
+@@11vi95l
+Monsters
+@@xtqk3a
+Legendaries
+@@1sgcljy
+Blessings
+@@z87o7
+Can you beat it? · Fendaria on Google Play
+@@xrf3t1
+My result in Fendaria: 
+@@1m84w2l
+<button id="btnShareEnd" class="btn btn-share" type="button">📤 Share result</button>
+@@seq53c
+<button id="btnShareDead" class="btn btn-share" type="button">📤 Share result</button>
+@@tfp7fl
+<div class="rank-sw"><button data-rm="daily" class="${rankMode === 'daily' ? 'on' : ''}">☀ Daily Rift</button><button data-rm="torment" class="${rankMode === 'torment' ? 'on' : ''}">☠ Torment</button></div>
+@@1tuxk5d
+Torment · the highest level cleared by each player
+@@1jrsn25
+<div class="rank-me">Your place: <b>#${me.pos}</b> of ${fmtNum(me.total)} · Torment ${ROMAN(me.level)}</div>
+@@jeqwyf
+<div class="rank-me">Choose your name in the «Daily Rift» tab to appear in the ranking.</div>
+@@1rl7js3
+<div class="rank-me">Sending your Torment…</div>
+@@19fk6id
+Beat your first Torment (Rift map) to enter the ranking.
+@@z2o8uw
+Torment Levels open when you defeat Morvhal.
+@@1cdo0v0
+<div class="rank-me">Nobody has beaten a Torment yet. Be the first!</div>
+@@ay4zqp
+<div class="rank-me">Offline: the ranking can't be loaded right now.</div>
+@@rahtry
+${d.hero} · Lv. ${d.lvl}

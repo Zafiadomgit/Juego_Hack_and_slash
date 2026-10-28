@@ -1232,3 +1232,19 @@ button.gem { cursor: pointer; color: #6a7090; font-weight: 900; font-size: 18px;
 .rank-name { display: flex; gap: 6px; margin: 4px 0 8px; }
 .rank-name input { flex: 1; padding: 6px 8px; border-radius: 6px; border: 1px solid #c9b27a; background: #141b30; color: #f2ead4; font: inherit; }
 .rank-name button { padding: 6px 12px; border-radius: 6px; border: 1px solid #ecd18a; background: #33406a; color: #fff3d0; font: 700 13px Garamond, Georgia, serif; cursor: pointer; }
+
+/* Niveles de Tormento (torment.js) */
+.tor-row { display: grid; grid-template-columns: 1fr 30px minmax(34px, auto) 30px; align-items: center; gap: 6px; margin: 8px 0 6px; padding: 6px 8px; border-radius: 8px;
+  background: rgba(40, 14, 52, 0.55); border: 1px solid rgba(211, 107, 255, 0.35); }
+.tor-row.on { background: linear-gradient(90deg, rgba(90, 20, 110, 0.75), rgba(40, 10, 50, 0.7)); border-color: #d36bff; box-shadow: 0 0 14px rgba(211, 107, 255, 0.35); }
+.tor-row .tor-lbl { white-space: nowrap; font: 700 13px Cinzel, serif; color: #e6b8ff; letter-spacing: 1px; }
+.tor-row b { text-align: center; font: 900 17px Cinzel, serif; color: #fff; text-shadow: 0 0 8px #d36bff; }
+.tor-row button { height: 28px; border-radius: 6px; border: 1px solid #a65ad0; background: #2a1236; color: #f0d8ff; font-size: 13px; cursor: pointer; }
+.tor-row button:disabled { opacity: 0.3; cursor: default; }
+.tor-row small { grid-column: 1 / -1; font-size: 11px; color: #d9c4e8; line-height: 1.3; }
+.ach-toast.tor { top: 34%; border-color: #d36bff; box-shadow: 0 0 24px rgba(211, 107, 255, 0.5); max-width: min(92vw, 460px); }
+.ach-toast.tor img { filter: hue-rotate(230deg) saturate(1.5); }
+.rank-sw { display: flex; gap: 6px; margin-bottom: 8px; }
+.rank-sw button { flex: 1; padding: 6px 8px; border-radius: 8px; border: 1px solid #4a5478; background: #161c30; color: #cdd4ea; font: 700 12px Cinzel, serif; cursor: pointer; }
+.rank-sw button.on { background: #2c2a50; border-color: #ecd18a; color: #ffe6a6; }
+.btn-share { background: linear-gradient(180deg, #3a2a5a, #241838); border-color: #a07ad8; color: #f0e2ff; margin-bottom: 8px; }
