@@ -1,0 +1,4 @@
+@@a29owc
+Ultimate
+@@7jif0u
+<label class="opt-row"><span><b>Ultimate cinematic</b><small>A one-second pause with your hero when you cast your ultimate</small></span><input type="checkbox" data-o="ultCine"></label>
