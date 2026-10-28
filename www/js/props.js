@@ -82,11 +82,29 @@ function villaFrame(kind, x, y) {
   const img = PROP_IMG.villa, list = PROP_ATLAS.villa && PROP_ATLAS.villa[kind];
   if (!img || !list || !list.length) return null;
   const h = propHash(x, y);
-  return { img, f: list[Math.floor(h * list.length) % list.length], flip: kind !== 'sign' && kind !== 'board' && ((h * 7919) % 1) < 0.5 };
+  const pool = kind === 'oak' ? list.slice(0, 2) : list; // el tercer roble trae un rombo de tierra pintado: fuera de la plaza flota
+  return { img, f: pool[Math.floor(h * pool.length) % pool.length], flip: kind !== 'sign' && kind !== 'board' && ((h * 7919) % 1) < 0.5 };
 }
 // fracción de la altura del sprite que queda por debajo del punto de apoyo (mitad del rombo de la base)
 const VILLA_SINK = { house: 0.13, stall: 0.1, alchemy: 0.08, well: 0.05, oak: 0.05, forge: 0.08 };
 const VILLA_KIND = { forge: 'forge', house: 'house', stall: 'stall', alchemy: 'alchemy', well: 'well', lamp: 'lamp', barrel: 'barrel', bush: 'bush', sign: 'sign', cauldron: 'cauldron' };
+// sombras de contacto de la villa en una capa aparte, sobre el suelo y antes que los objetos
+// (si cada objeto pinta la suya, la del árbol de delante cae encima del de detrás y parece que flota)
+let villaShadowPass = false;
+function villaShadows(list) {
+  ctx.save();
+  ctx.fillStyle = 'rgba(10,8,20,0.32)';
+  for (const o of list) {
+    const kind = o.kind === 'tree' ? 'oak' : o.kind === 'board' ? 'board' : VILLA_KIND[o.kind];
+    const fr = kind && villaFrame(kind, o.x, o.y);
+    if (!fr) continue;
+    const sw = fr.f[2] * PROP_WU_PER_PX * (kind === 'oak' ? o.s || 1 : 1);
+    const iso = VILLA_SINK[kind] && kind !== 'oak';
+    const rx = iso ? sw * 0.5 : kind === 'oak' ? Math.min(sw * 0.3, 46) : Math.min(sw * 0.36, 40), ry = iso ? sw * 0.24 : rx * 0.42;
+    ctx.beginPath(); ctx.ellipse(o.x, o.y + (iso ? 4 : 1), rx, ry, 0, 0, TAU); ctx.fill();
+  }
+  ctx.restore();
+}
 // Dibuja un elemento del pueblo con sprite pintado; devuelve false si no hay sprite
 function drawVillaSprite(o) {
   const kind = o.kind === 'tree' ? 'oak' : o.kind === 'board' ? 'board' : VILLA_KIND[o.kind];
@@ -97,6 +115,7 @@ function drawVillaSprite(o) {
   const sw = fr.f[2] * PROP_WU_PER_PX * scale;
   // los edificios tienen una base isométrica (rombo): se apoyan por el centro de esa base
   const sink = VILLA_SINK[kind] || 0;
+  if (villaShadowPass) { blitProp(fr, o.x, o.y, scale, sink); return true; } // las sombras ya están en su capa
   if (sink) {
     // sombra de contacto con la forma del rombo de la base
     ctx.save();

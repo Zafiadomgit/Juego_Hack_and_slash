@@ -37,8 +37,6 @@ function buildVillage() {
   for (const [x, y] of [[-238, -40], [238, -40], [-130, 120], [130, 120], [-150, -205], [150, -205]]) { add({ kind: 'lamp', x, y }, 7); VILLAGE.lamps.push({ x, y: y - 62 }); }
   add({ kind: 'portalbase', x: PORTAL.x, y: PORTAL.y + 2 }, 42, -6);
   // vallas con flores al sur
-  for (let x = -640; x <= -200; x += 44) add({ kind: 'fence', x, y: 310 });
-  for (let x = 200; x <= 640; x += 44) add({ kind: 'fence', x, y: 310 });
   for (const [x, y] of [[-60, 280], [60, 330], [-470, 120], [470, 115], [-120, -300], [120, -290]]) add({ kind: 'bush', x, y, v: (x & 3) }, 16);
   // bosque alrededor
   const r = vRand(77);
@@ -466,7 +464,6 @@ function artBoard(g) {
 
 function drawNpc(n) {
   if (n.id === 'board') {
-    shadow(n.x, n.y + 1, 30);
     if (!drawVillaSprite({ kind: 'board', x: n.x, y: n.y })) {
       ctx.save(); ctx.translate(n.x, n.y);
       sprite('vboard', 80, 92, 40, 88, artBoard);
@@ -574,6 +571,7 @@ function renderVillage() {
   const list = [];
   for (const o of VILLAGE.props) if (Math.abs(o.x - cx) < vw && Math.abs(o.y - cy) < vh) list.push(o);
   villageLifeProps(list);
+  if (PROP_IMG.villa) { villaShadows(list.concat(NPCS.filter((n) => n.id === 'board').map((n) => ({ kind: 'board', x: n.x, y: n.y })))); villaShadowPass = true; }
   const heroO = { kind: 'hero', y: vHero.y };
   const portalO = { kind: 'portal', y: PORTAL.y + 4 };
   if (S) list.push(heroO);
@@ -588,6 +586,7 @@ function renderVillage() {
     else if (o.kind === 'hen') drawHen(o.h);
     else drawVillageProp(o);
   }
+  villaShadowPass = false;
   // ventanas encendidas y chispas del portal
   for (const w of VILLAGE.windows) glow(w.x + 8, w.y + 9, 26, '255,190,90', 0.35);
   glow(PORTAL.x, PORTAL.y - 82, 90, '110,200,255', 0.5 + Math.sin(now * 2) * 0.1);
