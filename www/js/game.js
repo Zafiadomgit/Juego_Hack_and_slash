@@ -2359,8 +2359,17 @@ function update(dt) {
   updateFx(dt);
   updateVfx(dt);
   if (state === 'play') updateRift(dt);
-  cam.x = lerp(cam.x, P.x, 1 - Math.exp(-8 * dt));
-  cam.y = lerp(cam.y, P.y - 10, 1 - Math.exp(-8 * dt));
+  // con un jefe cerca, la cámara se desplaza un poco hacia él para que se vea entero
+  let tx = P.x, ty = P.y - 10;
+  if (scene === 'rift') for (const e of enemies) {
+    if (e.dead || !(e.boss || e.superDef) || e.child) continue;
+    const dx = e.x - P.x, dy = e.y - e.r * 2.2 - P.y;
+    if (dx * dx + dy * dy > 760 * 760) continue;
+    tx += clamp(dx * 0.5, -220, 220); ty += clamp(dy * 0.5, -170, 170);
+    break;
+  }
+  cam.x = lerp(cam.x, tx, 1 - Math.exp(-(tx === P.x ? 8 : 4) * dt));
+  cam.y = lerp(cam.y, ty, 1 - Math.exp(-(tx === P.x ? 8 : 4) * dt));
 }
 
 function frame(t) {

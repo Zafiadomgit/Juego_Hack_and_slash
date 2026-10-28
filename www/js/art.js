@@ -1208,7 +1208,8 @@ function drawMonsterAnim(e, A0, k, ox, oy) {
   const B = scene === 'rift' && rift ? rift.biome : null;
   const filt = !e.boss && !e.superDef && B && B.mfilter ? B.mfilter : null;
   const c = monFrame(id, pose, i, filt, B && B.id);
-  const hw = A0.h * k * (e.boss ? 1.25 : 1.1); // altura en mundo similar a la del dibujo procedural
+  // altura en mundo similar a la del dibujo procedural; el Súper Jefe, algo mayor que un Guardián pero sin tapar la pantalla
+  const hw = A0.h * k * (e.superDef ? 0.95 : e.boss ? 1.25 : 1.1);
   const s = hw / A.bh;
   ctx.save();
   ctx.scale(e.face || 1, 1);
