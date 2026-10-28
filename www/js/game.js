@@ -1936,6 +1936,7 @@ function text(str, x, y, size, color, align = 'left', weight = 800, stroke = tru
 
 // ---------- piezas del HUD: placa con marco dorado y barras con brillo y estela ----------
 function hudPlate(x, y, w, h, r = 8) {
+  if (typeof UI_KIT !== 'undefined' && UI_KIT.plate) { ctx.save(); ctx.globalAlpha *= 0.92; draw9(UI_KIT.plate, x, y, w, h, 44, Math.min(14 * ui, h / 2.4)); ctx.restore(); return; }
   const g = ctx.createLinearGradient(0, y, 0, y + h);
   g.addColorStop(0, 'rgba(26,34,62,0.82)'); g.addColorStop(1, 'rgba(8,11,24,0.82)');
   roundRect(x, y, w, h, r, g, 'rgba(201,178,122,0.75)', 1.2);
@@ -2000,9 +2001,15 @@ function drawHUD() {
     drawHero(ctx, P.cls, { x: 0, y: 0, dir: 0.2, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now });
   }
   ctx.restore();
-  { const lg = ctx.createLinearGradient(0, py + 17 * s, 0, py + 32 * s); lg.addColorStop(0, '#ffeaa8'); lg.addColorStop(1, '#b48a3e');
-    roundRect(px - 14 * s, py + 17 * s, 28 * s, 15 * s, 7 * s, lg, '#2a1a06', 1.5); }
-  text(String(S.level), px, py + 25 * s, 12 * s, '#2a1a06', 'center', 900, false);
+  if (UI_KIT.portrait) {
+    const fw = 25.5 * s * 2 / 0.74, fh = fw * UI_KIT.portrait.height / UI_KIT.portrait.width;
+    ctx.drawImage(UI_KIT.portrait, px - fw / 2, py - fh * 0.475, fw, fh);
+    text(String(S.level), px, py - fh * 0.475 + fh * 0.875, 11 * s, '#f6e2a6', 'center', 900, true);
+  } else {
+    const lg = ctx.createLinearGradient(0, py + 17 * s, 0, py + 32 * s); lg.addColorStop(0, '#ffeaa8'); lg.addColorStop(1, '#b48a3e');
+    roundRect(px - 14 * s, py + 17 * s, 28 * s, 15 * s, 7 * s, lg, '#2a1a06', 1.5);
+    text(String(S.level), px, py + 25 * s, 12 * s, '#2a1a06', 'center', 900, false);
+  }
 
   // PV
   const bx = px + 34 * s, bw = hbw, bh = 16 * s;
@@ -2043,10 +2050,11 @@ function drawHUD() {
   });
 
   // botones pausa / bolsa
-  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(10,14,30,0.6)', '#c9b27a', 2);
+  circle(L.pause.x, L.pause.y, L.pause.r, 'rgba(10,14,30,0.6)', UI_KIT.iconring ? null : '#c9b27a', 2);
+  if (UI_KIT.iconring) for (const b of [L.pause, L.bag]) { const R = b.r * 1.28; ctx.drawImage(UI_KIT.iconring, b.x - R, b.y - R, R * 2, R * 2); }
   if (UI_ICON.pause) ctx.drawImage(UI_ICON.pause, L.pause.x - L.pause.r * 0.8, L.pause.y - L.pause.r * 0.8, L.pause.r * 1.6, L.pause.r * 1.6);
   else { ctx.fillStyle = '#efece2'; ctx.fillRect(L.pause.x - 6 * s, L.pause.y - 7 * s, 4 * s, 14 * s); ctx.fillRect(L.pause.x + 2 * s, L.pause.y - 7 * s, 4 * s, 14 * s); }
-  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(10,14,30,0.6)', '#c9b27a', 2);
+  circle(L.bag.x, L.bag.y, L.bag.r, 'rgba(10,14,30,0.6)', UI_KIT.iconring ? null : '#c9b27a', 2);
   if (UI_ICON.bag) ctx.drawImage(UI_ICON.bag, L.bag.x - L.bag.r * 0.85, L.bag.y - L.bag.r * 0.85, L.bag.r * 1.7, L.bag.r * 1.7);
   else text('🎒', L.bag.x, L.bag.y + 1, 18 * s, '#fff', 'center', 400, false);
   if (S.points > 0) {
@@ -2169,7 +2177,13 @@ const skillImg = (cls, i) => {
   return SKILL_IMG[n].complete && SKILL_IMG[n].naturalWidth ? SKILL_IMG[n] : null;
 };
 const UI_KIT = {};
-for (const n of ['ring', 'barframe', 'banner']) { const im = new Image(); im.onload = () => { UI_KIT[n] = im; }; im.src = 'img/ui/kit/' + n + '.webp'; }
+for (const n of ['ring', 'barframe', 'banner', 'portrait', 'iconring', 'plate']) { const im = new Image(); im.onload = () => { UI_KIT[n] = im; }; im.src = 'img/ui/kit/' + n + '.webp'; }
+// imagen estirada en 9 partes (esquinas intactas), con un tamaño de esquina en pantalla
+function draw9(img, x, y, w, h, sl, d) {
+  const iw = img.width, ih = img.height, sx = [0, sl, iw - sl, iw], sy = [0, sl, ih - sl, ih];
+  const dx = [x, x + d, x + w - d, x + w], dy = [y, y + d, y + h - d, y + h];
+  for (let i = 0; i < 3; i++) for (let j = 0; j < 3; j++) ctx.drawImage(img, sx[i], sy[j], sx[i + 1] - sx[i], sy[j + 1] - sy[j], dx[i], dy[j], dx[i + 1] - dx[i], dy[j + 1] - dy[j]);
+}
 // imagen estirada en 3 partes (los extremos conservan su proporción)
 function draw3(img, x, y, w, h, cap = 0.15) {
   const sw = img.width * cap, dw = Math.min(w / 2, sw * (h / img.height));

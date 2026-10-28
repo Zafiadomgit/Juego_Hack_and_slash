@@ -164,3 +164,7 @@ button.gem, .gp-slots button { background: url(../img/ui/kit/socket.webp) center
 button.gem { width: 40px !important; height: 43px !important; border-radius: 0 !important; color: #c9b27a !important; }
 button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .gp-slots button { min-height: 64px; color: #e8d6a8; }
+/* botón principal: placa dorada pintada; cerrar: botón pintado */
+.btn.big, .rp-opt.go { border-style: solid !important; border-width: 10px 22px !important; border-image: url(../img/ui/kit/goldbtn.webp) 34 62 fill / 10px 22px / 0 stretch !important; background: none !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45) !important; border-radius: 0 !important; }
+.sh-close, .ach-x, #gpClose, .bt-x { background: url(../img/ui/kit/close.webp) center / contain no-repeat !important; border: none !important; box-shadow: none !important; color: transparent !important; font-size: 0 !important; width: 36px !important; height: 36px !important; }
+.sh-close:active, .ach-x:active { transform: scale(0.92); }
