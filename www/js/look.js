@@ -120,15 +120,19 @@ function villagePatches(g) {
 // las Grietas: manchas deterministas por celda del mundo (sin cortes entre trozos)
 function riftPatches(g, cx, cy, B) {
   if (rift && rift.isDungeon) return;
-  const tex = biomeGroundTex(B);
-  const kinds = [
-    { fill: texPat(g, tex, (tex.patScale || 2.2) * tex.width * 0.55), tint: B.patch[0].replace(/[\d.]+\)$/, '0.45)'), r: [60, 150] },
-    { fill: texPat(g, tex, (tex.patScale || 2.2) * tex.width * 1.6), tint: B.patch[1].replace(/[\d.]+\)$/, '0.4)'), rim: 'rgba(0,0,0,0.18)', r: [50, 120] },
-  ];
+  // manchas suaves de color (claras y oscuras), difuminadas y sin borde: variación del suelo sin «pegatinas»
   for (let gx = cx - 1; gx <= cx + 1; gx++) for (let gy = cy - 1; gy <= cy + 1; gy++) {
     let s = (gx * 48611 + gy * 96769 + 13) | 0;
     const rnd = () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; };
-    paintPatches(g, rnd, { x0: gx * CHUNK, y0: gy * CHUNK, w: CHUNK, h: CHUNK }, 3, kinds);
+    for (let i = 0; i < 4; i++) {
+      const x = gx * CHUNK + rnd() * CHUNK, y = gy * CHUNK + rnd() * CHUNK, r = 90 + rnd() * 170, k = rnd() < 0.5 ? 0 : 1;
+      const col = B.patch[k], a0 = k ? 0.32 : 0.26;
+      const gr = g.createRadialGradient(x, y, 0, x, y, r);
+      gr.addColorStop(0, col.replace(/[\d.]+\)$/, a0 + ')')); gr.addColorStop(0.6, col.replace(/[\d.]+\)$/, (a0 * 0.45).toFixed(3) + ')')); gr.addColorStop(1, col.replace(/[\d.]+\)$/, '0)'));
+      g.save(); g.translate(x, y); g.scale(1, 0.62); g.translate(-x, -y);
+      g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2);
+      g.restore();
+    }
   }
 }
 
