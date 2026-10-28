@@ -1,0 +1,156 @@
+/* Fendaria — capa visual común (se carga después de style.css).
+ * Marcos ornamentados para todas las ventanas, botones de acción dorados, entrada animada,
+ * fichas de cifras con iconos pintados y pantallas de victoria / derrota / pausa.
+ */
+:root {
+  --gold: #c9b27a; --gold-hi: #f3dc9a; --gold-lo: #7a6232; --ink: #0a0e1c;
+  --pa: rgba(32, 42, 76, 0.97); --pb: rgba(12, 16, 32, 0.98);
+  --corner: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cg fill='none' stroke='%23e8cf8a' stroke-width='1.6' stroke-linecap='round'%3E%3Cpath d='M3 22V8q0-5 5-5h14'/%3E%3Cpath d='M8 30V12q0-4 4-4h18' stroke-opacity='.55'/%3E%3Cpath d='M3 8q6 1 7 7M8 3q1 6 7 7' stroke-opacity='.8'/%3E%3C/g%3E%3Cpath d='M3 3l5 1.5L3 8z M3 3l1.5 5L8 3z' fill='%23f3dc9a'/%3E%3Ccircle cx='15' cy='15' r='2.2' fill='%23f3dc9a'/%3E%3Ccircle cx='15' cy='15' r='1' fill='%23243058'/%3E%3C/svg%3E");
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .9 0 0 0 0 .7 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- fondo de las ventanas ---------- */
+.overlay:not(.titlescr):not(.startscr):not(.intro):not(.hubhud):not(.side),
+.run-pick { background: radial-gradient(ellipse at 50% 45%, rgba(10, 14, 30, 0.55) 0%, rgba(3, 4, 10, 0.86) 80%); backdrop-filter: blur(2.5px); -webkit-backdrop-filter: blur(2.5px); }
+
+/* ---------- marco ornamentado ---------- */
+.panel, .sheet, .rp-box, .ach-box {
+  position: relative;
+  background: var(--grain), radial-gradient(ellipse at 50% -10%, rgba(120, 140, 220, 0.16), transparent 55%), linear-gradient(180deg, var(--pa) 0%, var(--pb) 100%) !important;
+  border: 1px solid var(--gold) !important;
+  border-radius: 8px !important;
+  box-shadow: inset 0 0 0 3px rgba(8, 11, 22, 0.92), inset 0 0 0 4px rgba(201, 178, 122, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 14px 44px rgba(0, 0, 0, 0.8) !important;
+}
+.ui-corners { position: absolute; inset: -4px; pointer-events: none; z-index: 3; }
+.ui-corners i { position: absolute; width: 34px; height: 34px; background: var(--corner) center / contain no-repeat; filter: drop-shadow(0 1px 1px #000); }
+.ui-corners i:nth-child(1) { left: 0; top: 0; }
+.ui-corners i:nth-child(2) { right: 0; top: 0; transform: scaleX(-1); }
+.ui-corners i:nth-child(3) { left: 0; bottom: 0; transform: scaleY(-1); }
+.ui-corners i:nth-child(4) { right: 0; bottom: 0; transform: scale(-1, -1); }
+@media (max-height: 430px) { .ui-corners i { width: 26px; height: 26px; } }
+
+/* ---------- entrada animada ---------- */
+@keyframes uiIn { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: none; } }
+.overlay.show > .panel, .overlay.show > .sheet, .run-pick.show > .rp-box, .run-pick.show > .ach-box, #achPanel.show .ach-box { animation: uiIn 0.22s cubic-bezier(.2, .9, .3, 1.1); }
+
+/* ---------- títulos con filete ---------- */
+.panel > h2, .rp-head b, .ach-head > b {
+  font-family: Cinzel, serif; letter-spacing: 1.5px;
+  background: linear-gradient(180deg, #fff6d6 0%, #f0d48a 45%, #b48a3e 100%); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 2px 0 #05070f) drop-shadow(0 0 10px rgba(236, 209, 138, 0.25));
+}
+.panel > h2 { margin: 2px 0 4px; font-size: 26px; }
+.panel > h2.red { background: linear-gradient(180deg, #ffd8cc 0%, #ff7a5a 50%, #a8281a 100%); -webkit-background-clip: text; background-clip: text; }
+.panel > h2::after, .rp-head::after {
+  content: ''; display: block; height: 10px; margin: 6px auto 0; width: min(78%, 300px);
+  background: radial-gradient(circle, #f3dc9a 0 2.5px, transparent 3px) center / 10px 10px no-repeat,
+    linear-gradient(90deg, transparent, rgba(201, 178, 122, 0.9) 30%, transparent 46%, transparent 54%, rgba(201, 178, 122, 0.9) 70%, transparent) center / 100% 1px no-repeat;
+}
+.rp-head { flex-direction: column; text-align: center; }
+.rp-head::after { width: 70%; }
+
+/* ---------- botones ---------- */
+.btn, .rp-opt { transition: transform 0.08s, filter 0.15s, box-shadow 0.15s; }
+.btn:hover:not(:disabled), .rp-opt:hover { filter: brightness(1.12); }
+.btn:active:not(:disabled), .rp-opt:active { transform: translateY(1px) scale(0.985); }
+/* acción principal: dorada */
+.btn.big, .rp-opt.go {
+  background: linear-gradient(180deg, #ffeaa8 0%, #e2bd66 46%, #b48a3e 54%, #d9b664 100%) !important;
+  color: #2a1a06 !important; text-shadow: 0 1px 0 rgba(255, 245, 210, 0.6) !important;
+  border: 1px solid #fff0b8 !important;
+  box-shadow: inset 0 0 0 2px rgba(120, 82, 24, 0.55), 0 0 0 1px #3a2608, 0 4px 14px rgba(0, 0, 0, 0.5), 0 0 18px rgba(236, 200, 110, 0.22) !important;
+}
+.rp-opt.go small, .rp-opt.go b { color: #2a1a06 !important; }
+.btn.big:active:not(:disabled) { background: linear-gradient(180deg, #f3d98e, #c9a050) !important; }
+.btn-share { background: linear-gradient(180deg, #4a3474, #261a40) !important; border-color: #b892f0 !important; color: #f4e8ff !important; }
+
+/* ---------- fichas de cifras (Grieta cerrada, caída, pausa) ---------- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 6px; max-width: none; margin: 10px 0 6px; }
+.tiles .st {
+  display: grid; grid-template-columns: 30px 1fr; grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: left;
+  padding: 6px 9px; border-radius: 6px; background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.18));
+  border: 1px solid rgba(201, 178, 122, 0.28); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  animation: uiIn 0.3s backwards;
+}
+.tiles .st img { grid-row: span 2; width: 30px; height: 30px; object-fit: contain; filter: drop-shadow(0 1px 1px #000); }
+.tiles .st span { font-size: 11px; color: #b7b0a0; letter-spacing: 0.3px; line-height: 1.1; }
+.tiles .st b { font: 800 17px Garamond, Georgia, serif; color: #f6e2a6; text-align: left; line-height: 1.15; }
+.tiles .st.hi { border-color: rgba(243, 220, 154, 0.7); background: linear-gradient(180deg, rgba(243, 220, 154, 0.16), rgba(0, 0, 0, 0.15)); }
+.tiles .st:nth-child(2) { animation-delay: 0.04s; } .tiles .st:nth-child(3) { animation-delay: 0.08s; } .tiles .st:nth-child(4) { animation-delay: 0.12s; }
+.tiles .st:nth-child(5) { animation-delay: 0.16s; } .tiles .st:nth-child(6) { animation-delay: 0.2s; } .tiles .st:nth-child(n+7) { animation-delay: 0.24s; }
+
+/* ---------- Grieta cerrada (victoria) ---------- */
+#end .panel { max-width: 560px; padding-top: 58px; overflow: visible; }
+#end .panel .ui-crest, #dead .panel .ui-crest {
+  position: absolute; left: 50%; top: -34px; width: 84px; height: 84px; margin-left: -42px; z-index: 4; border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #3a4a86, #121a36 70%); border: 2px solid var(--gold-hi);
+  box-shadow: 0 0 0 4px rgba(8, 11, 22, 0.9), 0 0 0 5px var(--gold), 0 0 30px rgba(243, 220, 154, 0.55);
+  display: flex; align-items: center; justify-content: center;
+}
+#end .panel .ui-crest img, #dead .panel .ui-crest img { width: 56px; height: 56px; filter: drop-shadow(0 2px 2px #000); }
+#end .panel .ui-crest::before {
+  content: ''; position: absolute; inset: -26px; z-index: -1; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0 8deg, rgba(243, 220, 154, 0.5) 10deg, transparent 13deg 28deg, rgba(243, 220, 154, 0.35) 30deg, transparent 33deg 45deg);
+  -webkit-mask: radial-gradient(circle, transparent 38px, #000 40px, transparent 70px); mask: radial-gradient(circle, transparent 38px, #000 40px, transparent 70px);
+  animation: uiSpin 9s linear infinite;
+}
+@keyframes uiSpin { to { transform: rotate(360deg); } }
+#end .panel > h2 { font-size: 28px; }
+#end .ui-btns, #dead .ui-btns, #pause .ui-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 4px; }
+#end .ui-btns .btn, #dead .ui-btns .btn, #pause .ui-btns .btn { margin: 0; }
+/* derrota: marco rojizo */
+#dead .panel { max-width: 560px; padding-top: 58px; overflow: visible; --gold: #b0563e;
+  background: var(--grain), radial-gradient(ellipse at 50% -10%, rgba(220, 70, 50, 0.2), transparent 55%), linear-gradient(180deg, rgba(48, 22, 30, 0.97), rgba(16, 8, 14, 0.98)) !important; border-color: #b0563e !important;
+  box-shadow: inset 0 0 0 3px rgba(12, 4, 8, 0.92), inset 0 0 0 4px rgba(200, 90, 60, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.5), 0 14px 44px rgba(0, 0, 0, 0.8) !important; }
+#dead .panel .ui-crest { background: radial-gradient(circle at 50% 40%, #6a2a2a, #200c10 70%); border-color: #ff9a7a; box-shadow: 0 0 0 4px rgba(12, 4, 8, 0.9), 0 0 0 5px #b0563e, 0 0 30px rgba(255, 90, 60, 0.5); }
+#dead .panel .ui-crest img { filter: grayscale(0.3) sepia(0.5) hue-rotate(-30deg) drop-shadow(0 2px 2px #000); }
+#dead .tiles .st { border-color: rgba(200, 100, 70, 0.3); }
+#dead .tiles .st b { color: #ffd2c0; }
+#dead .panel p.small { color: #d8b8b0; margin: 0 0 4px; }
+
+/* ---------- pausa: compacta y siempre dentro de la pantalla ---------- */
+#pause .panel { max-width: 560px; }
+#pause .panel > h2 { font-size: 24px; }
+
+/* ---------- ventanas que no cabían ---------- */
+.panel, .rp-box { max-height: calc(100dvh - 20px); overflow-y: auto; scrollbar-width: thin; scrollbar-color: #6a5a34 transparent; }
+#end .panel, #dead .panel { overflow-y: visible; max-height: none; }
+.rp-box.opt-box { max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+@media (max-height: 430px) {
+  .panel > h2 { font-size: 21px; }
+  #end .panel, #dead .panel { padding-top: 46px; }
+  #end .panel .ui-crest, #dead .panel .ui-crest { width: 66px; height: 66px; margin-left: -33px; top: -26px; }
+  #end .panel .ui-crest img, #dead .panel .ui-crest img { width: 44px; height: 44px; }
+  .tiles { grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 6px 0 4px; }
+  .tiles .st { padding: 4px 7px; grid-template-columns: 24px 1fr; }
+  .tiles .st img { width: 24px; height: 24px; }
+  .tiles .st b { font-size: 15px; }
+  #end .panel > h2, #dead .panel > h2 { font-size: 22px; }
+}
+/* scrollbars finas en todas las listas */
+.shop-grid, .quest-list, .ach-list, .gp-list, .map-info { scrollbar-width: thin; scrollbar-color: #6a5a34 transparent; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: linear-gradient(#8a7444, #5a4824); border-radius: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- elección de héroe ---------- */
+.hs-art { background: linear-gradient(180deg, rgba(6, 8, 18, 0.15), rgba(6, 8, 18, 0.75) 85%), var(--hsbg, none) center / cover, #0e1428 !important; border-color: rgba(201, 178, 122, 0.45) !important; box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7); transition: background 0.3s; }
+.hs-info { -webkit-mask-image: linear-gradient(180deg, #000 85%, transparent); mask-image: linear-gradient(180deg, #000 85%, transparent); padding-bottom: 22px !important; }
+.hs-list button { position: relative; border-radius: 6px !important; transition: transform 0.12s, border-color 0.15s, background 0.15s; }
+.hs-list button img { border-radius: 50%; background: radial-gradient(circle at 50% 40%, #2c3a66, #0e1428 70%); border: 1px solid rgba(201, 178, 122, 0.45); }
+.hs-list button.on { transform: translateX(3px); }
+.hs-list button.on img { border-color: #f3dc9a; box-shadow: 0 0 10px rgba(243, 220, 154, 0.5); }
+.hs-list button.on::after { content: ''; position: absolute; right: -7px; top: 50%; margin-top: -6px; border: 6px solid transparent; border-left-color: #ecd18a; }
+
+/* ---------- Ajustes compacto ---------- */
+@media (max-height: 480px) { .opt-row { padding: 4px 2px !important; } .opt-row small { display: none; } .opt-box .rp-head::after { margin-top: 3px; } }
+.opt-box { overflow-y: auto; }
+
+/* ---------- esquinas algo más presentes ---------- */
+.ui-corners i { width: 40px; height: 40px; filter: drop-shadow(0 0 3px rgba(243, 220, 154, 0.35)) drop-shadow(0 1px 1px #000); }
+@media (max-height: 430px) { .ui-corners i { width: 30px; height: 30px; } }
+
+/* ---------- Mazmorra cerrada ---------- */
+.dg-lock { margin: 24px auto; max-width: 420px; padding: 86px 18px 18px; border-radius: 10px; position: relative;
+  background: radial-gradient(circle at 50% 30%, rgba(255, 90, 208, 0.18), transparent 60%), rgba(10, 6, 20, 0.5); border: 1px dashed rgba(255, 138, 224, 0.45); }
+.dg-lock::before { content: ''; position: absolute; left: 50%; top: 14px; width: 62px; height: 62px; margin-left: -31px; background: url(../img/icons/chest.png) center / contain no-repeat; filter: grayscale(0.6) brightness(0.8) drop-shadow(0 0 12px rgba(255, 90, 208, 0.5)); }

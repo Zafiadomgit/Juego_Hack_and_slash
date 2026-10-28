@@ -1934,6 +1934,35 @@ function text(str, x, y, size, color, align = 'left', weight = 800, stroke = tru
   ctx.fillText(str, x, y);
 }
 
+// ---------- piezas del HUD: placa con marco dorado y barras con brillo y estela ----------
+function hudPlate(x, y, w, h, r = 8) {
+  const g = ctx.createLinearGradient(0, y, 0, y + h);
+  g.addColorStop(0, 'rgba(26,34,62,0.82)'); g.addColorStop(1, 'rgba(8,11,24,0.82)');
+  roundRect(x, y, w, h, r, g, 'rgba(201,178,122,0.75)', 1.2);
+  roundRect(x + 2.5, y + 2.5, w - 5, h - 5, Math.max(2, r - 2), null, 'rgba(201,178,122,0.18)', 1);
+}
+function fancyBar(x, y, w, h, k, c0, c1, lag, ticks) {
+  const r = h / 2;
+  roundRect(x, y, w, h, r, 'rgba(4,6,14,0.85)', '#0a0e1c', 2);
+  const iw = w - 4, ih = h - 4, ix = x + 2, iy = y + 2;
+  if (lag > k) roundRect(ix, iy, iw * Math.min(1, lag), ih, ih / 2, 'rgba(255,190,150,0.55)');
+  if (k > 0) {
+    const g = ctx.createLinearGradient(0, iy, 0, iy + ih);
+    g.addColorStop(0, c0); g.addColorStop(1, c1);
+    roundRect(ix, iy, Math.max(ih, iw * k), ih, ih / 2, g);
+    roundRect(ix + 2, iy + 1, Math.max(0, iw * k - 4), ih * 0.38, ih * 0.2, 'rgba(255,255,255,0.28)');
+  }
+  if (ticks) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; for (let i = 1; i < ticks; i++) ctx.fillRect(ix + (iw * i) / ticks, iy + 1, 1, ih - 2); }
+  roundRect(x + 0.5, y + 0.5, w - 1, h - 1, r, null, 'rgba(201,178,122,0.55)', 1);
+}
+function drawCrystal(x, y, r, fill, glow) {
+  ctx.save();
+  if (glow) { ctx.shadowColor = glow; ctx.shadowBlur = r * 1.6; }
+  ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r * 0.62, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r * 0.62, y); ctx.closePath();
+  ctx.fillStyle = fill; ctx.fill();
+  ctx.restore();
+}
+
 // iconos pintados de la interfaz (img/ui)
 const UI_ICON = {};
 for (const n of ['bag', 'pause', 'potion']) { const im = new Image(); im.onload = () => { UI_ICON[n] = im; }; im.src = 'img/ui/' + n + '.png'; }
@@ -1944,13 +1973,17 @@ function drawHUD() {
   const nextXp = xpNext(S.level);
 
   // XP barra superior
-  roundRect(0, 0, W, 5 * s, 0, 'rgba(0,0,0,0.5)');
-  ctx.fillStyle = '#4fc3f7';
-  ctx.fillRect(0, 0, W * clamp(S.xp / nextXp, 0, 1), 5 * s);
+  roundRect(0, 0, W, 5 * s, 0, 'rgba(0,0,0,0.55)');
+  { const xg = ctx.createLinearGradient(0, 0, W, 0); xg.addColorStop(0, '#3a8cff'); xg.addColorStop(1, '#8fe0ff');
+    ctx.fillStyle = xg; ctx.fillRect(0, 0, W * clamp(S.xp / nextXp, 0, 1), 5 * s);
+    ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(0, 0, W * clamp(S.xp / nextXp, 0, 1), 1.5 * s); }
 
   // retrato
   const px = pad + 26 * s, py = pad + 30 * s;
-  circle(px, py, 26 * s, '#1f2a4a', '#c9b27a', 3 * s);
+  const hbw = Math.min(170 * s, W * 0.22), plateR = px + 34 * s + Math.max(hbw, P.maxPa * 17 * s + 20 * s) + 8 * s;
+  hudPlate(pad - 6 * s, pad - 2 * s, plateR - pad + 6 * s, 74 * s, 10 * s);
+  { const rg = ctx.createLinearGradient(px, py - 28 * s, px, py + 28 * s); rg.addColorStop(0, '#fff0b8'); rg.addColorStop(0.5, '#c9a050'); rg.addColorStop(1, '#6a4a1c');
+    circle(px, py, 28 * s, rg); circle(px, py, 25.5 * s, '#1f2a4a', '#0a0e1c', 1.5 * s); }
   ctx.save();
   ctx.beginPath(); ctx.arc(px, py, 24 * s, 0, Math.PI * 2); ctx.clip();
   const art = heroArt(P.cls);
@@ -1967,35 +2000,38 @@ function drawHUD() {
     drawHero(ctx, P.cls, { x: 0, y: 0, dir: 0.2, walkT: 0, moving: false, swing: 0, swingSide: 1, shot: 0, t: now });
   }
   ctx.restore();
-  roundRect(px - 13 * s, py + 17 * s, 26 * s, 15 * s, 6 * s, '#c9b27a');
-  text(String(S.level), px, py + 25 * s, 12 * s, '#151d34', 'center', 900, false);
+  { const lg = ctx.createLinearGradient(0, py + 17 * s, 0, py + 32 * s); lg.addColorStop(0, '#ffeaa8'); lg.addColorStop(1, '#b48a3e');
+    roundRect(px - 14 * s, py + 17 * s, 28 * s, 15 * s, 7 * s, lg, '#2a1a06', 1.5); }
+  text(String(S.level), px, py + 25 * s, 12 * s, '#2a1a06', 'center', 900, false);
 
   // PV
-  const bx = px + 34 * s, bw = Math.min(190 * s, W * 0.28), bh = 16 * s;
+  const bx = px + 34 * s, bw = hbw, bh = 16 * s;
   let by = pad + 8 * s;
-  roundRect(bx, by, bw, bh, bh / 2, 'rgba(0,0,0,0.6)', '#151d34', 2);
   const hpk = Math.max(0, P.hp / P.maxHp);
-  if (hpk > 0) roundRect(bx + 2, by + 2, (bw - 4) * hpk, bh - 4, (bh - 4) / 2, hpk < 0.3 ? '#ff1744' : '#e53935');
-  if (P.shield > 0) roundRect(bx + 2, by + 2, Math.min(bw - 4, (bw - 4) * (P.shield / P.maxHp)), (bh - 4) / 2, 3, 'rgba(140,210,255,0.85)');
-  drawHeart(bx + 2 * s, by + bh / 2, 10 * s, '#e53935');
-  text(Math.ceil(P.hp) + ' / ' + P.maxHp, bx + 16 * s, by + bh / 2 + 1, 11 * s, '#fff', 'left', 800);
+  P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.0045);
+  const low = hpk < 0.3, pulse = low ? 0.5 + 0.5 * Math.sin(now * 8) : 0;
+  fancyBar(bx, by, bw, bh, hpk, low ? `rgb(255,${90 + pulse * 60 | 0},80)` : '#ff6a55', low ? '#a00018' : '#b3201c', P._hpLag, 10);
+  if (P.shield > 0) roundRect(bx + 2, by + 2, Math.min(bw - 4, (bw - 4) * (P.shield / P.maxHp)), (bh - 4) / 2, 3, 'rgba(150,220,255,0.9)');
+  drawHeart(bx + 2 * s, by + bh / 2, 10 * s, '#ff5a4a');
+  text(Math.ceil(P.hp) + ' / ' + P.maxHp, bx + bw / 2 + 4 * s, by + bh / 2 + 1, 11 * s, '#fff', 'center', 800);
 
   // PA y PM
   by += bh + 6 * s;
   for (let i = 0; i < P.maxPa; i++) {
     const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
-    drawStar(cx, cy, 8 * s, 'rgba(0,0,0,0.5)');
+    drawCrystal(cx, cy, 8.5 * s, 'rgba(0,0,0,0.6)');
     const fillK = clamp(P.pa - i, 0, 1);
-    if (fillK >= 1) drawStar(cx, cy, 7 * s, '#29b6f6');
-    else if (fillK > 0) drawStar(cx, cy, 7 * s * fillK, '#0277bd');
+    if (fillK >= 1) { drawCrystal(cx, cy, 7 * s, '#4fd2ff', 'rgba(80,200,255,0.9)'); drawCrystal(cx - 1.2 * s, cy - 2 * s, 2.6 * s, 'rgba(255,255,255,0.75)'); }
+    else if (fillK > 0) drawCrystal(cx, cy, 7 * s * (0.35 + fillK * 0.65), '#1e6fa8');
   }
   text('EN', bx + 9 * s + P.maxPa * 17 * s, by + 8 * s, 10 * s, '#81d4fa', 'left', 900);
   by += 18 * s;
   for (let i = 0; i < P.maxPm; i++) {
     const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
-    circle(cx, cy, 7 * s, 'rgba(0,0,0,0.5)');
+    roundRect(cx - 6.5 * s, cy - 3.5 * s, 13 * s, 7 * s, 3.5 * s, 'rgba(0,0,0,0.6)');
     const fillK = clamp(P.pm - i, 0, 1);
-    if (fillK > 0) circle(cx, cy, 6 * s * (fillK >= 1 ? 1 : fillK * 0.8), fillK >= 1 ? '#66bb6a' : '#2e7d32');
+    if (fillK > 0) { roundRect(cx - 5.5 * s, cy - 2.5 * s, 11 * s * (fillK >= 1 ? 1 : fillK), 5 * s, 2.5 * s, fillK >= 1 ? '#7dea7a' : '#2e7d32');
+      if (fillK >= 1) roundRect(cx - 4.5 * s, cy - 2 * s, 9 * s, 1.6 * s, 1 * s, 'rgba(255,255,255,0.45)'); }
   }
   text('IM', bx + 9 * s + P.maxPm * 17 * s, by + 8 * s, 10 * s, '#a5d6a7', 'left', 900);
   // elixires activos en esta Grieta
@@ -2020,13 +2056,13 @@ function drawHUD() {
 
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
+  hudPlate(rx - 158 * s, ry - 13 * s, 164 * s, 50 * s, 8 * s);
   text(rift.isDungeon ? `Mazmorra · Piso ${rift.tier}` : rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
   text(rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
-  roundRect(rx - pw, ry + 9 * s, pw, 8 * s, 4 * s, 'rgba(0,0,0,0.6)', '#6f6a5a', 1.5);
-  const pk = rift.progress / rift.goal;
-  if (pk > 0) roundRect(rx - pw + 1.5, ry + 10.5 * s, (pw - 3) * pk, 5 * s, 3 * s, rift.bossSpawned ? '#ff7043' : '#ffb300');
+  const pk = Math.min(1, rift.progress / rift.goal);
+  fancyBar(rx - pw, ry + 8 * s, pw, 9 * s, pk, rift.bossSpawned ? '#ff9a6a' : '#ffe08a', rift.bossSpawned ? '#c8401a' : '#d08a10', 0, 0);
 
   // minimapa (radar)
   const mr = 26 * s, mx = rx - mr, my = ry + 44 * s + mr;
@@ -2055,10 +2091,15 @@ function drawHUD() {
 
   // jefe
   if (bossRef && !bossRef.dead) {
-    const w = Math.min(W * 0.42, 340 * s), x = W / 2 - w / 2, y = pad + 18 * s;
-    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 6 * s, 13 * s, bossRef.enraged ? '#ff5252' : '#ecd18a', 'center', 900);
-    roundRect(x, y + 2 * s, w, 12 * s, 6 * s, 'rgba(0,0,0,0.65)', '#c9b27a', 2);
-    roundRect(x + 2, y + 2 * s + 2, (w - 4) * Math.max(0, bossRef.hp / bossRef.maxHp), 12 * s - 4, 4 * s, '#d84315');
+    const w = Math.min(W * 0.34, 300 * s), x = W / 2 - w / 2, y = pad + 18 * s;
+    const bk = Math.max(0, bossRef.hp / bossRef.maxHp);
+    bossRef._lag = bossRef._lag === undefined || bossRef._lag < bk ? bk : Math.max(bk, bossRef._lag - 0.003);
+    hudPlate(x - 14 * s, y - 16 * s, w + 28 * s, 36 * s, 8 * s);
+    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 5 * s, 12.5 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
+    const sup = !!bossRef.superDef;
+    fancyBar(x, y + 3 * s, w, 12 * s, bk, sup ? '#ff5ad0' : '#ff7a3a', sup ? '#7a1a8a' : '#a8240e', bossRef._lag, 0);
+    if (sup) for (const m of [0.66, 0.33]) { ctx.fillStyle = '#f3dc9a'; ctx.fillRect(x + 2 + (w - 4) * m - 1, y + 3 * s, 2, 12 * s); }
+    drawStar(x - 5 * s, y + 9 * s, 7 * s, sup ? '#ff5ad0' : '#ff7043');
   }
 
   // racha
@@ -2070,6 +2111,18 @@ function drawHUD() {
   drawControls();
 }
 
+// franja oscura con filetes del color del cartel, que se desvanece a los lados
+function bannerBand(cy, h, col, k = 1) {
+  const w = Math.min(W * 0.86, 760 * ui), x = W / 2 - w / 2;
+  const g = ctx.createLinearGradient(x, 0, x + w, 0);
+  g.addColorStop(0, 'rgba(4,6,14,0)'); g.addColorStop(0.2, `rgba(4,6,14,${0.62 * k})`); g.addColorStop(0.8, `rgba(4,6,14,${0.62 * k})`); g.addColorStop(1, 'rgba(4,6,14,0)');
+  ctx.fillStyle = g; ctx.fillRect(x, cy - h / 2, w, h);
+  const l = ctx.createLinearGradient(x, 0, x + w, 0);
+  l.addColorStop(0, 'rgba(0,0,0,0)'); l.addColorStop(0.5, col); l.addColorStop(1, 'rgba(0,0,0,0)');
+  ctx.save(); ctx.globalAlpha *= 0.85; ctx.fillStyle = l;
+  ctx.fillRect(x, cy - h / 2, w, 1.5 * ui); ctx.fillRect(x, cy + h / 2 - 1.5 * ui, w, 1.5 * ui);
+  ctx.restore();
+}
 function drawBanners() {
   const s = ui;
   if (banner) {
@@ -2083,6 +2136,7 @@ function drawBanners() {
       drawGem(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
       y += 10 * s;
     }
+    bannerBand(y + (banner.sub ? 10 * s : 0), banner.sub ? 66 * s : 46 * s, banner.color);
     text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900, true, 'Cinzel, serif');
     if (banner.sub) text(banner.sub, W / 2, y + 26 * s, 12 * s, '#efece2', 'center', 700);
     ctx.restore();
@@ -2090,6 +2144,7 @@ function drawBanners() {
   if (subBanner) {
     ctx.save();
     ctx.globalAlpha = Math.min(1, subBanner.t * 2);
+    bannerBand(H * 0.3 + 54 * s, 26 * s, '#ffcc80', 0.6);
     text(subBanner.text, W / 2, H * 0.3 + 54 * s, 14 * s, '#ffcc80', 'center', 900);
     ctx.restore();
   }
