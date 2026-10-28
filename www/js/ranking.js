@@ -5,12 +5,15 @@
  */
 'use strict';
 
-const RANK_API = { url: 'https://zwunhuhwrleasgapruvt.supabase.co', key: '__SUPABASE_KEY__' };
-const rankPid = () => (SAVE.pid = SAVE.pid || (crypto.randomUUID ? crypto.randomUUID() : 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2)));
+// clave publicable: está pensada para ir en el cliente (la tabla solo se toca a través de las dos funciones)
+const RANK_API = { url: 'https://peyywtypbriuxspnwnsk.supabase.co', key: 'sb_publishable_mhBv-mlDDb0NABnFjSubkw_Y_CWK8KS' };
+const uuid4 = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID()
+  : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 3 | 8)).toString(16); }));
+const rankPid = () => (SAVE.pid = SAVE.pid || uuid4());
 const rankName = () => SAVE.pname || '';
 async function rankRpc(fn, body) {
   const r = await fetch(`${RANK_API.url}/rest/v1/rpc/${fn}`, {
-    method: 'POST', headers: { apikey: RANK_API.key, Authorization: 'Bearer ' + RANK_API.key, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    method: 'POST', headers: { apikey: RANK_API.key, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
   });
   if (!r.ok) throw new Error('ranking ' + r.status);
   return r.json();
