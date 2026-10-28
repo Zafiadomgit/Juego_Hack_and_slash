@@ -110,3 +110,24 @@ renderLighting = function (lights, ...rest) {
   if (scene !== 'rift') for (const l of lights) if (l.rgb === '255,165,85') l.a *= 0.86 + Math.sin(now * 9 + l.x) * 0.06 + Math.sin(now * 23 + l.y) * 0.05;
   return _renderLightingVfx(lights, ...rest);
 };
+
+// ---------- Entrar por el Portal: remolino que nace del Portal, destello y la Grieta se abre ----------
+let portalFxBusy = false;
+const _startNodeVfx = startNode;
+startNode = function (b, n, d) {
+  if (scene !== 'hub' || portalFxBusy || navigator.webdriver) { _startNodeVfx(b, n, d); return; }
+  portalFxBusy = true;
+  // posición del Portal en pantalla (si no se ve, desde el centro)
+  const px = ((PORTAL.x - vCam.x) * zoom + W / 2) / W * 100, py = ((PORTAL.y - 120 - vCam.y) * zoom + H / 2) / H * 100;
+  let el = $('portalFx');
+  if (!el) { el = document.createElement('div'); el.id = 'portalFx'; document.body.appendChild(el); }
+  el.style.setProperty('--px', clamp(px, 0, 100) + '%'); el.style.setProperty('--py', clamp(py, 0, 100) + '%');
+  el.className = 'in';
+  SFX.play('zaap');
+  setTimeout(() => {
+    try { _startNodeVfx(b, n, d); } finally {
+      el.className = 'out';
+      setTimeout(() => { el.className = ''; portalFxBusy = false; }, 700);
+    }
+  }, 520);
+};

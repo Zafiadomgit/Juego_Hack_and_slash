@@ -176,3 +176,13 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .mnode.boss { width: 66px; height: 66px; box-shadow: 0 0 0 3px #ff5a48, 0 0 20px rgba(255,80,60,.6), 0 6px 12px rgba(0,0,0,.6); }
 .mnode.boss.done { box-shadow: 0 0 0 3px #ecd18a, 0 6px 12px rgba(0,0,0,.6); }
 .mf-bg path { stroke-width: 0; }
+
+/* Entrar por el Portal */
+#portalFx { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0;
+  background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), #fff 0, #d8f8ff 6%, #6fd8ff 18%, #2a6ad0 38%, #120c3a 62%, #04040c 85%);
+  clip-path: circle(0% at var(--px, 50%) var(--py, 50%)); }
+#portalFx.in { opacity: 1; animation: pfxIn .52s cubic-bezier(.6, 0, .9, .5) forwards; }
+#portalFx.out { opacity: 1; clip-path: circle(150% at 50% 50%); animation: pfxOut .7s ease-out forwards; }
+@keyframes pfxIn { from { clip-path: circle(0% at var(--px, 50%) var(--py, 50%)); filter: hue-rotate(0deg) brightness(1); } to { clip-path: circle(150% at var(--px, 50%) var(--py, 50%)); filter: hue-rotate(40deg) brightness(1.6); } }
+@keyframes pfxOut { 0% { opacity: 1; filter: brightness(2.2); transform: scale(1); } 100% { opacity: 0; filter: brightness(1); transform: scale(1.25); } }
+@media (prefers-reduced-motion: reduce) { #portalFx.in, #portalFx.out { animation-duration: .01s; } }
