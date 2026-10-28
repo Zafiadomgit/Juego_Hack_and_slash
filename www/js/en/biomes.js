@@ -10,7 +10,7 @@ const BIOMES = [
     ground: [[74, 42, 30], [92, 54, 38], [52, 30, 22]], grain: [150, 100, 70], patch: ['rgba(120,60,30,0.25)', 'rgba(30,14,8,0.3)'],
     deco: { fern: 30, bones: 8, grass: 14, crackline: 8, pebble: 20, blotch: 20 }, decoCol: ['#4d6b30', '#3e5a2a', '#5b6e2c'],
     tree: 'dead', props: { pillar: 18, crystal: 10, brazier: 16 }, pool: 'lava', pools: 14,
-    ambient: 0.42, shade: '92,70,120', fog: '120,90,110', mote: 'ember', tint: null,
+    ambient: 0.3, shade: '110,86,130', fog: '120,90,110', mote: 'ember', tint: 'rgba(255,170,100,0.08)',
     weights: { tofu: 4, bouftou: 4, arakne: 3, pissenlit: 2, craqueleur: 1 }, boss: 'bouftouRoyal',
   },
   {

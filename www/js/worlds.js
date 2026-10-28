@@ -53,8 +53,8 @@ BIOMES.push(
   {
     id: 'cristal', name: 'Bosque de Cristal',
     ground: [[60, 40, 80], [76, 52, 98], [44, 30, 60]], grain: [210, 180, 255], patch: ['rgba(150,90,220,0.25)', 'rgba(20,10,40,0.3)'],
-    deco: { glowshroom: 10, pebble: 10, blotch: 12, iceshard: 8 }, decoCol: ['#7a5aa8', '#5a3a88', '#9a7ac8'],
-    tree: 'pine', props: { pillar: 10, crystal: 30, brazier: 10 }, pool: 'ice', pools: 10, crystalHue: 1,
+    deco: { glowshroom: 6, pebble: 10, blotch: 12, iceshard: 5 }, decoCol: ['#7a5aa8', '#5a3a88', '#9a7ac8'],
+    tree: 'pine', props: { pillar: 10, crystal: 18, brazier: 10 }, pool: 'ice', pools: 10, crystalHue: 1,
     ambient: 0.5, shade: '110,80,170', fog: '190,160,240', mote: 'snow', tint: 'rgba(170,120,255,0.16)',
     weights: { duende: 5, polilla: 4, golemC: 2 }, boss: 'ciervo', minion: 'duende',
   },

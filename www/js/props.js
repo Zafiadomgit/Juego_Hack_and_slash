@@ -45,11 +45,13 @@ function blitProp(fr, x, y, scale, sink = 0) {
   return h;
 }
 
+// escala de los objetos de la Grieta, a la medida del héroe (los árboles le sacan casi dos cabezas)
+const RIFT_SCALE = { tree: 1.5, pillar: 1.3, rock: 1.15, crystal: 1.25, brazier: 1.3 };
 // Obstáculos de la Grieta: devuelve true si se ha dibujado con sprite
 function drawPropSprite(o, kind) {
   const fr = propFrame(kind, o.x, o.y);
   if (!fr) return false;
-  const scale = kind === 'brazier' ? 1 : o.s || 1;
+  const scale = (kind === 'brazier' ? 1 : o.s || 1) * (RIFT_SCALE[kind] || 1);
   const [, , sw] = fr.f;
   shadow(o.x, o.y + 2, Math.min(sw * PROP_WU_PER_PX * scale * 0.42, kind === 'tree' ? 34 * scale : 60));
   if (kind === 'crystal') {
@@ -73,7 +75,7 @@ function drawPropDeco(d) {
   if (!kind) return false;
   const fr = propFrame(kind, d.x, d.y);
   if (!fr) return false;
-  blitProp(fr, d.x, d.y, (d.s || 1) * 0.9);
+  blitProp(fr, d.x, d.y, (d.s || 1) * 1.2); // matas y detalles a la escala del héroe
   return true;
 }
 
