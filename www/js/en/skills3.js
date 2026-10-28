@@ -253,11 +253,5 @@ drawControls = function () {
   if (!P || !P.C.skills[2] || scene !== 'rift') return;
   const s = ui, b = buttonLayout().s2, sk = P.C.skills[2];
   const cdk = clamp(P.skillCd[2] / sk.cd, 0, 1), on = P.pa >= sk.cost && cdk <= 0;
-  ctx.save();
-  ctx.globalAlpha = on ? 1 : 0.55;
-  circle(b.x, b.y, b.r, 'rgba(12,16,32,0.6)', '#ab7cf0', 3);
-  if (cdk > 0) { ctx.beginPath(); ctx.moveTo(b.x, b.y); ctx.arc(b.x, b.y, b.r - 2, -Math.PI / 2, -Math.PI / 2 + TAU * cdk); ctx.closePath(); ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fill(); }
-  text(sk.icon, b.x, b.y - 4 * s, b.r * 0.75, '#fff', 'center', 900);
-  text(sk.cost + ' EN', b.x, b.y + b.r * 0.5, 10 * s, '#d1b8ff', 'center', 900);
-  ctx.restore();
+  combatButton(b, skillImg(P.cls, 3) || sk.icon, sk.cost + ' EN', '#ab7cf0', cdk, on, false, '#d1b8ff');
 };

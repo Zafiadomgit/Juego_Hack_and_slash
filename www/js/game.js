@@ -2098,6 +2098,7 @@ function drawHUD() {
     text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 5 * s, 12.5 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
     const sup = !!bossRef.superDef;
     fancyBar(x, y + 3 * s, w, 12 * s, bk, sup ? '#ff5ad0' : '#ff7a3a', sup ? '#7a1a8a' : '#a8240e', bossRef._lag, 0);
+    if (UI_KIT.barframe) { const fh = 12 * s / 0.42; draw3(UI_KIT.barframe, x - fh * 0.42, y + 3 * s + 6 * s - fh / 2, w + fh * 0.84, fh, 0.14); }
     if (sup) for (const m of [0.66, 0.33]) { ctx.fillStyle = '#f3dc9a'; ctx.fillRect(x + 2 + (w - 4) * m - 1, y + 3 * s, 2, 12 * s); }
     drawStar(x - 5 * s, y + 9 * s, 7 * s, sup ? '#ff5ad0' : '#ff7043');
   }
@@ -2136,7 +2137,10 @@ function drawBanners() {
       drawGem(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
       y += 10 * s;
     }
-    bannerBand(y + (banner.sub ? 10 * s : 0), banner.sub ? 66 * s : 46 * s, banner.color);
+    if (UI_KIT.banner) {
+      const bw2 = Math.min(W * 0.8, Math.max(320 * s, banner.text.length * 15 * s)), bh2 = (banner.sub ? 92 : 70) * s;
+      draw3(UI_KIT.banner, W / 2 - bw2 / 2, y - bh2 * 0.42, bw2, bh2, 0.2);
+    } else bannerBand(y + (banner.sub ? 10 * s : 0), banner.sub ? 66 * s : 46 * s, banner.color);
     text(banner.text, W / 2, y, Math.min(28 * s * sc, (W * 0.9) / Math.max(8, banner.text.length) * 1.8), banner.color, 'center', 900, true, 'Cinzel, serif');
     if (banner.sub) text(banner.sub, W / 2, y + 26 * s, 12 * s, '#efece2', 'center', 700);
     ctx.restore();
@@ -2148,6 +2152,61 @@ function drawBanners() {
     text(subBanner.text, W / 2, H * 0.3 + 54 * s, 14 * s, '#ffcc80', 'center', 900);
     ctx.restore();
   }
+}
+
+// iconos pintados de los botones de combate: [ataque, habilidad 1, habilidad 2, habilidad 3, definitiva] (img/talents)
+const SKILL_ART = {
+  iop: ['axe', 'mountain', 'fireburst', 'whirl', 'twinslash'], cra: ['bow', 'flame', 'rain', 'bolt', 'hawk'],
+  feca: ['staff', 'aegis', 'rune', 'crystal', 'orb'], sombra: ['dagger', 'ghost', 'poison', 'toxiccloud', 'thousandcuts'],
+  domadora: ['paw', 'wolf', 'gust', 'thorns', 'stag'], artificiera: ['bomb', 'gear', 'burst', 'trap', 'comet'],
+  berserker: ['swords', 'blood', 'horn', 'giant', 'rage'],
+};
+const SKILL_IMG = {};
+const skillImg = (cls, i) => {
+  const n = SKILL_ART[cls] && SKILL_ART[cls][i];
+  if (!n) return null;
+  if (!SKILL_IMG[n]) { const im = new Image(); im.src = 'img/talents/' + n + '.png'; SKILL_IMG[n] = im; }
+  return SKILL_IMG[n].complete && SKILL_IMG[n].naturalWidth ? SKILL_IMG[n] : null;
+};
+const UI_KIT = {};
+for (const n of ['ring', 'barframe', 'banner']) { const im = new Image(); im.onload = () => { UI_KIT[n] = im; }; im.src = 'img/ui/kit/' + n + '.webp'; }
+// imagen estirada en 3 partes (los extremos conservan su proporción)
+function draw3(img, x, y, w, h, cap = 0.15) {
+  const sw = img.width * cap, dw = Math.min(w / 2, sw * (h / img.height));
+  ctx.drawImage(img, 0, 0, sw, img.height, x, y, dw, h);
+  ctx.drawImage(img, sw, 0, img.width - 2 * sw, img.height, x + dw, y, w - 2 * dw, h);
+  ctx.drawImage(img, img.width - sw, 0, sw, img.height, x + w - dw, y, dw, h);
+}
+// botón de combate: disco oscuro, icono pintado, recarga en abanico y aro dorado pintado (img/ui/kit/ring)
+function combatButton(b, label, sub, color, cdk, enabled, held, subColor = '#9fe0ff') {
+  const s = ui;
+  ctx.save();
+  ctx.globalAlpha = enabled ? 1 : 0.55;
+  const g = ctx.createRadialGradient(b.x, b.y - b.r * 0.3, b.r * 0.1, b.x, b.y, b.r);
+  g.addColorStop(0, held ? 'rgba(255,226,150,0.75)' : 'rgba(44,56,100,0.85)'); g.addColorStop(1, held ? 'rgba(150,100,30,0.75)' : 'rgba(8,11,24,0.85)');
+  circle(b.x, b.y, b.r * 0.92, g);
+  if (label && typeof label === 'object') {
+    ctx.save(); ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.86, 0, Math.PI * 2); ctx.clip();
+    const k = b.r * (sub ? 1.18 : 1.32);
+    ctx.drawImage(label, b.x - k / 2, b.y - k / 2 - (sub ? b.r * 0.1 : 0), k, k);
+    ctx.restore();
+  } else text(label, b.x, b.y - (sub ? 4 * s : 0), b.r * 0.75, '#fff', 'center', 900);
+  if (cdk > 0) {
+    ctx.beginPath(); ctx.moveTo(b.x, b.y);
+    ctx.arc(b.x, b.y, b.r * 0.9, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * cdk);
+    ctx.closePath(); ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fill();
+  }
+  ctx.strokeStyle = color; ctx.lineWidth = 2.2 * s; ctx.globalAlpha *= 0.85;
+  ctx.beginPath(); ctx.arc(b.x, b.y, b.r * 0.9, 0, Math.PI * 2); ctx.stroke();
+  ctx.globalAlpha = enabled ? 1 : 0.55;
+  if (UI_KIT.ring) { const R = b.r * 1.22; ctx.drawImage(UI_KIT.ring, b.x - R, b.y - R, R * 2, R * 2); }
+  else { ctx.strokeStyle = '#c9b27a'; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2); ctx.stroke(); }
+  if (sub) {
+    const w = Math.max(24 * s, sub.length * 6.5 * s);
+    roundRect(b.x - w / 2, b.y + b.r * 0.5 - 7 * s, w, 14 * s, 7 * s, 'rgba(6,8,18,0.85)', 'rgba(201,178,122,0.6)', 1);
+    text(sub, b.x, b.y + b.r * 0.5, 9.5 * s, subColor, 'center', 900, false);
+  }
+  ctx.restore();
 }
 
 function drawControls() {
@@ -2163,30 +2222,14 @@ function drawControls() {
     circle(x, y, 26 * s, 'rgba(255,255,255,0.12)');
   }
 
-  const btn = (b, label, sub, color, cdk, enabled, held) => {
-    ctx.save();
-    ctx.globalAlpha = enabled ? 1 : 0.55;
-    circle(b.x, b.y, b.r, held ? 'rgba(255,220,140,0.55)' : 'rgba(12,16,32,0.6)', color, 3);
-    if (cdk > 0) {
-      ctx.beginPath();
-      ctx.moveTo(b.x, b.y);
-      ctx.arc(b.x, b.y, b.r - 2, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * cdk);
-      ctx.closePath();
-      ctx.fillStyle = 'rgba(0,0,0,0.55)';
-      ctx.fill();
-    }
-    if (label && typeof label === 'object') ctx.drawImage(label, b.x - b.r * 0.62, b.y - b.r * 0.78, b.r * 1.24, b.r * 1.24);
-    else text(label, b.x, b.y - (sub ? 4 * s : 0), b.r * 0.75, '#fff', 'center', 900);
-    if (sub) text(sub, b.x, b.y + b.r * 0.5, 10 * s, '#81d4fa', 'center', 900);
-    ctx.restore();
-  };
+  const btn = combatButton;
 
-  const atkIcon = ATK_ICON[P.cls] || '⚔';
+  const atkIcon = skillImg(P.cls, 0) || ATK_ICON[P.cls] || '⚔';
   btn(L.attack, atkIcon, null, '#ecd18a', 0, true, input.attack);
   for (let i = 0; i < 2; i++) {
     const sk = P.C.skills[i];
     const cdk = clamp(P.skillCd[i] / sk.cd, 0, 1);
-    btn(L['s' + i], sk.icon, sk.cost + ' EN', '#29b6f6', cdk, P.pa >= sk.cost && cdk <= 0, false);
+    btn(L['s' + i], skillImg(P.cls, i + 1) || sk.icon, sk.cost + ' EN', '#29b6f6', cdk, P.pa >= sk.cost && cdk <= 0, false);
   }
   const pmk = P.pm >= 1 ? 0 : 1 - (P.pm % 1);
   btn(L.dash, '»', String(Math.floor(P.pm)), '#66bb6a', pmk, P.pm >= 1, false);
@@ -2194,7 +2237,7 @@ function drawControls() {
   // definitiva: anillo de carga y brillo cuando está lista
   const uk = clamp((P.ult || 0) / 100, 0, 1), ub = L.ult;
   if (uk >= 1) { ctx.save(); ctx.globalAlpha = 0.35 + Math.sin(now * 6) * 0.2; circle(ub.x, ub.y, ub.r + 7 * s, 'rgba(255,214,110,0.5)'); ctx.restore(); }
-  btn(ub, ULTIMATES[P.cls].icon, uk >= 1 ? '¡YA!' : Math.floor(uk * 100) + '%', uk >= 1 ? '#ffd54f' : '#b08a3a', 1 - uk, uk >= 1, false);
+  btn(ub, skillImg(P.cls, 4) || ULTIMATES[P.cls].icon, uk >= 1 ? '¡YA!' : Math.floor(uk * 100) + '%', uk >= 1 ? '#ffd54f' : '#b08a3a', 1 - uk, uk >= 1, false);
 }
 
 // ============================================================

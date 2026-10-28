@@ -22,7 +22,7 @@
   box-shadow: inset 0 0 0 3px rgba(8, 11, 22, 0.92), inset 0 0 0 4px rgba(201, 178, 122, 0.4), inset 0 0 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.6), 0 14px 44px rgba(0, 0, 0, 0.8) !important;
 }
 .ui-corners { position: absolute; inset: -4px; pointer-events: none; z-index: 3; }
-.ui-corners i { position: absolute; width: 34px; height: 34px; background: var(--corner) center / contain no-repeat; filter: drop-shadow(0 1px 1px #000); }
+.ui-corners i { position: absolute; width: 34px; height: 34px; background: url(../img/ui/kit/corner.webp) center / contain no-repeat; filter: drop-shadow(0 1px 1px #000); }
 .ui-corners i:nth-child(1) { left: 0; top: 0; }
 .ui-corners i:nth-child(2) { right: 0; top: 0; transform: scaleX(-1); }
 .ui-corners i:nth-child(3) { left: 0; bottom: 0; transform: scaleY(-1); }
@@ -147,10 +147,20 @@
 .opt-box { overflow-y: auto; }
 
 /* ---------- esquinas algo más presentes ---------- */
-.ui-corners i { width: 40px; height: 40px; filter: drop-shadow(0 0 3px rgba(243, 220, 154, 0.35)) drop-shadow(0 1px 1px #000); }
-@media (max-height: 430px) { .ui-corners i { width: 30px; height: 30px; } }
+.ui-corners i { width: 52px; height: 47px; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.8)); }
+@media (max-height: 430px) { .ui-corners i { width: 40px; height: 36px; } }
 
 /* ---------- Mazmorra cerrada ---------- */
 .dg-lock { margin: 24px auto; max-width: 420px; padding: 86px 18px 18px; border-radius: 10px; position: relative;
   background: radial-gradient(circle at 50% 30%, rgba(255, 90, 208, 0.18), transparent 60%), rgba(10, 6, 20, 0.5); border: 1px dashed rgba(255, 138, 224, 0.45); }
 .dg-lock::before { content: ''; position: absolute; left: 50%; top: 14px; width: 62px; height: 62px; margin-left: -31px; background: url(../img/icons/chest.png) center / contain no-repeat; filter: grayscale(0.6) brightness(0.8) drop-shadow(0 0 12px rgba(255, 90, 208, 0.5)); }
+
+/* ---------- piezas pintadas (SpriteCook, img/ui/kit) ---------- */
+.panel > h2::after, .rp-head::after { height: 22px; margin-top: 4px; width: min(80%, 300px); background: url(../img/ui/kit/divider.webp) center / contain no-repeat !important; }
+.ui-corners { inset: -10px; }
+.sh-modes, .sh-head { position: relative; }
+/* huecos de gema con engaste dorado */
+button.gem, .gp-slots button { background: url(../img/ui/kit/socket.webp) center / contain no-repeat, radial-gradient(circle, rgba(10, 14, 30, 0.9) 40%, transparent 41%) !important; border: none !important; box-shadow: none !important; }
+button.gem { width: 40px !important; height: 43px !important; border-radius: 0 !important; color: #c9b27a !important; }
+button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
+.gp-slots button { min-height: 64px; color: #e8d6a8; }
