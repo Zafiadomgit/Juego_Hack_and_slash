@@ -32,13 +32,13 @@ function drawMini() {
   // caminos y plaza
   g.strokeStyle = '#8a6a46'; g.lineCap = 'round';
   const road = (pts, w) => { g.lineWidth = w * sx; g.beginPath(); pts.forEach(([x, y], i) => { const [a, b] = P(x, y); if (i) g.lineTo(a, b); else g.moveTo(a, b); }); g.stroke(); };
-  road([[0, 60], [10, 220], [-10, 380], [0, 600]], 84); road([[-120, 60], [-300, 110], [-520, 140], [-800, 160]], 70); road([[120, 60], [300, 110], [520, 150], [800, 170]], 70);
-  const [pcx, pcy] = P(0, -40);
-  g.fillStyle = '#a59a86'; g.beginPath(); g.ellipse(pcx, pcy, 270 * sx, 175 * sy, 0, 0, TAU); g.fill();
+  for (const [pts, w] of VROADS) road(pts, w);
+  const [pcx, pcy] = P(VPLAZA.x, VPLAZA.y);
+  g.fillStyle = '#a59a86'; g.beginPath(); g.ellipse(pcx, pcy, VPLAZA.rx * sx, VPLAZA.ry * sy, 0, 0, TAU); g.fill();
   for (const o of VILLAGE.props) {
     const [x, y] = P(o.x, o.y);
-    if (o.kind === 'house') { g.fillStyle = '#7a3f2a'; g.fillRect(x - 7, y - 9, 14, 10); }
-    else if (o.kind === 'tree') { g.fillStyle = o.tint ? '#b8743a' : '#24401c'; g.beginPath(); g.arc(x, y, o.s < 0.7 ? 1.6 : 3, 0, TAU); g.fill(); }
+    if (o.kind === 'house') { g.fillStyle = '#7a3f2a'; g.fillRect(x - 170 * sx, y - 130 * sy, 340 * sx, 130 * sy); }
+    else if (o.kind === 'tree') { g.fillStyle = o.tint ? '#b8743a' : '#24401c'; g.beginPath(); g.arc(x, y, Math.max(1.5, 70 * o.s * sx), 0, TAU); g.fill(); }
   }
   const [qx, qy] = P(PORTAL.x, PORTAL.y);
   g.fillStyle = '#6fd8ff'; g.beginPath(); g.arc(qx, qy, 4, 0, TAU); g.fill();

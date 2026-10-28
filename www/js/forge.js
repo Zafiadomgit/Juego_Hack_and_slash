@@ -200,4 +200,6 @@ offerHTML = function (o) {
 };
 
 // ---------- NPC en Villa Candela ----------
-NPCS.push({ id: 'smith', name: 'Tobías', title: 'Herrero', x: 150, y: 236, prompt: '⚒ Hablar con Tobías · Refinar y mejorar armas', color: '#ffb070' });
+NPCS.push({ id: 'smith', name: 'Tobías', title: 'Herrero', x: 190, y: 380, prompt: '⚒ Hablar con Tobías · Refinar y mejorar armas', color: '#ffb070' });
+// la villa puede estar ya construida (fondo del menú): Tobías entra también en su lista de objetos
+if (VILLAGE.built) { const n = NPCS[NPCS.length - 1]; VILLAGE.props.push({ kind: 'npc', x: n.x, y: n.y, npc: n }); VILLAGE.solids.push({ x: n.x, y: n.y, r: 16 }); }

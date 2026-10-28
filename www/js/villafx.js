@@ -10,6 +10,13 @@ const VFX_POINTS = {
   forge: { 0: [[0.31, 0.05, 'smoke'], [0.44, 0.68, 'fire']] },
   cauldron: { 0: [[0.5, 0.15, 'brew']] },
 };
+// ventanas de cada casa pintada (fracciones del sprite): ahí van el brillo y la luz al anochecer
+const VFX_WINDOWS = {
+  0: [[0.16, 0.7], [0.31, 0.75], [0.56, 0.77], [0.87, 0.65], [0.7, 0.51]],
+  1: [[0.19, 0.44], [0.13, 0.71], [0.29, 0.75], [0.79, 0.72]],
+  2: [[0.2, 0.73], [0.36, 0.76], [0.85, 0.66], [0.25, 0.47], [0.6, 0.5], [0.85, 0.46], [0.31, 0.34]],
+  3: [[0.55, 0.72]],
+};
 const VFX = { parts: [], emit: [], built: false, flies: [] };
 
 function vfxBuild() {
@@ -22,8 +29,20 @@ function vfxBuild() {
     if (!fr) continue;
     const idx = PROP_ATLAS.villa[o.kind].indexOf(fr.f);
     for (const [fx, fy, k] of pts[idx] || []) {
-      const w = fr.f[2] * PROP_WU_PER_PX, h = fr.f[3] * PROP_WU_PER_PX, sink = VILLA_SINK[o.kind] || 0;
-      VFX.emit.push({ k, x: o.x + (fr.flip ? 0.5 - fx : fx - 0.5) * w, y: o.y + h * sink - h + 2 + fy * h, t: Math.random() * 2 });
+      const k = villaScale(o.kind, o), w = fr.f[2] * PROP_WU_PER_PX * k, h = fr.f[3] * PROP_WU_PER_PX * k, sink = VILLA_SINK[o.kind] || 0;
+      VFX.emit.push({ k, x: o.x + (fr.flip ? 0.5 - fx : fx - 0.5) * w, y: o.y + h * sink - h + 2 * k + fy * h, t: Math.random() * 2 });
+    }
+  }
+  // las ventanas antiguas eran de las casas dibujadas a mano: ahora salen de las ventanas del sprite
+  VILLAGE.windows = [];
+  for (const o of VILLAGE.props) {
+    if (o.kind !== 'house') continue;
+    const fr = villaFrame('house', o.x, o.y);
+    if (!fr) continue;
+    const k = villaScale('house', o), w = fr.f[2] * PROP_WU_PER_PX * k, h = fr.f[3] * PROP_WU_PER_PX * k, sink = VILLA_SINK.house || 0;
+    for (const [fx, fy] of VFX_WINDOWS[PROP_ATLAS.villa.house.indexOf(fr.f)] || []) {
+      // village.js dibuja el brillo en (x+8, y+9)
+      VILLAGE.windows.push({ x: o.x + (fr.flip ? 0.5 - fx : fx - 0.5) * w - 8, y: o.y + h * sink - h + 2 * k + fy * h - 9 });
     }
   }
   // el humo antiguo salía de casas dibujadas a mano que ya no existen

@@ -460,10 +460,10 @@ drawDecals = function () {
   circle(-8, -5, 4, '#ff6a6a', '#2a1010', 1); circle(4, -6, 4, '#7ad8ff', '#10202a', 1); circle(12, -3, 3, '#ffd76a', '#2a2010', 1);
   ctx.restore();
   if (img && f) {
-    const w = f[2] * PROP_WU_PER_PX, h = f[3] * PROP_WU_PER_PX;
+    const h = villagerH('merchant'), w = h * f[2] / f[3];
     ctx.drawImage(img, f[0], f[1], f[2], f[3], m.x - w / 2, m.y - h + 2, w, h);
   } else circle(m.x, m.y - 20, 14, '#ffcf7a', '#2a2010', 2);
-  ctx.save(); ctx.font = '18px serif'; ctx.textAlign = 'center'; ctx.fillText('🪙', m.x, m.y - 84 + Math.sin(now * 3) * 3); ctx.restore();
+  ctx.save(); ctx.font = '18px serif'; ctx.textAlign = 'center'; ctx.fillText('🪙', m.x, m.y - 112 + Math.sin(now * 3) * 3); ctx.restore();
 };
 const _boonLights2 = boonLights;
 boonLights = function (lights, toS) {

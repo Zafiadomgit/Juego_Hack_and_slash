@@ -4,57 +4,75 @@
  */
 'use strict';
 
-const VB = { x0: -640, x1: 640, y0: -400, y1: 440 }; // zona caminable
-const VG = { x0: -960, y0: -700, w: 1920, h: 1400 }; // suelo pre-renderizado
+// Villa Candela, a la escala del héroe (≈100 de alto). Calle principal de oeste a este, plaza con el Portal en el centro,
+// casas en fila al norte (fachada al sur) y al sur, mercado al oeste, alquimista al este, fragua y tablón al sur de la plaza.
+const VB = { x0: -1150, x1: 1150, y0: -560, y1: 900 }; // zona caminable
+const VG = { x0: -1500, y0: -1150, w: 3000, h: 2400 }; // suelo pre-renderizado
+const VPLAZA = { x: 0, y: 0, rx: 400, ry: 250 };
+// caminos de tierra: [puntos, ancho]
+const VROADS = [
+  [[[-1500, 60], [-700, 50], [-380, 30]], 120], [[[380, 30], [700, 50], [1500, 60]], 120], // calle mayor
+  [[[0, 230], [10, 520], [-10, 820], [0, 1250]], 120], // salida sur
+  [[[-1500, 830], [-600, 812], [0, 820], [600, 812], [1500, 830]], 96], // calle sur
+  [[[0, -240], [0, -480]], 100], [[[-1500, -500], [-700, -490], [0, -480], [700, -490], [1500, -500]], 96], // calle norte
+];
 const VILLAGE = { built: false, props: [], solids: [], npcs: [], lamps: [], windows: [], smoke: [], fx: [], ground: null, groundScale: 0 };
-const vHero = { x: 0, y: 40, dir: Math.PI / 2, walkT: 0, moving: false, target: null, pending: null };
+const vHero = { x: 0, y: 140, dir: Math.PI / 2, walkT: 0, moving: false, target: null, pending: null };
 let vNear = null, vNearShown = undefined, vCam = { x: 0, y: 0 };
 
 const NPCS = [
-  { id: 'merchant', name: 'Brunilda', title: 'Mercader', x: -212, y: 132, prompt: '💬 Hablar con Brunilda · Equipo', color: '#ffcf7a' },
-  { id: 'alchemist', name: 'Maese Ivo', title: 'Alquimista', x: 214, y: 132, prompt: '💬 Hablar con Maese Ivo · Elixires y mejoras', color: '#d9a8ff' },
-  { id: 'board', name: 'Tablón', title: 'Misiones y Gesta', x: -86, y: 226, prompt: '📜 Tablón · Misiones, Trascendencia y Forja', color: '#ecd18a' },
+  { id: 'merchant', name: 'Brunilda', title: 'Mercader', x: -600, y: 70, prompt: '💬 Hablar con Brunilda · Equipo', color: '#ffcf7a' },
+  { id: 'alchemist', name: 'Maese Ivo', title: 'Alquimista', x: 590, y: 70, prompt: '💬 Hablar con Maese Ivo · Elixires y mejoras', color: '#d9a8ff' },
+  { id: 'board', name: 'Tablón', title: 'Misiones y Gesta', x: -250, y: 330, prompt: '📜 Tablón · Misiones, Trascendencia y Forja', color: '#ecd18a' },
 ];
-const PORTAL = { x: 0, y: -80 };
+const PORTAL = { x: 0, y: -70 };
+const PORTAL_K = 1.5; // el Portal es el monumento de la plaza
 
 function vRand(seed) { let s = seed; return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return s / 0x7fffffff; }; }
+// distancia de un punto al camino más cercano (descontando su ancho)
+function vRoadDist(x, y) {
+  let best = 1e9;
+  for (const [pts, w] of VROADS) for (let i = 1; i < pts.length; i++) {
+    const [ax, ay] = pts[i - 1], [bx, by] = pts[i], dx = bx - ax, dy = by - ay;
+    const t = clamp(((x - ax) * dx + (y - ay) * dy) / (dx * dx + dy * dy), 0, 1);
+    best = Math.min(best, Math.hypot(x - ax - t * dx, y - ay - t * dy) - w / 2);
+  }
+  return best;
+}
+const vInPlaza = (x, y, m = 0) => ((x - VPLAZA.x) / (VPLAZA.rx + m)) ** 2 + ((y - VPLAZA.y) / (VPLAZA.ry + m * 0.62)) ** 2 < 1;
 
 function buildVillage() {
   if (VILLAGE.built) return;
   VILLAGE.built = true;
   const P_ = VILLAGE.props, SL = VILLAGE.solids;
   const add = (o, r, oy = 0) => { P_.push(o); if (r) SL.push({ x: o.x, y: o.y + oy, r }); };
-  const houses = [
-    [-470, -250, 0], [-205, -320, 1], [215, -315, 2], [480, -245, 0], [-560, 245, 1], [565, 250, 2],
-  ];
-  for (const [x, y, v] of houses) { add({ kind: 'house', x, y, v }, 72, -22); VILLAGE.windows.push({ x: x - 36, y: y - 58 }, { x: x + 36, y: y - 58 }); VILLAGE.smoke.push({ x: x + 38, y: y - 150, t: Math.random() * 3 }); }
-  add({ kind: 'stall', x: -300, y: 92 }, 58, -12);
-  add({ kind: 'alchemy', x: 300, y: 92 }, 58, -12);
-  add({ kind: 'cauldron', x: 372, y: 118 }, 20);
-  add({ kind: 'well', x: -405, y: -40 }, 30);
-  add({ kind: 'forge', x: 215, y: 300 }, 30, -8); // fragua de Tobías
-  for (const [x, y] of [[-390, 110], [-372, 132], [-250, 150], [380, 150], [395, 128]]) add({ kind: 'barrel', x, y, v: (x * 7) & 1 }, 13);
-  for (const [x, y] of [[-238, -40], [238, -40], [-130, 120], [130, 120], [-150, -205], [150, -205]]) { add({ kind: 'lamp', x, y }, 7); VILLAGE.lamps.push({ x, y: y - 62 }); }
-  add({ kind: 'portalbase', x: PORTAL.x, y: PORTAL.y + 2 }, 42, -6);
-  // vallas con flores al sur
-  for (const [x, y] of [[-60, 280], [60, 330], [-470, 120], [470, 115], [-120, -300], [120, -290]]) add({ kind: 'bush', x, y, v: (x & 3) }, 16);
-  // bosque alrededor
-  const r = vRand(77);
-  for (let i = 0; i < 60; i++) {
-    const side = i % 4;
-    let x, y;
-    if (side === 0) { x = -760 + r() * 1520; y = -560 + r() * 130; }
-    else if (side === 1) { x = -760 + r() * 1520; y = 450 + r() * 140; }
-    else if (side === 2) { x = -790 + r() * 130; y = -500 + r() * 1000; }
-    else { x = 660 + r() * 130; y = -500 + r() * 1000; }
-    add({ kind: 'tree', tk: 'oak', x, y, s: 0.9 + r() * 0.45, hue: r() < 0.5 ? 1 : 0 }, 18);
+  // casas: fila norte (frente a la calle norte) y fila sur (frente a la calle sur)
+  const houses = [[-960, -580], [-500, -590], [500, -585], [960, -580], [-1000, 760], [-600, 750], [610, 755], [1010, 760]];
+  for (const [x, y] of houses) {
+    P_.push({ kind: 'house', x, y });
+    for (const dx of [-110, 0, 110]) SL.push({ x: x + dx, y: y - 40, r: 78 });
   }
-  for (const n of NPCS) { P_.push({ kind: 'npc', x: n.x, y: n.y, npc: n }); SL.push({ x: n.x, y: n.y, r: 14 }); }
+  add({ kind: 'stall', x: -640, y: -20 }, 0); for (const dx of [-60, 0, 60]) SL.push({ x: -640 + dx, y: -40, r: 46 });
+  add({ kind: 'alchemy', x: 640, y: -20 }, 0); for (const dx of [-55, 0, 55]) SL.push({ x: 640 + dx, y: -40, r: 46 });
+  add({ kind: 'cauldron', x: 770, y: 60 }, 30);
+  add({ kind: 'well', x: -330, y: -330 }, 46, -8);
+  add({ kind: 'forge', x: 330, y: 330 }, 0); for (const dx of [-50, 30]) SL.push({ x: 330 + dx, y: 310, r: 48 });
+  for (const [x, y] of [[-790, -10], [-770, 40], [-500, -60], [790, -30], [800, 120], [450, 380]]) add({ kind: 'barrel', x, y, v: (x * 7) & 1 }, 20);
+  // faroles alrededor de la plaza y en las calles
+  for (const [x, y] of [[-330, -165], [330, -165], [-395, 110], [395, 110], [-110, 270], [110, 270], [-260, -500], [260, -500], [-700, 760], [700, 760]]) {
+    add({ kind: 'lamp', x, y }, 10);
+    VILLAGE.lamps.push({ x, y: y - 112 });
+  }
+  add({ kind: 'portalbase', x: PORTAL.x, y: PORTAL.y + 2 }, 66, -8);
+  // matas delante de las casas y del mercado
+  for (const [x, y] of [[-1090, -560], [-830, -560], [-630, -570], [-370, -575], [370, -565], [630, -570], [830, -560], [1090, -565],
+    [-860, 790], [-740, 780], [-470, 780], [480, 785], [740, 780], [870, 790], [-470, 0], [470, 0]]) add({ kind: 'bush', x, y, v: (x & 3) }, 16);
+  for (const n of NPCS) { P_.push({ kind: 'npc', x: n.x, y: n.y, npc: n }); SL.push({ x: n.x, y: n.y, r: 16 }); }
 }
 
 // ---------- Suelo pintado (una sola vez) ----------
 function villageGround() {
-  const gs = HD2D.on ? zoom / hd2dPixSize() : Math.min(1.2, zoom * DPR);
+  const gs = Math.min(HD2D.on ? zoom / hd2dPixSize() : Math.min(1.2, zoom * DPR), 2600 / VG.w); // tope para no gastar memoria en móviles
   if (VILLAGE.ground && Math.abs(VILLAGE.groundScale - gs) < 0.01) return VILLAGE.ground;
   const c = document.createElement('canvas');
   c.width = Math.ceil(VG.w * gs); c.height = Math.ceil(VG.h * gs);
@@ -65,7 +83,7 @@ function villageGround() {
   g.fillStyle = pat; g.fillRect(VG.x0, VG.y0, VG.w, VG.h);
   const r = vRand(1234);
   // manchas de césped claro y oscuro
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < 90; i++) {
     const x = VG.x0 + r() * VG.w, y = VG.y0 + r() * VG.h, rr = 60 + r() * 140;
     const col = i % 2 ? 'rgba(150,190,80,0.22)' : 'rgba(30,60,25,0.25)';
     const gr = g.createRadialGradient(x, y, 0, x, y, rr);
@@ -85,51 +103,53 @@ function villageGround() {
       g.stroke();
     }
   };
-  road([[0, 60], [10, 220], [-10, 380], [0, 600]], 84);
-  road([[-120, 60], [-300, 110], [-520, 140], [-800, 160]], 70);
-  road([[120, 60], [300, 110], [520, 150], [800, 170]], 70);
-  road([[-80, -150], [-200, -250], [-470, -200]], 50);
-  road([[80, -150], [215, -255], [480, -200]], 50);
+  for (const [pts, w] of VROADS) road(pts, w);
   for (let i = 0; i < (dirt ? 0 : 420); i++) { // piedrecitas del camino
-    const x = -760 + r() * 1520, y = -540 + r() * 1120;
+    const x = VB.x0 + r() * (VB.x1 - VB.x0), y = VB.y0 + r() * (VB.y1 - VB.y0);
     g.fillStyle = r() < 0.5 ? 'rgba(60,40,24,0.35)' : 'rgba(200,170,120,0.25)';
     g.fillRect(x, y, 2 + r() * 3, 2 + r() * 2);
   }
   // plaza empedrada
+  const { x: px, y: py, rx, ry } = VPLAZA;
   g.save();
-  g.beginPath(); g.ellipse(0, -40, 270, 175, 0, 0, TAU); g.closePath();
+  g.beginPath(); g.ellipse(px, py, rx, ry, 0, 0, TAU); g.closePath();
   g.fillStyle = '#4a4238'; g.fill();
   g.clip();
   if (GROUND_IMG.plaza) {
-    // adoquines pintados (pixel art)
+    // adoquines pintados (pixel art), algo más grandes para ir con la escala del héroe
     const pat = g.createPattern(GROUND_IMG.plaza, 'repeat');
-    if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(280 / GROUND_IMG.plaza.width));
-    g.fillStyle = pat; g.fillRect(-300, -240, 600, 400);
-  } else for (let y = -230; y < 150; y += 16) {
-    const off = ((y / 16) & 1) * 13;
-    for (let x = -300 + off; x < 300; x += 26) {
+    if (pat.setTransform) pat.setTransform(new DOMMatrix().scale(380 / GROUND_IMG.plaza.width));
+    g.fillStyle = pat; g.fillRect(px - rx, py - ry, rx * 2, ry * 2);
+  } else for (let y = py - ry; y < py + ry; y += 22) {
+    const off = ((y / 22) & 1) * 18;
+    for (let x = px - rx + off; x < px + rx; x += 36) {
       const v = r();
       g.fillStyle = v < 0.33 ? '#a59a86' : v < 0.66 ? '#968a76' : '#b3a892';
-      g.beginPath(); g.roundRect(x + 1.5, y + 1.5, 23 - r() * 3, 13 - r() * 2, 4); g.fill();
-      g.fillStyle = 'rgba(255,255,240,0.18)'; g.fillRect(x + 4, y + 3, 12, 2);
+      g.beginPath(); g.roundRect(x + 2, y + 2, 32 - r() * 4, 18 - r() * 3, 5); g.fill();
+      g.fillStyle = 'rgba(255,255,240,0.18)'; g.fillRect(x + 5, y + 4, 16, 3);
     }
   }
-  // musgo entre piedras
-  for (let i = 0; i < (GROUND_IMG.plaza ? 0 : 90); i++) { g.fillStyle = 'rgba(80,120,50,0.45)'; g.beginPath(); g.ellipse(-280 + r() * 560, -210 + r() * 350, 4 + r() * 8, 2 + r() * 3, 0, 0, TAU); g.fill(); }
+  // sombreado en el borde para que la plaza no parezca una pegatina
+  const rim = g.createRadialGradient(px, py, rx * 0.7, px, py, rx);
+  rim.addColorStop(0, 'rgba(30,24,18,0)'); rim.addColorStop(1, 'rgba(30,24,18,0.35)');
+  g.save(); g.translate(px, py); g.scale(1, ry / rx); g.translate(-px, -py); g.fillStyle = rim; g.fillRect(px - rx, py - rx, rx * 2, rx * 2); g.restore();
   g.restore();
-  g.lineWidth = 6; g.strokeStyle = '#6e6252';
-  g.beginPath(); g.ellipse(0, -40, 272, 177, 0, 0, TAU); g.stroke();
-  g.lineWidth = 2; g.strokeStyle = 'rgba(30,24,18,0.6)';
-  g.beginPath(); g.ellipse(0, -40, 276, 181, 0, 0, TAU); g.stroke();
+  // bordillo de piedra
+  g.lineWidth = 10; g.strokeStyle = '#6e6252';
+  g.beginPath(); g.ellipse(px, py, rx + 2, ry + 2, 0, 0, TAU); g.stroke();
+  g.lineWidth = 3; g.strokeStyle = 'rgba(30,24,18,0.6)';
+  g.beginPath(); g.ellipse(px, py, rx + 8, ry + 8, 0, 0, TAU); g.stroke();
+  g.lineWidth = 2; g.strokeStyle = 'rgba(230,220,200,0.35)';
+  g.beginPath(); g.ellipse(px, py - 2, rx - 2, ry - 2, 0, Math.PI * 1.05, Math.PI * 1.95); g.stroke();
   // círculo rúnico bajo el portal
-  g.strokeStyle = 'rgba(120,200,255,0.35)'; g.lineWidth = 3;
-  g.beginPath(); g.ellipse(0, -76, 92, 46, 0, 0, TAU); g.stroke();
-  g.beginPath(); g.ellipse(0, -76, 70, 34, 0, 0, TAU); g.stroke();
+  g.strokeStyle = 'rgba(120,200,255,0.35)'; g.lineWidth = 4;
+  g.beginPath(); g.ellipse(PORTAL.x, PORTAL.y, 140, 66, 0, 0, TAU); g.stroke();
+  g.beginPath(); g.ellipse(PORTAL.x, PORTAL.y, 108, 50, 0, 0, TAU); g.stroke();
   // flores y matas de hierba
   const flowers = ['#ff6b6b', '#ffd54f', '#ffffff', '#ce93d8', '#81d4fa'];
-  for (let i = 0; i < 70; i++) {
+  for (let i = 0; i < 150; i++) {
     const cx = VG.x0 + 60 + r() * (VG.w - 120), cy = VG.y0 + 60 + r() * (VG.h - 120);
-    if (Math.abs(cx) < 300 && cy > -230 && cy < 150) continue;
+    if (vInPlaza(cx, cy, 30) || vRoadDist(cx, cy) < 20) continue;
     const col = flowers[(r() * flowers.length) | 0];
     for (let k = 0; k < 7; k++) {
       const x = cx + (r() - 0.5) * 40, y = cy + (r() - 0.5) * 22;
@@ -140,9 +160,9 @@ function villageGround() {
   }
   const saved = ctx; ctx = g;
   try {
-    for (let i = 0; i < 260; i++) {
+    for (let i = 0; i < 620; i++) {
       const x = VG.x0 + r() * VG.w, y = VG.y0 + r() * VG.h;
-      if (Math.abs(x) < 290 && y > -225 && y < 145) continue;
+      if (vInPlaza(x, y, 20) || vRoadDist(x, y) < 6) continue;
       drawGrassTuft({ x, y, s: 0.8 + r() * 0.7, c: r() < 0.5 ? '#4f8a34' : '#3e7228', r: r() * 6 });
     }
   } finally { ctx = saved; }
@@ -424,8 +444,8 @@ function drawVillageProp(o) {
   if (o.kind === 'npc') { drawNpc(o.npc); return; }
   if (o.kind === 'portalbase' && PORTAL_IMG.img) return; // la base ya viene en el portal pintado
   if (drawVillaSprite(o)) {
-    if (o.kind === 'lamp') glow(o.x, o.y - 62, 34, '255,200,110', 0.55 + Math.sin(now * 5 + o.x) * 0.05);
-    if (o.kind === 'cauldron') glow(o.x, o.y - 30, 40, '120,255,100', 0.45 + Math.sin(now * 3) * 0.1);
+    if (o.kind === 'lamp') glow(o.x, o.y - 112, 44, '255,200,110', 0.55 + Math.sin(now * 5 + o.x) * 0.05);
+    if (o.kind === 'cauldron') glow(o.x, o.y - 48, 56, '120,255,100', 0.45 + Math.sin(now * 3) * 0.1);
     return;
   }
   if (o.kind === 'tree') { drawTree(o); return; }
@@ -443,7 +463,7 @@ function drawVillageProp(o) {
     ctx.fillStyle = '#7dff5a'; ctx.beginPath(); ctx.ellipse(0, -28, 16, 4, 0, 0, TAU); ctx.fill();
     for (let i = 0; i < 3; i++) { const k = (t + i * 0.7) % 2; ctx.fillStyle = `rgba(170,255,140,${1 - k / 2})`; ctx.beginPath(); ctx.arc(-8 + i * 8, -30 - k * 12, 2.5, 0, TAU); ctx.fill(); }
     ctx.restore();
-    glow(o.x, o.y - 30, 40, '120,255,100', 0.45 + Math.sin(t) * 0.1);
+    glow(o.x, o.y - 48, 56, '120,255,100', 0.45 + Math.sin(t) * 0.1);
   }
   if (o.kind === 'lamp') glow(o.x + 11, o.y - 57, 34, '255,200,110', 0.55 + Math.sin(now * 5 + o.x) * 0.05);
 }
@@ -462,6 +482,22 @@ function artBoard(g) {
   }
 }
 
+// Rótulo de un vecino: pegado sobre su cabeza. De lejos solo el aviso «!»; el nombre aparece al acercarse.
+function npcLabel(n, top, badge) {
+  const near = vNear === n, close = S && dist(vHero.x, vHero.y, n.x, n.y) < 230;
+  const bob = Math.sin(now * 3 + n.x) * 2;
+  if (near || close) {
+    text(n.name, n.x, top - 26 + bob, near ? 16 : 14, n.color, 'center', 800);
+    text(n.title, n.x, top - 11 + bob, 11, '#efece2', 'center', 700);
+  } else if (badge) {
+    const y = top - 12 + bob;
+    glow(n.x, y, 16, '255,214,80', 0.45);
+    ctx.fillStyle = '#ffd54f'; ctx.strokeStyle = '#2a1a0c'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(n.x, y, 7, 0, TAU); ctx.fill(); ctx.stroke();
+    text(badge, n.x, y, 10, '#2a1a0c', 'center', 900, false);
+  }
+}
+
 function drawNpc(n) {
   if (n.id === 'board') {
     if (!drawVillaSprite({ kind: 'board', x: n.x, y: n.y })) {
@@ -469,14 +505,13 @@ function drawNpc(n) {
       sprite('vboard', 80, 92, 40, 88, artBoard);
       ctx.restore();
     }
-    const bob = Math.sin(now * 3) * 3, near = vNear === n, ready = typeof dailyReady === 'function' ? dailyReady() : 0;
-    text(n.name, n.x, n.y - 98 + bob, near ? 13 : 11, n.color, 'center', 800);
-    text(n.title, n.x, n.y - 86 + bob, 9, '#efece2', 'center', 700);
-    if (ready && !near) { glow(n.x, n.y - 114 + bob, 22, '255,214,80', 0.6); ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(n.x, n.y - 114 + bob, 7, 0, TAU); ctx.fill(); text(String(ready), n.x, n.y - 114 + bob, 10, '#2a1a0c', 'center', 900, false); }
+    const ready = typeof dailyReady === 'function' ? dailyReady() : 0;
+    const fr = villaFrame('board', n.x, n.y), top = n.y - (fr ? fr.f[3] * PROP_WU_PER_PX * villaScale('board', n) : 92);
+    npcLabel(n, top, ready ? String(ready) : '');
     return;
   }
   const fi = Math.floor(((now * 0.35 + n.x * 0.01) % 1 + 1) % 1 * 8);
-  shadow(n.x, n.y + 1, 15);
+  shadow(n.x, n.y + 1, 20);
   if (n.id === 'smith' && !(PROP_ATLAS.villa && PROP_ATLAS.villa.forge && PROP_IMG.villa)) drawAnvil(n.x, n.y);
   ctx.save();
   ctx.translate(n.x, n.y);
@@ -484,17 +519,12 @@ function drawNpc(n) {
   if (!drawVillager(n.id, 0, 0, -1, false, now + n.x * 0.01)) // el sprite mira a la derecha: -1 para que, con el volteo de arriba, mire al héroe
     sprite('npc|' + n.id + '|' + fi, 60, 100, 30, 96, () => (n.id === 'merchant' ? artMerchant : artAlchemist)(fi / 8));
   ctx.restore();
-  // nombre e indicador flotante
-  const bob = Math.sin(now * 3 + n.x) * 3;
-  const near = vNear === n;
-  text(n.name, n.x, n.y - 94 + bob, near ? 13 : 11, n.color, 'center', 800);
-  text(n.title, n.x, n.y - 82 + bob, 9, '#efece2', 'center', 700);
-  if (!near) { ctx.fillStyle = '#ffd54f'; ctx.beginPath(); ctx.arc(n.x, n.y - 110 + bob, 6, 0, TAU); ctx.fill(); text('!', n.x, n.y - 110 + bob, 10, '#2a1a0c', 'center', 900, false); }
+  npcLabel(n, n.y - (villagerH(n.id) || 96), '!');
 }
 
 // ---------- Lógica ----------
 function villageReset() {
-  vHero.x = 0; vHero.y = 40; vHero.dir = Math.PI / 2; vHero.target = null; vHero.pending = null; vHero.moving = false;
+  vHero.x = 0; vHero.y = 140; vHero.dir = Math.PI / 2; vHero.target = null; vHero.pending = null; vHero.moving = false;
   vCam.x = 0; vCam.y = -20;
   vNear = null; vNearShown = undefined;
 }
@@ -502,7 +532,7 @@ function villageReset() {
 function villageTap(sx, sy) {
   const hz = zoom;
   const wx = (sx - W / 2) / hz + vCam.x, wy = (sy - H / 2) / hz + vCam.y;
-  for (const n of NPCS) if (Math.abs(wx - n.x) < 34 && wy > n.y - 100 && wy < n.y + 14) { vHero.target = { x: n.x + (vHero.x < n.x ? -34 : 34), y: n.y + 26 }; vHero.pending = n; return; } // se coloca a su lado
+  for (const n of NPCS) if (Math.abs(wx - n.x) < 44 && wy > n.y - (n.id === 'board' ? 140 : 100) && wy < n.y + 14) { vHero.target = { x: n.x + (vHero.x < n.x ? -50 : 50), y: n.y + 30 }; vHero.pending = n; return; } // se coloca a su lado
   if (dist(wx, wy, PORTAL.x, PORTAL.y - 40) < 50) { vHero.target = { x: PORTAL.x, y: PORTAL.y + 44 }; vHero.pending = 'portal'; return; }
   vHero.target = { x: clamp(wx, VB.x0, VB.x1), y: clamp(wy, VB.y0, VB.y1) }; vHero.pending = null;
 }
@@ -529,7 +559,7 @@ function updateVillage(dt) {
   }
   vHero.moving = !!(mx || my);
   if (vHero.moving) {
-    const sp = 175;
+    const sp = 215;
     vHero.x += mx * sp * dt; vHero.y += my * sp * dt;
     vHero.walkT += dt;
     vHero.dir = Math.atan2(my, mx);
@@ -543,8 +573,8 @@ function updateVillage(dt) {
   }
   // ¿junto a alguien?
   vNear = null;
-  for (const n of NPCS) if (dist(vHero.x, vHero.y, n.x, n.y + 10) < 80) vNear = n;
-  if (!vNear && dist(vHero.x, vHero.y, PORTAL.x, PORTAL.y + 30) < 80) vNear = 'portal';
+  for (const n of NPCS) if (dist(vHero.x, vHero.y, n.x, n.y + 10) < 100) vNear = n;
+  if (!vNear && dist(vHero.x, vHero.y, PORTAL.x, PORTAL.y + 40) < 120) vNear = 'portal';
   if (vNear !== vNearShown) { vNearShown = vNear; updateHubPrompt(); }
   // la cámara no enseña más allá del suelo pintado
   const hw = W / (2 * zoom) + 10, hh = H / (2 * zoom) + 10;
@@ -581,7 +611,7 @@ function renderVillage() {
     if (o === heroO) {
       shadow(vHero.x, vHero.y + 1, 13);
       drawHero(ctx, S.cls, { x: vHero.x, y: vHero.y, dir: vHero.dir, walkT: vHero.walkT, moving: vHero.moving, swing: 0, swingSide: 1, shot: 0, t: now });
-    } else if (o === portalO) drawPortal(PORTAL.x, PORTAL.y, now);
+    } else if (o === portalO) drawPortal(PORTAL.x, PORTAL.y, now, PORTAL_K);
     else if (o.kind === 'walker') drawWalker(o.w);
     else if (o.kind === 'hen') drawHen(o.h);
     else drawVillageProp(o);
@@ -589,7 +619,7 @@ function renderVillage() {
   villaShadowPass = false;
   // ventanas encendidas y chispas del portal
   for (const w of VILLAGE.windows) glow(w.x + 8, w.y + 9, 26, '255,190,90', 0.35);
-  glow(PORTAL.x, PORTAL.y - 82, 90, '110,200,255', 0.5 + Math.sin(now * 2) * 0.1);
+  glow(PORTAL.x, PORTAL.y - 120, 130, '110,200,255', 0.5 + Math.sin(now * 2) * 0.1);
   for (const f of VILLAGE.fx) {
     const a = f.life / f.max;
     if (f.k === 'smoke') { ctx.globalAlpha = 0.35 * a; circle(f.x, f.y, f.r, '#c8c4c0'); }
@@ -606,8 +636,8 @@ function renderVillage() {
   if (S) { const q = toS(vHero.x, vHero.y - 20); lights.push({ x: q.x, y: q.y, r: 200 * hz, a: 0.55, rgb: '255,238,212' }); }
   for (const l of VILLAGE.lamps) { const q = toS(l.x + (PROP_IMG.villa ? 0 : 11), l.y + 5); lights.push({ x: q.x, y: q.y, r: 175 * hz, a: 0.75, rgb: '255,165,85', haze: 0.35 }); }
   for (const w of VILLAGE.windows) { const q = toS(w.x + 8, w.y + 20); lights.push({ x: q.x, y: q.y, r: 95 * hz, a: 0.75, rgb: '255,190,110', haze: 0.2 }); }
-  { const q = toS(PORTAL.x, PORTAL.y - 80); lights.push({ x: q.x, y: q.y, r: 280 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
-  { const q = toS(372, 90); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
+  { const q = toS(PORTAL.x, PORTAL.y - 120); lights.push({ x: q.x, y: q.y, r: 360 * hz, a: 0.85, rgb: '120,200,255', haze: 0.4 }); }
+  { const q = toS(770, 30); lights.push({ x: q.x, y: q.y, r: 140 * hz, a: 0.9, rgb: '130,255,120', haze: 0.3 }); }
   for (const n of NPCS) { const q = toS(n.x, n.y - 40); lights.push({ x: q.x, y: q.y, r: 170 * hz, a: 0.75, rgb: '255,226,190' }); }
   renderLighting(lights, 0.5, '84,96,150');
   ctx.fillStyle = 'rgba(255,150,80,0.08)'; ctx.fillRect(0, 0, W, H); // tono cálido de atardecer
@@ -623,8 +653,10 @@ function renderVillage() {
 // ============================================================
 // Vida del pueblo: aldeanos que pasean, gallinas, pájaros, mariposas y sombras de nubes
 // ============================================================
-const VPATH = [[0, 60], [10, 220], [-10, 380], [-300, 175], [-520, 150], [300, 175], [520, 160], [-200, -60], [200, -60],
-  [-150, 60], [150, 60], [-200, -250], [-470, -170], [215, -255], [480, -170], [0, -190], [-120, -120], [120, -120]];
+// puntos de paseo de los aldeanos (sobre calles y plaza)
+const VPATH = [[-1000, 60], [-820, 70], [-450, 60], [450, 60], [820, 70], [1000, 60], [0, 400], [0, 640], [-20, 860],
+  [-800, 840], [-400, 830], [400, 830], [800, 840], [0, -420], [-700, -470], [-300, -480], [300, -480], [700, -470],
+  [-220, -120], [220, -120], [-260, 120], [260, 120], [0, 170]];
 const VILLAGERS = [
   { skin: '#f0c8a0', hair: '#3a2416', shirt: '#4a6aa0', pants: '#5a4630', hat: 'straw', item: 'hoe', speed: 46 },
   { skin: '#e8b890', hair: '#c8a050', shirt: '#b04a4a', pants: '#3a3a4a', hat: null, item: 'basket', speed: 40 },
@@ -637,9 +669,9 @@ function buildLife() {
   if (LIFE.built) return;
   LIFE.built = true;
   VILLAGERS.forEach((v, i) => { const p = VPATH[(i * 5) % VPATH.length]; LIFE.walkers.push({ v, id: i, x: p[0], y: p[1], tx: p[0], ty: p[1], wait: 1 + i, walkT: 0, face: 1, moving: false }); });
-  for (const [x, y] of [[-520, 40], [-490, 70], [-540, 80], [520, 40], [500, 75]]) LIFE.hens.push({ x, y, hx: x, hy: y, t: Math.random() * 3, peck: 0, face: 1, vx: 0, vy: 0 });
-  for (let i = 0; i < 10; i++) LIFE.flies.push({ x: rand(-600, 600), y: rand(-380, 420), ph: rand(0, 6), col: pick(['#ffd54f', '#ffffff', '#ff8ab0', '#8fd0ff']), vx: 0, vy: 0 });
-  for (let i = 0; i < 4; i++) LIFE.clouds.push({ x: rand(-900, 900), y: rand(-500, 500), r: rand(180, 300), v: rand(10, 18) });
+  for (const [x, y] of [[-980, 300], [-930, 340], [-1020, 360], [-880, 420], [960, 320], [1010, 380]]) LIFE.hens.push({ x, y, hx: x, hy: y, t: Math.random() * 3, peck: 0, face: 1, vx: 0, vy: 0 });
+  for (let i = 0; i < 16; i++) LIFE.flies.push({ x: rand(VB.x0, VB.x1), y: rand(VB.y0, VB.y1), ph: rand(0, 6), col: pick(['#ffd54f', '#ffffff', '#ff8ab0', '#8fd0ff']), vx: 0, vy: 0 });
+  for (let i = 0; i < 7; i++) LIFE.clouds.push({ x: rand(-1500, 1500), y: rand(-1000, 1100), r: rand(260, 420), v: rand(10, 18) });
 }
 
 function villageLife(dt) {
@@ -650,7 +682,7 @@ function villageLife(dt) {
     const dx = w.tx - w.x, dy = w.ty - w.y, d = Math.hypot(dx, dy);
     if (d < 4) { w.wait = rand(1.5, 5); w.moving = false; continue; }
     w.moving = true; w.walkT += dt;
-    w.x += (dx / d) * w.v.speed * dt; w.y += (dy / d) * w.v.speed * dt;
+    w.x += (dx / d) * w.v.speed * 1.4 * dt; w.y += (dy / d) * w.v.speed * 1.4 * dt;
     if (Math.abs(dx) > 2) w.face = dx > 0 ? 1 : -1;
   }
   // gallinas: picotean, dan saltitos y huyen del héroe
@@ -679,11 +711,11 @@ function villageLife(dt) {
   for (const f of LIFE.flies) {
     f.vx += rand(-90, 90) * dt; f.vy += rand(-90, 90) * dt;
     f.vx = clamp(f.vx, -40, 40); f.vy = clamp(f.vy, -30, 30);
-    f.x = clamp(f.x + f.vx * dt, -650, 650); f.y = clamp(f.y + f.vy * dt, -400, 440);
+    f.x = clamp(f.x + f.vx * dt, VB.x0, VB.x1); f.y = clamp(f.y + f.vy * dt, VB.y0, VB.y1);
   }
-  for (const c of LIFE.clouds) { c.x += c.v * dt; if (c.x > 1100) { c.x = -1100; c.y = rand(-500, 500); } }
+  for (const c of LIFE.clouds) { c.x += c.v * dt; if (c.x > 1700) { c.x = -1700; c.y = rand(-1000, 1100); } }
   // chispas que suben del Portal
-  if (Math.random() < dt * 8) VILLAGE.fx.push({ k: 'spark', x: PORTAL.x + rand(-40, 40), y: PORTAL.y + rand(-6, 10), vx: rand(-6, 6), vy: rand(-55, -30), life: 1.6, max: 1.6, r: 2 });
+  if (Math.random() < dt * 8) VILLAGE.fx.push({ k: 'spark', x: PORTAL.x + rand(-70, 70), y: PORTAL.y + rand(-6, 10), vx: rand(-6, 6), vy: rand(-55, -30), life: 1.6, max: 1.6, r: 2 });
   // humo de chimeneas y luciérnagas
   for (const s of VILLAGE.smoke) {
     s.t -= dt;
@@ -743,7 +775,7 @@ function artHen(p, peck) {
 
 function drawWalker(w) {
   const fi = w.moving ? Math.floor((w.walkT * 2.2) % 1 * 8) : Math.floor(((now * 0.4 + w.id * 0.3) % 1) * 8);
-  shadow(w.x, w.y + 1, w.v.kid ? 9 : 12);
+  shadow(w.x, w.y + 1, w.v.kid ? 13 : 18);
   if (drawVillager('vil' + w.id, w.x, w.y, w.face, w.moving, w.moving ? w.walkT : now + w.id)) return;
   ctx.save(); ctx.translate(w.x, w.y); ctx.scale(w.face, 1);
   sprite('vil|' + w.id + '|' + fi + '|' + (w.moving ? 1 : 0), 50, 92, 25, 88, () => artVillager(w.v, fi / 8, w.moving));
@@ -752,8 +784,8 @@ function drawWalker(w) {
 function drawHen(h) {
   const moving = Math.hypot(h.vx, h.vy) > 8;
   const fi = moving ? Math.floor((now * 3 + h.hx) % 1 * 4) : 0;
-  shadow(h.x, h.y + 1, 7);
-  ctx.save(); ctx.translate(h.x, h.y); ctx.scale(h.face, 1);
+  shadow(h.x, h.y + 1, 10);
+  ctx.save(); ctx.translate(h.x, h.y); ctx.scale(h.face * 1.4, 1.4);
   sprite('hen|' + fi + '|' + (h.peck > 0 ? 1 : 0), 30, 26, 15, 23, () => artHen(fi / 4, h.peck > 0));
   ctx.restore();
 }

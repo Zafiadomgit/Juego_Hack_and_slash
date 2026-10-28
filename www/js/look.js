@@ -107,8 +107,8 @@ function paintPatches(g, rnd, area, count, kinds) {
 function villagePatches(g) {
   const r = vRand(4242);
   const grass = texPat(g, GROUND_IMG.grass, 520), dirt = texPat(g, GROUND_IMG.path, 300), cob = texPat(g, GROUND_IMG.plaza, 280);
-  const area = { x0: VG.x0, y0: VG.y0, w: VG.w, h: VG.h, skip: (x, y) => ((x / 300) ** 2 + ((y + 40) / 200) ** 2) < 1 };
-  paintPatches(g, r, area, 46, [
+  const area = { x0: VG.x0, y0: VG.y0, w: VG.w, h: VG.h, skip: (x, y) => vInPlaza(x, y, 30) };
+  paintPatches(g, r, area, 90, [
     { fill: dirt, rim: 'rgba(60,40,22,0.45)', r: [60, 140] },
     { fill: grass, tint: 'rgba(222,190,84,0.62)', rim: 'rgba(120,100,40,0.3)', r: [70, 170] }, // pasto seco
     { fill: grass, tint: 'rgba(190,166,66,0.5)', r: [50, 130] },
@@ -165,28 +165,28 @@ drawVillaSprite = function (o) {
 };
 function lookProps() {
   const P_ = VILLAGE.props, SL = VILLAGE.solids, r = vRand(909);
-  const free = (x, y, d) => !P_.some((o) => o.kind !== 'tree' && dist(o.x, o.y, x, y) < d) && !NPCS.some((n) => dist(n.x, n.y, x, y) < 70);
-  // bosque exterior (que se ve ahora que la cámara está más lejos)
-  for (let i = 0; i < 70; i++) {
-    const side = i % 4;
-    let x, y;
-    if (side === 0) { x = VG.x0 + r() * VG.w; y = VG.y0 + 20 + r() * 150; }
-    else if (side === 1) { x = VG.x0 + r() * VG.w; y = 600 + r() * 120; }
-    else if (side === 2) { x = VG.x0 + 20 + r() * 170; y = VG.y0 + r() * VG.h; }
-    else { x = 790 + r() * 160; y = VG.y0 + r() * VG.h; }
+  const ROOM = { house: 300, stall: 190, alchemy: 190, forge: 170, well: 120, lamp: 90 };
+  const free = (x, y, d) => !P_.some((o) => o.kind !== 'tree' && dist(o.x, o.y, x, y) < Math.max(d, ROOM[o.kind] || 0)) && !NPCS.some((n) => dist(n.x, n.y, x, y) < 200);
+  // bosque denso alrededor del pueblo: fuera de la zona caminable, sin tapar las calles que salen
+  for (let k = 0, n = 0; k < 900 && n < 110; k++) {
+    const x = VG.x0 + r() * VG.w, y = VG.y0 + 60 + r() * (VG.h - 60);
+    const out = x < VB.x0 - 40 || x > VB.x1 + 40 || y < VB.y0 - 470 || y > VB.y1 + 200;
+    if (!out || vRoadDist(x, y) < 40) continue;
+    if (P_.some((o) => o.kind === 'tree' && dist(o.x, o.y, x, y) < 110)) continue;
     const tint = r() < 0.35 ? 'oyrp'[Math.floor(r() * 4)] : null;
-    P_.push({ kind: 'tree', tk: 'oak', x, y, s: 0.85 + r() * 0.5, tint });
+    P_.push({ kind: 'tree', tk: 'oak', x, y, s: 0.9 + r() * 0.4, tint });
+    n++;
   }
-  // arbolitos sueltos dentro del pueblo, muchos con color de otoño
+  // árboles sueltos dentro del pueblo, con color de otoño; nunca en calles ni en la plaza
   let placed = 0;
-  for (let k = 0; k < 700 && placed < 64; k++) {
-    const x = VB.x0 - 60 + r() * (VB.x1 - VB.x0 + 120), y = VB.y0 - 40 + r() * (VB.y1 - VB.y0 + 80);
-    if (((x / 330) ** 2 + ((y + 40) / 220) ** 2) < 1) continue; // la plaza queda despejada
-    if (Math.abs(x) < 70 && y > 40) continue; // camino del sur
-    if (!free(x, y, 72)) continue;
+  for (let k = 0; k < 1200 && placed < 16; k++) {
+    const x = VB.x0 + r() * (VB.x1 - VB.x0), y = VB.y0 - 380 + r() * (VB.y1 - VB.y0 + 380);
+    if (vInPlaza(x, y, 120) || vRoadDist(x, y) < 70) continue;
+    if (!free(x, y, 120)) continue;
+    if (P_.some((o) => o.kind === 'tree' && dist(o.x, o.y, x, y) < 220)) continue;
     const tint = r() < 0.7 ? 'oyrp'[Math.floor(r() * 4)] : null;
-    P_.push({ kind: 'tree', tk: 'oak', x, y, s: 0.38 + r() * 0.24, tint });
-    SL.push({ x, y, r: 8 });
+    P_.push({ kind: 'tree', tk: 'oak', x, y, s: 0.55 + r() * 0.3, tint });
+    SL.push({ x, y, r: 22 });
     placed++;
   }
 }

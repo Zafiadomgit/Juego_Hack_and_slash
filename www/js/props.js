@@ -87,6 +87,9 @@ function villaFrame(kind, x, y) {
 }
 // fracción de la altura del sprite que queda por debajo del punto de apoyo (mitad del rombo de la base)
 const VILLA_SINK = { house: 0.13, stall: 0.1, alchemy: 0.08, well: 0.05, oak: 0.05, forge: 0.08 };
+// escala de cada elemento para que todo esté a la medida del héroe (≈100 de alto): puertas a su altura, casas de dos pisos
+const VILLA_SCALE = { house: 2.05, stall: 1.55, alchemy: 1.5, forge: 1.6, well: 1.4, lamp: 1.7, barrel: 1.5, bush: 1.6, sign: 1.4, cauldron: 1.6, board: 1.45, oak: 2 };
+const villaScale = (kind, o) => (VILLA_SCALE[kind] || 1) * (kind === 'oak' ? o.s || 1 : 1);
 const VILLA_KIND = { forge: 'forge', house: 'house', stall: 'stall', alchemy: 'alchemy', well: 'well', lamp: 'lamp', barrel: 'barrel', bush: 'bush', sign: 'sign', cauldron: 'cauldron' };
 // sombras de contacto de la villa en una capa aparte, sobre el suelo y antes que los objetos
 // (si cada objeto pinta la suya, la del árbol de delante cae encima del de detrás y parece que flota)
@@ -98,7 +101,7 @@ function villaShadows(list) {
     const kind = o.kind === 'tree' ? 'oak' : o.kind === 'board' ? 'board' : VILLA_KIND[o.kind];
     const fr = kind && villaFrame(kind, o.x, o.y);
     if (!fr) continue;
-    const sw = fr.f[2] * PROP_WU_PER_PX * (kind === 'oak' ? o.s || 1 : 1);
+    const sw = fr.f[2] * PROP_WU_PER_PX * villaScale(kind, o);
     const iso = VILLA_SINK[kind] && kind !== 'oak';
     const rx = iso ? sw * 0.5 : kind === 'oak' ? Math.min(sw * 0.3, 46) : Math.min(sw * 0.36, 40), ry = iso ? sw * 0.24 : rx * 0.42;
     ctx.beginPath(); ctx.ellipse(o.x, o.y + (iso ? 4 : 1), rx, ry, 0, 0, TAU); ctx.fill();
@@ -111,7 +114,7 @@ function drawVillaSprite(o) {
   if (!kind) return false;
   const fr = villaFrame(kind, o.x, o.y);
   if (!fr) return false;
-  const scale = kind === 'oak' ? o.s || 1 : 1;
+  const scale = villaScale(kind, o);
   const sw = fr.f[2] * PROP_WU_PER_PX * scale;
   // los edificios tienen una base isométrica (rombo): se apoyan por el centro de esa base
   const sink = VILLA_SINK[kind] || 0;
@@ -128,6 +131,12 @@ function drawVillaSprite(o) {
   return true;
 }
 
+// altura en el mundo de cada vecino: adultos casi como el héroe, el niño más bajo
+const VILLAGER_H = { vil3: 68 };
+function villagerH(kind) {
+  const list = PROP_ATLAS.villa && PROP_ATLAS.villa[kind];
+  return list ? VILLAGER_H[kind] || 94 : 0;
+}
 // Vecinos pintados: personaje de pie que respira o camina (rebote y balanceo suaves)
 function drawVillager(kind, x, y, face, moving, t) {
   const img = PROP_IMG.villa, list = PROP_ATLAS.villa && PROP_ATLAS.villa[kind];
@@ -135,7 +144,7 @@ function drawVillager(kind, x, y, face, moving, t) {
   const f = list[0];
   const hop = moving ? Math.abs(Math.sin(t * 9)) * 2.2 : 0;
   const breath = moving ? 0 : Math.sin(t * 2.4) * 0.012;
-  const w = f[2] * PROP_WU_PER_PX, h = f[3] * PROP_WU_PER_PX;
+  const h = villagerH(kind), w = h * f[2] / f[3];
   ctx.save();
   ctx.translate(x, y - hop);
   ctx.rotate(moving ? Math.sin(t * 9) * 0.05 : 0);
