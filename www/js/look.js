@@ -229,3 +229,19 @@ genRift = function () {
     if (free(lx, ly, 30)) obstacles.push(Math.random() < 0.65 ? { kind: 'brazier', x: lx, y: ly, r: 11, ph: rand(0, 6) } : { kind: 'crystal', x: lx, y: ly, r: 13, s: rand(0.9, 1.3), hue: b.crystalHue ?? 0, ph: rand(0, 6) });
   }
 };
+
+// ============================================================
+// Monstruos a la escala del héroe (≈104): cada uno según lo que es. «r» agranda dibujo y zona de golpe;
+// «vis» agranda solo el dibujo (los humanoides son altos pero no anchos)
+// ============================================================
+const MON_SIZE = {
+  tofu: [1.2], bouftou: [1.45], arakne: [1.35], pissenlit: [1.35], craqueleur: [1.25],
+  cangrejo: [1.3], medusa: [1.35, 1.1], triton: [1.35, 1.3], duende: [1.35, 1.1], polilla: [1.35],
+  golemC: [1.25], guardiaR: [1.4, 1.45], ojo: [1.3], sombraC: [1.35, 1.35],
+};
+for (const [t, [r, vis]] of Object.entries(MON_SIZE)) {
+  const D = ENEMIES[t];
+  if (!D || D.boss) continue;
+  if (D.r) D.r = Math.round(D.r * r); else if (D.size) D.size = Math.round(D.size * r);
+  if (vis) D.vis = vis;
+}

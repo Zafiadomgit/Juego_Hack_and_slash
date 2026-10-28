@@ -1033,7 +1033,7 @@ function drawEnemy(e) {
   // barra de vida
   // ojos que brillan cuando va a atacar
   if (e.state === 'wind' || e.state === 'charge' || e.enraged) glow(e.x + e.face * e.r * 0.5, e.y - e.r * 1.3 - e.z, e.r * 0.9, '255,60,30', 0.7);
-  const y = e.y - e.r * 2 - 18 - e.z;
+  const y = e.y - Math.max(e.r * 2, (e.hTop || 0) + 4) - 18 - e.z;
   if ((e.hp < e.maxHp || e.elite) && !e.boss) {
     const bw = Math.max(26, e.r * 2.2);
     const k = Math.max(0, e.hp / e.maxHp);
@@ -1209,7 +1209,8 @@ function drawMonsterAnim(e, A0, k, ox, oy) {
   const filt = !e.boss && !e.superDef && B && B.mfilter ? B.mfilter : null;
   const c = monFrame(id, pose, i, filt, B && B.id);
   // altura en mundo similar a la del dibujo procedural; el Súper Jefe, algo mayor que un Guardián pero sin tapar la pantalla
-  const hw = A0.h * k * (e.superDef ? 0.95 : e.boss ? 1.25 : 1.1);
+  const hw = A0.h * k * (e.superDef ? 0.95 : e.boss ? 1.25 : 1.1) * ((!e.boss && !e.superDef && e.D && e.D.vis) || 1);
+  e.hTop = hw; // altura real del dibujo: los rótulos van encima
   const s = hw / A.bh;
   ctx.save();
   ctx.scale(e.face || 1, 1);

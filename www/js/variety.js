@@ -137,7 +137,7 @@ drawEnemy = function (e) {
     const M = MUTS[e.mut];
     // indicador flotante sobre la cabeza (estilo flecha de jugador): icono en una placa y punta hacia abajo
     const bob = Math.sin(now * 4 + e.seed) * 2.5;
-    const ax = e.x, ay = e.y - e.r * 2.2 - (e.z || 0) - 10 + bob;
+    const ax = e.x, ay = e.y - Math.max(e.r * 2.2, (e.hTop || 0) + 8) - (e.z || 0) - 10 + bob;
     ctx.save();
     glow(ax, ay - 10, 18, M.color, 0.35);
     ctx.fillStyle = `rgb(${M.color})`; ctx.strokeStyle = 'rgba(8,10,20,0.9)'; ctx.lineWidth = 2;
