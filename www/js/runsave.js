@@ -1,8 +1,8 @@
 /* Fendaria — la expedición sobrevive al cierre de la app.
- * Mientras estás en una Grieta se guarda un punto de control (cada pocos segundos, al elegir bendición y al
- * pasar la app a segundo plano): mundo, Grieta, profundidad de la expedición, bendiciones, martillos, vidas,
- * vida y definitivo. Si la app se cierra, al volver a Villa Candela se ofrece continuar: la Grieta empieza
- * de nuevo, pero con todo lo ganado en la expedición. Al morir, al cruzar el Portal o al abandonar, se borra.
+ * Al entrar en cada Grieta se guarda un punto de control: mundo, Grieta, profundidad de la expedición y lo que
+ * llevabas AL ENTRAR (bendiciones, martillos, vidas, vida y definitivo). Lo ganado dentro de la Grieta no se
+ * guarda, así que cerrar la app no sirve para repetirla con más bendiciones. Si la app se cierra, al volver a
+ * Villa Candela se ofrece continuar: la Grieta empieza de nuevo con lo que tenías al entrar. Al morir, al cruzar el Portal o al abandonar, se borra.
  * (No aplica a la Mazmorra ni a la Grieta del Día.)
  */
 'use strict';
@@ -23,17 +23,7 @@ startNode = function (b, n, d) {
   _startNodeRS(b, n, d);
   later(1.5, () => { runSnapshot(); persist(); });
 };
-let rsT = 0;
-const _updatePlayerRS = updatePlayer;
-updatePlayer = function (dt) {
-  _updatePlayerRS(dt);
-  rsT += dt;
-  if (rsT > 5) { rsT = 0; runSnapshot(); persist(); }
-};
-const _chooseBoonRS = chooseBoon;
-chooseBoon = function (k) { const r = _chooseBoonRS(k); runSnapshot(); persist(); return r; };
-document.addEventListener('visibilitychange', () => { if (document.hidden) { runSnapshot(); persist(); } });
-window.addEventListener('pagehide', () => { runSnapshot(); persist(); });
+document.addEventListener('visibilitychange', () => { if (document.hidden) persist(); });
 
 // cuándo se borra: la expedición terminó de verdad
 const _finishRiftRS = finishRift;
@@ -46,7 +36,7 @@ $('btnQuit').addEventListener('click', clearRunSave);
 document.body.insertAdjacentHTML('beforeend', `<div id="resumePick" class="run-pick">
   <div class="rp-box">
     <div class="rp-head"><b>Expedición en curso</b><small id="rsInfo"></small></div>
-    <button id="rsGo" class="rp-opt go" type="button"><i>⚔</i><span><b>Continuar la expedición</b><small>La Grieta empieza de nuevo, con todas tus bendiciones</small></span></button>
+    <button id="rsGo" class="rp-opt go" type="button"><i>⚔</i><span><b>Continuar la expedición</b><small>La Grieta empieza de nuevo, con lo que llevabas al entrar en ella</small></span></button>
     <button id="rsDrop" class="rp-opt" type="button"><i>✕</i><span><b>Abandonarla</b><small>Pierdes las bendiciones; el botín y el ámbar ya son tuyos</small></span></button>
   </div>
 </div>`);
