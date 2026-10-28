@@ -16,7 +16,7 @@ function playCine(name, onEnd) {
   state = 'cine';
   clearInput();
   MUSIC.setDuck(0);
-  v.src = 'video/cine_' + name + '.webm';
+  v.src = 'video/cine_' + name + (document.documentElement.lang === 'en' ? '_en' : '') + '.webm';
   v.currentTime = 0; v.muted = !!SFX.muted;
   el.classList.add('show');
   const p = v.play();

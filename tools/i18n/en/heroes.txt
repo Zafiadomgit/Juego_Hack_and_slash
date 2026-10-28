@@ -1,0 +1,38 @@
+@@tym7ul
+Momentum
+@@1cpopdn
+Every hit that lands adds <b>Momentum</b> (+6% damage). At 5 charges, your next slash is a <b>Helmsplitter</b>: a shockwave that crushes everything around.
+@@1oqvd95
+Hawk's Eye
+@@acsacn
+Every <b>5th shot</b> is a golden arrow that pierces three enemies and hits more than twice as hard.
+@@uhpwrn
+Orbiting runes
+@@vevm4l
+Every spell creates a <b>rune</b> that circles you, burning enemies (up to 3). If you're hit, a rune breaks and absorbs 60% of the damage.
+@@r4spfu
+After you <b>dodge</b> the shadow wraps around you: your next hit is a guaranteed crit with +60% damage.
+@@ogcdbw
+Pack bond
+@@11w2e09
+<b>+8% damage</b> for each wolf at your side. Every 10 kills an <b>Alpha Wolf</b> howls and fights for free.
+@@1odabdi
+Unstable charge
+@@10oejc1
+Each throw heats the charge; the <b>6th</b> is a volley of <b>three bombs</b>.
+@@lfu286
+Bloodlust
+@@1um9a5s
+Each kill adds <b>fury</b> (+3% damage, up to 10). With fury maxed out, each kill <b>heals</b> you 3%.
+@@ivlepq
+Ambush!
+@@cjy55b
+Volley!
+@@o0ocgv
+Helmsplitter!
+@@t10lw4
+Bloodlust!
+@@1qeyisl
+Alpha Wolf!
+@@1xva47y
+<div class="hs-sig" style="--sc:rgb(${D.color})"><b>✦ ${D.name}</b> <span>· signature mechanic — ${D.desc}</span></div>

@@ -1,0 +1,167 @@
+@@1qxugis
+ · lv. 
+@@x3dnir
+Ashen Forest
+@@16dfnxp
+Gloomy Swamp
+@@1ab8o1b
+Runic Glacier
+@@uanhoi
+Amber Desert
+@@19kuvhg
+Volcanic Abyss
+@@j7xqx1
+Max level (${cap})
+@@4ikbwz
+Defeat ${nextSuperName()} to keep leveling · experience turns into amber
+@@givc7j
+Lv. ${S.level} / ${cap}
+@@1m66y62
+Max level: defeat ${nextSuperName()} to go higher
+@@b482u7
+no limit
+@@oaen1m
+<span>When defeated</span><b style="color:#7cff8a">level cap ${sel.b + 1 >= BIOMES.length ? 'sin límite' : 23 + 14 * (supersDone() + 1)}</b>
+@@1j7j0pc
+<div id="cine" class="cine">
+  <video id="cineVid" playsinline preload="none"></video>
+  <button id="cineSound" class="intro-sound" type="button">🔇 Turn on sound</button>
+  <button id="cineSkip" class="cine-skip" type="button">Skip ›</button>
+</div>
+@@1iwm53u
+Ancestral
+@@1nvd1ou
+Vibration: 
+@@1atoc9i
+<div id="dofusBar" class="dbar">
+    <canvas id="dbMini" class="db-mini" width="240" height="120" aria-label="Minimap of Candela Village"></canvas>
+    <div class="db-slots">
+      <button id="dbMap" class="db-slot" type="button"><img src="img/ui/map.png" alt=""><span>Rifts</span></button>
+      <button id="dbQuests" class="db-slot" type="button"><img src="img/ui/quest.png" alt=""><span>Quests</span></button>
+    </div>
+  </div>
+@@g8k7uc
+<div class="sh-modes" id="shModes">
+  <button data-m="bag" type="button"><img class="pico-ui" src="img/icons/bag.png" width="18" height="18" alt=""> Inventory</button><button data-m="stats" type="button"><img class="pico-ui" src="img/icons/stats.png" width="18" height="18" alt=""> Stats</button></div>
+@@39y0m8
+🎒 Inventory
+@@105zayk
+<button id="btnPauseStats" class="btn">📊 Stats</button>
+@@glv9ze
+Boomerang Axe
+@@d61jfb
+Throws the axe spinning: it passes through everyone on the way out and back, dragging them toward you
+@@16g9797
+Thunder Arrow
+@@65uwld
+A lightning bolt pierces every enemy in a line and jumps to those nearby
+@@14riah0
+Frost Prison
+@@quccyv
+A ring of ice freezes enemies in the area for 2 s and damages them
+@@1r8rebw
+Smoke Bomb
+@@7fkfbp
+Poisonous smoke that blinds and slows; you step out of it in Ambush
+@@5yd9l1
+Wild Roots
+@@oeq12j
+Roots burst out in a cone, trapping enemies for 1.5 s and damaging them
+@@qlpzo5
+Magnetic Mine
+@@1j6aja6
+A mine that pulls enemies in for 1.2 s and then explodes
+@@1imaat9
+Titan's Leap
+@@1r2nvpa
+Leaps over the crowd and lands with a red wave that stuns
+@@1cz6xk3
+<button id="btnAutoEquip" class="sh-sell auto">⚡ Equip best</button><button id="btnSellMode" class="sh-sell">🪙 Sell several</button>
+@@1v3a2jz
+<button id="btnAutoEquip" hidden></button><div class="sell-bar">
+      <div class="sell-chips"><span>Select:</span>
+        <button data-q="0">Commons</button><button data-q="1">Rares or lower</button><button data-q="w">Worse than mine</button><button data-q="all">All</button><button data-q="none">None</button></div>
+      <div class="sell-go"><button id="btnSellCancel" class="sh-sell">Cancel</button>
+        <button id="btnSellDo" class="sh-sell auto" ${n ? '' : 'disabled'}>Sell ${n} · ${AMBER_SVG} ${fmtNum(tot)}</button></div>
+    </div>
+@@1mw8t9e
+Sold ${cnt} items · +${fmtNum(gain)} amber
+@@ha1ixm
+Merchant
+@@1gv6lc3
+💬 Talk to Brunilda · Gear
+@@1v6smb5
+Alchemist
+@@l8gnqd
+💬 Talk to Master Ivo · Elixirs and upgrades
+@@7vmwxr
+Board
+@@16r0krd
+Quests and Feats
+@@14c03uf
+📜 Board · Quests, Transcendence and Forge
+@@1snfzjd
+The forest that burned
+@@ldaqm4
+Where the water keeps secrets
+@@p7flzx
+Runes beneath the eternal ice
+@@c23p7z
+Sands that hide temples
+@@1ddb1es
+The burning heart of the Rift
+@@1n1cbwg
+Ruins beneath the tide
+@@k7vf2y
+Light trapped in stone
+@@1pujkjs
+The Locksmith's fortress
+@@1a1su8y
+Rift Guardian
+@@l9aoon
+Rift ${n}
+@@v9dan3
+Chapter ${rift.b + 1}
+@@1j5z5n4
+×2!
+@@cgji92
+
+@@jyawk4
+of 
+@@cflhn3
+Sound: 
+@@jx4ruf
+<div class="bp-repl">Replaces: ${BOONS[b.slots[B.slot]].name}</div>
+@@fk2jqu
+Offering: 
+@@1xnjpjy
+${REWARDS[t.d.kind].icon} Cross: ${REWARDS[t.d.kind].name}
+@@1d0uwnn
+Resist.
+@@v8yal5
+Lv. 
+@@1lmh641
+<button id="dbAch" class="db-slot" type="button"><img src="img/talents/trophy.png" alt=""><span>Awards</span></button>
+@@ursv1i
+<button id="dbOpts" class="db-slot" type="button"><img src="img/ui/gear.png" alt=""><span>Settings</span></button>
+@@e0us8y
+<button id="dbStats" class="db-slot" type="button"><img src="img/icons/stats.png" alt=""><span>Stats</span></button>
+@@1x3hfiv
+<img src="img/ui/bag.png" alt=""><span>Inventory</span>
+@@1ca0zx5
+<img src="img/icons/stats.png" alt=""><span>Stats</span>
+@@1e5at4n
+<div class="dlg-dim"></div>
+  <div class="dlg-box">
+    <div class="dlg-port"><img alt=""></div>
+    <div class="dlg-body"><div class="dlg-name"></div><div class="dlg-text"></div><div class="dlg-choices"></div><div class="dlg-next">▼</div></div>
+    <button class="dlg-skip" type="button">Skip ⏭</button>
+  </div>
+@@ssv2ad
+Ch. 
+@@1yt9q54
+<button data-m="talents" type="button"><img class="pico-ui" src="img/icons/talents.png" width="18" height="18" alt=""> Talents</button>
+@@137gibo
+<img class="pico-ui" src="img/icons/talents.png" width="18" height="18" alt=""> Talents
+@@o9fhgs
+ and 

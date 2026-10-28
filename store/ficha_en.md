@@ -28,4 +28,5 @@ A new Rift every day, the same for everyone.
 📱 BUILT FOR MOBILE
 Touch controls, optional auto-attack, big buttons, auto-save and no ads.
 
-Note: the game is currently in Spanish only. Publish this English listing only once the game is translated (or say "Spanish only" at the top).
+Languages: English and Spanish (chosen automatically from the device language; can be changed in Settings).
+Screenshots and feature graphic in English: `store/en/`.

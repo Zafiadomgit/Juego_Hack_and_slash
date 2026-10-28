@@ -1,0 +1,178 @@
+@@6hemdb
+First blood
+@@5mfwyd
+Defeat 50 monsters
+@@wdxhih
+Hunter
+@@qe53pz
+Defeat 1,000 monsters
+@@1hr6s76
+the Hunter
+@@okt6ea
+Scourge of the Rifts
+@@1b3ja3
+Defeat 10,000 monsters
+@@1na22yy
+Giantslayer
+@@jwlo2z
+Defeat 25 elites
+@@1yjgfng
+Elite executioner
+@@y52pun
+Defeat 250 elites
+@@q6ttrg
+the Executioner
+@@7t9kpr
+Against nature
+@@1gpsfza
+Defeat 100 mutated monsters
+@@mu6a38
+Fallen Guardian
+@@1ejf06q
+Defeat your first Guardian
+@@t4mxnd
+Guardbreaker
+@@1eymr6d
+Defeat 25 Guardians
+@@1vs1eky
+Untouchable
+@@n9by1e
+Defeat a Guardian without taking damage
+@@17quanp
+the Untouchable
+@@3l7w8w
+Seal freed
+@@1woel1f
+Defeat your first Super Boss
+@@11f6lfy
+Sealbearer
+@@1oc3oj3
+Liberator
+@@hfpo16
+Defeat 4 Super Bosses
+@@c1j2r8
+the Liberator
+@@12xxaj4
+End of the Locksmith
+@@o6jzy
+Defeat 8 Super Bosses
+@@55fe9i
+Bane of Morvhal
+@@ugwjlr
+Explorer
+@@1w509yh
+Close 10 Rifts
+@@r3ngjw
+Wanderer
+@@1t2so87
+Close 100 Rifts
+@@62xoev
+the Wanderer
+@@g8xqdz
+Expedition
+@@1jk1qo8
+Reach the 3rd Rift of an expedition
+@@1q5nt2f
+No looking back
+@@1lqrqj0
+Reach the 7th Rift of an expedition
+@@1fe0xj2
+the Tireless
+@@k334h9
+Living legend
+@@ywmwvw
+Reach the 12th Rift of an expedition
+@@1u2jf9p
+Living Legend
+@@9jcayf
+Favorite of the Twelve
+@@1ft7uqx
+Have 10 blessings at once
+@@10qm4e4
+Golden glow
+@@rogvsa
+Find 10 legendary items
+@@11ygdrz
+Collector
+@@ewmak6
+Find 50 legendary items
+@@1xwil0c
+the Collector
+@@17x56zw
+Power unleashed
+@@1tpeo3l
+Use your ultimate 50 times
+@@15n8w1a
+Surprises
+@@1amc3yz
+Complete 20 Rift events
+@@sqdloj
+Deep pockets
+@@1uu71vh
+Collect 50,000 amber
+@@74p3gj
+the Wealthy
+@@i7q3uj
+Companions
+@@1yjkpts
+Enter a Rift with 3 different heroes
+@@16pptwx
+The Seven
+@@xpkxpz
+Enter a Rift with all 7 heroes
+@@7kltph
+Master of the Seven
+@@kaplmr
+Veteran
+@@1e64jeb
+Reach level 30 with a hero
+@@1bmjtbj
+Hero of Fendaria
+@@1kiefsi
+Reach level 60 with a hero
+@@1a26umf
+Early bird
+@@11ui8sv
+Score 3,000 points in the Daily Rift
+@@3varnd
+Champion of the day
+@@1l4z6zx
+Score 10,000 points in the Daily Rift
+@@1wm7ord
+Champion of the Day
+@@1aui1ov
+Get up
+@@rjcu8r
+Fall in combat 10 times
+@@x032a1
+the Stubborn
+@@1lhkqi9
+Bestiary
+@@2xrk4h
+Defeat 20 different kinds of monster
+@@1virf3e
+the Naturalist
+@@7565du
+<div id="achToast" class="ach-toast"><img src="img/talents/trophy.png" alt=""><span><small>Achievement unlocked!</small><b></b><em></em></span></div>
+@@ev96m9
++${seals} Feat Seals
+@@3qzerl
+ · title «${title}»
+@@1woa01y
+<div id="achPanel" class="run-pick">
+  <div class="rp-box ach-box">
+    <div class="ach-head"><b>Achievements</b><div class="ach-tabs"><button data-t="ach" class="on">Achievements</button><button data-t="best">Bestiary</button><button data-t="rank">Ranking</button></div><button class="ach-x" aria-label="Close">✕</button></div>
+    <div id="achSub" class="ach-sub"></div>
+    <div id="achList" class="ach-list"></div>
+  </div>
+</div>
+@@3qqft7
+ · Title: <b>«${SAVE.title}»</b>
+@@1nw4wor
+ · tap an earned title to wear it
+@@1o61e4y
+${n} / ${ACHS.length} earned${SAVE.title ? ` · Título: <b>«${SAVE.title}»</b>` : ' · toca un título conseguido para lucirlo'}
+@@1md769j
+${seen} / ${ids.length} monsters discovered
+@@1vccxnc
+Undiscovered

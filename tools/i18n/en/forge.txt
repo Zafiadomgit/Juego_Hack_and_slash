@@ -1,0 +1,68 @@
+@@jo58uw
+You don't have enough amber
+@@upilan
+You're missing Shards: salvage gear you don't use
+@@1crl6cx
+Equipped
+@@1v5lz6g
+Bag
+@@tu412n
+${it.name}! (+${Math.round(REFINE_STEP * 100 * it.refine)}% stats)
+@@11kdwky
+The refine failed… (${Math.round(REFINE_CHANCE[r] * 100)}% success). The item wasn't damaged
+@@168kvmq
+${it.name} is now ${RARITY[it.rarity].name}
+@@tjiipq
+Properties reforged
+@@1lr06rz
++${Math.round(n)} Shards
+@@ap9k0l
+No items of that quality in the bag
+@@i2rr9m
+${n} items salvaged · +${Math.round(got)} Shards
+@@v9yprl
+Fully refined
+@@10k46my
++${r} → <b style="color:#ffd76a">+${r + 1}</b>: +${Math.round(REFINE_STEP * 100)}% to all its properties · ${Math.round(REFINE_CHANCE[r] * 100)}% success
+@@1vxumxv
+Up to +5 refining never fails; after that it can fail, but the item is never lost.
+@@16elg0b
+Already Legendary
+@@13lkwav
+ and a new property
+@@ejr59s
+${RARITY[it.rarity].name} → <b style="color:${RARITY[it.rarity + 1].color}">${RARITY[it.rarity + 1].name}</b>: stats ×${(RARITY[it.rarity + 1].mul / RARITY[it.rarity].mul).toFixed(2)}${RARITY[it.rarity + 1].affixes > RARITY[it.rarity].affixes ? ' y una propiedad nueva' : ''}
+@@r8no1j
+Raise the quality of your favorite weapons and pieces without waiting for better ones to drop. (Set pieces can't be ascended.)
+@@18382bm
+Now: ${top}. All its properties are rerolled (keeps quality, level and refine)
+@@104znn0
+Useful for getting the properties that suit your hero best.
+@@10fj9i7
+${RARITY[it.rarity].name} · Lv ${it.level}
+@@1yjuiyz
+Set pieces can't be salvaged
+@@iindi2
+Salvage → ${FRAG_SVG} ${n} Shards
+@@rn8wke
+<div class="smith-empty">Your bag is empty. Salvage gear you won't use here to get Shards.</div>
+@@gunaoz
+Salvage gear you don't use to get Ore Shards.
+@@noktfh
+Salvage commons and rares
+@@1glp8ub
+Tobias · Blacksmith
+@@o50qa0
+Refine
+@@12qfpkg
+Ascend
+@@zp3454
+Reforge
+@@1ozxhhv
+Salvage
+@@p0cbnf
+Tobias
+@@1vf72d8
+Blacksmith
+@@nyof4m
+⚒ Talk to Tobias · Refine and upgrade weapons

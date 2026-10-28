@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Fendaria · The Runic Rifts</title>
+  <link rel="icon" type="image/png" href="img/icon-192.png" />
+  <link rel="apple-touch-icon" href="img/icon-192.png" />
+  <meta name="theme-color" content="#070b18" />
+  <meta name="description" content="Fendaria: The Runic Rifts — a fantasy hack and slash in HD pixel art." />
+  <script>
+    // idioma: el guardado, o el del sistema la primera vez (español → index.html, el resto → index_en.html)
+    (function () {
+      var l = null; try { l = localStorage.getItem('fendaria_lang'); } catch (e) {}
+      if (!l) l = navigator.webdriver || /^es\b/i.test(navigator.language || 'es') ? 'es' : 'en'; // las pruebas automáticas, en español
+      var cur = document.documentElement.lang === 'en' ? 'en' : 'es';
+      if (l !== cur) location.replace(l === 'en' ? 'index_en.html' : 'index.html');
+    })();
+  </script>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <canvas id="game"></canvas>
+
+  <!-- Video de presentación -->
+
+  <!-- Pantalla de título: toca para empezar -->
+  <div id="title" class="overlay titlescr">
+    <div class="t-bg"></div><div class="t-shade"></div><div class="t-sparks"></div>
+    <div class="t-rays"></div>
+    <img class="t-logo" src="img/logo_en.png" alt="Fendaria · The Runic Rifts" />
+    <div class="t-tap">Tap to start</div>
+    <div class="t-ver">v1.1</div>
+  </div>
+
+  <!-- Menú principal -->
+  <div id="start" class="overlay startscr">
+    <div class="t-bg dim"></div><div class="t-shade"></div>
+    <img class="s-logo" src="img/logo_en.png" alt="Fendaria" />
+    <nav class="s-menu">
+      <button id="stContinue">Continue<small id="stContinueSub"></small></button>
+      <button id="stNew">New game</button>
+      <button id="stIntro">Watch prologue</button>
+    </nav>
+  </div>
+
+  <!-- Selección de personaje -->
+  <div id="menu" class="overlay sheet-ov">
+    <div class="sheet herosel">
+      <header class="sh-head">
+        <button id="btnMenuBack" class="menu-back">‹ Back</button>
+        <span id="menuTitle" class="sh-name">Choose your hero</span>
+        <span id="menuSub" class="hs-sub"></span>
+      </header>
+      <div class="hs-body">
+        <nav id="classList" class="hs-list"></nav>
+        <section class="hs-art"><img id="hsArt" alt="" /><div class="hs-floor"></div></section>
+        <section id="hsInfo" class="hs-info"></section>
+      </div>
+      <footer class="hs-foot"><button id="btnStart" class="btn big" disabled>Choose a character</button></footer>
+    </div>
+  </div>
+
+  <!-- Villa Candela (hub) -->
+  <div id="hub" class="overlay hubhud">
+    <div id="hubChar" class="hub-card"></div>
+    <div class="hub-btns">
+      <button id="btnInv" class="hbtn"><img src="img/ui/bag.png" alt=""><span>Character</span></button>
+      <button id="btnChange" class="hbtn"><img src="img/ui/heroes.png" alt=""><span>Heroes</span></button>
+    </div>
+    <button id="hubPrompt" class="hub-prompt"></button>
+    <div id="portalPanel" class="portal-panel">
+      <div class="pp-title">🌀 Runic Portal</div>
+      <div id="fLabel" class="pp-info"></div>
+      <div class="pp-btns">
+        <button id="btnMap" class="btn ibtn"><img src="img/ui/map.png" alt="">Choose a Rift</button>
+        <button id="btnDungeon" class="btn ibtn"><img src="img/ui/key.png" alt="">Dungeon</button>
+        <button id="btnPortalGo" class="btn big">⚔ Enter</button>
+      </div>
+    </div>
+    <div id="hubHint" class="hub-hint">Move with the joystick or by tapping the ground · Talk to the villagers · Walk up to the Portal to enter a Rift</div>
+  </div>
+
+  <!-- Ficha de personaje (equipo, características y bolsa) -->
+  <div id="inv" class="overlay sheet-ov">
+    <div class="sheet">
+      <header class="sh-head">
+        <span id="shName" class="sh-name"></span>
+        <span id="shLevel" class="sh-lvl"></span>
+        <div class="sh-xp"><div id="shXp"></div></div>
+        <span id="shPower" class="sh-power"></span>
+        <span id="shAmber" class="sh-amber"></span>
+        <button id="btnInvClose" class="sh-close" aria-label="Close">✕</button>
+      </header>
+      <div class="sh-body">
+        <section id="shDoll" class="sh-doll"></section>
+        <section class="sh-stats">
+          <div class="sh-sub"><h2>Stats</h2><span id="shPoints"></span></div>
+          <div id="shStatRows"></div>
+          <div id="shDerived" class="sh-derived"></div>
+        </section>
+        <section class="sh-bag">
+          <div class="sh-tabs" id="shTabs"></div>
+          <div id="bagGrid" class="sh-grid"></div>
+          <div class="bag-actions"><button id="btnAutoEquip" class="sh-sell auto">⚡ Equip best</button><button id="btnSellCommons" class="sh-sell">Sell commons</button></div>
+        </section>
+      </div>
+    </div>
+    <div id="itemCard" class="icard-ov"></div>
+    <div id="shToast" class="sh-toast"></div>
+  </div>
+
+  <!-- Mercader (diseño: canvas "Merchant") -->
+  <div id="shop" class="overlay sheet-ov">
+    <div class="sheet">
+      <header class="sh-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9 L6 3 L18 3 L20 9 Z" fill="#b8322a" stroke="#2a1a0c" stroke-width="1.5"/><path d="M5 9 L5 20 L19 20 L19 9" fill="#6b4528" stroke="#2a1a0c" stroke-width="1.5"/><rect x="10" y="13" width="4" height="7" fill="#2a1a0c"/></svg>
+        <span id="shopTitle" class="sh-name">Merchant</span>
+        <div id="shopTabs" class="sh-tabs shop-tabs"></div>
+        <span id="shopAmber" class="sh-amber" style="margin-left:auto"></span>
+        <button id="btnShopClose" class="sh-close" aria-label="Close">✕</button>
+      </header>
+      <div id="shopGrid" class="shop-grid"></div>
+      <footer class="shop-foot">
+        <span id="shopNote"></span>
+        <button id="btnRestock" class="sh-sell"></button>
+      </footer>
+    </div>
+    <div id="shopCard" class="icard-ov"></div>
+    <div id="shopToast" class="sh-toast"></div>
+  </div>
+
+  <!-- Tablón de misiones diarias -->
+  <div id="quests" class="overlay sheet-ov">
+    <div class="sheet quest-sheet">
+      <header class="sh-head">
+        <img src="img/ui/quest.png" width="30" height="30" alt="" style="image-rendering:pixelated;filter:drop-shadow(0 2px 2px rgba(0,0,0,.6))">
+        <span class="sh-name">Board</span>
+        <div id="questTabs" class="sh-tabs shop-tabs"></div>
+        <span id="questAmber" class="sh-amber" style="margin-left:auto"></span>
+        <button id="btnQuestClose" class="sh-close" aria-label="Close">✕</button>
+      </header>
+      <div id="questList" class="quest-list"></div>
+      <footer class="shop-foot"><span id="questNote"></span></footer>
+    </div>
+    <div id="questToast" class="sh-toast"></div>
+  </div>
+
+  <!-- Mazmorra -->
+  <div id="dungeon" class="overlay sheet-ov">
+    <div class="sheet quest-sheet">
+      <header class="sh-head">
+        <span class="sh-name">🗝 Dungeon</span>
+        <span id="dgRes" class="sh-amber" style="margin-left:auto"></span>
+        <button id="btnDgClose" class="sh-close" aria-label="Close">✕</button>
+      </header>
+      <p class="dg-help">Ever harder floors, crawling with elites and with a Super Boss at the end. This is where you find <b style="color:#ffb040">unique relics</b> and <b style="color:#ff8ae0">Rupture Essences</b> to break your heroes' limits (Board → Rupture).</p>
+      <div id="dgList" class="quest-list"></div>
+    </div>
+  </div>
+
+  <!-- Pausa -->
+  <!-- Mapa de Grietas -->
+  <div id="map" class="overlay sheet-ov">
+    <div class="sheet mapsheet">
+      <header class="sh-head">
+        <span class="sh-name">Rift Map</span>
+        <div id="mapTabs" class="sh-tabs map-tabs"></div>
+        <button id="btnMapClose" class="sh-close" aria-label="Close">✕</button>
+      </header>
+      <div class="map-body">
+        <div id="mapField" class="map-field"></div>
+        <aside id="mapInfo" class="map-info"></aside>
+      </div>
+    </div>
+  </div>
+
+  <div id="pause" class="overlay">
+    <div class="panel">
+      <h2>Pause</h2>
+      <div id="pauseStats" class="stats"></div>
+      <button id="btnResume" class="btn big">Continue</button>
+      <button id="btnPauseInv" class="btn">🎒 Character</button>
+      <button id="btnMute" class="btn">Sound: ON</button>
+      <button id="btnQuit" class="btn ghost">Leave the Rift (you keep the loot)</button>
+    </div>
+  </div>
+
+  <!-- Grieta cerrada -->
+  <div id="end" class="overlay">
+    <div class="panel">
+      <h2 id="endTitle" class="gold">Rift closed</h2>
+      <div id="endStats" class="stats"></div>
+      <button id="btnEndHub" class="btn big">Back to Candela Village</button>
+    </div>
+  </div>
+
+  <!-- Muerte -->
+  <div id="dead" class="overlay">
+    <div class="panel">
+      <h2 class="red">You have fallen...</h2>
+      <p class="small">You wake up beside the Portal of Candela Village. You keep your loot and experience.</p>
+      <div id="deadStats" class="stats"></div>
+      <button id="btnDeadHub" class="btn big">Back to Candela Village</button>
+    </div>
+  </div>
+
+  <script src="js/en/data.js"></script>
+  <script src="js/icons.js"></script>
+  <script src="js/fx.js"></script>
+  <script src="js/hd2d.js"></script>
+  <script src="js/anim_data.js"></script>
+  <script src="js/mon_data.js"></script>
+  <script src="js/en/art.js"></script>
+  <script src="js/vfx_data.js"></script>
+  <script src="js/vfx.js"></script>
+  <script src="js/en/biomes.js"></script>
+  <script src="js/props_data.js"></script>
+  <script src="js/props.js"></script>
+  <script src="js/en/progress.js"></script>
+  <script src="js/en/village.js"></script>
+  <script src="js/en/content.js"></script>
+  <script src="js/en/classes.js"></script>
+  <script src="js/en/game.js"></script>
+  <script src="js/en/forge.js"></script>
+  <script src="js/en/dungeon.js"></script>
+  <script src="js/en/story.js"></script>
+  <script src="js/en/boons.js"></script>
+  <script src="js/en/hades.js"></script>
+  <script src="js/en/worlds.js"></script>
+  <script src="js/en/ui2.js"></script>
+  <script src="js/en/camp.js"></script>
+  <script src="js/look.js"></script>
+  <script src="js/en/hudbar.js"></script>
+  <script src="js/motion.js"></script>
+  <script src="js/en/cine.js"></script>
+  <script src="js/en/sheets.js"></script>
+  <script src="js/en/forge2.js"></script>
+  <script src="js/en/talents.js"></script>
+  <script src="js/en/caps.js"></script>
+  <script src="js/en/run.js"></script>
+  <script src="js/en/heroes.js"></script>
+  <script src="js/en/skills3.js"></script>
+  <script src="js/balance.js"></script>
+  <script src="js/en/feel.js"></script>
+  <script src="js/en/tutorial.js"></script>
+  <script src="js/en/variety.js"></script>
+  <script src="js/en/daily.js"></script>
+  <script src="js/en/visuals.js"></script>
+  <script src="js/music.js"></script>
+  <script src="js/en/qol.js"></script>
+  <script src="js/en/runsave.js"></script>
+  <script src="js/en/logros.js"></script>
+  <script src="js/en/ranking.js"></script>
+</body>
+</html>

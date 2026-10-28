@@ -1,0 +1,615 @@
+@@1h41i70
++3% damage per rank
+@@1bjhba
++3% attack speed per rank
+@@1ht55ld
++1.5% crit chance per rank
+@@mtrnyx
++10% crit damage per rank
+@@1xgvm8e
++4% skill damage per rank
+@@1isf8i5
+-3% cooldown time per rank
+@@gmler0
++4% max HP per rank
+@@14rkbd8
+-1.5% damage taken per rank
+@@1n7ykuu
++3% movement speed per rank
+@@pdf1fe
+Recover 0.2% health per second per rank
+@@4pgs4c
+Steal 0.8% of damage as health per rank
+@@zpm0s4
++1 max energy per rank
+@@thxa5y
++5% energy regen per rank
+@@1m6qxxz
++8% amber per rank
+@@c3rnma
+Your ultimate charges 10% faster per rank
+@@1l3lbg6
++6% damage to Guardians and elites per rank
+@@nfpd5u
+Fury
+@@wu4esz
+Honed edge
+@@2dzs47
+War rhythm
+@@1rpsk7x
+Double chop
+@@13zuf65
+Every 4th basic hit throws a second slash (70%)
+@@17mzbxv
+Windmill
+@@otz7aj
+Every 5th basic hit is a full spin that hits everyone around
+@@ze951u
+Brutal blow
+@@1ltktmn
+Executioner
+@@ica319
++40% damage to enemies below 30% health
+@@xlipz2
+Giant slayer
+@@1rcs9g5
++25% damage to Guardians and elites
+@@1nmq22j
+Frenzy
+@@1gdwpxe
+Unstoppable rage
+@@8jdthr
+Each enemy you kill: +8% attack speed for 3 s (up to ×5)
+@@znh1cr
+Whirlwind
+@@1iqtv62
+Fiery conduit
+@@1iuxgfl
+Runic vigor
+@@d1l8yk
+Burning landing
+@@1mru4yj
+Seismic Leap leaves the ground burning for 3 s
+@@1pi021s
+Rebound
+@@4oghxo
+30% chance that Seismic Leap doesn't use its cooldown
+@@4pthkn
+Energy reserve
+@@wnbewu
+Combat breathing
+@@1jpbhuc
+Wildfire
+@@ixk4tn
+Fiery Fury leaves the ground burning for 3 s
+@@jtwewo
+Overcharge
+@@o6570k
++20% damage while your energy is full
+@@1vaxxp5
+Omen
+@@y18l43
+Cataclysm
+@@dosuh3
+Your ultimate charges 40% faster and your skills deal +15%
+@@1o6i4dz
+Bastion
+@@9fib4v
+Iron skin
+@@183tdp6
+Guard
+@@9twgl0
+Second wind
+@@1ckz7k4
+Once per Rift, when you drop below 25% health you recover 35%
+@@4ivil0
+Spiked plate
+@@ok05kd
+Reflect 40% of damage taken to nearby enemies
+@@s8e2bv
+Regeneration
+@@1gez9c5
+Light feet
+@@1rx43tp
+War shield
+@@3rrj2n
+Each skill gives you a shield worth 12% of your health
+@@kxeezb
+Bloodthirsty
+@@4bucok
+Each enemy you kill heals you for 2% health
+@@gj7b04
+Colossus
+@@46q85s
+Unbreakable
+@@ihoh57
+When you dodge: 1 s more invulnerability and +25% damage for 2 s
+@@1ei3vvf
+Marksmanship
+@@5fq3s4
+Sharp feathers
+@@1us42a
+Quick draw
+@@hgix5s
+Piercing arrow
+@@dfbjd8
+Your basic arrows pierce one more enemy
+@@1nwgk6r
+Flurry
+@@1xytqah
+Every 3rd shot fires a second arrow (60%)
+@@1l8gq9u
+Critical eye
+@@z1xdif
+Lethal tip
+@@uabkst
+Coup de grâce
+@@tpigvk
+Big game
+@@1fpfh6j
+Precision
+@@1v9cki8
+Multishot
+@@1p65qo
+Every 5th shot fires 3 arrows in a fan
+@@17jofw0
+Artillery
+@@z34ms
+Gunpowder
+@@1jjbqzv
+Light quiver
+@@6r8np
+Twin arrow
+@@sbi99d
+Fire Arrow shoots two arrows at once
+@@a4oq7
+Embers
+@@1gkx08l
+Fire Arrow leaves fire where it lands
+@@1e5hx5c
+Breathing
+@@27o611
+Deluge
+@@1th8y5w
+25% chance that Arrow Storm doesn't use its cooldown
+@@v25mua
+Critical spark
+@@1p400wn
+Your critical hits give you energy back
+@@1sibif0
+Keen sight
+@@prnq9l
+Hawk's eye
+@@v4x8ip
+Survival
+@@ds0743
+Tanned leather
+@@1rnzs7l
+Stride
+@@1qnudg2
+Wind step
+@@1wlj60
++1 dodge charge
+@@1o2gdgd
+Recoil
+@@zp5yrm
+When you dodge you push back and damage nearby enemies
+@@cw60l4
+Instinctive dodge
+@@19vxsr0
+Looter
+@@1e9az9p
+Last resort
+@@xfsqq1
+Easy prey
+@@1jls9yj
+Forest herbs
+@@1k4c5zy
+Tactical retreat
+@@4jpgn2
+When you dodge you leave a trap that explodes (200% skill damage)
+@@10rtiv8
+Runes
+@@1i8tzz7
+Fire ink
+@@gwubrc
+Quick stroke
+@@1xhh4pk
+Double circle
+@@lwjzul
+Fire Rune leaves a second burning circle
+@@1jjdyk6
+Resonant rune
+@@vvow7y
+30% chance that Fire Rune doesn't use its cooldown
+@@jwc83x
+Arcane reserve
+@@jqyxuy
+Meditation
+@@6zue8k
+Arcane overcharge
+@@1xh5hgc
+Runic omen
+@@1ytgwtk
+Archmage
+@@dzwbsz
+Aegis
+@@auq7qt
+Seal of life
+@@usjm46
+Warding glyph
+@@4gwuvs
+Reflecting aegis
+@@1ue3yoa
+Rune of life
+@@1vfryw0
+Runic sap
+@@lk5frz
+Levitation
+@@pz19kn
+Eternal barrier
+@@79zmai
+Runic wave
+@@p7sdpt
+Bulwark
+@@zvntgx
+Living wall
+@@ku1ifv
+Staff
+@@14lp4bm
+Polished crystal
+@@1jgf6o7
+Swift casting
+@@j4lk32
+Wandering orb
+@@1p3pwhj
+Your orbs pierce one more enemy
+@@bnx52a
+Twin orb
+@@o70udp
+Every 3rd shot fires a second orb (60%)
+@@1g9zlh4
+Focus
+@@5uug3a
+Burst
+@@ndsx9k
+Judgment
+@@4jzk7w
+Herald hunter
+@@6ox02u
+Resonance
+@@15xsn1g
+Orb rain
+@@wngxz3
+Every 5th shot fires 3 orbs in a fan
+@@acgspn
+Edge
+@@93ihs
+Sharpen
+@@9aqeos
+Dagger dance
+@@nibkvs
+Double cut
+@@1f0cz5y
+Every 3rd basic hit adds an extra slash (60%)
+@@meu8vu
+Poisoned edge
+@@1be0ccb
+Your hits poison (25% of damage over 3 s)
+@@kokr3j
+Weak spot
+@@1mvq1sw
+Lethal blow
+@@11f1k4e
+Assassination
+@@7izrno
+Bounty hunter
+@@1a4e8cl
+Butcher
+@@4dwr1l
+Thousand cuts
+@@6ky5o
+Every 5th basic hit is a whirl of daggers that hits everyone around
+@@dgcgho
+Shadows
+@@1belaua
+Pitch-black night
+@@1fo5acc
+Fleeting
+@@k7o77e
+Double step
+@@e6ha4e
+35% chance that Shadowstep doesn't use its cooldown
+@@gabun8
+Toxic mist
+@@187jxyr
+Venom Fan leaves a damaging cloud
+@@b0swjh
+Shadow reserve
+@@1tcm860
+Whisper
+@@1j97ail
+Void hunger
+@@746gm5
+Total darkness
+@@k6i0b7
+Twilight
+@@1ezre90
+Eclipse
+@@26iwi
+Evasion
+@@pu8ak8
+Stealth
+@@16h9bf
+Sinew
+@@ot7mf7
+Smoke screen
+@@7qbj5d
+Reflexes
+@@305cun
+Leech
+@@1elafki
+Escape artist
+@@12rmxeu
+Predator
+@@1yeq8hx
+Plunder
+@@1uj01w8
+Ghost
+@@1qjy7pj
+Pack
+@@1q2s8iz
+Howl
+@@1mqimjb
+Tracking
+@@10js3wh
+Alpha wolf
+@@ex5kwk
+30% chance that Call of the Wolf doesn't use its cooldown
+@@1yz6l9l
+Torn earth
+@@1lpy1o6
+Savage Roar tears up the ground (damages for 3 s)
+@@18udu9j
+Savage reserve
+@@1e6cafr
+Bond
+@@1vnofzh
+Full instinct
+@@bxhftt
+Bearskin
+@@10ftffz
+Full moon
+@@1fepi84
+Queen of the pack
+@@1wixz0i
+Staff
+@@1jay1pp
+Ashwood
+@@was6mg
+Tribal rhythm
+@@u0t306
+Double hit
+@@zsfw77
+Every 4th basic hit strikes again (70%)
+@@19c7izy
+Thorns
+@@18nawdd
+Lynx eye
+@@1x0eexw
+Fang
+@@73ev2b
+Finisher
+@@11sbsci
+Savage fury
+@@1mjpd33
+Staff whirl
+@@7if60x
+Every 5th basic hit strikes everyone around
+@@sz6yo4
+Nature
+@@19eg77c
+Roots
+@@1oh70e1
+Thorny bark
+@@wb96f1
+Rebirth
+@@1drpl2l
+Bark
+@@nmxybj
+Circle of life
+@@b9rk5t
+Sprout
+@@efv9v7
+Oak
+@@pn1pr0
+Archdruid
+@@ofad9t
+Explosives
+@@1ij8ef2
+Fine powder
+@@1nrrfbi
+Short fuse
+@@16gh6rh
+Twin bombs
+@@qxytpk
+Every 3rd bomb throws an extra one (60%)
+@@147ep23
+Bouncing bomb
+@@xoy0o4
+Your bombs pass through one more enemy before exploding
+@@1ualz9t
+Caliber
+@@ub9j15
+Shrapnel
+@@1iaks84
+Demolition
+@@1f9m1yw
+Wallbreaker
+@@qcw3az
+Nitro
+@@1r1zuc1
+Every 5th bomb throws 3 in a fan
+@@x63pny
+Engineering
+@@1ants3h
+Gears
+@@16p54xk
+Monkey wrench
+@@kaafet
+Express turret
+@@13du0jx
+30% chance that the Turret doesn't use its cooldown
+@@13if4ga
+Burning oil
+@@opf2cd
+Cluster Bomb sets the ground on fire
+@@15ax6hl
+Battery
+@@qr5j45
+Dynamo
+@@slp6bz
+Bright spark
+@@hk9a8f
+Prototype
+@@1i5et6y
+Masterpiece
+@@1r3xf5e
+Plating
+@@10ne1f3
+Plates
+@@bgt0j3
+Rivets
+@@v8e23n
+Brass shield
+@@az0d0d
+Spikes
+@@7vq4r3
+Steam boots
+@@t0uh1w
+Scrapper
+@@1umrl8g
+First-aid kit
+@@upu6yj
+Thruster
+@@od5nws
+Self-repair
+@@1w53lx4
+Parting mine
+@@o40y12
+When you dodge you leave a mine that explodes (200% skill damage)
+@@1qj6d0j
+Slaughter
+@@12w9brv
+Steel
+@@vuuwlt
+Backswing
+@@1s1ldes
+Every 4th basic hit adds another slash (70%)
+@@p4yqoz
+Brutal
+@@1nnu8g5
+Red eye
+@@uisknu
+Behead
+@@10mdq08
+Ogre slayer
+@@1l1lzyg
+Carnage
+@@1q9493r
+Red wrath
+@@1yuweh
+Blood
+@@1o9lpor
+Thirst
+@@mjryju
+Vigor
+@@2xuzx3
+Wounded rage
+@@dsepdr
+Below 50% health you deal 30% more damage
+@@1syibqc
+Feast
+@@1k6p3id
+Scars
+@@1llhix7
+Vampire
+@@1cpcmbw
+Refuse to fall
+@@1ohj8nk
+War hide
+@@lx94rq
+Hulk
+@@6dgyan
+Immortal
+@@1d63n6k
+Shout
+@@ptq8y6
+Booming voice
+@@s90x4s
+War breath
+@@rdoiw8
+Hot blood
+@@15sb50
+30% chance that Blood Strike doesn't use its cooldown
+@@y7g1l2
+Earthquake
+@@ewc3es
+Blood Strike cracks the ground (damages for 3 s)
+@@cw9u7n
+Rage reserve
+@@9edtqi
+Iron shout
+@@d1gqk4
+Full rage
+@@1uijxy4
+Call to war
+@@zw2vms
+Warlord
+@@yrvxp6
+Again!
+@@qyqxna
+Second wind!
+@@qh5f7d
+<div class="tal-soon">🌳 This hero doesn't have a talent tree yet.</div>
+@@1ju649d
+<div class="tv-row" style="--c:${br.color}">
+      <div class="tv-crest"><span class="tv-emb">${talIcon(br.icon)}</span><span class="tv-nm">${br.name}<small>${spent} pts</small></span>
+        <span class="tv-bar" title="Capstone: ${CAP_NEED} points"><i style="width:${capPct}%"></i></span></div>
+      <div class="tv-path">${nodes}</div></div>
+@@plthnx
+No points: you earn one per level
+@@kmz93g
+You already chose the other option (reset to change)
+@@sio7ci
+First learn the previous one in the branch
+@@1x5ujhc
+You need ${CAP_NEED} points in ${SB.name} (you have ${branchSpent(SB)})
+@@1as4ont
+★★ Capstone
+@@18e1077
+★ Crossroads
+@@jsf95r
+Passive
+@@ctjwsd
+<div class="ti-alt"><span>or</span><b>${talIcon(alt.icon, 'sm')} ${alt.name}</b>${alt.d}</div>
+@@19brpqj
+✔ Learned
+@@1y89lkj
+Upgrade · rank ${r + 1}
+@@kgxiks
+Learn
+@@19lb7od
+<div class="tv-head"><b>Talents</b>
+      <span class="tv-pts ${pts ? 'has' : ''}"><i><img class="pico-ui" src="img/icons/talents.png" width="16" height="16" alt=""></i>${pts}<small>point${pts === 1 ? '' : 's'}</small></span>
+      <small class="tv-sp">${talSpent()} spent · one per level</small>
+      <button id="talReset" class="tv-reset" ${talSpent() && invReturn === 'hub' ? '' : 'disabled'} title="Free in Candela Village">↺ Reset</button></div>
+    <div class="tv-grid"><div class="tv-tree">${rows}</div>
+      <aside class="tv-info" style="--c:${SB.color}">
+        <div class="ti-top"><span class="ti-medal ${r ? 'got' : ''} ${SN.cap ? 'cap' : ''}">${talIcon(SO.icon)}</span>
+          <div><div class="ti-n">${SO.name}</div><span class="ti-chip">${kind}</span><span class="ti-br">${SB.name}</span></div></div>
+        <div class="ti-d">${SO.d}</div>
+        ${segs}
+        ${alt ? `<div class="ti-alt"><span>o bien</span><b>${talIcon(alt.icon, 'sm')} ${alt.name}</b>${alt.d}</div>` : ''}
+        <button id="talLearn" class="ti-learn" ${can ? '' : 'disabled'}>${r >= SO.max ? '✔ Aprendido' : r ? `Mejorar · rango ${r + 1}` : 'Aprender'}</button>
+        ${why ? `<small class="ti-why">${why}</small>` : ''}</aside></div>

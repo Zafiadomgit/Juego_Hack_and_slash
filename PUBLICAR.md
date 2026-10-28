@@ -46,7 +46,9 @@ Ahora: versionCode 2, versionName 1.1.0.
 1. Cuenta de desarrollador: https://play.google.com/console (pago único de 25 USD, verificación de identidad).
 2. **Crear app**: nombre «Fendaria: Las Grietas Rúnicas», idioma Español, Juego, Gratis.
 3. **Ficha de la tienda** (carpeta `store/`):
-   - Textos: `store/ficha_es.md` (y `ficha_en.md` cuando el juego esté traducido).
+   - Textos: `store/ficha_es.md` y, como traducción al inglés de la ficha, `store/ficha_en.md`
+     (Ficha de la tienda › Gestionar traducciones › Inglés).
+   - Para la ficha en inglés usa las imágenes de `store/en/` (capturas y gráfico destacado con el logo en inglés).
    - Icono 512x512: `store/icono_512.png`.
    - Gráfico destacado 1024x500: `store/grafico_destacado_1024x500.png`.
    - Capturas de teléfono/tablet: `store/cap_*.png` (1920x1080).
@@ -69,3 +71,13 @@ Ahora: versionCode 2, versionName 1.1.0.
 - En tablets con Android 16, el sistema puede ignorar el bloqueo a horizontal: el juego debe verse bien igualmente.
 - El ranking usa Supabase (proyecto «Fendaria»). El plan gratuito pausa el proyecto tras 7 días sin uso; si pasa,
   reactívalo en https://supabase.com/dashboard. El juego sigue funcionando sin ranking.
+
+## Idiomas (español e inglés)
+- El juego elige solo el idioma del móvil (español → español, el resto → inglés) y se puede cambiar en **Ajustes**.
+- La versión inglesa (`www/index_en.html` y `www/js/en/`) **se genera**: no se edita a mano.
+  Los textos traducidos están en `tools/i18n/en/*.txt`. Tras cambiar cualquier texto del juego:
+  ```
+  node tools/i18n/extract.js   # lista lo que falta por traducir en tools/i18n/work/
+  node tools/i18n/build.js     # regenera la versión inglesa
+  ```
+- Cinemáticas en inglés: `cd cinematicas && python3 tools/build.py --en`, render, y vuelve a `python3 tools/build.py`.

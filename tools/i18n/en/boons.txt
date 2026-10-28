@@ -1,0 +1,234 @@
+@@p0pnfg
+god of Wrath
+@@1v8g5i4
+Strike first, think later! That's how wars are won!
+@@ymc6yx
+goddess of the Hunt
+@@1bl75kx
+Breathe. Aim. Nothing escapes those who know how to wait.
+@@bks59f
+god of Shields
+@@1eet69g
+A wall doesn't attack, little one. But it never falls.
+@@9wpurp
+goddess of Shadows
+@@1uloc4o
+The sweetest death is the one that takes its time…
+@@10cs0df
+god of Time
+@@111cbhz
+Tick. Tock. Your enemies are already late.
+@@1kdeag1
+goddess of Luck
+@@1yukhl2
+Wanna bet a life this works out? Meow!
+@@1oeygad
+goddess of Healing
+@@fzadoy
+While I'm watching over you, no wound is forever.
+@@7zk1u4
+god of Beasts
+@@sbwoxc
+You never fight alone. The pack walks with you.
+@@dodmpv
+god of Wealth
+@@1xfnk2s
+Everything shines if you dig deep enough. Everything!
+@@1qzwo7p
+god of the Old Forest
+@@o5tjhu
+Roots remember. And they don't forgive.
+@@1bl8rp3
+goddess of Blood
+@@wnvh5t
+It hurts, doesn't it? Good. Pain is power.
+@@3tgb9a
+god of Revelry
+@@1236l33
+A toast! …and then a barrel on someone's head.
+@@uqpt3c
+Attack
+@@mqrsll
+Skill
+@@wks8t3
+Dodge
+@@2gk78c
+Seal
+@@1nr0c1p
+Passive
+@@1jb2xpu
+Duo
+@@1wxfmh0
+Common
+@@1mc3vef
+Rare
+@@102qaln
+Epic
+@@q5rwg2
+Heroic
+@@erpx9t
+Wrathful Strike
+@@1gw0f2k
+Your basic attacks deal <b>+${pct(x)}</b> damage.
+@@1hd9d1o
+Divine Slash
+@@x2439u
+Your skills deal <b>+${pct(x)}</b> damage and <b>stun</b> for 0.6 s.
+@@1frtllr
+Blind Fury
+@@133xoo
+The less health you have, the more damage you deal: up to <b>+${pct(x)}</b>.
+@@jtgje
+Hunter's Mark
+@@1oe7psy
+Your basics <b>mark</b> for 4 s. Marked enemies take <b>+${pct(x)}</b> damage from everything.
+@@19igzm7
+Retreating Volley
+@@dzkt2l
+When you dodge you fire <b>6 arrows</b> in a fan (${pct(x)} of basic damage each).
+@@irh2q7
+True Eye
+@@1ei17z3
+<b>+${pct(x)}</b> crit chance.
+@@ksluyp
+Swift Aegis
+@@1elxwta
+When you dodge you gain a <b>shield</b> worth ${pct(x)} of your max health (every 2 s).
+@@d5p8ko
+Warding Rune
+@@1n9c24v
+When you use a skill you gain a shield worth <b>${pct(x)}</b> of your health and <b>push back</b> nearby enemies.
+@@ql3zyi
+Runic Skin
+@@anv687
+<b>+${pct(x)}</b> resistance to all damage.
+@@o1cfvz
+Toxic Edge
+@@k61802
+Your basics <b>poison</b> for 3 s (${pct(x)} of basic damage per second).
+@@1pa522h
+Shadow Trap
+@@1y2ny6t
+When you dodge you leave a <b>trap</b> that explodes when stepped on (${pct(x)} of basic damage plus poison).
+@@jy0ntf
+Sly Strike
+@@hja53h
+<b>+${pct(x)}</b> damage to poisoned enemies.
+@@1lnmy7m
+Clock Hands
+@@146plj3
+Your basics <b>slow</b> for 1.5 s and you attack <b>${pct(x)}</b> faster.
+@@lsq1lc
+Time Loop
+@@1pumigq
+<b>${pct(x)}</b> chance that a skill <b>doesn't go on cooldown</b>.
+@@1ntafx
+Paradox
+@@u1slbx
+When you dodge you <b>freeze time</b> for nearby enemies for ${(x).toFixed(1)} s.
+@@xyzvo2
+Dice Roll
+@@1a6iko9
+<b>${pct(x)}</b> chance for a basic to deal <b>double</b> damage.
+@@1oxhmhf
+Black Cat
+@@8adfkm
+Your crits deal <b>+${pct(x)}</b> damage.
+@@e2g7b8
+Jackpot
+@@1ri54c4
+<b>${pct(x)}</b> chance for an enemy to drop a <b>pile of amber</b> when it dies.
+@@bye3ub
+Healing Word
+@@tej397
+Each skill <b>heals</b> you for ${pct(x)} of your max health.
+@@19cjcl0
+Kiss of Life
+@@gu3aow
+Each enemy you kill heals you for <b>${(x * 100).toFixed(1)}%</b> of your health.
+@@1m9xx04
+Second Wind
+@@1bd3c5t
+Once per Rift, when you fall you <b>come back</b> with ${pct(x)} of your health.
+@@uvw6ob
+Dragonling
+@@16s1lid
+Each skill summons a <b>dragonling</b> for 8 s that spits fire (${pct(x)} of basic damage).
+@@avx0q8
+Pack Spirit
+@@1fv5qj5
+A <b>spirit</b> follows you and fires non-stop (${pct(x)} of basic damage).
+@@1fgk5kw
+Claw Swipe
+@@1tl1e3n
+Your basics deal <b>+${pct(x)}</b> damage and <b>knock back</b> further.
+@@n2t1i5
+Deep Pockets
+@@1s3pgrt
+<b>+${pct(x)}</b> amber in this Rift.
+@@hzcfo0
+Golden Shovel
+@@10v1w1o
+Your basics deal <b>+${pct(x)}</b> damage and sometimes <b>dig up amber</b>.
+@@1sn32n
+Greedy Step
+@@1wxkuoe
+When you dodge you <b>pull in all nearby loot</b> and gain a burst of speed.
+@@1e69ndo
+Brambles
+@@1vik889
+When you dodge you leave <b>brambles</b> for 3 s that hurt (${pct(x)} of basic per second) and slow.
+@@qmg9bw
+Old Roots
+@@1npxv8c
+Your skills have a <b>${pct(x)}</b> chance to <b>root</b> (stun for 1 s).
+@@qfutpr
+Sap
+@@1l82uja
+You <b>regenerate</b> ${(x * 100).toFixed(1)}% of your health per second.
+@@1umaihk
+Bloody Cut
+@@195ey5r
+Your basics deal <b>+${pct(x)}</b> damage and <b>steal</b> 3% as health.
+@@127twa1
+Sacrifice
+@@1jb2ecb
+<b>+${pct(x)}</b> damage to everything, but <b>-20%</b> max health.
+@@1iclvs7
+Retribution
+@@18z79nk
+Your skills deal <b>+${Math.round(x * 10)}%</b> damage for every 10% of health you're missing.
+@@1tazfof
+Barrel Bash
+@@1u038s1
+When you dodge you leave a <b>barrel</b> that explodes (${pct(x)} of basic damage) and sends everyone flying.
+@@a8x65x
+Drunken Blow
+@@8x0t28
+<b>${pct(x)}</b> chance for a basic to <b>stun</b> for 1 s.
+@@qz3u0i
+Tavern Stamina
+@@6dwrsz
+<b>+${pct(x)}</b> max health.
+@@15plud0
+Altar of 
+@@szc5l3
+ offers you a blessing
+@@150ylgy
+I am 
+@@eqqbph
+, one of the Twelve. We gods of Fendaria cannot cross the Rifts…
+@@1cc7il8
+…but we can lend you our power while you're inside. Choose wisely: my blessing fades when you leave.
+@@11zoijj
+Level 
+@@x4e0ha
+Loop!
+@@1ce64lx
+Stunned!
+@@93wzk8
+Jackpot!
+@@pmdkza
+Second Wind!
+@@1md8fbc
+Lunessa isn't done with you yet

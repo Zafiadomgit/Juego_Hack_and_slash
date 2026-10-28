@@ -1,0 +1,178 @@
+@@1wzkpxn
+Coral Crab
+@@143m73w
+Abyssal Jellyfish
+@@1kwq375
+Harpoon Triton
+@@11epf7o
+Kraken of the Ruins
+@@1uu7in1
+Quartz Imp
+@@i4ghxb
+Prismatic Moth
+@@t676vw
+Amethyst Golem
+@@l77am0
+Crystal Stag
+@@1mzbxcx
+Runic Guard
+@@104ml51
+Watcher Eye
+@@15nvyqx
+Chained Shade
+@@1nrreca
+The Jailer
+@@6eam52
+Sunken City
+@@a5k0fh
+Crystal Forest
+@@57f0ej
+Locksmith's Citadel
+@@3yocma
+Nereth, Herald of the Tide
+@@ez0n8r
+Lysara, Herald of the Prism
+@@uggco0
+Deep Tide
+@@v462q4
+Eternal Prism
+@@jsb82w
+Master Key
+@@1fi7bs1
+Abyssal Pearl
+@@dkkrax
++25% max HP
+@@44jbzt
+Tide Gem
+@@1q4rcr2
++30% energy regen
+@@mrgus8
+Prismatic Gem
+@@1me4amg
++12% crit
+@@jh7b15
+Living Quartz
+@@1i8n7n7
++15% attack speed
+@@1x9lak5
+Key Gem
+@@yktv8w
++25% damage
+@@11hwh28
+Find your hawk in the Gloomy Swamp
+@@6gkw4z
+Gust hasn't come back since we entered the Swamp. He never takes this long.
+@@hs2vbw
+Hawks hate the swamp, {hero}. If he's there, something is holding him.
+@@439f8d
+Gust! He was caught in an Ashweaver web… but he's still alive.
+@@1xhtbby
+Ilvra saw it all. A hunter who goes back for his companion deserves my favor.
+@@oix567
+My father's helm
+@@229hcq
+Find the lost forge on the Runic Glacier
+@@1amjxd1
+Kara, your father left a mountain forge before he died. They say it was on the Glacier.
+@@c1wn8r
+Then his last helm is still there. I'm going for it.
+@@79zn5v
+Found it. Helm iron, tempered in ice. Just like he used to say.
+@@1sa71wf
+Not even I can get a temper like that. Wear it with pride, girl.
+@@srj2hf
+The amber core
+@@fulb4l
+Get a core of pure amber in the Desert
+@@wj7ue6
+Ivo, if I get pure amber from the desert I can build the ultimate bomb.
+@@1waw0v8
+Or blow up half the village. Bring it, but we keep it far from my herbs.
+@@urypyi
+An amber core! It glows like a tiny sun. My bombs will never be the same.
+@@2c83qd
+Ha, ha! Panzo approves of explosions. A toast to you, little one.
+@@16h6m10
+The Tower's pages
+@@192okod
+Recover the writings of the Tower of Runes in the Abyss
+@@utepun
+Elara, when the Tower fell, the Abyss swallowed its library. There may be pages left.
+@@5ovow9
+If they're there, I'll find them. I need to know how they closed the first Rift.
+@@1tuvj9
+I have them. The Order didn't close the Rift: they held it. Someone always has to hold it.
+@@2srak4
+Aldemar knows about that. Your aegis is now mine too.
+@@o0yp9v
+The lost crew
+@@t9tq65
+Find out what happened to your old gang in the Sunken City
+@@1us07lx
+My old smuggling gang went into a Rift at the harbor. They never came back.
+@@oqg76w
+Smugglers? I haven't heard a thing. But if they come back, they owe me money.
+@@b3rwmh
+They were in Aelmar. Nereth had turned them into sailors of his tide. They're free now.
+@@1boe0rg
+Nharas protects those who live in the shadows. And you've brought yours out of them.
+@@1gqumtx
+The crystal pack
+@@12gzik4
+Free the pack trapped in the Crystal Forest
+@@1dntjix
+The grey she-wolf howls toward the crystal forest every night. Her pack is there.
+@@14nzahk
+Lysara's song must have frozen them. Break the crystal without breaking them, Ayla.
+@@1i5ium3
+They're alive! Cold and furious, but alive. The pack is coming home.
+@@1g4eds2
+Drakhon never forgets those who don't leave their pack behind.
+@@1xmsxeb
+The clan's runes
+@@1f9jw39
+Find the spirits of your clan in the Citadel
+@@85g545
+The Jailer keeps Morvhal's dead. My clan is with them. I feel it in the runes.
+@@23231f
+Then the Citadel awaits you twice, Brann.
+@@1rj0y8h
+I saw them. They sang me the war song one last time. Now they rest.
+@@rlboas
+Kharra honors the blood your people shed. Your fury is now mine too.
+@@46jz1t
+Quest of 
+@@gvve9f
+Quest complete
+@@b8jkn8
+ · +10% damage and health
+@@415gk1
+Dice of Fate
+@@1668xms
+You can reroll the blessings a god offers you (${l} → ${l + 1} times per Rift)
+@@1pjjvt2
+More rare, epic and heroic blessings (now +${l * 20}%)
+@@1qiw5ki
+Death Defiance
+@@1ue91ou
+You come back to life with half health (${l} → ${l + 1} times per Rift)
+@@lw8mi4
+Key of Doors
+@@h71wwk
+A second choice of doors appears at 75% of every Rift
+@@1jyg5i2
+Haggling
+@@96xhtw
+The wandering Merchant charges you less (now -${l * 8}%)
+@@wogd95
+Opening offering
+@@cziqed
+Every Rift starts with a god's Altar beside you
+@@26kymb
+<button class="btn bp-reroll" type="button">🎲 Reroll (${b.rerolls})</button>
+@@ywqg4
+Death Defiance!
+@@1ql8hyp
+${b.lives} left
+@@4nil5v
+That was the last one

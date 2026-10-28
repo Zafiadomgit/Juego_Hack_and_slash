@@ -2530,6 +2530,7 @@ function buildMenu() {
   showClassInfo(selectedClass);
 }
 
+const HS_STAT = { Vida: 'Vida', Daño: 'Daño', Alcance: 'Alcance', Defensa: 'Defensa', Movilidad: 'Movilidad' }; // nombres visibles (traducibles)
 function showClassInfo(id) {
   const C = CLASSES[id], L = CLASS_LORE[id], slot = SAVE.slots[id];
   const art = heroArt(id);
@@ -2543,7 +2544,7 @@ function showClassInfo(id) {
     <p class="sum">${L.summary}</p>
     <p class="hs-story">${L.story}</p>
     <p class="ps">${L.playstyle}</p>
-    <div class="hs-stats">${Object.entries(L.stats).map(([k, v]) => `<span>${k}</span>${bar(v)}`).join('')}</div>
+    <div class="hs-stats">${Object.entries(L.stats).map(([k, v]) => `<span>${HS_STAT[k] || k}</span>${bar(v)}`).join('')}</div>
     <div class="hs-skills">${C.skills.map((sk) => `<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energía — ${sk.desc}</span></div>`).join('')}<div><b>${ULTIMATES[id].icon} ${ULTIMATES[id].name}</b> <span>· definitiva — ${ULTIMATES[id].desc}</span></div></div>`;
   $('btnStart').disabled = false;
   $('btnStart').textContent = slot ? (menuMode === 'new' ? `Empezar de nuevo con ${C.name}` : `Continuar con ${C.name}`) : `Comenzar con ${C.name}`;

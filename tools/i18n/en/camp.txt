@@ -1,0 +1,91 @@
+@@xf6rxa
+Clear the area!
+@@1g5bvk2
+Finish off the rest: the battle ends and your reward arrives
+@@1kqseu9
+Battle won
+@@1iz1kv5
+Choose a door: walk up to it and press the button
+@@11mogit
+A god awaits you: walk up to their altar
+@@11uaav6
+Herald's Chest
+@@4ios8o
+An <b>epic or legendary</b> piece of your level.
+@@180216i
+Ore sack
+@@snr983
+<b>Ore Shards</b> for refining at Tobias's smithy.
+@@db6nxd
+Favor of the Twelve
+@@ves3fq
+You start the next Rift with a <b>rare or better blessing</b>.
+@@oecafd
+Runecaster's tome
+@@10qbx3l
+Lots of <b>experience</b> at once.
+@@yeu7fx
+Feat Seal
+@@hddsq1
+<b>+1 Feat Seal</b> for the Board.
+@@8cognh
+the merchant
+@@1cqbmw7
+One more <b>potion</b> for your bag (kept for the following Rifts).
+@@gyhpe0
+Camp
+@@u1gogl
+The merchant and an Offering of the Twelve await you by the Portal
+@@1o53c34
+<span style="color:#ffe08a;font-weight:800">Offering</span> · this blessing will go with you into your next Rift
+@@12pp7uz
+It will go with you when you enter your next Rift
+@@wfk09m
+Camp · goods you take home
+@@5zugvv
+ walks with you in this Rift
+@@1ehg795
+An altar awaits you nearby
+@@lcu5ud
+✦ Offering of ${G.name}
+@@1761vz7
+✦ Blessing of ${G.name}
+@@tvqjhu
+✦ Cross: blessing of ${GODS[t.d.god].name}
+@@1v0ena1
+🪙 Trade with the merchant
+@@1sm0blb
+🌀 Cross the Portal
+@@igl5gw
+New wave!
+@@1ucc299
+The Rifts are spitting out monsters again
+@@djo0aj
+Clear the area · ${n} left
+@@j14vvo
+I can smell ash from here. Good work, {hero}. Come back: amber doesn't spend itself.
+@@10g61jx
+If you bring frogs, not live ones please. Drop by my stall, I've got new goods today.
+@@1raiam1
+That weapon is crying, kid. Bring it to the forge and I'll have it singing.
+@@1rkjrkm
+Every Rift you close gives me one more day. My upgrades await you at the stall.
+@@1cvbay1
+How entertaining… keep closing doors, little light. I'll keep opening others.
+@@1pnx1jn
+The Twelve watch you with more interest each time. That's good… almost always.
+@@1cc2gat
+Bring me ore shards and I'll raise your weapon a point. Or two, if you catch me in a good mood.
+@@tvuxir
+Amber in your pockets? What a coincidence: I love amber.
+@@19hzb7h
+You're back in one piece! With the amber you bring you can upgrade in the village: I sell permanent upgrades, Tobias refines your weapon and the Board has quests.
+@@br0qwd
+<div id="backTips" class="back-tips">
+  <div class="bt-head"><b>What should I upgrade?</b><span id="btAmber"></span><button class="bt-x" aria-label="Close">✕</button></div>
+  <button data-go="ivo"><i>⚗</i><span><b>Master Ivo</b><small>Permanent upgrades and Pacts</small></span></button>
+  <button data-go="smith"><i>⚒</i><span><b>Tobias</b><small>Refine and ascend your weapon</small></span></button>
+  <button data-go="board"><i>📜</i><span><b>Board</b><small>Quests and Feats</small></span></button>
+</div>
+@@pd6m9
+ · blessing

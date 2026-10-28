@@ -1,0 +1,84 @@
+@@1gah0to
+Volatile
+@@1u9v0lg
+Explodes on death: get away from the red circle
+@@da615m
+Splitting
+@@bqguci
+Splits in two on death
+@@13fspp5
+Shielded
+@@1jx9ohd
+Its shield blocks hits from the front: go around it
+@@14ckm66
+Scorching
+@@ntcemx
+Leaves fire wherever it goes
+@@g4q3u5
+Shaman
+@@1an0n8k
+Heals and speeds up its allies: kill it first
+@@ctfmza
+Blinker
+@@ux8ndw
+Appears right next to you: watch for the purple flash
+@@13c6xf
+New: ${MUTS[k].icon} ${MUTS[k].name} — ${MUTS[k].tip}
+@@11pueui
++ healing
+@@14q88lh
+Blocked!
+@@1a18t28
+It's going to blow!
+@@140hoyf
+Golden Goblin
+@@u5ghme
+A goblin loaded with amber! Catch it before it escapes
+@@aeoxno
+Cursed Chest
+@@cy4gef
+Open it if you dare: the Rift will defend it
+@@1k3bgl5
+Elite Arena
+@@8gvkv8
+You're locked in: defeat the elites and a god will reward you
+@@1rbqgn7
+Risky Pact
+@@1pl3j20
+An epic blessing in exchange for monsters hitting harder
+@@1b4c785
+Darkness for 20 s: more monsters, double amber
+@@1n1tl5k
+Arena · wave ${ev.wave}/2
+@@113wj41
+You can't leave the circle until you win
+@@1lpq5ly
+It got away!
+@@1oqyx6w
+Goblin caught!
+@@1br8zgf
+ amber and an item
+@@xcl85s
+The Rift defends the chest!
+@@n6le9j
+Survive three waves inside the circle
+@@xdz3rv
+Wave ${ev.wave}/3
+@@dxu9bu
+Cursed chest conquered!
+@@1jv7w88
+A legendary item is yours
+@@10dmo7l
+Arena cleared!
+@@2xzrgx
+A god offers you an extra blessing
+@@1ibxaay
+Pact sealed
+@@1dbysxc
+Epic blessing at your side · monsters hit 30% harder
+@@1vvl3of
+The eclipse ends
+@@dohmhl
+You survived the darkness
+@@135hjrw
+Pact

@@ -1,0 +1,132 @@
+@@11tgob1
+Paralyzing Venom
+@@1ae7r05
+Poisoned enemies are <b>slowed</b> and your stuns last <b>50%</b> longer.
+@@8eucyy
+Bloody Fury
+@@1c3ra6c
+Below half health you deal <b>+30%</b> damage and steal <b>6%</b> as health.
+@@14rqz2e
+Golden Pack
+@@8pv1om
+Your spirits and dragonlings fire <b>twice as fast</b> and you gain <b>+25%</b> amber.
+@@peqfv5
+Living Wall
+@@w2ddph
+When your shield blocks a hit, <b>brambles</b> sprout around you.
+@@7id3jh
+Coup de Grâce
+@@almm48
+Your hits on <b>marked</b> enemies have <b>+30%</b> crit chance.
+@@7bsnsm
+Healing Toast
+@@m96fed
+Each enemy you <b>stun</b> heals you for <b>1.5%</b> of your health.
+@@1iu1sra
+Fiery Seal
+@@1fqts87
+Your <b>Seal</b> explodes when it ends (${pct(x)} of basic damage to those trapped).
+@@1mxcdde
+Toxic Seal
+@@1cwyk21
+Your <b>Seal</b> poisons those trapped (${pct(x)} of basic per second).
+@@vcsb9t
+Eternal Seal
+@@1w35u7a
+Your <b>Seal</b> lasts <b>${pct(x)}</b> longer and is bigger.
+@@xvvb4n
+Guardian Seal
+@@ivf8gw
+Inside your <b>Seal</b> you gain a shield worth ${pct(x)} of your health per second.
+@@1pivcri
+Bloody Seal
+@@1mj9xcs
+Enemies trapped in your <b>Seal</b> take <b>+${pct(x)}</b> damage.
+@@ytgg5o
+Echo Strike
+@@wqjsio
+Each basic attack <b>repeats</b> 0.15 s later with 60% of the damage.
+@@ikq4cr
+Seismic Strike
+@@1fvr7ov
+Every <b>third</b> basic attack sends out a shockwave around you (150% of basic damage).
+@@1k8p6s7
+Phantom Shot
+@@zw8b6v
+Each basic attack also fires an <b>orb</b> at the nearest enemy (60% of basic damage).
+@@1b4n8z8
+Broad Edge
+@@1m6b6fa
+Your basic attacks deal <b>+35%</b> damage and you attack <b>20%</b> faster.
+@@1etvy9w
+Tobias's Hammer
+@@1n4y345
+Upgrade your weapon for this Rift
+@@1d5dcqb
+A good hammer blow changes everything, kid.
+@@1ifcu
+Blessing
+@@7d7tm
+A god will offer you their blessing
+@@1jfe46r
+Hammer
+@@b219wa
+Upgrade your basic attack
+@@jketm1
+Treasure
+@@9bwkdh
+A nice pile of amber
+@@11dan88
+Chest
+@@i26ve4
+Two quality pieces of gear
+@@gkxndw
+Spring
+@@1axvi1m
+Restore all your health and a potion
+@@4kb2qr
+Choose your reward
+@@uk8wy4
+Two doors have opened: you can only cross one
+@@uq2xt0
+Poultice
+@@1e6rnt2
+Restore <b>50%</b> of your health.
+@@rbetod
+Extra potion
+@@v2fk46
+One more <b>potion</b> for this Rift.
+@@89tsg0
+Offering to the Twelve
+@@171y6l6
+A god offers you a <b>blessing</b> right now.
+@@1eedxlv
+Hammer blow
+@@4cqqsu
+An upgrade from <b>Tobias's Hammer</b> for your weapon.
+@@973j8
+Polish blessing
+@@6uz98c
+Raise the <b>rarity</b> of one of your blessings at random.
+@@51bqba
+Rift Heart
+@@10fgvi6
+<b>+15%</b> max health until you leave the Rift.
+@@1rrsj1f
+Wandering merchant
+@@i6pu4v
+Trade your amber for help inside the Rift
+@@g2wz8d
+${fmtNum(price)} amber
+@@1a3i6fj
+ <span style="color:#ff8a80">Unavailable</span>
+@@6mkyua
+Continue
+@@1qgkufe
+Keep fighting
+@@12bwdj9
+You have <b>${fmtNum(S.kamas)}</b> amber.
+@@n830xq
+Rift Shop
+@@z27s9b
+Amber? I accept anything, traveler… except excuses.

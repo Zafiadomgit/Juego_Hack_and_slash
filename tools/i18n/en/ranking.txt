@@ -1,0 +1,17 @@
+@@1eu7kad
+Daily Rift · ${dayIso().split('-').reverse().join('/')} · the ranking resets every day
+@@1cral8u
+<div class="rank-me">Choose the name you'll appear with on the world ranking:</div>
+      <div class="rank-name"><input id="rankNameIn" maxlength="16" placeholder="Your name" value="${(CLASS_LORE[S.cls] && CLASS_LORE[S.cls].hero) || ''}"><button id="rankNameOk">Save</button></div>
+@@h5jurf
+<div class="rank-me">Loading ranking…</div>
+@@u1fye2
+<div class="rank-me">Your place today: <b>#${me.pos}</b> of ${fmtNum(me.total)} · ${fmtNum(me.score)} pts</div>
+@@1s8ip30
+<div class="rank-me">You don't have a score today yet: play the Daily Rift («Daily» button) to enter the ranking.</div>
+@@1kclt6c
+<div class="rank-me">Nobody has played today's Rift yet. Be the first!</div>
+@@1yvji5b
+<div class="rank-name" style="margin-top:8px"><small style="color:#aab3cc">You appear as «${esc(rankName())}»</small></div>
+@@koroy6
+<div class="rank-me">Offline: the ranking can't be loaded right now. Your scores will be sent when the connection is back.</div>

@@ -1,0 +1,126 @@
+@@19srd9r
+Shadow
+@@8hxe9k
+Dagger assassin
+@@1av1qxv
+Black hood and twin daggers. Lightning-fast strikes, devastating crits and steps through the shadows.
+@@ml3qqn
+Daggers
+@@69nfem
+Dirks
+@@gfcvjr
+Stilettos
+@@1miqv1r
+Shadowstep
+@@6bnt2g
+Appears behind the nearest enemy and stabs it with a guaranteed crit
+@@1pkmdx9
+Venom Fan
+@@1rugb6k
+Throws a fan of seven poisoned daggers
+@@16cjd4e
+Beastmaster
+@@e1o95t
+Beast summoner
+@@1ak1z2t
+Spirit-crystal staff and wolf pelts. Her wolves fight at her side and go wild at her roar.
+@@1eyymiw
+Tribal staff
+@@rd4t58
+Spirit rod
+@@s62s8l
+Bone staff
+@@utx5q2
+Call of the Wolf
+@@1qhygx7
+Summons a wolf that hunts enemies for 16 s (up to 3)
+@@110q8hv
+Savage Roar
+@@tjxtmm
+Pushes enemies back and enrages your beasts (+70% damage)
+@@1qxgfyc
+Artificer
+@@mrfoka
+Explosives engineer
+@@1pct12m
+Brass goggles and a bomb belt. Throws explosives and plants turrets that fire on their own.
+@@116kgrx
+Bomb launcher
+@@1m7rncl
+Hand mortar
+@@1jyr7vh
+Blunderbuss
+@@15xp1a6
+Spark Turret
+@@1cvyjgf
+Plants a turret that fires for 12 s (up to 2)
+@@1usz6oj
+Cluster Bomb
+@@lq662x
+A big bomb that releases six smaller bombs
+@@91dun1
+Melee fury
+@@8y8ldl
+Huge greatsword and war tattoos. The less health he has, the harder he hits, and he heals with every blow.
+@@1qqu97v
+Greatsword
+@@r1agcx
+Claymore
+@@1wjd9qd
+Great blade
+@@jmxs6y
+Blood Strike
+@@1cddho9
+Sacrifices 8% health for a brutal blow that heals you
+@@5k1485
+War Cry
+@@br8wmr
+You attack 40% faster and take 25% less damage for 7 s
+@@793ck4
+the Shadow
+@@1j8derz
+Dagger assassin. Attacks blindingly fast, chains huge crits and appears behind her prey. Very fragile when surrounded.
+@@mkksg8
+For skilled players: get in, kill the target and dodge out before they catch you.
+@@efej5k
+Nyx used to steal in the alleys of Candela Village until a Rift opened beneath her feet and she spent three days on the other side, in the dark. She came back with eyes used to the night and a skill nobody can explain: she can step into one shadow and come out of another. Now she sells that talent to the village, as long as nobody asks about her past.
+@@hrsasp
+the Beastmaster
+@@1x0q9py
+Wolf summoner. Her spirit staff keeps enemies at bay while her pack hunts them down, and her roar makes them unstoppable.
+@@1osfiy4
+Calm, strategic play: keep wolves on the field and let them do the dirty work.
+@@1d7zjh7
+Ayla looked after the sheepdogs of the southern farms. When the Rift beasts attacked the flock, a grey she-wolf came out of the ashen forest and took her side. Since then the pack grows every season: wolves born near the Rifts that only obey Ayla's bone whistle.
+@@1p5zte9
+the Artificer
+@@14ogcf3
+Explosives engineer. Throws bombs that blow up in an area and plants turrets that fire on their own. Shreds big groups.
+@@x8hhlw
+Set up turrets, back off and bombard. She shines when monsters pile up.
+@@1atl04i
+Brina took apart the clock of Candela Village's tower at nine just to see how it worked (and put it back together with one piece to spare). Today she runs the only workshop in the village that makes gunpowder from Rift amber. Her bombs glow like little suns, and she swears that one day she'll close a Rift with the right explosion.
+@@305xib
+the Berserker
+@@loeflo
+Savage warrior. The more wounded he is, the harder he hits, and every blow gives him health back. His greatsword splits whatever it touches.
+@@nivbi0
+Risky and explosive: play at low health to hit harder, but don't overdo it.
+@@2jqyvu
+Brann came from the frozen north following the trail of a Frost Colossus that destroyed his clan. He found it in the Runic Glacier, on the other side of a Rift, and split it with his father's greatsword. Every red scar on his skin is a rune of his people. Since that day a red fury runs through his veins when he fights: he feels no pain, only the thirst for the next fight.
+@@kjjnvo
+Dance of a Thousand Cuts
+@@huhmor
+For 2 s you leap from enemy to enemy stabbing, untouchable
+@@1ahvcft
+Stampede
+@@xy5mw7
+A pack of spectral wolves tramples everything in the direction you're facing
+@@1e9svpw
+Bombardment
+@@11e5l20
+A rain of explosions falls across the whole screen
+@@hzjrql
+Red Frenzy
+@@mosil5
+10 s of fury: +50% damage, +30% attack speed, life steal and instant healing

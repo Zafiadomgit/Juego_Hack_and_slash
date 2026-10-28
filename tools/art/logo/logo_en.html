@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face { font-family: Cinzel; font-weight: 900; src: url(cinzel-latin-900-normal.woff2); }
+@font-face { font-family: Cinzel; font-weight: 700; src: url(cinzel-latin-700-normal.woff2); }
+html, body { margin: 0; background: transparent; }
+body.dark { background: #0b1022; }
+#logo { position: relative; width: 1600px; height: 760px; }
+svg { position: absolute; inset: 0; }
+.word { position: absolute; left: 0; right: 0; top: 268px; text-align: center; font: 900 196px/1 Cinzel, serif; letter-spacing: 22px; padding-left: 22px; }
+.word span.big { font-size: 236px; }
+.w-shadow { color: #05070f; transform: translate(0, 10px); filter: blur(10px); opacity: .85; }
+.w-edge { color: transparent; -webkit-text-stroke: 9px #1a1408; }
+.w-fill { background: linear-gradient(180deg, #ffffff 0%, #f3ecd8 30%, #cdb98a 52%, #8a6a32 56%, #d8c08a 70%, #fff4d0 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.w-shine { background: linear-gradient(100deg, transparent 40%, rgba(255,255,255,.85) 48%, transparent 56%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.w-glow { color: transparent; text-shadow: 0 0 40px rgba(120,200,255,.55), 0 0 90px rgba(80,150,255,.35); }
+.sub { position: absolute; left: 0; right: 0; top: 548px; text-align: center; font: 700 52px/1 Cinzel, serif; letter-spacing: 18px; padding-left: 18px;
+  background: linear-gradient(180deg, #fff3cf, #c9a24a 60%, #8a6a32); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 3px 0 #120c04) drop-shadow(0 0 14px rgba(0,0,0,.6)); }
+</style></head>
+<body class="">
+<div id="logo">
+  <svg viewBox="0 0 1600 760" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="gold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff3cf"/><stop offset=".5" stop-color="#d8b86a"/><stop offset="1" stop-color="#8a6a32"/></linearGradient>
+      <linearGradient id="silver" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset=".5" stop-color="#b8c4d8"/><stop offset="1" stop-color="#6a7890"/></linearGradient>
+      <radialGradient id="rift" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#ffffff"/><stop offset=".25" stop-color="#bfe6ff"/><stop offset=".6" stop-color="#3a8cff" stop-opacity=".55"/><stop offset="1" stop-color="#1a3aa0" stop-opacity="0"/></radialGradient>
+      <radialGradient id="halo" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#7cc4ff" stop-opacity=".45"/><stop offset="1" stop-color="#7cc4ff" stop-opacity="0"/></radialGradient>
+      <filter id="soft"><feGaussianBlur stdDeviation="6"/></filter>
+    </defs>
+    <!-- halo azul -->
+    <ellipse cx="800" cy="360" rx="560" ry="330" fill="url(#halo)"/>
+    <!-- anillo rúnico del Portal -->
+    <g transform="translate(800 360)">
+      <ellipse rx="300" ry="300" fill="none" stroke="#0b0f1e" stroke-width="22" opacity=".7"/>
+      <ellipse rx="300" ry="300" fill="none" stroke="url(#silver)" stroke-width="7"/>
+      <ellipse rx="272" ry="272" fill="none" stroke="url(#gold)" stroke-width="3"/>
+      <ellipse rx="326" ry="326" fill="none" stroke="url(#gold)" stroke-width="2" stroke-dasharray="4 14"/>
+      <g fill="url(#gold)" font-family="Cinzel" font-weight="900" font-size="30" text-anchor="middle">
+        <!-- marcas rúnicas alrededor -->
+        <g id="runes">
+          <path d="M0 -286 l8 10 -8 10 -8 -10z"/>
+        </g>
+      </g>
+      <g stroke="url(#gold)" stroke-width="3" fill="none" id="runemarks"></g>
+      <!-- grieta luminosa vertical -->
+      <path d="M0 -250 L18 -170 L-6 -110 L22 -40 L-10 30 L16 110 L-8 180 L6 250 L-16 180 L4 110 L-26 30 L4 -40 L-22 -110 L2 -170 Z" fill="url(#rift)" filter="url(#soft)"/>
+      <path d="M0 -236 L12 -170 L-4 -110 L14 -40 L-6 30 L10 110 L-4 180 L2 236 L-8 180 L2 110 L-14 30 L2 -40 L-12 -110 L0 -170 Z" fill="#e8f6ff"/>
+      <!-- espada que atraviesa el anillo -->
+      <g transform="rotate(0)">
+        <rect x="-7" y="-360" width="14" height="520" fill="url(#silver)" stroke="#0b0f1e" stroke-width="3" opacity=".0"/>
+      </g>
+    </g>
+    <!-- filetes ornamentales -->
+    <g stroke="#d8b86a" stroke-width="3" fill="none">
+      <path d="M210 520 H690"/><path d="M910 520 H1390"/><path d="M240 528 H660" stroke="#8a6a32" stroke-width="1.5"/><path d="M940 528 H1360" stroke="#8a6a32" stroke-width="1.5"/>
+      <path d="M150 520 q30 -16 60 0 q-30 16 -60 0z" fill="url(#gold)"/><path d="M1390 520 q30 -16 60 0 q-30 16 -60 0z" fill="url(#gold)"/>
+    </g>
+    <g transform="translate(800 520)"><path d="M-36 0 L0 -18 L36 0 L0 18Z" fill="url(#gold)" stroke="#120c04" stroke-width="3"/><path d="M-14 0 L0 -7 L14 0 L0 7Z" fill="#bfe6ff"/></g>
+    <g stroke="#d8b86a" stroke-width="2" fill="none"><path d="M330 236 H600"/><path d="M1000 236 H1270"/></g><g fill="#d8b86a"><path d="M600 236 l10 -6 10 6 -10 6z"/><path d="M980 236 l10 -6 10 6 -10 6z"/></g>
+  </svg>
+  <div class="word w-glow">F<span>ENDARI</span>A</div>
+  <div class="word w-shadow">F<span>ENDARI</span>A</div>
+  <div class="word w-edge">F<span>ENDARI</span>A</div>
+  <div class="word w-fill">F<span>ENDARI</span>A</div>
+  <div class="word w-shine">F<span>ENDARI</span>A</div>
+  <div class="sub">THE RUNIC RIFTS</div>
+</div>
+<script>
+  // marcas rúnicas alrededor del anillo
+  const g = document.getElementById('runemarks');
+  const shapes = ['M-8 -10 L0 10 L8 -10', 'M-8 -10 L-8 10 M-8 0 L8 -10 M-8 0 L8 10', 'M0 -10 L0 10 M-8 -4 L8 4', 'M-8 10 L0 -10 L8 10 M-4 2 H4', 'M-6 -10 L6 0 L-6 10', 'M-8 -10 H8 L-8 10 H8'];
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2;
+    if (Math.abs(Math.sin(a)) < 0.12) continue;
+    const r = 286, x = Math.sin(a) * r, y = -Math.cos(a) * r;
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    p.setAttribute('d', shapes[i % shapes.length]);
+    p.setAttribute('transform', `translate(${x} ${y}) rotate(${(a * 180) / Math.PI})`);
+    g.appendChild(p);
+  }
+  document.querySelectorAll('.word').forEach((w) => { w.innerHTML = '<span class="big">F</span>ENDARI<span class="big">A</span>'; });
+  if (location.hash === '#dark') document.body.className = 'dark';
+</script>
+</body></html>

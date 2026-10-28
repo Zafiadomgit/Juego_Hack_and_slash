@@ -1,0 +1,328 @@
+@@1ez9ufp
+Helmbreaker
+@@oy280h
+Melee warrior
+@@sknwv4
+Horned helm and a double-bladed axe. Sweeps enemies in an arc and leaps into the middle of the fight.
+@@u1to1e
+Axe
+@@1kws5pw
+Great axe
+@@1vhzht3
+War axe
+@@1yll076
+Seismic Leap
+@@1cnsz04
+Leaps onto the enemy and crushes the area
+@@djvvf6
+Fiery Fury
+@@xojzdy
+A colossal fire slash after a brief wind-up
+@@xxwcrj
+Hawkeye
+@@252l74
+Ranged scout
+@@4ssewu
+Hawk-feather hood and longbow. Shoots non-stop and punishes groups from afar.
+@@1ic7qmo
+Bow
+@@vo5xpr
+Longbow
+@@x7ivk7
+Shortbow
+@@10uamsc
+Fire Arrow
+@@11gqu91
+An arrow that explodes in an area
+@@1854bqk
+Arrow Storm
+@@w0mh14
+A rain of arrows falls on the area
+@@q6aypt
+Runecaster
+@@nwxshx
+Protective mage
+@@1v71sdd
+Rune-stitched robe and amber staff. Shields that absorb damage and rune circles that burn.
+@@z0m232
+Staff
+@@8ffk9q
+Wand
+@@bqg1n6
+Scepter
+@@11trpxg
+Runic Aegis
+@@tp33s6
+Protective shield and a pushback wave
+@@12k4sds
+Fire Rune
+@@1nvrxc0
+A rune circle that burns and slows
+@@1jlikxk
+the Helmbreaker
+@@38rpdh
+Frontline warrior. Takes a lot of punishment, hits everything nearby in an arc and leaps into the middle of the fight with her axe.
+@@y9omfz
+Ideal if you like straightforward melee: get close, spin the axe and don't stop.
+@@yshyc7
+Kara grew up among the forges of Candela Village, where her father tempered helms for the guard. The night the first Rift opened, monsters ravaged the smithy and she held them back with a woodcutter's axe. Since then she carries that axe, riveted with helm iron, and has sworn to split every helmet that crosses the Portal.
+@@1p1784k
+Ranged scout. Shoots non-stop and punishes groups from afar with explosive arrows and arrow rain, but has little health.
+@@16ihv4n
+For those who prefer to keep their distance: move, dodge and don't let them surround you.
+@@b27j2n
+Teo was a hunter in the woods around the village, before they turned to ash. He followed the beasts' trail to the first Rift and learned to read its paths like no one else. They say he never misses a shot and that his hawk flies ahead of him to warn him of what waits on the other side of the Portal.
+@@5h9uqw
+the Runecaster
+@@1x3yudh
+Rune arcanist. Shields herself with barriers that absorb damage, pushes enemies away and burns the ground with rune circles.
+@@diw8xu
+Balanced and safe: use the Aegis when you're surrounded and let the runes do the work.
+@@5lt15x
+Elara was the youngest apprentice in the Tower of Runes when the Rift split it in two. She survived locked behind a rune shield she didn't yet know how to hold. Now she studies the Rifts from the inside: she believes the runes glowing on their edges are a lock, and that someone, somewhere, has the key.
+@@l0trhp
+Sparky
+@@1wmb38z
+Mossy Boar
+@@1esn5t9
+Ashweaver
+@@uppsf9
+Spitting Shroom
+@@9zazds
+Basalt Golem
+@@1spam4t
+Ancestral Fang
+@@wv2eaq
+Fiery Claw
+@@wkpjrs
+Ashweaver Queen
+@@qmazxb
+Frost Colossus
+@@4hllkr
+Abyss Sorcerer
+@@bc4kd0
+Vampire Black
+@@ci518s
+Golden
+@@1r9xow2
+Furious
+@@1fapinv
+Armored
+@@msixbk
+Explosive
+@@1huxo3p
+Rare
+@@18xsg75
+Epic
+@@3l4hic
+Weapon
+@@rqq1ey
+Hat
+@@18kd6xi
+Helmet
+@@15kotda
+Cap
+@@1fk488u
+Cape
+@@46l5pu
+Hood
+@@1c8gtpk
+Mantle
+@@acsh7q
+Amulet
+@@1d8utn8
+Necklace
+@@irlqge
+Ring
+@@1ebmb29
+Signet
+@@1nc1mmk
+Boots
+@@jfgkq1
+Sandals
+@@2caucz
+Belt
+@@1cxyjrf
+Sash
+@@v8dc0b
+of the Boar
+@@v80o6g
+of Ash
+@@b885bf
+of the Ashweaver
+@@16xpj7k
+of the Shroom
+@@rggdbu
+of Basalt
+@@19ztaho
+of Candela
+@@1j61iel
+of the Rift
+@@1qcx70d
+of the Adventurer
+@@3506yr
+of Amber
+@@j6hafb
+of the Hawk
+@@1nxse3h
+Vitality
+@@13tqewd
++2 HP per point
+@@1usavhx
+Wisdom
+@@1c4ja0d
+Wis
+@@1oi9v97
++1% XP and +0.5% energy regen
+@@1km2n4i
+Strength
+@@1i9xt3v
+Str
+@@1ba9t10
++1% damage
+@@1jxqtr9
+Intelligence
+@@vuqgw8
++1.5% spell damage
+@@1qux25f
+Luck
+@@1famorm
+Lck
+@@15pl46r
++0.15% crit and +0.5% amber
+@@1r3zhx0
+Agility
+@@v5spre
++0.6% attack speed
+@@1oe3wp7
+Damage
+@@131cwgx
+% Critical
+@@om5z3k
+% Crit
+@@1brf956
+% Resistance
+@@13to46o
+Prospecting
+@@1xfigwz
+Garnet Gem
+@@ocnhbr
++15% damage
+@@1jnq115
+Ember Gem
+@@z0xygs
++12% attack speed
+@@h9mz6n
+Emerald Gem
+@@747lpe
++20% max HP
+@@19f3tmf
+Moss Gem
+@@1wpvs9b
+You recover 1% of your HP every second
+@@nkwpsj
+Sapphire Gem
+@@qpt6ri
++10% crit chance
+@@umwxxy
+Frost Gem
+@@ues989
+-12% damage taken
+@@2ursku
+Sun Gem
+@@1ojkhgv
+Energy recharges 30% faster
+@@1htehv5
+Amber Gem
+@@d6lhj0
++40% amber and a wider pickup radius
+@@1upiwcw
+Void Gem
+@@19bwitv
+Crits deal 40% more damage
+@@jtjgnw
+Obsidian Gem
+@@fn8qgq
++25% spell damage
+@@mgds2s
+Phoenix Heart
+@@3196lc
+Your ultimate charges 50% faster
+@@l36olu
+Titan Heart
+@@x3zvd9
++10% damage and +10% HP
+@@d5v592
++1% XP and +0.5% energy regen per point
+@@7x2imk
++1% to all your damage per point
+@@1n7c3yi
+damage
+@@o83866
++${t.fue}% damage
+@@grbha6
++1.5% spell damage per point
+@@1x4xe6c
++${Math.round(t.int * 1.5)}% spells
+@@1b9qpyy
++0.15% crit and +0.5% amber per point
+@@3bfo80
+crit
+@@fcbe65
++${(t.sue * 0.15).toFixed(1)}% crit
+@@1j6glv6
++0.6% attack speed and a bit of movement per point
+@@r60oap
++${Math.round(t.agi * 0.6)}% atk. speed
+@@in9fzo
+Elixir of Fury
+@@bfm2lh
++30% damage for one Rift
+@@1vfrq89
+Stoneskin Elixir
+@@r09igu
+-25% damage taken for one Rift
+@@1i6le8r
+Sage's Elixir
+@@1ty38gf
++50% experience for one Rift
+@@17c77a2
+Elixir of Fortune
+@@p7ihff
++50% amber and more rare items for one Rift
+@@j1f0ie
+Whetstone
+@@hdzj9i
++5% damage forever (now +${l * 5}%)
+@@94ekoo
+Vigor talisman
+@@1ghuqg3
++5% max HP forever (now +${l * 5}%)
+@@34bmzr
+Tanned hide
+@@6lkc7e
+-2% damage taken (now -${l * 2}%)
+@@1uogi29
+Energy crystal
+@@pa4qj1
++6% energy regen (now +${l * 6}%)
+@@1afa4of
+Lucky clover
+@@160kpyf
++5% amber in Rifts (now +${l * 5}%)
+@@17bs0yt
+Reflex boots
+@@ub8vk6
++1 dodge charge (now ${3 + l})
+@@1tav7mm
+Amber magnet
+@@1qtdxwe
++25% radius to pull in amber and XP (now +${l * 25}%)
+@@16p5iif
+Larger bag
+@@1tn5xry
++6 bag slots (${36 + 6 * l} → ${42 + 6 * l})
+@@1j09hwx
+Potion belt
+@@1g9wrdq
+Carry up to ${6 + l} potions (now ${5 + l})

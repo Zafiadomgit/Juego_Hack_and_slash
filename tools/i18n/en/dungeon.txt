@@ -1,0 +1,121 @@
+@@eu6ooj
+of the Eclipse
+@@1f7kj2d
++25% damage and +8% crit
+@@13y0u1i
+Bloody Fang
+@@1f4ohpb
+Steal 6% of the damage you deal as health
+@@1jmr5pe
+Crown of the Ash King
+@@311p5r
++30% max HP
+@@vlv7f1
+Mantle of the Void
+@@ozze1k
+-15% damage taken and +12% speed
+@@4a89jm
+Amulet of Echoes
+@@nsquz0
+Your spells recharge 30% faster
+@@ts7qvx
+Executioner's Ring
+@@34teq9
+Crits deal 60% more damage
+@@163sx9z
+Boots of the Endless Wind
+@@ulc35q
++1 dodge and +20% speed
+@@4oxja3
+Sash of the Greedy King
+@@1micfuc
++60% amber and +40% experience
+@@l7wsb2
+Volcano Axe
+@@8ahwzm
++30% damage and +20% max HP
+@@1tvpiar
+Dawn Bow
+@@1gus76w
++30% damage and +12% crit
+@@g9cntv
+Staff of a Thousand Runes
+@@17ybbfm
++30% damage and 25% faster spells
+@@g166q1
+Eclipse Fangs
+@@vw9cqj
++30% damage and 50% stronger crits
+@@w1vulx
+Staff of the Ancient Forest
+@@1vkl5gz
++30% damage, +15% resistance and +10% speed
+@@1guyh9u
+Solar Cannon
+@@1sz653a
++45% damage
+@@73fpao
+Claymore of the Fallen King
+@@98bfm3
++30% damage and steal 5% of damage as health
+@@1rcaqal
++12% damage and HP
+@@33obp0
++12% damage and HP · max refine +11
+@@q94b6t
++12% damage and HP · 4th gem socket!
+@@payu6q
++12% damage and HP · max refine +13
+@@1lfuhs8
++12% damage and HP · max refine +15 and Rupture aura
+@@41etqe
+${ESS_SVG} ${essence()} Essences · Rupture ${lbRank()}/${LB_MAX}
+@@26zip7
+<div class="dg-lock">🔒 The Dungeon opens when you defeat the Super Boss of the Ashen Forest.<br><small>That's where unique relics and Rupture Essences drop, to break your heroes' limits.</small></div>
+@@wypmve
+ (first time ×2)
+@@nwk7vy
+guaranteed!
+@@toeqa1
+<div class="dg-row ${first ? 'new' : ''}">
+      <div class="dg-n">${t}</div>
+      <div class="dg-txt"><b>Floor ${t} · ${B.name}</b>
+        <span>Monsters level ${dungeonLevel(t) * 2 + 4} · lots of elites · Super Boss ${SUPER_BOSSES[B.id].name.split(',')[0]}</span>
+        <span class="dg-rw">${ESS_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Essences${first ? ' (primera vez ×2)' : ''} · <b style="color:#ffb040">Unique relic ${first ? '¡asegurada!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${FRAG_SVG} ${10 * t}</span></div>
+      <button class="btn big" data-t="${t}">Enter</button></div>
+@@19p01nl
+<div class="dg-cls"><img src="img/uniques/${ck}.png" width="40" height="40" alt=""><div><b style="color:${cu.color}">${CLASSES[S.cls].name}'s legendary weapon: ${cu.name}</b><span>${cu.desc} · only drops in the Dungeon</span></div></div>
+@@r960xc
+Dungeon · Floor 
+@@23eihi
+Elites everywhere · Super Boss at the end
+@@sbqbik
+Unique relic!
+@@sfmwox
++${ess} Rupture Essences · +${10 * t} Shards
+@@kn6is8
+Rupture
+@@1wyvia7
+Limit broken
+@@1jifx4e
+Rupture ${r + 1}
+@@1fqbgfo
+Your hero has surpassed all their limits.
+@@1bbniyg
+ <b style="color:#ff8a80">You need level ${lvl}.</b>
+@@3me8gr
+Rupture ${i + 1}
+@@msc5kw
+Level ${LB_LEVEL[i]} · ${LB_COST[i]} Essences
+@@1dvlqkt
+✔ Active
+@@1g33fj3
+Locked
+@@16j13d2
+Rupture Essences only drop in the Dungeon (Runic Portal → Dungeon).
+@@zjpxjp
+You need level ${LB_LEVEL[r]}
+@@t28owr
+You're missing Rupture Essences: get them in the Dungeon
+@@pkp6r2
+Limit Rupture ${S.lb}! ${LB_PERKS[r]}

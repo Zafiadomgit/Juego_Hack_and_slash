@@ -1,0 +1,34 @@
+@@ts6r7x
+Hard
+@@i37nez
+Burning Ash
+@@x5dggk
+Gloomy Swamp
+@@qbc75g
+Runic Frost
+@@e5lcwx
+Amber Sun
+@@c2swte
+Eternal Void
+@@10pp5qi
++${Math.round(v * 100)}% damage
+@@kifvty
++${Math.round(v * 100)}% crit
+@@1gmxc65
++${Math.round(v * 100)}% atk. speed
+@@uobsox
++${Math.round(v * 100)}% resistance
+@@13hqpw
++${Math.round(v * 100)}% amber
+@@16rbo08
++${Math.round(v * 100)}% energy
+@@nfhw9u
+Ash King, the Devourer
+@@17mu5r2
+Swamp Mother
+@@1jr4yk3
+Titan of Eternal Winter
+@@1ihk7qn
+Amber Phoenix
+@@1rk545n
+Void Archmage

@@ -1,0 +1,191 @@
+@@1d36vum
+Steel Whirlwind
+@@9q7g9z
+Spin with your axe for a few seconds, hitting everything around you
+@@brfmnu
+Rain of Hawks
+@@d0udhl
+Three waves of arrows in every direction and hawks that dive on nearby enemies
+@@fxtcc
+Great Ancestral Rune
+@@1ehayfi
+A huge rune that burns and slows enemies, plus a shield that absorbs half your health
+@@1eelwcj
+Ultimate ready!
+@@qtesn7
+Defeat ${g} monsters
+@@1nntfo7
+Defeat ${g} elites
+@@1qpfz8w
+Defeat ${g} Guardian${g > 1 ? 's' : ''}
+@@edrwew
+Close ${g} Rift${g > 1 ? 's' : ''}
+@@13xnqlg
+Close ${g} more story Rift${g > 1 ? 's' : ''}
+@@11e4pi9
+Collect ${g} amber
+@@7nlwuj
+Use your ultimate ${g} times
+@@zi9zv3
+Complete ${g} Rift event${g > 1 ? 's' : ''}
+@@e8m3th
+✔ Quest complete: 
+@@1wae8wk
++${n} Feat Seals${why ? ' · ' + why : ''}
+@@1rl2c1d
+Pent-up fury
+@@oh7ymq
+Your ultimate charges 30% faster
+@@qdnefj
+Awakened soul
+@@9dltn3
+You start every Rift with your ultimate at 50%
+@@1drett6
+Eye of fate
+@@14we2wu
++5% crit chance
+@@17v1k91
+Transcended
+@@4cm1k
+Your ultimate deals 50% more damage and a golden aura follows you
+@@46o0bf
+Initiate
+@@1xk0sn7
+Tempered
+@@xqa7uo
+Awakened
+@@ul0ey0
+Heroic
+@@1gvv36h
+Legendary
+@@19jekud
+Feat Weapon
+@@1dspv3m
+Exclusive legendary weapon, +20% stats over a normal legendary
+@@tss3wn
+Feat Piece
+@@11eabqx
+Random exclusive legendary piece (no weapon), +20% stats
+@@1ri5yt8
+Ancestral Gem
+@@1mtjpye
+An Ancestral Gem you don't have yet (permanent bonus)
+@@5b40og
+of Feats
+@@1weqgbi
+Quests
+@@evy5nd
+Transcendence
+@@pzf2zl
+Forge
+@@z1bhee
+Armory
+@@1v23huw
+Max
+@@1hkpayb
+ + a random elixir
+@@3k32wh
+✔ Claimed
+@@zyrm32
+Claim
+@@1hlzdxa
+In progress
+@@d22ihq
+<div class="quest ${q.claimed ? 'claimed' : done ? 'done' : ''}">${questMedal(q.id)}
+        <div class="q-txt"><b>${def.text(q.goal)}</b><span>Reward: ${SEAL_SVG} ${questSeals(q)} Feat Seals${def.elixir ? ' + un elixir al azar' : ''}</span>
+          <div class="q-bar"><i style="width:${(q.prog / q.goal) * 100}%"></i></div><small>${fmtNum(q.prog)} / ${fmtNum(q.goal)}</small></div>
+        <button class="btn" data-q="${i}" ${done && !q.claimed ? '' : 'disabled'}>${q.claimed ? '✔ Cobrada' : done ? 'Reclamar' : 'En curso'}</button></div>
+@@12y28t3
+✔ Opened
+@@i0r65r
+Open
+@@1pukeyl
+Locked
+@@1np8jfr
+<div class="quest bonus ${d.bonus ? 'claimed' : bonusReady(d) ? 'done' : ''}">${questMedal('bonus')}
+        <div class="q-txt"><b>Daily chest</b><span>Complete and claim all 3 quests: ${SEAL_SVG} ${DAILY_BONUS} extra Feat Seals</span></div>
+        <button class="btn" data-q="bonus" ${bonusReady(d) ? '' : 'disabled'}>${d.bonus ? '✔ Abierto' : bonusReady(d) ? 'Abrir' : 'Cerrado'}</button></div>
+@@sc5zay
+New quests in ${left} h · each hero has their own. <b>Feat Seals</b> are spent on Transcendence, the Forge and the Armory.
+@@achozi
+Rank ${r + 1}: ${TRANS_TITLES[r + 1]}
+@@m5y3tz
+${CLASSES[S.cls].name} · rank ${r}/${TRANS_MAX}
+@@k2jee7
+You've reached the peak of Transcendence.
+@@75ew0g
+ <b style="color:#ffd76a">Milestone: ${perk.name}</b> — ${perk.desc}.
+@@ye7028
+ <b style="color:#ff8a80">You need level ${lvlReq}.</b>
+@@1qyfa8n
++5% damage and +5% HP forever (now +${r * 5}%).${perk ? ` <b style="color:#ffd76a">Hito: ${perk.name}</b> — ${perk.desc}.` : ''}${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvlReq}.</b>`}
+@@1quu25o
+Rank ${k} milestone
+@@19flshb
+✔ Active
+@@8sk8sh
+Rank ${k}
+@@1duar7g
+Transcendence is permanent for this hero and doesn't depend on gear.
+@@1wet5fg
+Empty slot
+@@t52rgc
++${st * 12}% to the stats of the piece you wear here.
+@@1kcdmwf
++${st * 12}% → <b style="color:#e6c0ff">+${(st + 1) * 12}%</b> to the stats of the piece in this slot.
+@@16omgph
+Stars belong to the slot: you keep them even if you change pieces.
+@@nbdsx
+${S.dofus.length}/${Object.keys(GEMS).length} gems
+@@1f3z8d
+Legendary · Lv ${Math.max(1, (highestLevel() - 1) * 2 + 3 + DIFFS[2].lvl)}
+@@9ptuta
+You have them all
+@@1eokj3x
+The level of Feat pieces rises with the highest Rift you've cleared.
+@@1y0qa2j
+You don't have enough Feat Seals
+@@ulx7n5
+You need level ${transLevel(r)}
+@@125pray
+Rank ${S.trans}! Milestone: ${perk.name}
+@@y1pn9
+Transcendence rank ${S.trans}!
+@@rg7zty
+${SLOT_INFO[key].name} forged to ${st + 1}★
+@@1cmwex5
+Bag full! Sell something first
+@@ux44ve
+ · socket it in Character → Gems
+@@pgxidf
+${it.name} is in your bag
+@@1c65w5t
+🎁 Daily chest: +${DAILY_BONUS} Feat Seals
+@@6rum2g
++${n} Feat Seals and ${ELIXIRS[k].name}
+@@wccakh
++${n} Feat Seals
+@@7hdoeh
+Treasure Chest
+@@1a035p8
+A chest has appeared in the Rift. Find it!
+@@hkurri
+Amber Rain
+@@7wfic9
+Grab all the amber you can!
+@@12skf9g
+Ambush
+@@5a8nnf
+Elites surround you. Defeat them all for a reward
+@@86t0pq
+Altar of Power
+@@1wnmkbj
+Touch the altar to gain power for 30 s
+@@tlt7sz
+Ambush cleared · +${bonus} amber
+@@rc4qp2
+Altar power!
+@@9ugx1d
++50% damage and more speed for 30 s
+@@44wgkb
+The altar's power fades

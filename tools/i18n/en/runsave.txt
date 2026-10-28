@@ -1,0 +1,14 @@
+@@u08mb0
+<div id="resumePick" class="run-pick">
+  <div class="rp-box">
+    <div class="rp-head"><b>Expedition in progress</b><small id="rsInfo"></small></div>
+    <button id="rsGo" class="rp-opt go" type="button"><i>⚔</i><span><b>Continue the expedition</b><small>The Rift starts over, with what you had when you entered it</small></span></button>
+    <button id="rsDrop" class="rp-opt" type="button"><i>✕</i><span><b>Abandon it</b><small>You lose the blessings; the loot and amber are already yours</small></span></button>
+  </div>
+</div>
+@@1spvm56
+${BIOMES[rs.b].name} · ${rs.n === 'S' ? 'Super Boss' : 'Rift ' + rs.n} · ${depth} Rift${depth > 1 ? 's' : ''} · ${nb} blessing${nb === 1 ? '' : 's'}
+@@1fnqssr
+Expedition recovered
+@@2txpdk
+${Object.keys(b.owned).length} blessings with you

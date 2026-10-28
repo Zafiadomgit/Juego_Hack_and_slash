@@ -515,6 +515,7 @@ h1.title span { color: #ecd18a; }
 .hs-skills span { color: #aeb0c4; }
 .hs-story { margin: 0; padding: 8px 10px; border: 1px solid #3a4668; border-radius: 4px; background: rgba(8, 11, 22, .55); font-style: italic; color: #d8d2c0; font-size: 13.5px; }
 .hs-story::before { content: 'Historia'; display: block; font: 700 12px Cinzel, serif; font-style: normal; letter-spacing: 2px; color: #c9b27a; margin-bottom: 3px; }
+html[lang=en] .hs-story::before { content: 'Story'; }
 .hs-save { display: inline-block; margin: 0 0 6px; padding: 2px 8px; border-radius: 3px; background: rgba(124, 196, 87, .18); border: 1px solid #7cc457; color: #b5f28a; font-size: 12px; font-weight: 800; }
 .hs-foot { padding: 8px 12px 10px; }
 .hs-foot .btn { margin: 0; }

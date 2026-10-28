@@ -1,0 +1,82 @@
+@@1s0v053
+Ember Rune
+@@1md9dj5
+Your hits burn: ${Math.round(30 * k)}% extra damage over 3 s
+@@ut6nes
+Frost Rune
+@@18novja
+${Math.round(20 * k)}% chance to freeze (slows for 2 s)
+@@1s92r4a
+Blood Rune
+@@1alpwz8
+Steal ${(3 * k).toFixed(1)}% of damage as health
+@@1lzr4rz
+Echo Rune
+@@bvgbb0
+${Math.round(12 * k)}% chance to hit twice
+@@1wo1gk
+Storm Rune
+@@3nqlh0
+Every 6 hits, lightning jumps to 3 enemies (${Math.round(60 * k)}% of damage)
+@@efzvbo
+Executioner's Rune
+@@f8smj7
++${Math.round(40 * k)}% damage to enemies below 30% health
+@@12fyu39
+ · awakened
+@@gc7gww
+Choose the rune
+@@w2qgcd
+Tobias's legendary weapon
+@@qd7j4f
+Tobias's epic weapon
+@@16zofhs
+One rune per weapon, kid. Choose well: it can't be changed.
+@@1hx0ae0
+Forge rune
+@@1nazw54
+of Tobias
+@@xrojbx
+${it.name} forged! It's in your bag (${FORGE_RUNES[o.id].name})
+@@hlmdzp
+Refine +${r} transferred to ${b.name}
+@@17l2fsw
+Reforge
+@@1r92ov6
+Look at the metal, kid. Will you keep it?
+@@13n6pf2
+▲ New
+@@1lyomrs
+▼ New
+@@dmzg4z
+Keep the new one
+@@1t3kv97
+Previous
+@@175agc1
+Keep the previous one
+@@k1wrvd
+You keep the previous properties
+@@1hy8qyf
+Forge
+@@9ezhmm
+Transfer
+@@syzp57
+epic
+@@101frhd
+Tobias's ${rar === 3 ? 'legendary' : 'epic'} weapon
+@@1imbs9l
+Level ${L} · masterwork +15%
+@@11gadb2
+ (your weapon: level ${cur.level})
+@@1m8uw7k
+Above what drops in your Rifts${cur ? ` (tu arma: nivel ${cur.level})` : ''}. <b style="color:#ffb070">You choose 1 of 3 Forge Runes</b>: effects only Tobias can make, which grow with refining.
+@@n6ldi5
+Runes grow 10% with each refine level and awaken (×1.5) at +10. If you switch weapons, carry over the refine in «Transfer».
+@@1j1cy2r
+Receives the <b style="color:#ffd76a">+${r}</b> refine from <b>${p.a.name}</b> (which goes back to +0).
+@@1wg9d2p
+<div class="smith-empty">Nothing to transfer: you need a refined piece and another for the same slot (one equipped and one in the bag).</div>
+@@i2r5nm
+What you invested in refining isn't lost when you change gear.
+@@zzgs15
+<span class="reco-tag">★ Recommended</span>

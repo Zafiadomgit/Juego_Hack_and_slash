@@ -1,0 +1,24 @@
+@@ubltfs
+<div id="runPick" class="run-pick">
+  <div class="rp-box">
+    <div class="rp-head"><b>The Portal opens</b><small id="rpInfo"></small></div>
+    <button id="rpGo" class="rp-opt go" type="button"><i>⚔</i><span><b>Continue the expedition</b><small id="rpNext"></small></span></button>
+    <button id="rpHome" class="rp-opt" type="button"><i>🏡</i><span><b>Back to Candela Village</b><small>You end the expedition: blessings are lost, loot and amber stay with you</small></span></button>
+  </div>
+</div>
+@@s17k94
+Expedition · ${d} Rift${d > 1 ? 's' : ''} cleared · ${nb} blessing${nb === 1 ? '' : 's'}
+@@1fx4mb0
+<b style="color:#ff7a5a">Super Boss</b> of ${B.name}
+@@1jtl5zz
+${B.name} · Rift ${nx.n}
+@@1mgsvhj
+ · you keep blessings, health and ultimate. <span style="color:#ff9a7a">Monsters will be tougher</span>
+@@1t6fovg
+<br><span style="color:#ffe08a">Defeating the Super Boss ends the expedition and you return to the village</span>
+@@nd8duc
+Expedition · Rift ${run.depth + 1}
+@@cy0qii
+${Object.keys(b.owned).length} blessings with you · monsters grow tougher
+@@br0nj9
+${rift.run.depth + 1} Rifts (record ${Math.max(S.bestRun || 0, rift.run.depth + 1)})

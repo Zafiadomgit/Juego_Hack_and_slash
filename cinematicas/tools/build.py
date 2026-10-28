@@ -1,8 +1,36 @@
 """Genera las 5 cinemáticas (compositions/cN-*.html) y el index.html que las encadena.
 Cada cinemática: 4 planos de 6 s con Ken Burns, partículas, viñeta, franjas de cine y texto.
-Uso: python3 tools/build.py
+Uso: python3 tools/build.py        (español)
+     python3 tools/build.py --en   (inglés: mismo montaje con los textos traducidos; render → cine_*_en.webm)
 """
-import json, random, os
+import json, random, os, sys
+
+EN = '--en' in sys.argv
+TR = {
+  'Prólogo': 'Prologue', 'El primer Sello': 'The first Seal', 'La verdad de Ivo': "Ivo's truth", 'Los Heraldos': 'The Heralds', 'La llave rota': 'The broken key',
+  'Hace trescientos años, la Orden de las Runas selló el mal.': 'Three hundred years ago, the Order of Runes sealed away evil.',
+  'Esta noche… la cerradura ha cedido.': 'Tonight… the lock has given way.',
+  'Morvhal, el Cerrajero, quiere volver.': 'Morvhal, the Locksmith, wants to return.',
+  'El guardián del bosque descansa al fin.': 'The guardian of the forest rests at last.',
+  'Primer Sello: restaurado.': 'First Seal: restored.',
+  '«Qué grosero… romper mi cerradura.»': '“How rude… breaking my lock.”',
+  'Capítulo 2 · La ciénaga que susurra': 'Chapter 2 · The whispering swamp',
+  'Doce runistas. Una noche entera cantando.': 'Twelve runecasters. A whole night of chanting.',
+  'Solo uno sostuvo la última runa.': 'Only one held the last rune.',
+  'Y esperó trescientos años a que llegaras tú.': 'And he waited three hundred years for you to come.',
+  'Capítulo 4 · Las arenas de ámbar': 'Chapter 4 · The amber sands',
+  'Los Doce han estado observando.': 'The Twelve have been watching.',
+  'Nereth, Heraldo de la Marea.': 'Nereth, Herald of the Tide.',
+  'Lysara, Heraldo del Prisma.': 'Lysara, Herald of the Prism.',
+  'Acto II · Los Heraldos': 'Act II · The Heralds',
+  'La llave… se rompe.': 'The key… breaks.',
+  'Una a una, las Grietas se cierran.': 'One by one, the Rifts close.',
+  'Y Villa Candela vuelve a amanecer.': 'And dawn returns to Candela Village.',
+  'Siete héroes · Doce dioses · Un sello': 'Seven heroes · Twelve gods · One seal',
+  'Fin del primer viaje · Gracias por jugar': 'End of the first journey · Thanks for playing',
+}
+T = (lambda s: TR.get(s, s)) if EN else (lambda s: s)
+LOGO = 'logo_en.png' if EN else 'logo.png'
 
 CINES = [
  ('c1-prologo', 'Prólogo', [
@@ -56,6 +84,7 @@ def comp(cid, title, shots):
     html, js = [], []
     for k, sh in enumerate(shots):
         img, text, cam, pk, rgb = sh[:5]
+        text = T(text) if text else text
         fx = sh[5] if len(sh) > 5 else ''
         t0 = k * SHOT
         sid = f'{cid}-s{k}'
@@ -63,9 +92,9 @@ def comp(cid, title, shots):
         pdivs = ''.join(f'<i class="pt {pk}" id="{sid}-p{i}" style="left:{p["x"]}px;top:{p["y"]}px;width:{p["s"]}px;height:{p["s"]}px;--c:{p["c"]}"></i>' for i, p in enumerate(parts))
         cap = ''
         if fx == 'logo':
-            cap = f'<img class="logo" id="{sid}-logo" src="assets/img/logo.png" alt=""><div class="sub" id="{sid}-sub">Siete héroes · Doce dioses · Un sello</div>'
+            cap = f'<img class="logo" id="{sid}-logo" src="assets/img/{LOGO}" alt=""><div class="sub" id="{sid}-sub">{T("Siete héroes · Doce dioses · Un sello")}</div>'
         elif fx == 'end':
-            cap = f'<img class="logo" id="{sid}-logo" src="assets/img/logo.png" alt=""><div class="sub" id="{sid}-sub">Fin del primer viaje · Gracias por jugar</div>'
+            cap = f'<img class="logo" id="{sid}-logo" src="assets/img/{LOGO}" alt=""><div class="sub" id="{sid}-sub">{T("Fin del primer viaje · Gracias por jugar")}</div>'
         elif fx == 'title':
             cap = f'<div class="chap" id="{sid}-cap"><span class="rule"></span><b>{text}</b><span class="rule"></span></div>'
         else:
@@ -147,7 +176,7 @@ def comp(cid, title, shots):
 #root .fade {{ position: absolute; inset: 0; background: #040308; }}
 '''
     return f'''<!doctype html>
-<html lang="es">
+<html lang="{'en' if EN else 'es'}">
   <head><meta charset="UTF-8" /><title>{title}</title></head>
   <body>
     <template>
@@ -163,7 +192,7 @@ def comp(cid, title, shots):
         <div class="bars"></div>
         <div class="flash" id="{cid}-flash"></div>
         <div class="fade" id="{cid}-fade"></div>
-        <div class="act" id="{cid}-act">Fendaria · {title}</div>
+        <div class="act" id="{cid}-act">Fendaria · {T(title)}</div>
       </div>
       <script>
         const tl = gsap.timeline({{ paused: true }});

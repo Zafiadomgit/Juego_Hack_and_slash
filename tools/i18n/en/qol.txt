@@ -1,0 +1,19 @@
+@@14zcm41
+<div id="optPanel" class="run-pick">
+  <div class="rp-box opt-box">
+    <div class="rp-head"><b>Settings</b></div>
+    <label class="opt-row"><span><b>Auto-attack</b><small>Attack automatically when an enemy is in range</small></span><input type="checkbox" data-o="autoAtk"></label>
+    <label class="opt-row"><span><b>Music</b></span><input type="range" min="0" max="1" step="0.05" data-o="music"></label>
+    <label class="opt-row"><span><b>Sound effects</b></span><input type="range" min="0" max="1" step="0.05" data-o="sfx"></label>
+    <label class="opt-row"><span><b>Screen shake</b></span><input type="range" min="0" max="1" step="0.25" data-o="shake"></label>
+    <label class="opt-row"><span><b>Damage numbers</b></span><select data-o="dmgNums"><option value="all">All</option><option value="crit">Crits only</option><option value="off">None</option></select></label>
+    <label class="opt-row"><span><b>Big buttons</b><small>Larger combat buttons</small></span><input type="checkbox" data-o="bigBtns"></label>
+    <label class="opt-row"><span><b>Full bag: sell the worst</b><small>When you pick up something better, the weakest common or rare piece is sold automatically</small></span><input type="checkbox" data-o="autoSell"></label>
+    <label class="opt-row"><span><b>Language · Idioma</b></span><select id="optLang"><option value="es">Español</option><option value="en">English</option></select></label>
+    <button id="optClose" class="rp-opt go" type="button"><i>✔</i><span><b>Done</b></span></button>
+  </div>
+</div>
+@@1m1yvwz
+<button id="btnOpts" class="btn">⚙ Settings</button>
+@@19z584i
+Sold: ${old.name} (+${old.value || 0})

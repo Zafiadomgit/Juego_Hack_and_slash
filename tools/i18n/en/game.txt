@@ -1,0 +1,389 @@
+@@c1j68t
+of the Novice
+@@qerm33
+${e.name} is enraged!
+@@1drrvl8
+Super Boss of 
+@@u3iz64
+ · Get ready!
+@@53fdvf
+Rift ${n} · ${DF.name} · Fill the bar to summon the Guardian
+@@1187jam
+ · Super Boss
+@@9ygq9n
+Second phase!
+@@7ho8u8
+Final phase!
+@@a9dv1p
+ grows more dangerous
+@@1p11cie
+The Guardian appears!
+@@tp4nnl
+ · lv. 
+@@1nxutd4
+of the Ancestral Fang
+@@qow4ps
+of the Fiery Claw
+@@1xbyvj2
+of the Ashweaver Queen
+@@17ed64m
+of the Frost Colossus
+@@1mb0rmy
+of the Abyss Sorcerer
+@@14g9nhx
+${e.name} defeated!
+@@cke9mf
+Grab the loot and cross the Portal to return to Candela Village
+@@17vuswk
+first Super Boss
+@@1uu1iw7
+first victory on Hard
+@@1l0j5sx
+New world unlocked!
+@@1x6wa0x
+Streak ×${streak.n}  ·  +${bonus} amber
+@@13sw9g8
+Bag full!
+@@1y01xy6
+Legendary item: 
+@@16qq9bd
+ · Socketed!
+@@winslm
+ · Socket it in Character → Gems
+@@1evkobu
+Level 
+@@6tl6is
++5 stat points (open the bag 🎒)
+@@92568f
+Dungeon · Floor ${rift.tier}
+@@e1rexj
+Super Boss
+@@1j4lljz
+Rift ${rift.n} · ${rift.D.name}
+@@1u55pwz
+Streak ×
+@@mlbcnr
+NOW!
+@@1z04hai
+CRITICAL!
+@@12txloj
+Level ${slot.level}
+@@1oucxhf
+<span class="hs-save">Saved game · level ${slot.level}</span>
+@@1qrud32
+<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energy — ${sk.desc}</span></div>
+@@18oel5w
+
+    <h3>${C.name}</h3>
+    <div class="ep">${L.hero}, ${L.epithet} · ${C.role} · Difficulty ${'★'.repeat(L.difficulty)}${'☆'.repeat(3 - L.difficulty)}</div>
+    ${slot ? `<span class="hs-save">Partida guardada · nivel ${slot.level}</span>` : ''}
+    <p class="sum">${L.summary}</p>
+    <p class="hs-story">${L.story}</p>
+    <p class="ps">${L.playstyle}</p>
+    <div class="hs-stats">${Object.entries(L.stats).map(([k, v]) => `<span>${HS_STAT[k] || k}</span>${bar(v)}`).join('')}</div>
+    <div class="hs-skills">${C.skills.map((sk) => `<div><b>${sk.icon} ${sk.name}</b> <span>· ${sk.cost} energía — ${sk.desc}</span></div>`).join('')}<div><b>${ULTIMATES[id].icon} ${ULTIMATES[id].name}</b> <span>· ultimate — ${ULTIMATES[id].desc}</span></div></div>
+@@12v9kcp
+Start over with ${C.name}
+@@1ajqme6
+Continue with ${C.name}
+@@19u7s8e
+Start with ${C.name}
+@@1fkqkh4
+Empty gem socket
+@@1ilw6go
+Rift ${sel.n} · <span style="color:${DF.color}">${DF.name}</span>
+@@pnghrb
+<small>${fb.name} · Recommended level ${rec}</small>
+@@1hlidrl
+<small class="warn">⚠ Your level (${S.level}) is low for this Rift</small>
+@@1udregx
+<img src="img/ui/bag.png" alt=""><span>Character</span>
+@@16b47ov
+Are you sure? ${CLASSES[selectedClass].name}'s progress will be lost · Tap again
+@@1a0jfhg
+☠ Challenge
+@@1jffo9h
+⚔ Enter
+@@ym8l6e
+<div class="mf-set" style="color:${SETS[B.id].color}">${SETS[B.id].name} Set: ${cnt}/${SLOTS.length} equipped</div>
+@@1c1m4jr
+<h3>${B.name}</h3><div class="mi-lock">🔒 Defeat the Super Boss of ${BIOMES[b - 1].name} to open this world.</div>
+@@1atog1l
+<h3>${B.name}</h3><div class="mi-sub">Choose a Rift on the map.</div>
+@@zr709z
+☠ Super Boss
+@@p6em0b
+Rift 
+@@1pmy9di
+Guardian
+@@19hmfns
+Gems from here: all yours
+@@4g6k2
+Gems you can get
+@@1f0d8l5
+☠ Challenge the Super Boss
+@@1k77hwb
+🌀 Enter the Rift
+@@s34to5
+
+    <h3>${isS ? '☠ Súper Jefe' : 'Grieta ' + n}</h3>
+    <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
+    ${diffs}
+    <div class="mi-rows">
+      <span>Recommended</span><b class="${S.level + 2 < rec ? 'bad' : ''}">level ${rec}+ (you ${S.level})</b>
+      <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
+    </div>
+    <div class="mi-chips">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 20)}${S.dofus.includes(k) ? '<i>✔</i>' : ''}</span>`).join('')}<small>${gemsFor(B.id, isS).every((k) => S.dofus.includes(k)) ? 'Gemas de aquí: todas tuyas' : 'Gemas que puedes conseguir'}</small></div>
+    <details class="mi-more"><summary>More details</summary>
+    <div class="mi-rows">
+      <span>Monsters</span><b>level ${mlo}–${mlo + 4}</b>
+      <span>Designed for gear</span><b><span style="color:${RARITY[3].color}">Legendary</span></b>
+      <span>Amber and XP</span><b>×${DF.reward}</b>
+      <span>Loot quality</span><b>${rarityRangeText(DF)}</b>
+      <span>Set piece</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
+      <span>Ancestral Gem</span><b>${Math.round(gemChance(L, d, isS) * 100)}% if you're missing any</b>
+    </div>
+
+    <div class="mi-set" style="--sc:${SD.color}"><div class="t">${SD.name} Set (${cnt}/${SLOTS.length})</div>
+      ${[2, 4, 6].map((k) => `<div class="${cnt >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
+    </details>
+    <button id="btnMapGo" class="btn big">${isS ? '☠ Desafiar al Súper Jefe' : '🌀 Entrar en la Grieta'}</button>
+@@fo5xdf
+All
+@@tzqipp
+Weapons
+@@1vezmtn
+Armor
+@@17ubnnx
+Jewels
+@@135opza
+any Super Boss
+@@8fm65s
+the Guardian of 
+@@gzfap4
+<small>Empty socket</small>
+@@jhc0t8
+Socketed
+@@y6xyx4
+In your collection
+@@10s2fuc
+Obtained from 
+@@1q3b4db
+Remove
+@@1t6s3y7
+Socket
+@@1c5arz5
+<div class="gem-panel" role="dialog">
+    <header><b>Ancestral Gems</b><span>${S.dofus.length}/${Object.keys(GEMS).length}</span><button class="sh-close" id="gpClose">✕</button></header>
+    <p class="gp-help">Socket up to ${S.gemSlots.length} gems: only socketed gems give their bonus, and you can swap them whenever you like. You get them by defeating the Guardian of each gem's world (check the odds on the map).</p>
+    <div class="gp-slots">${S.gemSlots.map((k, i) => `<button data-gs="${i}" class="${i === gemSel ? 'on' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}">${k ? gemImg(k, 26) + '<small>' + GEMS[k].name + '</small>' : '<small>Hueco libre</small>'}</button>`).join('')}</div>
+    <div class="gp-list">${Object.keys(GEMS).map((k) => {
+      const own = S.dofus.includes(k), on = S.gemSlots.includes(k);
+      return `<div class="gp-gem ${own ? '' : 'locked'} ${on ? 'on' : ''}" style="--c:${GEMS[k].color}">
+        ${gemImg(k, 34, own)}
+        <div><b>${GEMS[k].name}</b><span>${GEMS[k].desc}</span><small>${own ? (on ? 'Engarzada' : 'En tu colección') : 'Se consigue con ' + where(k)}</small></div>
+        ${own ? `<button data-g="${k}" class="btn">${on ? 'Quitar' : 'Engarzar'}</button>` : ''}
+      </div>`;
+    }).join('')}</div></div>
+@@1xo9hka
+Damage
+@@1lokn4
+Critical
+@@obxaf4
+Spells
+@@11p6j9n
+Atk. speed
+@@sf1ns6
+<img class="pico-ui" src="img/icons/power.png" width="22" height="22" alt=""> Power 
+@@osrtk9
+
+    <div class="pedestal" style="--aura:${aura}"></div>
+    ${heroDollHTML()}
+    ${Object.keys(SLOT_POS).map((s) => slotHTML(s, SLOT_POS[s])).join('')}
+    <div class="bottom">
+      <button class="gems-label" id="btnGems">GEMS ${S.dofus.length}/${Object.keys(GEMS).length}</button>
+      ${S.gemSlots.map((k, i) => k
+        ? `<button class="gem got" data-gs="${i}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 22)}</button>`
+        : `<button class="gem" data-gs="${i}" title="Hueco libre: toca para engarzar una gema">+</button>`).join('')}
+    </div>
+@@olz8gu
+⚡ Equip best (${n})
+@@rzqx7v
+⚡ Equip best
+@@wxeuav
+<div class="stat" data-k="${k}" style="background:${col}14">
+      ${statIcon(k)}<span class="nm">${STAT_INFO[k].name}${rec ? '<i class="rec" title="Recomendada para tu clase">★</i>' : ''}<small class="eff">Gives <b style="color:${col};font-size:10.5px">${STAT_HELP[k].now(t)}</b></small></span>
+      <b style="color:${col}">${base}${bonus ? ` <small>+${bonus}</small>` : ''}</b>
+      <button class="plus" data-stat="${k}" ${S.points < 1 ? 'disabled' : ''} aria-label="Raise ${STAT_INFO[k].name}">+</button>
+    </div>
+@@dusq4r
+<button class="pri" id="icEquip">Equip</button>
+@@1h2ts4h
+<button class="pri" id="icUnequip">Unequip</button>
+@@szo2u7
+<button class="sec" id="icSell">Sell · ${it.value}</button>
+@@3601mz
+Crit
+@@rg3si
+Might
+@@uzixzz
+Power
+@@34lrmj
+You already have the best from your bag
+@@5jhmmk
+<div class="setbox" style="--sc:${SD.color}"><div class="t">${SD.name} Set (${nSet}/${SLOTS.length} equipped)</div>${[2, 4, 6].map((k) => `<div class="${nSet >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
+@@1fbqjlh
+Set piece
+@@saxdig
+">★ Unique relic</b>
+@@1fx7ma2
+<p class="cmp">Compared with <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipped)</p>
+@@t56dbf
+<article class="icard" style="--rc:${SD ? SD.color : R.color};--rg:rgba(${rgb},.5);--rt:${SD ? SD.color : it.rarity === 3 ? '#ffc37a' : R.color}">
+    <div class="bar"></div>
+    <div class="top">
+      <div class="big" style="background:radial-gradient(circle at 50% 40%, rgba(${rgb},.45), #1a0f08)">${itemSVG(it, 52)}</div>
+      <div style="display:flex;flex-direction:column;gap:4px;min-width:0">
+        <h2>${it.name}</h2>
+        <span class="rar">${SD ? 'Pieza de conjunto' : it.unique ? '<b style="color:' + UNIQUES[it.unique].color + '">★ Reliquia única</b>' : R.name}</span>${it.unique ? `<span class="uniq" style="color:${UNIQUES[it.unique].color}">${UNIQUES[it.unique].desc}</span>` : ''}
+        <span class="meta">${SLOT_INFO[it.slot].name} · Level ${it.level}</span>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <ul>${lines}</ul>
+    ${setBox}
+    ${eq ? `<p class="cmp">Comparado con <b style="color:${RARITY[eq.rarity].color}">${eq.name}</b> (equipado)</p>` : ''}
+    <div class="btns">${priBtn}${secBtn}</div>
+  </article>
+@@1vi5k34
+ <small style="color:#ffd76a">★ recommended for 
+@@msgzku
+<li>${statIcon(k)}<div><b style="color:${STAT_COLOR[k]}">${STAT_INFO[k].name}${rec.includes(k) ? ' <small style="color:#ffd76a">★ recomendada para ' + CLASSES[S.cls].name + '</small>' : ''}</b><span>${STAT_HELP[k].what}. Now: ${STAT_HELP[k].now(t)}.</span></div></li>
+@@15skwlm
+<li>${statIcon('dmg')}<div><b>Damage</b><span>Added to the power of every hit (mostly on weapons).</span></div></li>
+@@14g5zb8
+<li>${statIcon('crit')}<div><b>% Critical</b><span>Chance of a critical hit (×1.8 damage).</span></div></li>
+@@1r7vo0m
+<li>${statIcon('res')}<div><b>% Resistance</b><span>Reduces the damage you take.</span></div></li>
+@@e8o28x
+<li>${statIcon('pros')}<div><b>Prospecting</b><span>More amber and a wider loot pickup radius.</span></div></li>
+@@14lh0ef
+<article class="icard" style="--rc:#e8b64c;--rg:rgba(232,182,76,.4);--rt:#ffd76a;width:360px">
+    <div class="bar"></div>
+    <div class="top"><div style="display:flex;flex-direction:column;gap:2px"><h2>What does each stat do?</h2><span class="meta">Each level gives you 5 points. Hold «+» to spend them quickly.</span></div></div>
+    <div class="sep"></div>
+    <ul class="help-list">${rows}</ul>
+    <div class="btns"><button class="pri" id="helpOk">Got it</button></div>
+  </article>
+@@ftbp1e
+Brunilda · Merchant
+@@ur7h70
+Gear
+@@1gn4uql
+Master Ivo · Alchemist
+@@11v8z8q
+Elixirs
+@@1qjf0h0
+Upgrades
+@@siadmm
+Sold
+@@1f853v0
+${R.name} · Lv ${it.level}
+@@1gk6oth
+ <b style="color:#8fe36a">▲ better than yours</b>
+@@mjeipn
+New stock after every Rift you close. Amber comes from monsters, Guardians, streaks and selling items.
+@@a6adct
+Restock · 
+@@l8rcn6
+You have ${have} · Next Rift
+@@vchmm1
+Next Rift
+@@1vlaqri
+Sap Potion
+@@hjaye0
+You have ${S.pan}/${panMax()}
+@@4o3r0c
+Heals 40% of your HP in combat (🧪 button).
+@@1ho1tqp
+Elixirs are drunk automatically when you cross the Portal and last the whole Rift.
+@@ymcdx1
+Permanent upgrade · ${lv}/${U.max}
+@@bnvdxr
+Max level reached
+@@otl7pi
+Upgrades are permanent for this character.
+@@13tswr3
+<button class="pri" id="scBuy">Buy · ${fmtNum(it.price)}</button>
+@@dk6z7x
+<button class="sec" id="scClose">Close</button>
+@@o7mwc4
+${it.name} is in your bag · open it in Character to equip it
+@@1ih16w0
+Max 3 of each elixir
+@@14zagcv
+${ELIXIRS[key].name} ready for the next Rift
+@@rz2u1l
+You already carry the max potions
+@@ylwjzj
+Sap Potion bought (${S.pan}/${panMax()})
+@@1fcv0a5
+${U.name} upgraded to level ${lv + 1}
+@@1451sxk
+Stock renewed
+@@vc1n5f
+Time
+@@vwol9w
+Monsters defeated
+@@1wg6rrh
+Items found
+@@1sgcyj9
+ (${rift.legendaries} legendar${rift.legendaries > 1 ? 'ies' : 'y'})
+@@gr81ps
+Amber earned
+@@1g87u56
+Experience
+@@obahxe
+ (+${rift.levels} lv.)
+@@1v8u2b2
+Progress
+@@11vo88o
+Dungeon · Floor ${rift.tier} cleared
+@@1cuime0
+${SUPER_BOSSES[rift.biome.id].name.split(',')[0]} defeated!
+@@jo0k67
+Rift ${rift.n} (${rift.D.name}) closed
+@@r448ft
+Time bonus
+@@159d6ii
+ amber
+@@12tzxxq
+Rupture Essences
+@@psoblm
+${CLASSES[SAVE.last].name} · level ${last.level}
+@@19e6ikn
+No saved games yet
+@@1po1zr3
+New game · Choose your hero
+@@164exb2
+Choose who to play
+@@1dnpw5y
+Each hero has their own save.
+@@chxnp0
+Switch heroes; each one keeps their progress.
+@@1xqda0t
+<span title="Elixirs for the next Rift: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>
+@@471opg
+<button class="gem" data-gs="${i}" title="Empty socket: tap to socket a gem">+</button>
+@@9l9q89
+<i class="rec" title="Recommended for your class">★</i>
+@@2djp4l
+<button id="shHelpBtn" class="sh-help" aria-label="What does each stat do?">?</button>
+@@47nz7d
+Health
+@@zs18f0
+Range
+@@1mifepf
+Defense
+@@3nae02
+Mobility

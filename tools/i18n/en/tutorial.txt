@@ -1,0 +1,26 @@
+@@1r3shgw
+Drag your finger on the <b>left half</b> to move
+@@1j2yjj9
+Move with <b>WASD</b> or the arrow keys
+@@1gzo6eu
+Hold <b>⚔</b> to attack monsters
+@@1w6989f
+Hold <b>J</b> or <b>space</b> to attack
+@@169ct6z
+Press <b>»</b> to <b>dodge</b>: while rolling you can't be hit
+@@vwrvmy
+Your <b>skills</b> cost energy (<b>EN</b>), which recharges on its own. Try one!
+@@1mx5o6e
+Defeat monsters to <b>fill the Rift bar</b> (top right)
+@@1h70za2
+When the wave ends, <b>walk up to the altar</b> and press the button: the gods give you <b>blessings</b>
+@@yoautb
+The <b>Guardian</b>! Watch for the <b style="color:#ff6a5a">!</b> and the red zones: <b>dodge</b> at the right moment
+@@ita12d
+You know the basics!
+@@bfw8mm
+You'll discover the rest by fighting. Good luck, Bearer.
+@@ncvcm4
+You're low on health: tap the <b>potion</b> to heal
+@@xr27ic
+Walk to the <b>Portal</b> in the middle of the square to enter your first <b>Rift</b>

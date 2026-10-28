@@ -9,6 +9,15 @@
   <link rel="apple-touch-icon" href="img/icon-192.png" />
   <meta name="theme-color" content="#070b18" />
   <meta name="description" content="Fendaria: Las Grietas Rúnicas — hack and slash de fantasía en pixel art HD." />
+  <script>
+    // idioma: el guardado, o el del sistema la primera vez (español → index.html, el resto → index_en.html)
+    (function () {
+      var l = null; try { l = localStorage.getItem('fendaria_lang'); } catch (e) {}
+      if (!l) l = navigator.webdriver || /^es\b/i.test(navigator.language || 'es') ? 'es' : 'en'; // las pruebas automáticas, en español
+      var cur = document.documentElement.lang === 'en' ? 'en' : 'es';
+      if (l !== cur) location.replace(l === 'en' ? 'index_en.html' : 'index.html');
+    })();
+  </script>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>

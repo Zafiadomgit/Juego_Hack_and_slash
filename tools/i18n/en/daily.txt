@@ -1,0 +1,77 @@
+@@19l7hh2
+Crits only
+@@zyml2i
+All your hits are crits, but you deal 40% less damage
+@@sjwb6g
+Powder keg
+@@l5lt21
+All monsters explode on death
+@@4tlyg6
+Glass cannon
+@@27s2rg
++80% damage, but half health
+@@3lwfdz
+Swarm
+@@1cvvw2a
+Twice the monsters, with half the health
+@@1i1wtod
+Giants
+@@15vcw0u
+Huge, slow monsters with triple health
+@@13zvwk9
+Vampiric thirst
+@@18757ab
+No potions: every kill heals you 3%
+@@1oh3835
+Frenzy
+@@nstiki
+Everything's faster: monsters +30%, your attacks +30%
+@@6q5k3k
+Elite nest
+@@omm1wf
+A third of the monsters are elites
+@@iqpwqu
+Blessed
+@@1uyla5z
+You start with three random blessings
+@@14jcn5x
+Eternal night
+@@yh6kwl
+Permanent darkness: you only see close around you
+@@z8y8qq
+Daily Rift
+@@16qgt2l
+<div id="dailyPick" class="run-pick">
+  <div class="rp-box daily-box">
+    <div class="rp-head"><b>Daily Rift</b><small id="dlyInfo"></small></div>
+    <div id="dlyMods" class="dly-mods"></div>
+    <div id="dlyStats" class="dly-stats"></div>
+    <button id="dlyGo" class="rp-opt go" type="button"><i>⚔</i><span><b>Enter</b><small>Replay it as many times as you like: your best score counts</small></span></button>
+    <button id="dlyClose" class="rp-opt" type="button"><i>✕</i><span><b>Not now</b></span></button>
+  </div>
+</div>
+@@1hvsh92
+${B.name} · Rift ${T.node.n} · today, ${T.key.split('-').reverse().join('/')}
+@@1b901cl
+<span style="color:#7cff8a">✔ claimed</span>
+@@1qb2yl
+10 Seals + a legendary in your bag (defeat the Guardian)
+@@14h3c02
+<span>Your best today</span><b>${fmtNum(sv.best)} pts</b><span>Personal record</span><b>${fmtNum(S.dailyRecord || 0)} pts</b>
+    <span>Daily prize</span><b>${sv.claimed ? '<span style="color:#7cff8a">✔ cobrado</span>' : '10 Sellos + un legendario a la bolsa (vence al Guardián)'}</b>
+@@pp3ulx
+<button id="dbDaily" class="db-slot" type="button"><img src="img/icons/gem.png" alt=""><span>Daily</span></button>
+@@1o34qal
+No potions today
+@@1o179qj
+Daily Rift cleared
+@@5441iu
+ <span style="color:#ffd54f">RECORD!</span>
+@@hhekwn
+ <span style="color:#7cff8a">best of the day!</span>
+@@1licl7x
+<span>Score</span><b>${fmtNum(d.final)} pts${tag}</b><span>Personal record</span><b>${fmtNum(S.dailyRecord || 0)} pts</b>
+@@fhccmf
+<span>Daily prize</span><b style="color:#ffd54f">+10 Seals and a legendary</b>
+@@19tnxgu
+☀ Daily · ${fmtNum(dailyScore())} pts
