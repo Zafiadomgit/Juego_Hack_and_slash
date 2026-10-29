@@ -22,6 +22,21 @@
   <link rel="stylesheet" href="css/ui.css" />
 </head>
 <body>
+  <!-- Intro del estudio (Lumen): chispa → halo → letras con barrido de luz; se salta tocando -->
+  <div id="lumenSplash" aria-label="Lumen studio">
+    <div class="ls-glow"></div><div class="ls-ring"></div><div class="ls-spark"></div>
+    <div class="ls-word"><span>L</span><span>U</span><span>M</span><span>E</span><span>N</span><i class="ls-sweep"></i></div>
+    <div class="ls-sub">studio</div>
+  </div>
+  <script>
+    (function () {
+      var el = document.getElementById('lumenSplash');
+      function done() { if (!el || el.classList.contains('out')) return; el.classList.add('out'); setTimeout(function () { el.remove(); }, 700); }
+      if (navigator.webdriver) { el.remove(); return; } // pruebas automáticas: sin intro
+      el.addEventListener('click', done); el.addEventListener('touchstart', done, { passive: true });
+      setTimeout(done, 3800);
+    })();
+  </script>
   <canvas id="game"></canvas>
 
   <!-- Video de presentación -->
@@ -156,7 +171,7 @@
         <span id="dgRes" class="sh-amber" style="margin-left:auto"></span>
         <button id="btnDgClose" class="sh-close" aria-label="Close">✕</button>
       </header>
-      <p class="dg-help">Ever harder floors, crawling with elites and with a Super Boss at the end. This is where you find <b style="color:#ffb040">unique relics</b> y <b style="color:#ff8ae0">Sellos de Gesta</b>, y cada piso superado abre un rango de Despertar (Tablón → Despertar).</p>
+      <p class="dg-help">Ever harder floors, crawling with elites and with a Super Boss at the end. This is where you find <b style="color:#ffb040">unique relics</b> and <b style="color:#ff8ae0">Feat Seals</b>, and each floor you clear unlocks an Awakening rank (Board → Awakening).</p>
       <div id="dgList" class="quest-list"></div>
     </div>
   </div>
