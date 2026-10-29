@@ -1,0 +1,59 @@
+@@1oalbks
+<div id="paywall" class="pw-ov" role="dialog" aria-modal="true">
+  <div class="pw-box">
+    <div class="pw-art">${PW_WORLDS.map((w) => `<i style="background-image:url(img/worlds/art_${w}.webp)"></i>`).join('')}</div>
+    <button class="pw-x sh-close" data-pw="close" aria-label="Close">✕</button>
+    <div class="pw-body">
+      <small class="pw-kick">Fendaria · full game</small>
+      <h2 class="pw-title">The Rifts don't end here</h2>
+      <ul class="pw-list">
+        <li><b>6 more worlds</b> · from the Runic Glacier to the Locksmith's Citadel</li>
+        <li><b>6 Super Bosses</b> and their Guardians, with the full story</li>
+        <li><b>The Dungeon</b> · unique relics and your heroes' Awakening</li>
+        <li><b>Torment</b> · endless difficulty and a world ranking</li>
+      </ul>
+      <p class="pw-note">One single payment, forever and with no ads. Your current progress is kept.</p>
+      <button class="btn big pw-buy" data-pw="buy">Unlock · <span id="pwPrice">${FULL.price}</span></button>
+      <div class="pw-msg" id="pwMsg"></div>
+      <div class="pw-links"><button data-pw="restore">Restore purchase</button><button data-pw="code">Redeem code</button></div>
+    </div>
+  </div>
+</div>
+@@7ymw1z
+Purchases are available in the Google Play app.
+@@9sr3uy
+Opening Google Play…
+@@dyefma
+The purchase wasn't completed.
+@@1ij7mcm
+The purchase couldn't be completed. Please try again.
+@@123jhxl
+Restoring is available in the Google Play app.
+@@1c2ny7n
+Looking for your purchase…
+@@1ttdgky
+We couldn't find a purchase for this Google account.
+@@kot49m
+Enter your code:
+@@6dkgwc
+Invalid code.
+@@7gohyg
+Invalid code
+@@gj0x82
+<img src="img/talents/crown.png" alt=""><span><small>Thank you!</small><b>Full game unlocked</b><em>All 8 worlds, the Dungeon and Torment are now yours</em></span>
+@@8g1hpx
+<div class="pw-mapnote">★ This world is part of the <b>full game</b></div>
+@@jcvcq6
+★ Unlock the full game
+@@388usi
+You've completed the free worlds! Continue the story with the full game.
+@@15ns5k9
+✔ Unlocked · thank you for supporting Lumen
+@@qckjad
+Worlds 3–8, Dungeon and Torment
+@@1o0r3ow
+Restore
+@@1c8k40w
+View
+@@hz9fwv
+<div class="opt-row pw-row"><span><b>Full game</b><small id="pwState"></small></span><span class="pw-acts"><button class="btn" id="pwRedeem" type="button">Redeem code</button><button class="btn" id="pwOpen" type="button"></button></span></div>

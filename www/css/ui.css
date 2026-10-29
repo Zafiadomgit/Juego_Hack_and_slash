@@ -265,3 +265,31 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 @keyframes lsTrack { from { letter-spacing: .5em; padding-left: .5em; } to { letter-spacing: .28em; padding-left: .28em; } }
 @keyframes lsSweep { to { left: 120%; } }
 @media (prefers-reduced-motion: reduce) { #lumenSplash * { animation-duration: .01s !important; animation-delay: 0s !important; } }
+
+/* Juego completo */
+.pw-ov { position: fixed; inset: 0; z-index: 70; display: none; align-items: center; justify-content: center; background: rgba(4,4,12,.72); backdrop-filter: blur(3px); }
+.pw-ov.show { display: flex; animation: uiIn .3s ease-out; }
+.pw-box { position: relative; width: min(760px, calc(100vw - 24px)); max-height: calc(100dvh - 20px); display: grid; grid-template-columns: 1fr 1.15fr; overflow: hidden;
+  border: 2px solid #ecd18a; border-radius: 16px; background: linear-gradient(#1b2140, #0f1324); box-shadow: 0 20px 60px rgba(0,0,0,.7), 0 0 40px rgba(236,209,138,.25); }
+.pw-art { display: grid; grid-template-columns: 1fr 1fr; grid-auto-rows: 1fr; min-height: 260px; }
+.pw-art i { background-size: cover; background-position: center; filter: saturate(1.15); }
+.pw-art { -webkit-mask-image: linear-gradient(90deg, #000 70%, transparent); mask-image: linear-gradient(90deg, #000 70%, transparent); }
+.pw-body { padding: 18px 20px 14px 6px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+.pw-kick { color: #c9a35a; font: 700 11px Cinzel, serif; letter-spacing: 2px; text-transform: uppercase; }
+.pw-title { margin: 0; color: #ffe08a; font: 900 22px/1.15 Cinzel, serif; }
+.pw-list { margin: 2px 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.pw-list li { color: #e8dfc8; font: 600 14px/1.3 Garamond, serif; padding-left: 20px; position: relative; }
+.pw-list li::before { content: '★'; position: absolute; left: 0; color: #ffd76a; }
+.pw-list b { color: #fff3cf; }
+.pw-note { margin: 0; color: #aeb3c8; font: italic 13px Garamond, serif; }
+.pw-buy { margin-top: 4px; font-size: 19px !important; }
+.pw-msg { min-height: 16px; color: #ffcf9a; font: 600 13px Garamond, serif; text-align: center; }
+.pw-links { display: flex; justify-content: center; gap: 18px; }
+.pw-links button { background: none; border: 0; color: #9fd8ff; text-decoration: underline; font: 700 13px Garamond, serif; cursor: pointer; }
+.pw-x { position: absolute; top: 8px; right: 8px; z-index: 2; }
+.pw-tab { position: relative; }
+.pw-tab::after { content: '★'; position: absolute; top: 2px; right: 4px; color: #ffd76a; font-size: 11px; }
+.pw-mapnote { margin-bottom: 8px; padding: 6px 10px; border-radius: 8px; background: rgba(255,214,110,.12); border: 1px solid rgba(255,214,110,.4); color: #ffe08a; font: 600 13px Garamond, serif; }
+.pw-row .pw-acts { display: flex; gap: 6px; }
+.pw-row .btn { padding: 6px 10px; font-size: 13px; }
+@media (max-height: 430px) { .pw-art { min-height: 0; } .pw-title { font-size: 19px; } .pw-list li { font-size: 13px; } }

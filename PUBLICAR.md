@@ -81,3 +81,17 @@ Ahora: versionCode 2, versionName 1.1.0.
   node tools/i18n/build.js     # regenera la versión inglesa
   ```
 - Cinemáticas en inglés: `cd cinematicas && python3 tools/build.py --en`, render, y vuelve a `python3 tools/build.py`.
+
+## Juego completo (compra única de 2,99 $)
+- Gratis: entrenamiento, mundos 1 y 2 con sus Súper Jefes y la Grieta del Día. De pago: mundos 3–8, Mazmorra y Tormento (`www/js/paywall.js`).
+- Plugin: `@capgo/native-purchases` (Google Play Billing). Tras `git pull`: `npm install && npx cap sync android`.
+- **Play Console → Monetizar → Productos → Productos en la aplicación → Crear producto**
+  - ID del producto: `juego_completo` (exactamente así; no se puede cambiar después)
+  - Nombre: «Juego completo» · Descripción: «Los mundos 3 a 8, la Mazmorra y el Tormento» · Precio: 2,99 USD (Google convierte al resto de países) · Activar.
+  - Requiere la cuenta de comerciante (Monetizar → Perfil de pagos) y haber subido al menos un .aab con el plugin.
+- **Datos de inicio de sesión (Contenido de la app):** cambiar a «Sí, hay partes restringidas» e indicar a los revisores:
+  «Ajustes (⚙) → Juego completo → Canjear código → escribir el código de revisión». El código lo tiene el desarrollador
+  (no está en el repositorio: el juego solo guarda su huella SHA-256 en `FULL_CODES`).
+- **Seguridad de los datos:** añadir «Información financiera → Historial de compras» (recogido, no compartido, funcionalidad):
+  el desbloqueo se guarda en la partida y en la nube.
+- Probar compras sin pagar: Play Console → Configuración → Pruebas de licencias → añade tu correo (compras de prueba gratis).
