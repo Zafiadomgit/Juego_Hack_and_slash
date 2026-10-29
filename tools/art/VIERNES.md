@@ -31,7 +31,8 @@ Créditos previstos: Starter (800) + paquete 2500 ≈ 3300. Estilo y prompts: `t
 - [ ] Kit completo: marcos, botones, barras, iconos de habilidad propios de cada héroe
 
 ## 6. Jefes y Súper Jefes con animaciones de sus habilidades (≈ 1400 créditos) — pedido del usuario
-Cada jefe (≈ 88 créditos): sprite nuevo 12 + caminar 20 + ataque básico 14 + **2 habilidades animadas 28** + muerte 14.
+Cada jefe (≈ 102 créditos): sprite nuevo 12 + caminar 20 + ataque básico 14 + **2 habilidades animadas 28** + muerte 14
++ **aturdido 14** (bucle tambaleándose para la barra de Ruptura: ya funciona en el juego con estrellas y grietas de luz).
 Las habilidades llevan preparación muy visible (2–3 fotogramas de carga) para que el jugador pueda esquivarlas,
 y el efecto de la habilidad dibujado en el sprite (estela, onda, aliento, runas).
 **Guardianes (8):**
@@ -53,12 +54,12 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
 |---|---|
 | Validar estilo (Kara ×4) | 30 |
 | 7 héroes completos | 810 |
-| 16 jefes con habilidades | 1400 |
+| 16 jefes con habilidades y aturdido | 1630 |
 | Villa | 400 |
 | Vecinos | 370 |
 | Interfaz | 250 |
 | Efectos de habilidades de héroes | 150 |
-| **Total** | **≈ 3410** (se pasa ~110: quitar el caminar de los vecinos o dejar 2 Súper Jefes para la segunda recarga) |
+| **Total** | **≈ 3640** (se pasa ~340: vecinos solo en reposo −110 y 2 Súper Jefes a la segunda recarga −200, o comprar ya el paquete de 500) |
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6
