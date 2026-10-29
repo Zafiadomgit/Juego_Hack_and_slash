@@ -29,7 +29,7 @@ Equipo con rarezas y conjuntos, forja, gemas ancestrales, Trascendencia con vent
 📱 HECHO PARA MÓVIL
 Entrenamiento rápido al empezar, controles táctiles, ataque automático opcional, guardado en la nube para cambiar de móvil sin perder nada y sin anuncios.
 
-Empieza gratis: el entrenamiento, los dos primeros mundos y la Grieta del Día. Desbloquea el juego completo con una única compra.
+Empieza gratis con tres héroes, los dos primeros mundos y la Grieta del Día. Desbloquea el juego completo (los 7 héroes y los 8 mundos) con una única compra.
 
 **Categoría:** Juegos › Acción · **Etiquetas:** Hack and slash, Roguelike, Pixel art, Fantasía, Rol de acción
 **Clasificación de contenido (IARC):** violencia de fantasía contra criaturas, sin sangre realista; nombres de jugador visibles en los rankings; compras digitales

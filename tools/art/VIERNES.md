@@ -60,7 +60,10 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       borrosa. Rehacerlas en HyperFrames (`cinematicas/`) con la villa, los héroes y el Portal nuevos, imagen nítida.
 - [ ] **Luz azul del Portal** en la villa: se ve mal (halo azul plano encima de todo). Sustituirla por un efecto
       animado del Portal hecho con SpriteCook (remolino, runas que giran, partículas) y una luz más sutil.
-- [ ] Logotipo propio del estudio **Lumen** (llama-farol) para la intro, la ficha y el tráiler.
+- [ ] **Presentación del estudio Lumen** (pedido del usuario, 29-oct): rehacer la intro de arranque (`www/js/lumen.js`, 5 s)
+      con arte propio: logotipo llama-farol pintado en el estilo del juego, partículas y chispas de SpriteCook,
+      «LUMEN» forjado con un brillo mejor y «STUDIO». Debe verse en el móvil (ya se arregló que no apareciera en Android).
+      Mismo logotipo para la ficha y el tráiler.
 
 ## 7. Ficha de Google Play (sin créditos, al terminar el rework)
 - [ ] 6 capturas nuevas 1920×1080 en español (`store/`) y en inglés (`store/en/`) con la villa y el arte nuevos

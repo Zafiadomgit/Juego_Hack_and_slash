@@ -1,4 +1,4 @@
-@@1oalbks
+@@1ca283u
 <div id="paywall" class="pw-ov" role="dialog" aria-modal="true">
   <div class="pw-box">
     <div class="pw-art">${PW_WORLDS.map((w) => `<i style="background-image:url(img/worlds/art_${w}.webp)"></i>`).join('')}</div>
@@ -7,6 +7,7 @@
       <small class="pw-kick">Fendaria · full game</small>
       <h2 class="pw-title">The Rifts don't end here</h2>
       <ul class="pw-list">
+        <li><b>4 more heroes</b> · the Shadow, the Beastmaster, the Artificer and the Berserker</li>
         <li><b>6 more worlds</b> · from the Runic Glacier to the Locksmith's Citadel</li>
         <li><b>6 Super Bosses</b> and their Guardians, with the full story</li>
         <li><b>The Dungeon</b> · unique relics and your heroes' Awakening</li>
@@ -39,8 +40,8 @@ Enter your code:
 Invalid code.
 @@7gohyg
 Invalid code
-@@gj0x82
-<img src="img/talents/crown.png" alt=""><span><small>Thank you!</small><b>Full game unlocked</b><em>All 8 worlds, the Dungeon and Torment are now yours</em></span>
+@@1oc27w1
+<img src="img/talents/crown.png" alt=""><span><small>Thank you!</small><b>Full game unlocked</b><em>All 7 heroes, all 8 worlds, the Dungeon and Torment are now yours</em></span>
 @@8g1hpx
 <div class="pw-mapnote">★ This world is part of the <b>full game</b></div>
 @@jcvcq6
@@ -49,11 +50,15 @@ Invalid code
 You've completed the free worlds! Continue the story with the full game.
 @@15ns5k9
 ✔ Unlocked · thank you for supporting Lumen
-@@qckjad
-Worlds 3–8, Dungeon and Torment
+@@1yf1xd
+4 heroes, worlds 3–8, Dungeon and Torment
 @@1o0r3ow
 Restore
 @@1c8k40w
 View
 @@hz9fwv
 <div class="opt-row pw-row"><span><b>Full game</b><small id="pwState"></small></span><span class="pw-acts"><button class="btn" id="pwRedeem" type="button">Redeem code</button><button class="btn" id="pwOpen" type="button"></button></span></div>
+@@tdr2et
+★ Full game
+@@imfd3r
+<div class="pw-mapnote">★ This hero is part of the <b>full game</b></div>

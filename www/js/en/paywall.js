@@ -1,12 +1,12 @@
 /* Fendaria — juego completo (compra única, producto de Google Play «juego_completo»).
- *  · Gratis: el entrenamiento, los mundos 1 y 2 (con sus Súper Jefes) y la Grieta del Día.
- *  · Juego completo: los mundos 3 a 8, la Mazmorra y el Tormento.
+ *  · Gratis: el entrenamiento, los 3 primeros héroes, los mundos 1 y 2 (con sus Súper Jefes) y la Grieta del Día.
+ *  · Juego completo: los otros 4 héroes, los mundos 3 a 8, la Mazmorra y el Tormento.
  *  · El desbloqueo se guarda en la partida (SAVE.full) y viaja con el guardado en la nube; «Restaurar compra» lo recupera
  *    desde Google Play. Para la revisión de Google hay un código en Ajustes → «Canjear código».
  */
 'use strict';
 
-const FULL = { product: 'juego_completo', freeWorlds: 2, price: '2,99 $' };
+const FULL = { product: 'juego_completo', freeWorlds: 2, freeHeroes: ['iop', 'cra', 'feca'], price: '4,99 $' };
 // huella (SHA-256) de los códigos válidos: el código no está en el juego
 const FULL_CODES = ['50b62457e3654601d80a86d4c0a17481f38cd59ba65223a9880837c39d23861c'];
 const fullOwned = () => !!(SAVE && SAVE.full) || (navigator.webdriver && !window.__paywallTest);
@@ -18,6 +18,7 @@ function fullGrant(how) {
   paywallHide();
   if (typeof buildHub === 'function' && state === 'hub') buildHub();
   if (typeof buildMap === 'function' && state === 'map') buildMap();
+  if (state === 'menu') buildMenu();
   fullCelebrate();
 }
 
@@ -31,6 +32,7 @@ document.body.insertAdjacentHTML('beforeend', `<div id="paywall" class="pw-ov" r
       <small class="pw-kick">Fendaria · full game</small>
       <h2 class="pw-title">The Rifts don't end here</h2>
       <ul class="pw-list">
+        <li><b>4 more heroes</b> · the Shadow, the Beastmaster, the Artificer and the Berserker</li>
         <li><b>6 more worlds</b> · from the Runic Glacier to the Locksmith's Citadel</li>
         <li><b>6 Super Bosses</b> and their Guardians, with the full story</li>
         <li><b>The Dungeon</b> · unique relics and your heroes' Awakening</li>
@@ -111,7 +113,7 @@ $('paywall').addEventListener('click', (ev) => {
 function fullCelebrate() {
   const el = $('featToast');
   if (!el) return;
-  el.innerHTML = "<img src=\"img/talents/crown.png\" alt=\"\"><span><small>Thank you!</small><b>Full game unlocked</b><em>All 8 worlds, the Dungeon and Torment are now yours</em></span>";
+  el.innerHTML = "<img src=\"img/talents/crown.png\" alt=\"\"><span><small>Thank you!</small><b>Full game unlocked</b><em>All 7 heroes, all 8 worlds, the Dungeon and Torment are now yours</em></span>";
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
   SFX.play('level');
   setTimeout(() => el.classList.remove('show'), 4200);
@@ -126,6 +128,31 @@ startNode = function (b, n, d) {
 const _openDungeonPW = openDungeon;
 openDungeon = function () { if (!fullOwned()) { paywallShow(); return; } return _openDungeonPW(); };
 $('btnDungeon').addEventListener('click', (ev) => { if (!fullOwned()) { ev.stopImmediatePropagation(); paywallShow(); } }, true);
+// héroes del juego completo: candado en la selección (un héroe que ya tenía partida se conserva)
+const heroLocked = (id) => !fullOwned() && !FULL.freeHeroes.includes(id) && !(SAVE.slots && SAVE.slots[id]);
+const _buildMenuPW = buildMenu;
+buildMenu = function () {
+  const r = _buildMenuPW();
+  const ids = Object.keys(CLASSES);
+  $('classList').querySelectorAll('button').forEach((b, i) => {
+    if (!heroLocked(ids[i])) return;
+    b.classList.add('pw-lock');
+    const sm = b.querySelector('small'); if (sm) sm.textContent = "★ Full game";
+  });
+  return r;
+};
+const _showClassInfoPW = showClassInfo;
+showClassInfo = function (id) {
+  const r = _showClassInfoPW(id);
+  if (heroLocked(id)) {
+    $('hsInfo').insertAdjacentHTML('afterbegin', "<div class=\"pw-mapnote\">★ This hero is part of the <b>full game</b></div>");
+    $('btnStart').textContent = "★ Unlock the full game";
+  }
+  return r;
+};
+$('btnStart').addEventListener('click', (ev) => {
+  if (selectedClass && heroLocked(selectedClass)) { ev.stopImmediatePropagation(); SFX.play('click'); paywallShow(); }
+}, true);
 // el mapa marca los mundos del juego completo
 const _buildMapPW = buildMap;
 buildMap = function () {
@@ -156,7 +183,7 @@ goHub = function () {
 $('optClose').insertAdjacentHTML('beforebegin', "<div class=\"opt-row pw-row\"><span><b>Full game</b><small id=\"pwState\"></small></span><span class=\"pw-acts\"><button class=\"btn\" id=\"pwRedeem\" type=\"button\">Redeem code</button><button class=\"btn\" id=\"pwOpen\" type=\"button\"></button></span></div>");
 function pwRow() {
   const own = fullOwned();
-  $('pwState').textContent = own ? "✔ Unlocked · thank you for supporting Lumen" : "Worlds 3–8, Dungeon and Torment";
+  $('pwState').textContent = own ? "✔ Unlocked · thank you for supporting Lumen" : "4 heroes, worlds 3–8, Dungeon and Torment";
   $('pwOpen').textContent = own ? "Restore" : "View";
 }
 $('pwOpen').addEventListener('click', () => { SFX.play('click'); if (fullOwned()) fullRestore(true); else paywallShow(); });

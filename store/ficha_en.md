@@ -29,7 +29,7 @@ Gear with rarities and sets, forging, ancestral gems, Transcendence with perks y
 📱 MADE FOR MOBILE
 A quick training session to start, touch controls, optional auto-attack, cloud save to switch phones without losing anything, and no ads.
 
-Start for free: the training, the first two worlds and the Daily Rift. Unlock the full game with a single purchase.
+Start for free with three heroes, the first two worlds and the Daily Rift. Unlock the full game (all 7 heroes and 8 worlds) with a single purchase.
 
 **Category:** Games › Action · **Tags:** Hack and slash, Roguelike, Pixel art, Fantasy, Action RPG
 **Content rating (IARC):** fantasy violence against creatures, no realistic blood; player names visible in rankings; digital purchases

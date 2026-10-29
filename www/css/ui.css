@@ -276,3 +276,6 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .cine video { opacity: 0; transition: opacity .6s ease; }
 .cine video.on { opacity: 1; }
 .cine video::-webkit-media-controls, .cine video::-webkit-media-controls-start-playback-button, .cine video::-webkit-media-controls-overlay-play-button { display: none !important; -webkit-appearance: none; }
+/* héroes del juego completo */
+#classList button.pw-lock img { filter: grayscale(.85) brightness(.6); }
+#classList button.pw-lock small { color: #ffd76a; }
