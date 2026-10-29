@@ -27,3 +27,46 @@ drawMonsterAnim = function (e, A0, k, ox, oy) {
   ctx.save(); ctx.translate(0, -hop);
   try { return _drawMonsterAnimW(e, A0, k, ox, oy); } finally { ctx.restore(); }
 };
+
+// ============================================================
+// Tajos en media luna (como el ataque de referencia de Nyx): cuerpo del color del héroe, filo blanco brillante,
+// la cola se desvanece y, al terminar, la estela se deshace en chispas.
+// ============================================================
+drawSlash = function (s) {
+  const k = 1 - s.life / s.max, alpha = Math.max(0, 1 - k * k);
+  const a0 = s.dir - (s.arc / 2) * s.side, sweep = s.arc * Math.min(1, k * 2.4) * s.side;
+  const rgb = (P && typeof ULT_RGB !== 'undefined' && ULT_RGB[P.cls]) || (s.color === '#ffcc33' ? '255,180,60' : hexRgb(s.color));
+  const R = s.range, W0 = s.width * 1.15, cy = s.y - 16, steps = 18;
+  const pt = (a, rr) => [s.x + Math.cos(a) * rr, cy + Math.sin(a) * rr * 0.85];
+  ctx.save();
+  ctx.globalCompositeOperation = 'lighter';
+  // segmentos de la cola a la punta: más gruesos y opacos hacia la punta
+  for (let i = 0; i < steps; i++) {
+    const t0 = i / steps, t1 = (i + 1) / steps, a = a0 + sweep * t0, b = a0 + sweep * t1;
+    const w0 = W0 * Math.sin(Math.min(1, t0 * 1.15) * Math.PI * 0.5 + 0.08), w1 = W0 * Math.sin(Math.min(1, t1 * 1.15) * Math.PI * 0.5 + 0.08);
+    const fa = alpha * (0.15 + 0.85 * t1);
+    // cuerpo de color
+    ctx.fillStyle = `rgba(${rgb},${0.55 * fa})`;
+    ctx.beginPath();
+    let p = pt(a, R); ctx.moveTo(p[0], p[1]); p = pt(b, R); ctx.lineTo(p[0], p[1]);
+    p = pt(b, R - w1); ctx.lineTo(p[0], p[1]); p = pt(a, R - w0); ctx.lineTo(p[0], p[1]);
+    ctx.closePath(); ctx.fill();
+    // filo blanco en el borde exterior
+    ctx.fillStyle = `rgba(255,255,255,${0.75 * fa})`;
+    ctx.beginPath();
+    p = pt(a, R + 1); ctx.moveTo(p[0], p[1]); p = pt(b, R + 1); ctx.lineTo(p[0], p[1]);
+    p = pt(b, R - w1 * 0.28); ctx.lineTo(p[0], p[1]); p = pt(a, R - w0 * 0.28); ctx.lineTo(p[0], p[1]);
+    ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+  const tip = pt(a0 + sweep, R - W0 * 0.3);
+  glow(tip[0], tip[1], W0 * 1.8, rgb, alpha * 0.9);
+  // al acabar el barrido: chispas a lo largo de la estela
+  if (k > 0.45 && !s.sparked && QUALITY.fxK !== 0.5) {
+    s.sparked = true;
+    for (let i = 0; i < 9; i++) {
+      const t = 0.25 + Math.random() * 0.75, [x, y] = pt(a0 + sweep * t, R - W0 * Math.random() * 0.7), out = a0 + sweep * t;
+      particles.push({ kind: 'glowdot', x, y, vx: Math.cos(out) * rand(20, 70), vy: Math.sin(out) * rand(20, 60) - 20, life: 0.45, max: 0.45, rgb, size: rand(2, 3.5), grav: 0 });
+    }
+  }
+};
