@@ -1,32 +1,36 @@
 # Google Play listing — English
 
-**Title (max 30):** Fendaria: The Runic Rifts
+**App name (max 30):** Fendaria: The Runic Rifts
 
 **Short description (max 80):**
-Pixel-art hack & slash: 7 heroes, endless Rifts, epic bosses and a daily ranking
+Roguelite hack & slash: 7 heroes, epic bosses, divine boons and a daily ranking
 
 **Full description:**
-The Runic Rifts have opened above Candle Village. Pick your hero, step through the portal and carve your way through ever more dangerous worlds.
+The Runic Rifts have torn open above Villa Candela and the monsters keep coming. Choose your hero, step through the Portal and fight your way across eight ever more dangerous worlds.
 
 ⚔ 7 UNIQUE HEROES
-Each with a signature mechanic, three skills, an ultimate and a huge talent tree.
+The Helmbreaker, Hawkeye, the Runecaster, the Shadow, the Beastmaster, the Artificer and the Berserker: each with their own fighting style, three skills, a spectacular ultimate and their own talent tree.
 
-🌀 ROGUELITE EXPEDITIONS
-Chain Rifts without returning home. Gather blessings from 12 gods, fuse them into duos and forge your weapon. The deeper you go, the stronger the monsters.
+🌀 ROGUELITE RUNS
+Every Rift is a short, different run. Gather boons from twelve gods, combine them into duos and chain Rifts without returning to the village: the deeper you go, the tougher the monsters… and the better the loot.
 
-👑 BOSSES THAT MATTER
-Guardians and Super Bosses with phases, telegraphed attacks and their own music.
+👑 BOSSES THAT COMMAND RESPECT
+Guardians and Super Bosses with attacks you can see coming. Empty their Break bar to leave them stunned and vulnerable, then unleash your ultimate at the perfect moment.
 
-🌍 8 WORLDS
-Ash forests, swamps, glaciers, amber deserts, the abyss — each with its own weather, monsters and mutations.
+🌍 EIGHT WORLDS
+Ashen Forest, Gloomy Swamp, Runic Glacier, Amber Desert, Volcanic Abyss, Sunken City, Crystal Forest and the Locksmith's Citadel: each with its own monsters, weather and music.
 
-🏆 DAILY RIFT & GLOBAL LEADERBOARD
-A new Rift every day, the same for everyone.
+🏆 DAILY RIFT AND TORMENT
+A new Rift every day, the same for everyone, with a world ranking. And once you've beaten it all, Torment levels put the best to the test.
 
-🎖 31 ACHIEVEMENTS, TITLES & BESTIARY
+🛡 PROGRESSION THAT MATTERS
+Gear with rarities and sets, forging, ancestral gems, Transcendence with perks you choose, and a Dungeon full of unique relics.
 
-📱 BUILT FOR MOBILE
-Touch controls, optional auto-attack, big buttons, auto-save and no ads.
+📱 MADE FOR MOBILE
+A quick training session to start, touch controls, optional auto-attack, cloud save to switch phones without losing anything, and no ads.
 
-Languages: English and Spanish (chosen automatically from the device language; can be changed in Settings).
-Screenshots and feature graphic in English: `store/en/`.
+Start for free: the training, the first two worlds and the Daily Rift. Unlock the full game with a single purchase.
+
+**Category:** Games › Action · **Tags:** Hack and slash, Roguelike, Pixel art, Fantasy, Action RPG
+**Content rating (IARC):** fantasy violence against creatures, no realistic blood; player names visible in rankings; digital purchases
+**Contains ads:** No · **In-app purchases:** Yes (full game unlock, one-time purchase)

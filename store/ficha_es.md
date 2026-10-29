@@ -1,34 +1,36 @@
 # Ficha de Google Play — Español
 
-**Título (máx. 30):** Fendaria: Las Grietas Rúnicas
+**Nombre de la app (máx. 30):** Fendaria: Las Grietas Rúnicas
 
 **Descripción breve (máx. 80):**
-Hack & slash pixel art: 7 héroes, Grietas sin fin, jefes épicos y ranking diario
+Hack & slash roguelite: 7 héroes, jefes épicos, bendiciones y ranking diario
 
 **Descripción completa:**
-Las Grietas Rúnicas se han abierto sobre Villa Candela. Elige a tu héroe, cruza el portal y abre camino a golpes por mundos cada vez más peligrosos.
+Las Grietas Rúnicas se han abierto sobre Villa Candela y los monstruos no dejan de salir. Elige a tu héroe, cruza el Portal y abre camino a golpes por ocho mundos cada vez más peligrosos.
 
 ⚔ 7 HÉROES ÚNICOS
-Iop, Artificiera, Runista, Sombra, Domadora, Berserker y Ojo de Halcón: cada uno con su mecánica propia, tres habilidades, definitivo y un árbol de talentos enorme.
+La Rompeyelmos, Ojo de Halcón, la Runista, la Sombra, la Domadora, la Artificiera y el Berserker: cada uno con su forma de luchar, tres habilidades, una definitiva espectacular y un árbol de talentos propio.
 
-🌀 EXPEDICIONES ROGUELITE
-Encadena Grietas sin volver a la villa. Reúne bendiciones de 12 dioses, combínalas en dúos y forja tu arma con martillos. Cuanto más bajas, más fuertes son los monstruos.
+🌀 PARTIDAS ROGUELITE
+Cada Grieta es una partida corta y distinta. Reúne bendiciones de doce dioses, combínalas en dúos y encadena Grietas sin volver a la villa: cuanto más bajas, más fuertes son los monstruos… y mejor el botín.
 
 👑 JEFES QUE IMPONEN
-Guardianes y Súper Jefes con fases, ataques telegrafiados y música propia. Vence al Súper Jefe de cada mundo para desbloquear la historia.
+Guardianes y Súper Jefes con ataques que se ven venir. Vacía su barra de Ruptura para dejarlos aturdidos y vulnerables, y desata tu definitiva en el momento justo.
 
-🌍 8 MUNDOS
-Bosques de ceniza, ciénagas, glaciares, desiertos de ámbar, el abismo… cada uno con su clima, sus monstruos y sus mutaciones.
+🌍 OCHO MUNDOS
+Bosque Ceniciento, Pantano Sombrío, Glaciar Rúnico, Desierto de Ámbar, Abismo Volcánico, Ciudad Hundida, Bosque de Cristal y la Ciudadela del Cerrajero: cada uno con sus monstruos, su clima y su música.
 
-🏆 GRIETA DEL DÍA Y RANKING MUNDIAL
-Una Grieta nueva cada día, igual para todos. Compite por el primer puesto.
+🏆 GRIETA DEL DÍA Y TORMENTO
+Una Grieta nueva cada día, igual para todos, con ranking mundial. Y cuando lo superes todo, los niveles de Tormento ponen a prueba a los mejores.
 
-🎖 LOGROS, TÍTULOS Y BESTIARIO
-31 logros, títulos para presumir y un bestiario por completar.
+🛡 PROGRESO QUE IMPORTA
+Equipo con rarezas y conjuntos, forja, gemas ancestrales, Trascendencia con ventajas a elegir y una Mazmorra con reliquias únicas.
 
 📱 HECHO PARA MÓVIL
-Controles táctiles, ataque automático opcional, botones grandes, partida guardada al cerrar y sin anuncios.
+Entrenamiento rápido al empezar, controles táctiles, ataque automático opcional, guardado en la nube para cambiar de móvil sin perder nada y sin anuncios.
 
-**Categoría:** Juegos › Acción  ·  **Etiquetas:** Hack and slash, Roguelike, Pixel art, Fantasía
-**Clasificación de contenido (IARC):** violencia de fantasía, sin sangre realista → previsiblemente PEGI 7 / Everyone 10+
-**Contiene anuncios:** No  ·  **Compras en la app:** No
+Empieza gratis: el entrenamiento, los dos primeros mundos y la Grieta del Día. Desbloquea el juego completo con una única compra.
+
+**Categoría:** Juegos › Acción · **Etiquetas:** Hack and slash, Roguelike, Pixel art, Fantasía, Rol de acción
+**Clasificación de contenido (IARC):** violencia de fantasía contra criaturas, sin sangre realista; nombres de jugador visibles en los rankings; compras digitales
+**Contiene anuncios:** No · **Compras en la app:** Sí (desbloqueo del juego completo, compra única)
