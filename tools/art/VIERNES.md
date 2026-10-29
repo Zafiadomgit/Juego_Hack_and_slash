@@ -55,6 +55,11 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       con arte propio, una paleta «roto» por jefe que se vea mejor) + animación de aturdido tambaleándose
 - [ ] Nuevo enemigo: el brujo encapuchado de la referencia (Hechicero de la Ciudadela o jefe)
 
+## 7. Ficha de Google Play (sin créditos, al terminar el rework)
+- [ ] 6 capturas nuevas 1920×1080 en español (`store/`) y en inglés (`store/en/`) con la villa y el arte nuevos
+- [ ] Gráfico destacado 1024×500 nuevo (es/en) e icono 512 revisado
+- [ ] Sustituirlas en Play Console (ficha principal + traducción en inglés) antes de producción
+
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|
