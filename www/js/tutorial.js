@@ -32,6 +32,7 @@ function tutShow(step) {
   tutCur = step;
   el.querySelector('i').textContent = step.icon;
   el.querySelector('span').innerHTML = step.txt();
+  el.classList.toggle('top', scene === 'hub'); // en la villa, a un lado: en el centro están el Portal y su panel
   el.classList.remove('show'); void el.offsetWidth; el.classList.add('show');
 }
 function tutNext() {

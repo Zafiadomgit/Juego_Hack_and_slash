@@ -205,3 +205,8 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .cloud-link { background: none; border: 0; color: #9fd8ff; font: 700 13px Garamond, serif; text-decoration: underline; cursor: pointer; margin-right: auto; padding: 4px 8px; }
 #menu .hs-foot { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 #menu .hs-foot .btn.big { flex: 1 1 220px; }
+/* pista del tutorial en la villa: abajo a la izquierda, lejos del Portal y de su panel */
+.tut-hint.top { left: max(12px, env(safe-area-inset-left)); transform: none; max-width: min(40vw, 380px); }
+.opt-ver { color: #8f97b8; font-size: 11px; }
+.tut-hint.top.show { animation-name: tutInL; }
+@keyframes tutInL { from { opacity: 0; transform: translateY(14px) scale(.9); } to { opacity: 1; transform: none; } }
