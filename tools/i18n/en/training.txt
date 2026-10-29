@@ -1,0 +1,28 @@
+@@120vxgb
+Drag your finger on the <b>left half</b> of the screen to move
+@@1xot4qy
+Hold <b>⚔</b> to attack. Defeat the three training monsters
+@@10sz102
+Hold <b>J</b> or <b>space</b> to attack. Defeat the three training monsters
+@@vmxsql
+Tap <b>»</b> to <b>dodge</b>: while you roll, nothing can hurt you
+@@1l6q66i
+<b>Skills</b> cost energy (<b>EN</b>), which recharges on its own. Cast one at the group
+@@15axjoh
+Your <b>ultimate</b> is charged! It fills up as you defeat monsters. Tap it
+@@1tr2poh
+When your health is low, drink a <b>potion</b>. Try it now
+@@qxsesf
+Training grounds
+@@1kfdh5a
+First steps
+@@qktck0
+Training complete!
+@@1w94tka
+Head back to the village and cross the Portal for your first Rift
+@@1hxl5f0
+Well done! Cross the <b>Portal</b> to enter your first <b>Rift</b>
+@@g71y8v
+Cross the <b>Portal</b> to enter your first <b>Rift</b>
+@@yr7k9z
+<button id="trainSkip" class="train-skip" type="button">Skip training ›</button>

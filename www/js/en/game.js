@@ -2065,9 +2065,9 @@ function drawHUD() {
   // panel de la Faille (arriba a la derecha)
   const rx = W - pad, ry = 66 * s;
   hudPlate(rx - 158 * s, ry - 13 * s, 164 * s, 50 * s, 8 * s);
-  text(rift.isDungeon ? `Dungeon · Floor ${rift.tier}` : rift.isSuper ? "Super Boss" : `Rift ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
+  text(rift.training ? "Training" : rift.isDungeon ? `Dungeon · Floor ${rift.tier}` : rift.isSuper ? "Super Boss" : `Rift ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.training ? '#7cff8a' : rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
-  text(rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
+  text(rift.training ? '' : rift.bossSpawned ? (rift.bossDead ? '✔' : '☠') : fmtTime(rift.time), rx, ry, (rift.bossSpawned ? 15 : 12) * s, rift.bossSpawned ? '#ff7043' : tcol, 'right', 900);
   const pw = 150 * s;
   const pk = Math.min(1, rift.progress / rift.goal);
   fancyBar(rx - pw, ry + 8 * s, pw, 9 * s, pk, rift.bossSpawned ? '#ff9a6a' : '#ffe08a', rift.bossSpawned ? '#c8401a' : '#d08a10', 0, 0);

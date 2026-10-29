@@ -52,7 +52,7 @@ const _updatePlayerTut = updatePlayer;
 updatePlayer = function (dt) {
   const x0 = P.x, y0 = P.y;
   _updatePlayerTut(dt);
-  if (!tutOn() || scene !== 'rift' || !rift || rift.isDungeon) return;
+  if (!tutOn() || scene !== 'rift' || !rift || rift.isDungeon || rift.training) return;
   const s = tutS(), st = TUT[s.step];
   if (!st) return;
   s.t = (s.t || 0) + dt;
@@ -107,15 +107,15 @@ const _spawnEnemyTut = spawnEnemy;
 spawnEnemy = function (type, x, y, o = {}) {
   const e = _spawnEnemyTut(type, x, y, o);
   if (e && tutOn() && scene === 'rift' && rift && rift.b === 0 && rift.n === 1) {
-    const k = e.boss ? 0.7 : 0.6;
-    e.hp = e.maxHp = Math.round(e.maxHp * k); e.dmg *= 0.6;
+    const k = e.boss ? 0.6 : 0.5;
+    e.hp = e.maxHp = Math.round(e.maxHp * k); e.dmg *= 0.45;
   }
   return e;
 };
 const _spawnPackTut = spawnPack;
 spawnPack = function () {
   // sin avalanchas hasta saber atacar y esquivar
-  if (tutOn() && rift && rift.b === 0 && rift.n === 1 && (tutS().step < 3) && enemies.filter((e) => !e.dead).length >= 6) return;
+  if (tutOn() && rift && rift.b === 0 && rift.n === 1 && enemies.filter((e) => !e.dead).length >= (tutS().step < 3 ? 6 : 12)) return;
   return _spawnPackTut();
 };
 
@@ -124,7 +124,7 @@ function hubHint() {
   if (!tutOn() || (S.rifts || 0) > 0) return;
   setTimeout(() => {
     if (state !== 'hub' || (typeof dlg !== 'undefined' && dlg)) { if (scene === 'hub') setTimeout(hubHint, 1500); return; }
-    tutShow({ icon: '🌀', txt: () => 'Camina hasta el <b>Portal</b> del centro de la plaza para entrar en tu primera <b>Grieta</b>', btn: null });
+    tutShow({ icon: '🌀', txt: () => (S.tut && S.tut.train ? 'Camina hasta el <b>Portal</b> del centro de la plaza para entrar en tu primera <b>Grieta</b>' : 'Camina hasta el <b>Portal</b> del centro de la plaza: antes de tu primera Grieta, un <b>entrenamiento</b> rápido'), btn: null });
     setTimeout(() => { if (state === 'hub' && tutCur && tutCur.icon === '🌀') tutShow(null); }, 9000);
   }, 1200);
 }

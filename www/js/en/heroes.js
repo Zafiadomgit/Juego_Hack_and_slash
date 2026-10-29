@@ -263,8 +263,9 @@ heroAnimPose = function (cls, o) {
   const A = HERO_ANIM[cls];
   // golpe cuerpo a cuerpo: la animación ocupa todo el intervalo entre golpes (no 0,2 s y luego quieto)
   if (A && P && cls === P.cls && P.swingMax && o.swing > 0 && !(o.hurt > 0) && !(P.castAnim > 0)) {
-    const n = A.attack.length;
-    return ['attack', Math.min(n - 1, Math.floor((1 - o.swing / P.swingMax) * n))];
+    const n = A.attack.length, i = Math.min(n - 1, Math.floor((1 - o.swing / P.swingMax) * n));
+    // golpes alternos: el tajo de vuelta (la animación al revés), como un combo de ida y vuelta
+    return ['attack', P.swingSide < 0 && !A.attack2 ? n - 1 - i : i];
   }
   if (A && A.cast && scene === 'rift' && P && cls === P.cls && P.castAnim > 0 && !(o.hurt > 0)) {
     const n = A.cast.length;

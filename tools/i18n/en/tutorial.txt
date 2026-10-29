@@ -24,3 +24,5 @@ You'll discover the rest by fighting. Good luck, Bearer.
 You're low on health: tap the <b>potion</b> to heal
 @@xr27ic
 Walk to the <b>Portal</b> in the middle of the square to enter your first <b>Rift</b>
+@@bg1sbw
+Walk to the <b>Portal</b> in the middle of the square: before your first Rift, a quick <b>training</b> session

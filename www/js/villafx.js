@@ -111,23 +111,72 @@ renderLighting = function (lights, ...rest) {
   return _renderLightingVfx(lights, ...rest);
 };
 
-// ---------- Entrar por el Portal: remolino que nace del Portal, destello y la Grieta se abre ----------
-let portalFxBusy = false;
+// ---------- Entrar por el Portal: el remolino absorbe al héroe, la luz del Portal llena la pantalla y se abre la Grieta ----------
+const PFX = { dur: 0.8, run: null };
 const _startNodeVfx = startNode;
 startNode = function (b, n, d) {
-  if (scene !== 'hub' || portalFxBusy || navigator.webdriver) { _startNodeVfx(b, n, d); return; }
-  portalFxBusy = true;
-  // posición del Portal en pantalla (si no se ve, desde el centro)
-  const px = ((PORTAL.x - vCam.x) * zoom + W / 2) / W * 100, py = ((PORTAL.y - 120 - vCam.y) * zoom + H / 2) / H * 100;
-  let el = $('portalFx');
-  if (!el) { el = document.createElement('div'); el.id = 'portalFx'; document.body.appendChild(el); }
-  el.style.setProperty('--px', clamp(px, 0, 100) + '%'); el.style.setProperty('--py', clamp(py, 0, 100) + '%');
-  el.className = 'in';
+  if (scene !== 'hub' || PFX.run || navigator.webdriver) { _startNodeVfx(b, n, d); return; }
+  PFX.run = { t0: performance.now(), fx: vHero.x, fy: vHero.y, go: () => _startNodeVfx(b, n, d), fired: false };
+  vHero.warp = true; vHero.target = null; vHero.pending = null;
+  $('hub').style.visibility = 'hidden'; // sin botones encima durante la entrada
   SFX.play('zaap');
-  setTimeout(() => {
-    try { _startNodeVfx(b, n, d); } finally {
-      el.className = 'out';
-      setTimeout(() => { el.className = ''; portalFxBusy = false; }, 700);
+  if (typeof buzz === 'function') buzz('portal', [20, 30, 50], 0);
+};
+const pfxEase = (x) => x * x * (3 - 2 * x);
+// posición y forma del héroe mientras lo absorbe el Portal
+function pfxHero() {
+  const r = PFX.run, k = clamp((performance.now() - r.t0) / 1000 / PFX.dur, 0, 1), e = pfxEase(k);
+  return { x: lerp(r.fx, PORTAL.x, e), y: lerp(r.fy, PORTAL.y - 30, e), lift: e * 70 * PORTAL_K, s: 1 - 0.88 * e * e, spin: Math.cos(k * k * 22), a: 1 - Math.pow(k, 4), k };
+}
+const _updateVillagePfx = updateVillage;
+updateVillage = function (dt) {
+  if (!PFX.run) return _updateVillagePfx(dt);
+  // mientras dura no se mueve nadie: solo la vida del pueblo y las chispas que entran en el Portal
+  villageLife(dt); vfxUpdate(dt);
+  const h = pfxHero();
+  for (let i = 0; i < 3; i++) {
+    const a = rand(0, TAU), rr = rand(60, 160);
+    VILLAGE.fx.push({ k: 'spark', x: h.x + Math.cos(a) * rr, y: h.y - h.lift - 40 + Math.sin(a) * rr * 0.6, vx: -Math.cos(a) * rr * 2.2, vy: -Math.sin(a) * rr * 1.3, life: 0.4, max: 0.4, r: 2 });
+  }
+  vCam.x = lerp(vCam.x, PORTAL.x, 1 - Math.exp(-4 * dt)); vCam.y = lerp(vCam.y, PORTAL.y - 40, 1 - Math.exp(-4 * dt));
+};
+// el héroe se dibuja encogiendo y girando hacia el centro del remolino
+function pfxDrawHero(o) {
+  const h = pfxHero();
+  ctx.save();
+  ctx.globalAlpha = h.a;
+  ctx.translate(h.x, h.y - h.lift);
+  ctx.scale(h.s * (0.35 + 0.65 * Math.abs(h.spin)), h.s);
+  glow(0, -50, 70, '140,220,255', 0.6 * h.k);
+  drawHero(ctx, S.cls, Object.assign({}, o, { x: 0, y: 0, moving: false }));
+  ctx.restore();
+}
+// luz del Portal que crece hasta llenar la pantalla; al final, destello y entra la Grieta
+const _renderPfx = render;
+render = function () {
+  _renderPfx();
+  const r = PFX.run;
+  if (!r) return;
+  const t = (performance.now() - r.t0) / 1000, k = clamp(t / PFX.dur, 0, 1);
+  const px = (PORTAL.x - vCam.x) * zoom + W / 2, py = (PORTAL.y - 110 * PORTAL_K - vCam.y) * zoom + H / 2;
+  const R = Math.hypot(W, H) * (0.08 + 1.1 * Math.pow(k, 2.2));
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const g = ctx.createRadialGradient(px, py, 0, px, py, R);
+  g.addColorStop(0, `rgba(255,255,255,${0.9 * k})`); g.addColorStop(0.35, `rgba(150,230,255,${0.75 * k})`); g.addColorStop(0.75, `rgba(60,140,255,${0.45 * k})`); g.addColorStop(1, 'rgba(20,40,120,0)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  if (k > 0.8) { ctx.fillStyle = `rgba(255,255,255,${(k - 0.8) / 0.2})`; ctx.fillRect(0, 0, W, H); }
+  ctx.restore();
+  if (k >= 1 && !r.fired) {
+    r.fired = true;
+    let el = $('portalFx');
+    if (!el) { el = document.createElement('div'); el.id = 'portalFx'; document.body.appendChild(el); }
+    el.className = 'flash';
+    vHero.warp = false;
+    try { r.go(); } finally {
+      $('hub').style.visibility = '';
+      PFX.run = null;
+      requestAnimationFrame(() => { el.className = 'flash out'; });
+      setTimeout(() => { el.className = ''; }, 900);
     }
-  }, 520);
+  }
 };

@@ -177,15 +177,11 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .mnode.boss.done { box-shadow: 0 0 0 3px #ecd18a, 0 6px 12px rgba(0,0,0,.6); }
 .mf-bg path { stroke-width: 0; }
 
-/* Entrar por el Portal */
-#portalFx { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0;
-  background: radial-gradient(circle at var(--px, 50%) var(--py, 50%), #fff 0, #d8f8ff 6%, #6fd8ff 18%, #2a6ad0 38%, #120c3a 62%, #04040c 85%);
-  clip-path: circle(0% at var(--px, 50%) var(--py, 50%)); }
-#portalFx.in { opacity: 1; animation: pfxIn .52s cubic-bezier(.6, 0, .9, .5) forwards; }
-#portalFx.out { opacity: 1; clip-path: circle(150% at 50% 50%); animation: pfxOut .7s ease-out forwards; }
-@keyframes pfxIn { from { clip-path: circle(0% at var(--px, 50%) var(--py, 50%)); filter: hue-rotate(0deg) brightness(1); } to { clip-path: circle(150% at var(--px, 50%) var(--py, 50%)); filter: hue-rotate(40deg) brightness(1.6); } }
-@keyframes pfxOut { 0% { opacity: 1; filter: brightness(2.2); transform: scale(1); } 100% { opacity: 0; filter: brightness(1); transform: scale(1.25); } }
-@media (prefers-reduced-motion: reduce) { #portalFx.in, #portalFx.out { animation-duration: .01s; } }
+/* Entrar por el Portal: el destello blanco se funde y aparece la Grieta */
+#portalFx { position: fixed; inset: 0; z-index: 60; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 45%, #fff 0, #e8fbff 40%, #bfeaff 100%); }
+#portalFx.flash { opacity: 1; }
+#portalFx.flash.out { opacity: 0; transition: opacity .8s ease-out; }
+@media (prefers-reduced-motion: reduce) { #portalFx.flash.out { transition-duration: .01s; } }
 
 /* Guardado en la nube */
 .cloud-box { display: flex; flex-direction: column; gap: 10px; }
@@ -210,3 +206,19 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .opt-ver { color: #8f97b8; font-size: 11px; }
 .tut-hint.top.show { animation-name: tutInL; }
 @keyframes tutInL { from { opacity: 0; transform: translateY(14px) scale(.9); } to { opacity: 1; transform: none; } }
+
+/* Elegir héroe: columna de la lista más ancha, nombre en una línea y sin que la tarjeta elegida se salga */
+.hs-body { grid-template-columns: minmax(176px, 0.62fr) 0.9fr 1.35fr !important; }
+.hs-list { overflow-x: hidden; padding: 2px 10px 6px 2px; }
+.hs-list button { min-width: 0; padding: 5px 7px; gap: 7px; }
+.hs-list button > span, .hs-list button > div { min-width: 0; }
+.hs-list button img { width: 36px; height: 36px; }
+.hs-list button b, .hs-list button { white-space: nowrap; }
+.hs-list button small { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hs-list button.on { transform: none; }
+.hs-list button.on::after { right: -8px; }
+@media (max-height: 430px) { .hs-list button { font-size: 13.5px; } .hs-list button small { font-size: 10.5px; } }
+/* Campo de entrenamiento: botón para saltarlo */
+.train-skip { position: fixed; z-index: 45; left: 50%; transform: translateX(-50%); top: max(8px, env(safe-area-inset-top)); display: none;
+  padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(201,178,122,.6); background: rgba(10,14,28,.75); color: #e8dfc8; font: 700 13px Garamond, serif; cursor: pointer; }
+.train-skip.show { display: block; }

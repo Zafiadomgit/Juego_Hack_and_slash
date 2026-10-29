@@ -387,3 +387,5 @@ Range
 Defense
 @@3nae02
 Mobility
+@@8l3xkg
+Training

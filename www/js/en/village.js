@@ -609,8 +609,9 @@ function renderVillage() {
   list.sort((a, b) => a.y - b.y);
   for (const o of list) {
     if (o === heroO) {
-      shadow(vHero.x, vHero.y + 1, 13);
-      drawHero(ctx, S.cls, { x: vHero.x, y: vHero.y, dir: vHero.dir, walkT: vHero.walkT, moving: vHero.moving, swing: 0, swingSide: 1, shot: 0, t: now });
+      if (!vHero.warp) shadow(vHero.x, vHero.y + 1, 13);
+      const ho = { x: vHero.x, y: vHero.y, dir: vHero.dir, walkT: vHero.walkT, moving: vHero.moving, swing: 0, swingSide: 1, shot: 0, t: now };
+      if (vHero.warp && typeof pfxDrawHero === 'function') pfxDrawHero(ho); else drawHero(ctx, S.cls, ho);
     } else if (o === portalO) drawPortal(PORTAL.x, PORTAL.y, now, PORTAL_K);
     else if (o.kind === 'walker') drawWalker(o.w);
     else if (o.kind === 'hen') drawHen(o.h);
