@@ -12,18 +12,28 @@ npm install
 echo "=== 3/4 Copiando el juego (www) al proyecto Android ==="
 npx cap sync android
 echo "=== 4/4 Compilando el APK ==="
-# Java 21 de Android Studio (Gradle 8.14 no funciona con Java 25)
+# Java para Gradle 8.14: entre 17 y 24 (con Java 25 falla con «class file major version 69»).
+# Se busca por versión (archivo «release» del JDK): el jbr de los Android Studio recientes ya es Java 25,
+# y el «Use JVM 21» de Android Studio suele descargar un JDK 21 en C:\Users\<tú>\.jdks
+jver() { sed -n 's/^JAVA_VERSION="\([0-9]*\).*/\1/p' "$1/release" 2>/dev/null; }
+okjava() { local v; v=$(jver "$1"); [ -n "$v" ] && [ "$v" -ge 17 ] && [ "$v" -le 24 ]; }
+UP="$HOME"; command -v cygpath >/dev/null 2>&1 && [ -n "$USERPROFILE" ] && UP="$(cygpath "$USERPROFILE")"
 JBR="${JBR:-}"
-[ -n "$JBR" ] || for j in "/c/Program Files/Android/Android Studio/jbr" /c/Program\ Files/Android/*/jbr "${LOCALAPPDATA:-/nonexistent}/Programs/Android Studio/jbr" \
-         "/Applications/Android Studio.app/Contents/jbr/Contents/Home" "$HOME/android-studio/jbr"; do
-  if [ -x "$j/bin/java" ] || [ -x "$j/bin/java.exe" ]; then JBR="$j"; break; fi
-done
 if [ -z "$JBR" ]; then
-  echo "No encuentro el Java de Android Studio (carpeta jbr). Búscalo en Android Studio: Settings > Build Tools > Gradle > Gradle JDK"
-  echo "y vuelve a ejecutar con:  JBR=\"/c/ruta/a/jbr\" ./actualizar-y-compilar.sh"
+  for j in "$UP"/.jdks/* "$UP"/.gradle/jdks/* /c/Program\ Files/Android/*/jbr /c/Program\ Files/Java/* \
+           /c/Program\ Files/Eclipse\ Adoptium/* /c/Program\ Files/Microsoft/jdk-* /c/Program\ Files/Amazon\ Corretto/* /c/Program\ Files/Zulu/* \
+           "/Applications/Android Studio.app/Contents/jbr/Contents/Home" /Library/Java/JavaVirtualMachines/*/Contents/Home "$HOME/android-studio/jbr" /usr/lib/jvm/*; do
+    if okjava "$j"; then JBR="$j"; break; fi
+  done
+fi
+if [ -z "$JBR" ]; then
+  echo "No encuentro un Java entre 17 y 24 (Gradle 8.14 no funciona con Java 25)."
+  echo "Javas encontrados:"; for j in "$UP"/.jdks/* /c/Program\ Files/Android/*/jbr /c/Program\ Files/Java/*; do [ -f "$j/release" ] && echo "  $j -> Java $(jver "$j")"; done
+  echo "Solución: Android Studio > Settings > Build Tools > Gradle > Gradle JDK > Download JDK > versión 21,"
+  echo "y vuelve a ejecutar:  ./actualizar-y-compilar.sh   (o indica la carpeta:  JBR=\"/c/ruta/al/jdk-21\" ./actualizar-y-compilar.sh)"
   exit 1
 fi
-echo "Java: $JBR"
+echo "Java $(jver "$JBR"): $JBR"
 cd android
 if command -v cygpath >/dev/null 2>&1 && [ -f gradlew.bat ]; then
   # Windows (Git Bash / MSYS2): gradlew.bat necesita la ruta en formato Windows

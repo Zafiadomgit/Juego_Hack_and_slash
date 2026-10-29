@@ -18,7 +18,16 @@ call npm install || goto :err
 echo === 3/4 Copiando el juego (www) al proyecto Android ===
 call npx cap sync android || goto :err
 echo === 4/4 Compilando el APK ===
-if exist "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" set "JAVA_HOME=C:\Program Files\Android\Android Studio\jbr"
+REM Gradle 8.14 necesita Java 17-24 (con Java 25 falla). Se busca por version: el jbr de Android Studio reciente ya es 25
+set "JAVA_HOME="
+for /d %%d in ("%USERPROFILE%\.jdks\*" "%USERPROFILE%\.gradle\jdks\*" "C:\Program Files\Android\Android Studio\jbr" "C:\Program Files\Java\*" "C:\Program Files\Eclipse Adoptium\*" "C:\Program Files\Microsoft\jdk-*") do (
+  if not defined JAVA_HOME findstr /r /c:"JAVA_VERSION=\"1[7-9]" /c:"JAVA_VERSION=\"2[0-4]" "%%~d\release" >nul 2>&1 && set "JAVA_HOME=%%~d"
+)
+if not defined JAVA_HOME (
+  echo No encuentro un Java entre 17 y 24. En Android Studio: Settings ^> Build Tools ^> Gradle ^> Gradle JDK ^> Download JDK ^> version 21
+  goto :err
+)
+echo Java: %JAVA_HOME%
 cd android
 call gradlew.bat --stop >nul 2>&1
 call gradlew.bat assembleDebug || goto :err
