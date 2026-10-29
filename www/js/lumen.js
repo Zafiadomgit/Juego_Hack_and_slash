@@ -23,7 +23,9 @@
     S = Math.min(W, H) / 400;
   }
   size(); addEventListener('resize', size);
-  var T0 = performance.now(), END = 5.0, done = false;
+  // reloj propio: avanza fotograma a fotograma (máx. 1/30 s). Si el móvil se atasca cargando el juego,
+  // la intro se pausa en vez de «consumirse» sin que se vea (era el fallo en Android).
+  var T = 0, last = 0, END = 5.0, done = false;
   var cx = function () { return W / 2; }, cy = function () { return H * 0.36; };
   // partículas que convergen
   var P = [];
@@ -66,7 +68,8 @@
   function frame(now) {
     if (done) return;
     size();
-    var t = (now - T0) / 1000;
+    T += Math.min(1 / 30, Math.max(0, (now - last) / 1000)); last = now;
+    var t = T;
     if (t >= END) { finish(); return; }
     var x0 = cx(), y0 = cy();
     g.setTransform(1, 0, 0, 1, 0, 0);
@@ -189,7 +192,14 @@
   root.addEventListener('click', finish);
   root.addEventListener('touchstart', finish, { passive: true });
   // espera breve a la fuente (si tarda, se usa la de reserva)
-  var go = function () { requestAnimationFrame(function (n) { T0 = n; frame(n); }); };
-  if (document.fonts && document.fonts.load) Promise.race([document.fonts.load('900 40px Cinzel'), new Promise(function (r) { setTimeout(r, 400); })]).then(go, go);
-  else go();
+  // arranca cuando el juego ya terminó de cargar sus scripts (hasta entonces, pantalla negra)
+  var go = function () { requestAnimationFrame(function (n) { last = n; frame(n); }); };
+  var ready = function () {
+    if (document.fonts && document.fonts.load) Promise.race([document.fonts.load('900 40px Cinzel'), new Promise(function (r) { setTimeout(r, 400); })]).then(go, go);
+    else go();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { setTimeout(ready, 60); });
+  else ready();
+  // red de seguridad: si algo falla, la pantalla negra nunca tapa el juego más de 12 s
+  setTimeout(finish, 12000);
 })();
