@@ -236,3 +236,5 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .feat-new { position: relative; animation: featGlow 1.4s ease-in-out infinite; }
 .feat-new::after { content: '★'; position: absolute; top: -8px; right: -6px; padding: 1px 5px; border-radius: 6px; background: #7cff8a; color: #0b1a0b; font: 900 9px Garamond, serif; }
 @keyframes featGlow { 0%, 100% { box-shadow: 0 0 0 rgba(255,214,110,0); } 50% { box-shadow: 0 0 14px rgba(255,214,110,.85); } }
+.opt-link { text-decoration: none; color: inherit; }
+.opt-link > span:last-child { color: #c9a35a; font-size: 18px; }

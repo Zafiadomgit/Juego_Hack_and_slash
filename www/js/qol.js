@@ -20,6 +20,7 @@ document.body.insertAdjacentHTML('beforeend', `<div id="optPanel" class="run-pic
     <label class="opt-row"><span><b>Botones grandes</b><small>Botones de combate más grandes</small></span><input type="checkbox" data-o="bigBtns"></label>
     <label class="opt-row"><span><b>Bolsa llena: vender lo peor</b><small>Al recoger algo mejor, vende sola la pieza común o rara más floja</small></span><input type="checkbox" data-o="autoSell"></label>
     <label class="opt-row"><span><b>Idioma · Language</b></span><select id="optLang"><option value="es">Español</option><option value="en">English</option></select></label>
+    <a class="opt-row opt-link" href="https://zafiadomgit.github.io/Juego_Hack_and_slash/privacidad.html" target="_blank" rel="noopener"><span><b>Política de privacidad</b><small>Qué datos guarda el juego (ranking y guardado en la nube)</small></span><span>↗</span></a>
     <button id="optClose" class="rp-opt go" type="button"><i>✔</i><span><b>Listo</b></span></button>
   </div>
 </div>`);
