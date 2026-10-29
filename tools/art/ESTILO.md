@@ -103,3 +103,17 @@ Archivos en `tools/art/ref/` (tira de fotogramas en `ref/refs_tiras.png`):
   Además, el **brujo** (sombrero puntiagudo, capucha negra sin cara con ojos brillantes, túnica raída con parches,
   libro de hechizos y bastón con orbe) sirve de modelo para un **enemigo**: Hechicero de la Ciudadela o jefe.
 - **`sombra_ref.png`** — diseño de Nyx que sustituye al actual (encapuchada con máscara).
+
+## Monstruos: referencia del usuario (29-oct) — «en ese estilo quiero los monstruos»
+`ref/monstruo_seta_ref.webp` (tira en `ref/monstruo_seta_tira.png`): la Seta Escupidora en el estilo deseado, 8 fotogramas
+de ataque. Chibi redondito, contorno oscuro limpio, sombreado suave, paleta cálida, proporciones achaparradas, cara simple.
+Ataque de referencia (prompt del usuario, usarlo como plantilla de ataque cuerpo a cuerpo de monstruos pequeños):
+> "Pull back with a small hop, lifting one stubby arm and leaning the mushroom cap slightly behind the body, then lunge
+> forward with a quick two-handed body slam or shove, briefly stretching the torso into the strike before settling back
+> into a centered recovery stance."
+Reglas para TODOS los monstruos:
+- Este estilo y este nivel de animación (preparación con saltito → golpe estirando el cuerpo → vuelta al centro).
+- Si hace falta, se baja su velocidad de movimiento o de ataque, se hacen menos a la vez o se simplifica el diseño:
+  **que se vean bien manda** (pedido del usuario).
+- Tamaño acorde a lo que son, según `MON_SIZE` (look.js): pequeños ~55–70, medianos ~85–95, gólems ~115 (héroe 104).
+- Caminar 8 fotogramas con saltitos y balanceo (como el brujo), golpe 3, muerte 6.

@@ -1,7 +1,7 @@
 /* Fendaria — Herrería de Tobías: refinar (+1…+10), ascender de calidad, reforjar y desguazar.
  * Los objetos guardan sus stats originales en `base`; los stats efectivos se recalculan con el refinado,
  * así que fichas, comparaciones, Poder y equipamiento rápido funcionan sin cambios.
- * Moneda: ámbar + Fragmentos de mineral (S.frag), que salen de desguazar equipo.
+ * Moneda: solo ámbar (los antiguos Fragmentos de mineral se convirtieron en ámbar; vender sustituye a desguazar).
  */
 'use strict';
 
@@ -11,6 +11,7 @@ const REFINE_CHANCE = [1, 1, 1, 1, 1, 0.85, 0.7, 0.55, 0.42, 0.3, 0.25, 0.22, 0.
 const FRAG_SALVAGE = [1, 3, 8, 20, 60]; // el último: reliquias únicas                        // fragmentos al desguazar según calidad
 const FRAG_SVG = '<img class="pico-ui cur" src="img/icons/frag.png" width="18" height="18" alt="" aria-hidden="true">';
 const frags = () => (S && S.frag) || 0;
+const AMBER_PER_FRAG = 30; // lo que valía un Fragmento: ahora todo se paga en ámbar
 
 // ---------- Modelo ----------
 function itemBase(it) {
@@ -25,17 +26,17 @@ function applyRefine(it) {
 }
 const refineCost = (it) => {
   const r = it.refine || 0;
-  return { amber: Math.round((40 + it.level * 8) * (1 + it.rarity) * Math.pow(r + 1, 1.45) / 10) * 10, frag: (r + 1) * (1 + it.rarity) };
+  return { amber: Math.round(((40 + it.level * 8) * (1 + it.rarity) * Math.pow(r + 1, 1.45) + (r + 1) * (1 + it.rarity) * AMBER_PER_FRAG) / 10) * 10, frag: 0 };
 };
-const ascendCost = (it) => ({ amber: Math.round((150 + it.level * 25) * Math.pow(it.rarity + 1, 2) / 10) * 10, frag: 12 * Math.pow(it.rarity + 1, 2) });
-const reforgeCost = (it) => ({ amber: Math.round((30 + it.level * 5) * (1 + it.rarity) / 10) * 10, frag: 4 * (1 + it.rarity) });
-const canPay = (c) => S.kamas >= c.amber && frags() >= c.frag;
+const ascendCost = (it) => ({ amber: Math.round(((150 + it.level * 25) * Math.pow(it.rarity + 1, 2) + 12 * Math.pow(it.rarity + 1, 2) * AMBER_PER_FRAG) / 10) * 10, frag: 0 });
+const reforgeCost = (it) => ({ amber: Math.round(((30 + it.level * 5) * (1 + it.rarity) + 4 * (1 + it.rarity) * AMBER_PER_FRAG) / 10) * 10, frag: 0 });
+const canPay = (c) => S.kamas >= c.amber;
 function payCost(c) {
-  if (!canPay(c)) { showToast('shopToast', S.kamas < c.amber ? 'No tienes suficiente ámbar' : 'Te faltan Fragmentos: desguaza equipo que no uses', false); SFX.play('hurt'); return false; }
-  S.kamas -= c.amber; S.frag = frags() - c.frag;
+  if (!canPay(c)) { showToast('shopToast', 'No tienes suficiente ámbar', false); SFX.play('hurt'); return false; }
+  S.kamas -= c.amber;
   return true;
 }
-const costHTML = (c) => `${AMBER_SVG} ${fmtNum(c.amber)} · ${FRAG_SVG} ${c.frag}`;
+const costHTML = (c) => `${AMBER_SVG} ${fmtNum(c.amber)}`;
 
 // Objetos con los que se puede trabajar: primero lo equipado, después la bolsa
 function forgeItems() {
@@ -161,7 +162,7 @@ function buildSmith() {
     if (!S.bag.length) offers.push('<div class="smith-empty">Tu bolsa está vacía. Desguaza aquí el equipo que no vayas a usar para conseguir Fragmentos.</div>');
     $('shopNote').innerHTML = 'Desguaza el equipo que no uses para conseguir Fragmentos de mineral.';
   }
-  $('shopAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas) + ' &nbsp; ' + FRAG_SVG + ' ' + fmtNum(frags());
+  $('shopAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas);
   $('btnRestock').style.display = shopTab === 'salvage' ? '' : 'none';
   $('btnRestock').innerHTML = 'Desguazar comunes y raros';
   $('btnRestock').disabled = false;
@@ -170,7 +171,7 @@ function buildSmith() {
 }
 
 // enganches en la tienda existente
-Object.assign(SHOPS, { smith: { title: 'Tobías · Herrero', tabs: [['refine', 'Refinar'], ['ascend', 'Ascender'], ['reforge', 'Reforjar'], ['salvage', 'Desguazar']] } });
+Object.assign(SHOPS, { smith: { title: 'Tobías · Herrero', tabs: [['refine', 'Refinar'], ['ascend', 'Ascender'], ['reforge', 'Reforjar']] } }); // desguazar = vender (Brunilda)
 const _buildShop = buildShop;
 buildShop = function () {
   if (!SMITH_TABS[shopTab]) { $('btnRestock').onclick = null; return _buildShop(); }

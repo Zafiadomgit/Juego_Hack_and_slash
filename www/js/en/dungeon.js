@@ -1,7 +1,7 @@
 /* Fendaria — Mazmorra, reliquias únicas y Despertar.
  * La Mazmorra tiene pisos (1…20) cada vez más duros: monstruos de nivel superior al de tu mejor Grieta,
- * muchas élites y un Súper Jefe al final. Allí caen las Esencias de Despertar (para la Despertar de
- * los héroes) y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
+ * muchas élites y un Súper Jefe al final. Allí caen Sellos de Gesta y cada piso abre un rango de Despertar de
+ * los héroes, y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
  */
 'use strict';
 
@@ -57,7 +57,8 @@ function makeUnique(lvl, key) {
 // Despertar
 // ============================================================
 const LB_MAX = 5;
-const LB_COST = [5, 10, 18, 28, 40];       // Esencias de Despertar
+const LB_COST = [30, 45, 60, 80, 100];     // Sellos de Gesta (antes, Esencias de Despertar)
+const LB_FLOOR = [2, 4, 6, 8, 10];         // piso de la Mazmorra que hay que haber superado: la Mazmorra abre el Despertar
 const LB_LEVEL = [15, 25, 35, 45, 55];     // nivel de héroe necesario
 const LB_PERKS = ["+12% damage and HP", "+12% damage and HP · max refine +11", "+12% damage and HP · 4th gem socket!", "+12% damage and HP · max refine +13", "+12% damage and HP · max refine +15 and Awakening aura"];
 const lbRank = () => (S && S.lb) || 0;
@@ -83,9 +84,9 @@ function openDungeon() {
 function closeDungeon() { state = 'hub'; buildHub(); showOverlay('hub'); }
 function buildDungeon() {
   const D = S.dungeon || { max: 0 };
-  $('dgRes').innerHTML = `${ESS_SVG} ${essence()} Essences · Awakening ${lbRank()}/${LB_MAX}`;
+  $('dgRes').innerHTML = `${SEAL_SVG} ${fmtNum(seals())} · Awakening ${lbRank()}/${LB_MAX}`;
   if (!dungeonOpen()) {
-    $('dgList').innerHTML = "<div class=\"dg-lock\">🔒 The Dungeon opens when you defeat the Super Boss of the Ashen Forest.<br><small>That's where unique relics and Awakening Essences drop, to awaken your heroes' power.</small></div>";
+    $('dgList').innerHTML = "<div class=\"dg-lock\">🔒 The Dungeon opens when you defeat the Super Boss of the Ashen Forest.<br><small>Unique relics and Feat Seals drop there, and every floor you clear unlocks an Awakening rank for your heroes.</small></div>";
     return;
   }
   const rows = [];
@@ -95,7 +96,7 @@ function buildDungeon() {
       <div class="dg-n">${t}</div>
       <div class="dg-txt"><b>Floor ${t} · ${B.name}</b>
         <span>Monsters level ${dungeonLevel(t) * 2 + 4} · lots of elites · Super Boss ${SUPER_BOSSES[B.id].name.split(',')[0]}</span>
-        <span class="dg-rw">${ESS_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Essences${first ? " (first time ×2)" : ''} · <b style="color:#ffb040">Unique relic ${first ? "guaranteed!" : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${FRAG_SVG} ${10 * t}</span></div>
+        <span class="dg-rw">${SEAL_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Seals${first ? ' (first time ×2)' : ''} · <b style="color:#ffb040">Unique relic ${first ? 'guaranteed!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${AMBER_SVG} ${fmtNum(300 * t)}${LB_FLOOR.includes(t) && first ? ' · <b style="color:#ff8ae0">unlocks Awakening ' + (LB_FLOOR.indexOf(t) + 1) + '</b>' : ''}</span></div>
       <button class="btn big" data-t="${t}">Enter</button></div>`);
   }
   const ck = classUnique(), cu = ck && UNIQUES[ck];
@@ -144,8 +145,8 @@ function dungeonVictory(e) {
   const D = S.dungeon || (S.dungeon = { max: 0 });
   const t = rift.tier, first = t > D.max;
   const ess = dungeonEss(t) * (first ? 2 : 1);
-  S.ess = essence() + ess;
-  S.frag = frags() + 10 * t;
+  S.seals = seals() + ess; // la Mazmorra da Sellos (ya no hay Esencias)
+  S.kamas += 300 * t;
   if (first || Math.random() < uniqueChance(t)) {
     const it = makeUnique(itemLevel() + 2);
     dropPickup(e.x, e.y, 'item', { item: it });
@@ -153,7 +154,7 @@ function dungeonVictory(e) {
   }
   D.max = Math.max(D.max, t);
   rift.dungeonEss = ess;
-  later(3.2, () => { subBanner = { text: `+${ess} Awakening Essences · +${10 * t} Shards`, t: 3, max: 3 }; });
+  later(3.2, () => { subBanner = { text: `+${ess} Feat Seals · +${fmtNum(300 * t)} amber${LB_FLOOR.includes(t) && first ? ' · new Awakening rank available!' : ''}`, t: 3, max: 3 }; });
   persist();
 }
 
@@ -164,16 +165,16 @@ QUEST_TABS.splice(2, 0, ['limit', "Awakening"]);
 const _buildQuests = buildQuests;
 function buildLimitTab() {
   const r = lbRank(), maxed = r >= LB_MAX, cards = [];
-  const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0);
+  const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0), fl = LB_FLOOR[r], flOk = ((S.dungeon && S.dungeon.max) || 0) >= (fl || 0);
   cards.push(sealCard({ act: 'limit', icon: bigIcon('⟁' + r, 'radial-gradient(#ffd0f4,#a01a7a)'), name: maxed ? "Fully awakened" : `Awakening ${r + 1}`, color: '#ff8ae0',
     sub: `${CLASSES[S.cls].name} · ${r}/${LB_MAX}`,
-    desc: maxed ? "Your hero has surpassed all their limits." : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">You need level ${lvl}.</b>`}`,
-    price: cost, can: !maxed && lvlOk && essence() >= cost, done: maxed }));
-  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Awakening ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Level ${LB_LEVEL[i]} · ${LB_COST[i]} Essences`, desc: p, done: true, doneTxt: r > i ? "✔ Active" : "Locked" })));
+    desc: maxed ? "Your hero has surpassed all their limits." : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">You need level ${lvl}.</b>`}${flOk ? '' : ` <b style="color:#ff8a80">Clear floor ${fl} of the Dungeon.</b>`}`,
+    price: cost, can: !maxed && lvlOk && flOk && seals() >= cost, done: maxed }));
+  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Awakening ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Level ${LB_LEVEL[i]} · floor ${LB_FLOOR[i]} · ${LB_COST[i]} Seals`, desc: p, done: true, doneTxt: r > i ? "✔ Active" : "Locked" })));
   $('questList').className = 'shop-grid gesta-grid';
-  $('questList').innerHTML = cards.join('').replace(new RegExp(SEAL_SVG.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), ESS_SVG);
-  $('questAmber').innerHTML = ESS_SVG + ' ' + fmtNum(essence());
-  $('questNote').textContent = "Awakening Essences only drop in the Dungeon (Runic Portal → Dungeon).";
+  $('questList').innerHTML = cards.join('');
+  $('questAmber').innerHTML = SEAL_SVG + ' ' + fmtNum(seals());
+  $('questNote').textContent = "Each Awakening rank unlocks when you clear a Dungeon floor (Runic Portal → Dungeon).";
 }
 buildQuests = function () {
   const tab = questTab;
@@ -189,8 +190,9 @@ gestaAction = function (act) {
   const r = lbRank();
   if (r >= LB_MAX) return;
   if (S.level < LB_LEVEL[r]) { showToast('questToast', `You need level ${LB_LEVEL[r]}`, false); return; }
-  if (essence() < LB_COST[r]) { showToast('questToast', "You're missing Awakening Essences: get them in the Dungeon", false); SFX.play('hurt'); return; }
-  S.ess -= LB_COST[r];
+  if (((S.dungeon && S.dungeon.max) || 0) < LB_FLOOR[r]) { showToast('questToast', `Clear floor ${LB_FLOOR[r]} of the Dungeon to unlock this rank`, false); SFX.play('hurt'); return; }
+  if (seals() < LB_COST[r]) { showToast('questToast', "You don't have enough Feat Seals", false); SFX.play('hurt'); return; }
+  S.seals -= LB_COST[r];
   S.lb = r + 1;
   if (S.lb === 3) { while (S.gemSlots.length < GEM_SLOTS + 1) S.gemSlots.push(null); }
   if (P) recalc();

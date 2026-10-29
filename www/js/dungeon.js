@@ -1,7 +1,7 @@
 /* Fendaria — Mazmorra, reliquias únicas y Despertar.
  * La Mazmorra tiene pisos (1…20) cada vez más duros: monstruos de nivel superior al de tu mejor Grieta,
- * muchas élites y un Súper Jefe al final. Allí caen las Esencias de Despertar (para la Despertar de
- * los héroes) y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
+ * muchas élites y un Súper Jefe al final. Allí caen Sellos de Gesta y cada piso abre un rango de Despertar de
+ * los héroes, y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
  */
 'use strict';
 
@@ -57,7 +57,8 @@ function makeUnique(lvl, key) {
 // Despertar
 // ============================================================
 const LB_MAX = 5;
-const LB_COST = [5, 10, 18, 28, 40];       // Esencias de Despertar
+const LB_COST = [30, 45, 60, 80, 100];     // Sellos de Gesta (antes, Esencias de Despertar)
+const LB_FLOOR = [2, 4, 6, 8, 10];         // piso de la Mazmorra que hay que haber superado: la Mazmorra abre el Despertar
 const LB_LEVEL = [15, 25, 35, 45, 55];     // nivel de héroe necesario
 const LB_PERKS = ['+12% de daño y PV', '+12% de daño y PV · refinado máximo +11', '+12% de daño y PV · ¡4.º hueco de gema!', '+12% de daño y PV · refinado máximo +13', '+12% de daño y PV · refinado máximo +15 y aura del Despertar'];
 const lbRank = () => (S && S.lb) || 0;
@@ -83,9 +84,9 @@ function openDungeon() {
 function closeDungeon() { state = 'hub'; buildHub(); showOverlay('hub'); }
 function buildDungeon() {
   const D = S.dungeon || { max: 0 };
-  $('dgRes').innerHTML = `${ESS_SVG} ${essence()} Esencias · Despertar ${lbRank()}/${LB_MAX}`;
+  $('dgRes').innerHTML = `${SEAL_SVG} ${fmtNum(seals())} · Despertar ${lbRank()}/${LB_MAX}`;
   if (!dungeonOpen()) {
-    $('dgList').innerHTML = '<div class="dg-lock">🔒 La Mazmorra se abre al vencer al Súper Jefe del Bosque Ceniciento.<br><small>Allí caen reliquias únicas y Esencias de Despertar para despertar el poder de tus héroes.</small></div>';
+    $('dgList').innerHTML = '<div class="dg-lock">🔒 La Mazmorra se abre al vencer al Súper Jefe del Bosque Ceniciento.<br><small>Allí caen reliquias únicas y Sellos de Gesta, y cada piso superado abre un rango de Despertar para tus héroes.</small></div>';
     return;
   }
   const rows = [];
@@ -95,7 +96,7 @@ function buildDungeon() {
       <div class="dg-n">${t}</div>
       <div class="dg-txt"><b>Piso ${t} · ${B.name}</b>
         <span>Monstruos nivel ${dungeonLevel(t) * 2 + 4} · muchas élites · Súper Jefe ${SUPER_BOSSES[B.id].name.split(',')[0]}</span>
-        <span class="dg-rw">${ESS_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Esencias${first ? ' (primera vez ×2)' : ''} · <b style="color:#ffb040">Reliquia única ${first ? '¡asegurada!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${FRAG_SVG} ${10 * t}</span></div>
+        <span class="dg-rw">${SEAL_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Sellos${first ? ' (primera vez ×2)' : ''} · <b style="color:#ffb040">Reliquia única ${first ? '¡asegurada!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${AMBER_SVG} ${fmtNum(300 * t)}${LB_FLOOR.includes(t) && first ? ' · <b style="color:#ff8ae0">abre Despertar ' + (LB_FLOOR.indexOf(t) + 1) + '</b>' : ''}</span></div>
       <button class="btn big" data-t="${t}">Entrar</button></div>`);
   }
   const ck = classUnique(), cu = ck && UNIQUES[ck];
@@ -144,8 +145,8 @@ function dungeonVictory(e) {
   const D = S.dungeon || (S.dungeon = { max: 0 });
   const t = rift.tier, first = t > D.max;
   const ess = dungeonEss(t) * (first ? 2 : 1);
-  S.ess = essence() + ess;
-  S.frag = frags() + 10 * t;
+  S.seals = seals() + ess; // la Mazmorra da Sellos (ya no hay Esencias)
+  S.kamas += 300 * t;
   if (first || Math.random() < uniqueChance(t)) {
     const it = makeUnique(itemLevel() + 2);
     dropPickup(e.x, e.y, 'item', { item: it });
@@ -153,7 +154,7 @@ function dungeonVictory(e) {
   }
   D.max = Math.max(D.max, t);
   rift.dungeonEss = ess;
-  later(3.2, () => { subBanner = { text: `+${ess} Esencias de Despertar · +${10 * t} Fragmentos`, t: 3, max: 3 }; });
+  later(3.2, () => { subBanner = { text: `+${ess} Sellos de Gesta · +${fmtNum(300 * t)} ámbar${LB_FLOOR.includes(t) && first ? ' · ¡nuevo rango de Despertar disponible!' : ''}`, t: 3, max: 3 }; });
   persist();
 }
 
@@ -164,16 +165,16 @@ QUEST_TABS.splice(2, 0, ['limit', 'Despertar']);
 const _buildQuests = buildQuests;
 function buildLimitTab() {
   const r = lbRank(), maxed = r >= LB_MAX, cards = [];
-  const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0);
+  const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0), fl = LB_FLOOR[r], flOk = ((S.dungeon && S.dungeon.max) || 0) >= (fl || 0);
   cards.push(sealCard({ act: 'limit', icon: bigIcon('⟁' + r, 'radial-gradient(#ffd0f4,#a01a7a)'), name: maxed ? 'Despertar completo' : `Despertar ${r + 1}`, color: '#ff8ae0',
     sub: `${CLASSES[S.cls].name} · ${r}/${LB_MAX}`,
-    desc: maxed ? 'Tu héroe ha superado todos sus límites.' : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvl}.</b>`}`,
-    price: cost, can: !maxed && lvlOk && essence() >= cost, done: maxed }));
-  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Despertar ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Nivel ${LB_LEVEL[i]} · ${LB_COST[i]} Esencias`, desc: p, done: true, doneTxt: r > i ? '✔ Activa' : 'Bloqueada' })));
+    desc: maxed ? 'Tu héroe ha superado todos sus límites.' : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvl}.</b>`}${flOk ? '' : ` <b style="color:#ff8a80">Supera el piso ${fl} de la Mazmorra.</b>`}`,
+    price: cost, can: !maxed && lvlOk && flOk && seals() >= cost, done: maxed }));
+  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Despertar ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Nivel ${LB_LEVEL[i]} · piso ${LB_FLOOR[i]} · ${LB_COST[i]} Sellos`, desc: p, done: true, doneTxt: r > i ? '✔ Activa' : 'Bloqueada' })));
   $('questList').className = 'shop-grid gesta-grid';
-  $('questList').innerHTML = cards.join('').replace(new RegExp(SEAL_SVG.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), ESS_SVG);
-  $('questAmber').innerHTML = ESS_SVG + ' ' + fmtNum(essence());
-  $('questNote').textContent = 'Las Esencias de Despertar solo caen en la Mazmorra (Portal Rúnico → Mazmorra).';
+  $('questList').innerHTML = cards.join('');
+  $('questAmber').innerHTML = SEAL_SVG + ' ' + fmtNum(seals());
+  $('questNote').textContent = 'Cada rango de Despertar se abre al superar un piso de la Mazmorra (Portal Rúnico → Mazmorra).';
 }
 buildQuests = function () {
   const tab = questTab;
@@ -189,8 +190,9 @@ gestaAction = function (act) {
   const r = lbRank();
   if (r >= LB_MAX) return;
   if (S.level < LB_LEVEL[r]) { showToast('questToast', `Necesitas nivel ${LB_LEVEL[r]}`, false); return; }
-  if (essence() < LB_COST[r]) { showToast('questToast', 'Te faltan Esencias de Despertar: consíguelas en la Mazmorra', false); SFX.play('hurt'); return; }
-  S.ess -= LB_COST[r];
+  if (((S.dungeon && S.dungeon.max) || 0) < LB_FLOOR[r]) { showToast('questToast', `Supera el piso ${LB_FLOOR[r]} de la Mazmorra para abrir este rango`, false); SFX.play('hurt'); return; }
+  if (seals() < LB_COST[r]) { showToast('questToast', 'No tienes suficientes Sellos de Gesta', false); SFX.play('hurt'); return; }
+  S.seals -= LB_COST[r];
   S.lb = r + 1;
   if (S.lb === 3) { while (S.gemSlots.length < GEM_SLOTS + 1) S.gemSlots.push(null); }
   if (P) recalc();

@@ -1,0 +1,69 @@
+@@4so3ax
+Bring me amber and I'll raise your weapon a notch. Or two, if you catch me in a good mood.
+@@zs2gsb
+Tempered Skin
+@@1ovuopu
++10% max health
+@@1rrj7m
+Opening Aegis
+@@19ks6tj
+Start every Rift with a shield worth 30% of your health
+@@184xqu6
+Sure Strike
+@@15c451b
++25% critical damage
+@@19a2sd3
+Ultimate Echo
+@@l5w0m5
+When you unleash your ultimate you recover 35% of your health and it stays 25% charged
+@@1sig2zs
+Stars
+@@1vtqlfv
+New missions in ${left} h · each hero has their own. <b>Feat Seals</b> are spent on Transcendence, Awakening, Stars and Armory.
+@@10810uu
+Rank ${k} milestone · option ${opt ? 'B' : 'A'}
+@@1xv7y4y
+✔ Chosen
+@@1s30wh
+Choose
+@@angcsg
+Transcendence is permanent for this hero. At each milestone you pick one of two perks and can switch it for free whenever you like.
+@@zn836c
+Milestone ${k}: ${(+opt ? TRANS_ALT : TRANS_PERKS)[k].name}
+@@1lsr2o
+${SEAL_SVG} ${fmtNum(seals())} · Awakening ${lbRank()}/${LB_MAX}
+@@bub28x
+<div class="dg-lock">🔒 The Dungeon opens when you defeat the Super Boss of the Ashen Forest.<br><small>Unique relics and Feat Seals drop there, and every floor you clear unlocks an Awakening rank for your heroes.</small></div>
+@@wjajgk
+ · <b style="color:#ff8ae0">unlocks Awakening 
+@@c800b
+<div class="dg-row ${first ? 'new' : ''}">
+      <div class="dg-n">${t}</div>
+      <div class="dg-txt"><b>Floor ${t} · ${B.name}</b>
+        <span>Monsters level ${dungeonLevel(t) * 2 + 4} · lots of elites · Super Boss ${SUPER_BOSSES[B.id].name.split(',')[0]}</span>
+        <span class="dg-rw">${SEAL_SVG} ${dungeonEss(t) * (first ? 2 : 1)} Seals${first ? ' (first time ×2)' : ''} · <b style="color:#ffb040">Unique relic ${first ? 'guaranteed!' : Math.round(uniqueChance(t) * 100) + '%'}</b> · ${AMBER_SVG} ${fmtNum(300 * t)}${LB_FLOOR.includes(t) && first ? ' · <b style="color:#ff8ae0">unlocks Awakening ' + (LB_FLOOR.indexOf(t) + 1) + '</b>' : ''}</span></div>
+      <button class="btn big" data-t="${t}">Enter</button></div>
+@@1qmyw56
+ · new Awakening rank available!
+@@17ocv2f
++${ess} Feat Seals · +${fmtNum(300 * t)} amber${LB_FLOOR.includes(t) && first ? ' · new Awakening rank available!' : ''}
+@@1q4zei6
+ <b style="color:#ff8a80">Clear floor ${fl} of the Dungeon.</b>
+@@fcjwk1
+Level ${LB_LEVEL[i]} · floor ${LB_FLOOR[i]} · ${LB_COST[i]} Seals
+@@y3f4uv
+Each Awakening rank unlocks when you clear a Dungeon floor (Runic Portal → Dungeon).
+@@4dqtal
+Clear floor ${LB_FLOOR[r]} of the Dungeon to unlock this rank
+@@8v8l5y
+${f} Shards → ${fmtNum(f * ECO_FRAG)} amber
+@@7q850l
+${e} Essences → ${e * ECO_ESS} Seals
+@@n99p0l
+Currencies unified: 
+@@nf8s0q
+Feat Seals
+@@1eayctp
+What drops down there exists nowhere else: unique relics, and every floor you clear awakens a little more of your hero's power.
+@@1olkmjy
+Bring me amber and I'll refine your weapons. Whatever you don't use, sell it to Brunilda. That's how the world works.

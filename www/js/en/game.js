@@ -506,14 +506,14 @@ function derived() {
   const sb = activeSetBonus();
   const um = uniqueMods();
   return {
-    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (has('titan') ? 1.1 : 1) * (uniqueOn('corona') ? 1.3 : 1) * (1 + (um.hp || 0)) * (1 + 0.12 * lbRank()) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank())),
+    maxHp: Math.round((C.hp + (S.level - 1) * 8 + t.vit * 2) * (has('esmeralda') ? 1.2 : 1) * (has('titan') ? 1.1 : 1) * (uniqueOn('corona') ? 1.3 : 1) * (1 + (um.hp || 0)) * (1 + 0.12 * lbRank()) * (1 + 0.05 * (S.up.vigor || 0)) * (1 + (sb.hpP || 0)) * (1 + 0.05 * transRank()) * (transPerk(3, 1) ? 1.1 : 1)),
     power: 8 + S.level * 1.2 + t.dmg,
     dmgMul: (1 + t.fue * 0.01) * (has('purpura') ? 1.15 : 1) * (has('titan') ? 1.1 : 1) * (uniqueOn('eclipse') ? 1.25 : 1) * (1 + (um.dmg || 0)) * (1 + 0.12 * lbRank()) * (1 + 0.05 * (S.up.afilador || 0)) * (boostOn('furia') ? 1.3 : 1) * (1 + (sb.dmgP || 0)) * (1 + 0.05 * transRank()) * (P && P.altarT > 0 ? 1.5 : 1),
     skillMul: (1 + t.int * 0.015) * (has('obsidiana') ? 1.25 : 1),
-    critDmg: (has('vacio') ? 1.4 : 1) * (uniqueOn('verdugo') ? 1.6 : 1) * (1 + (um.critDmg || 0)),
+    critDmg: (has('vacio') ? 1.4 : 1) * (transPerk(7, 1) ? 1.25 : 1) * (uniqueOn('verdugo') ? 1.6 : 1) * (1 + (um.critDmg || 0)),
     cdMul: (uniqueOn('eco') ? 0.7 : 1) * (1 - (um.cd || 0)),
     hpRegen: has('musgo') ? 0.01 : 0,
-    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transRank() >= 7 ? 0.05 : 0) + (uniqueOn('eclipse') ? 0.08 : 0) + (um.crit || 0)),
+    crit: Math.min(0.75, 0.05 + t.sue * 0.0015 + t.crit * 0.01 + (has('turquesa') ? 0.1 : 0) + (sb.critP || 0) + (C.critBonus || 0) + (transPerk(7, 0) ? 0.05 : 0) + (uniqueOn('eclipse') ? 0.08 : 0) + (um.crit || 0)),
     atkSpeed: (1 + t.agi * 0.006) * (1 + (sb.spdP || 0)) * (has('brasa') ? 1.12 : 1),
     speed: C.speed * (1 + Math.min(0.35, t.agi * 0.002)) * (P && P.altarT > 0 ? 1.15 : 1) * (uniqueOn('manto') ? 1.12 : 1) * (uniqueOn('viento') ? 1.2 : 1) * (1 + (um.speed || 0)),
     xpMul: (1 + t.sab * 0.01) * (boostOn('sabio') ? 1.5 : 1) * (uniqueOn('avaro') ? 1.4 : 1) * (1 + (sb.xpP || 0)),
@@ -549,7 +549,7 @@ function createPlayer() {
     walkT: 0, moving: false, hurtFlash: 0,
     swingT: 0, swingSide: 1, shotT: 0,
     slowT: 0, sq: 0, lean: 0, recoil: 0, stepT: 0, ghostT: 0,
-    ult: transRank() >= 5 ? 50 : 0, spinT: 0, frenzyT: 0, warcryT: 0, danceT: 0, spinTick: 0, altarT: 0,
+    ult: transPerk(5, 0) ? 50 : 0, spinT: 0, frenzyT: 0, warcryT: 0, danceT: 0, spinTick: 0, altarT: 0,
   };
   recalc();
   P.hp = P.maxHp;
@@ -3602,7 +3602,7 @@ function finishRift() {
   $('endStats').innerHTML = riftRows([
     ["Time bonus", rift.bonus ? '+' + rift.bonus + " amber" : '—'],
     ...(rift.dofus ? [[GEMS[rift.dofus].name, '★']] : []),
-    ...(rift.dungeonEss ? [["Awakening Essences", '+' + rift.dungeonEss]] : []),
+    ...(rift.dungeonEss ? [["Feat Seals", '+' + rift.dungeonEss]] : []),
     ...(rift.setDrop ? [["Set piece", SETS[rift.biome.id].name]] : []),
   ]);
   showOverlay('end');

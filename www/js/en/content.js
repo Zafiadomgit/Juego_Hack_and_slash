@@ -14,7 +14,7 @@ const ULT_GAIN = { normal: 2.5, elite: 12, boss: 30 };
 function gainUlt(n) {
   if (!P) return;
   const was = P.ult >= 100;
-  P.ult = Math.min(100, (P.ult || 0) + n * (transRank() >= 3 ? 1.3 : 1) * (gemOn('fenix') ? 1.5 : 1));
+  P.ult = Math.min(100, (P.ult || 0) + n * (transPerk(3, 0) ? 1.3 : 1) * (gemOn('fenix') ? 1.5 : 1));
   if (!was && P.ult >= 100) { addText(P.x, P.y - 58, "Ultimate ready!", '#ffe08a', 1.1); SFX.play('shield'); }
 }
 
@@ -140,8 +140,17 @@ const TRANS_PERKS = {
   7: { name: "Eye of fate", desc: "+5% crit chance" },
   10: { name: "Transcended", desc: "Your ultimate deals 50% more damage and a golden aura follows you" },
 };
+// En cada hito se elige entre dos ventajas (y se puede cambiar cuando quieras): la A es la de siempre
+const TRANS_ALT = {
+  3: { name: "Tempered Skin", desc: "+10% max health" },
+  5: { name: "Opening Aegis", desc: "Start every Rift with a shield worth 30% of your health" },
+  7: { name: "Sure Strike", desc: "+25% critical damage" },
+  10: { name: "Ultimate Echo", desc: "When you unleash your ultimate you recover 35% of your health and it stays 25% charged" },
+};
+const transPick = (k) => (S && S.transPick && S.transPick[k]) || 0;
+const transPerk = (k, opt) => transRank() >= k && transPick(k) === opt;
 const TRANS_TITLES = ['', "Initiate", "Initiate", "Tempered", "Tempered", "Awakened", "Awakened", "Heroic", "Heroic", "Legendary", "Transcended"];
-const ultMul = () => (transRank() >= 10 ? 1.5 : 1);
+const ultMul = () => (transPerk(10, 0) ? 1.5 : 1);
 
 // --- Forja de estrellas: cada ranura de equipo sube hasta 5★ y potencia la pieza que lleves (+12% por ★).
 // Las estrellas son de la ranura: se conservan aunque cambies de pieza.
@@ -169,7 +178,7 @@ function makeGestaItem(slot) {
 // Tablón: Misiones · Trascendencia · Forja · Armería
 // ============================================================
 let questTab = 'quests';
-const QUEST_TABS = [['quests', "Quests"], ['trans', "Transcendence"], ['forge', "Forge"], ['armory', "Armory"]];
+const QUEST_TABS = [['quests', "Quests"], ['trans', "Transcendence"], ['forge', "Stars"], ['armory', "Armory"]]; // «Estrellas»: la Forja es la de Tobías
 
 function openQuests() {
   state = 'quests';
@@ -179,12 +188,12 @@ function openQuests() {
 }
 function closeQuests() { persist(); state = 'hub'; buildHub(); showOverlay('hub'); }
 
-function sealCard({ act, icon, name, color, sub, desc, price, can, done, doneTxt }) {
+function sealCard({ act, icon, name, color, sub, desc, price, can, done, doneTxt, btn }) {
   return `<button class="offer gesta${done ? ' sold' : ''}" data-g="${act}" style="--rc:${color};--rb:${color}66" ${done ? 'disabled' : ''}>
     <div class="row"><div class="ico">${icon}</div>
       <div style="min-width:0"><span class="nm" style="color:${color}">${name}</span><span class="sub">${sub}</span></div></div>
     <span class="desc">${desc}</span>
-    <span class="buy${can ? '' : ' no'}">${done ? doneTxt || "Max" : SEAL_SVG + ' ' + price}</span>
+    <span class="buy${can || btn ? '' : ' no'}">${done ? doneTxt || "Max" : btn || SEAL_SVG + ' ' + price}</span>
   </button>`;
 }
 const bigIcon = (txt, bg) => `<span class="g-ico" style="background:${bg}">${txt}</span>`;
@@ -206,7 +215,7 @@ function buildQuests() {
         <div class="q-txt"><b>Daily chest</b><span>Complete and claim all 3 quests: ${SEAL_SVG} ${DAILY_BONUS} extra Feat Seals</span></div>
         <button class="btn" data-q="bonus" ${bonusReady(d) ? '' : 'disabled'}>${d.bonus ? "✔ Opened" : bonusReady(d) ? "Open" : "Locked"}</button></div>`;
     const left = 24 - new Date().getHours();
-    $('questNote').innerHTML = `New quests in ${left} h · each hero has their own. <b>Feat Seals</b> are spent on Transcendence, the Forge and the Armory.`;
+    $('questNote').innerHTML = `New missions in ${left} h · each hero has their own. <b>Feat Seals</b> are spent on Transcendence, Awakening, Stars and Armory.`;
   } else if (questTab === 'trans') {
     const r = transRank(), cards = [];
     const maxed = r >= TRANS_MAX, cost = transCost(r), lvlReq = transLevel(r), lvlOk = S.level >= lvlReq;
@@ -215,13 +224,17 @@ function buildQuests() {
       sub: `${CLASSES[S.cls].name} · rank ${r}/${TRANS_MAX}`,
       desc: maxed ? "You've reached the peak of Transcendence." : `+5% damage and +5% HP forever (now +${r * 5}%).${perk ? ` <b style="color:#ffd76a">Milestone: ${perk.name}</b> — ${perk.desc}.` : ''}${lvlOk ? '' : ` <b style="color:#ff8a80">You need level ${lvlReq}.</b>`}`,
       price: cost, can: !maxed && lvlOk && seals() >= cost, done: maxed }));
+    // hitos: dos ventajas a elegir en cada uno (se puede cambiar gratis)
     for (const [k, p] of Object.entries(TRANS_PERKS)) {
       const got = r >= +k;
-      cards.push(sealCard({ act: 'perk', icon: bigIcon(got ? '★' : k, got ? 'radial-gradient(#fff3c4,#c9962a)' : '#2a2f48'), name: p.name, color: got ? '#ffd76a' : '#8d90a8',
-        sub: `Rank ${k} milestone`, desc: p.desc, done: true, doneTxt: got ? "✔ Active" : `Rank ${k}` }));
+      [p, TRANS_ALT[k]].forEach((q, opt) => {
+        const on = got && transPick(+k) === opt;
+        cards.push(sealCard({ act: 'pick:' + k + ':' + opt, icon: bigIcon(on ? '★' : opt ? 'B' : 'A', on ? 'radial-gradient(#fff3c4,#c9962a)' : '#2a2f48'), name: q.name, color: on ? '#ffd76a' : got ? '#e8dcc0' : '#8d90a8',
+          sub: `Rank ${k} milestone · option ${opt ? 'B' : 'A'}`, desc: q.desc, done: !got || on, doneTxt: on ? "✔ Chosen" : `Rank ${k}`, btn: "Choose" }));
+      });
     }
     list.innerHTML = cards.join('');
-    $('questNote').textContent = "Transcendence is permanent for this hero and doesn't depend on gear.";
+    $('questNote').textContent = "Transcendence is permanent for this hero. At each milestone you pick one of two perks and can switch it for free whenever you like.";
   } else if (questTab === 'forge') {
     list.innerHTML = SLOTS.map((slot) => {
       const st = forgeStars(slot), it = S.equip[slot], maxed = st >= FORGE_MAX, cost = forgeCost(slot, st);
@@ -245,6 +258,15 @@ function buildQuests() {
 
 function gestaAction(act) {
   const [kind, key] = act.split(':');
+  if (kind === 'pick') {
+    const [, k, opt] = act.split(':');
+    if (transRank() < +k) return;
+    S.transPick = S.transPick || {}; S.transPick[k] = +opt;
+    if (P) recalc();
+    persist(); SFX.play('shield'); buildQuests();
+    showToast('questToast', `Milestone ${k}: ${(+opt ? TRANS_ALT : TRANS_PERKS)[k].name}`);
+    return;
+  }
   const spend = (n) => { if (seals() < n) { showToast('questToast', "You don't have enough Feat Seals", false); SFX.play('hurt'); return false; } S.seals -= n; return true; };
   if (kind === 'trans') {
     const r = transRank();

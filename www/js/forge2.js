@@ -72,7 +72,7 @@ itemPower = function (it) { const p = _itemPowerR(it); return it && it.rune ? Ma
 const masterLevel = () => Math.max(S.level + 3, ((S.maxFaille || 1) - 1) * 2 + 9);
 const masterCost = (rar) => {
   const L = masterLevel();
-  return rar === 3 ? { amber: Math.round((1200 + L * 90) / 10) * 10, frag: 60 + L * 2 } : { amber: Math.round((450 + L * 40) / 10) * 10, frag: 22 + L };
+  return rar === 3 ? { amber: Math.round((1200 + L * 90 + (60 + L * 2) * AMBER_PER_FRAG) / 10) * 10, frag: 0 } : { amber: Math.round((450 + L * 40 + (22 + L) * AMBER_PER_FRAG) / 10) * 10, frag: 0 };
 };
 function doForge(rar) {
   const c = masterCost(rar);
@@ -104,7 +104,7 @@ function transferPairs() {
   }
   return out;
 }
-const transferCost = (r) => ({ amber: 60 * r, frag: 2 * r });
+const transferCost = (r) => ({ amber: 60 * r + 2 * r * AMBER_PER_FRAG, frag: 0 });
 function doTransfer(from, to) {
   const a = forgeGet(from), b = forgeGet(to);
   if (!a || !b || (a.refine || 0) <= (b.refine || 0)) return;
@@ -135,7 +135,7 @@ doReforge = function (ref) {
 };
 
 // ---------- Pestañas nuevas en la herrería ----------
-SHOPS.smith.tabs = [['forge', 'Forjar'], ['refine', 'Refinar'], ['transfer', 'Pasar'], ['ascend', 'Ascender'], ['reforge', 'Reforjar'], ['salvage', 'Desguazar']];
+SHOPS.smith.tabs = [['forge', 'Forjar'], ['refine', 'Refinar'], ['transfer', 'Pasar'], ['ascend', 'Ascender'], ['reforge', 'Reforjar']];
 Object.assign(SMITH_TABS, { forge: 1, transfer: 1 });
 const _buildSmithR = buildSmith;
 buildSmith = function () {
@@ -163,7 +163,7 @@ buildSmith = function () {
     if (!pairs.length) offers.push('<div class="smith-empty">Nada que transferir: necesitas una pieza refinada y otra del mismo hueco (una equipada y otra en la bolsa).</div>');
     $('shopNote').innerHTML = 'Lo invertido en refinar no se pierde al cambiar de equipo.';
   }
-  $('shopAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas) + ' &nbsp; ' + FRAG_SVG + ' ' + fmtNum(frags());
+  $('shopAmber').innerHTML = AMBER_SVG + ' ' + fmtNum(S.kamas);
   $('btnRestock').style.display = 'none';
   $('shopGrid').innerHTML = offers.join('');
   for (const el of $('shopGrid').querySelectorAll('.offer')) el.addEventListener('click', () => shopAction(el.dataset.act));

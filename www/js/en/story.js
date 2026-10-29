@@ -194,7 +194,7 @@ const SCENES = {
   ],
   dungeon: [
     ['ivo', "This is the Locksmith's Vault. Each floor is deeper… and more dangerous than the last."],
-    ['ivo', "What drops down there exists nowhere else: unique relics and Essences to break your limits."],
+    ['ivo', "What drops down there exists nowhere else: unique relics, and every floor you clear awakens a little more of your hero's power."],
   ],
 };
 
@@ -225,7 +225,7 @@ const CHATTER = {
     "New grey hairs every day. How wonderful! Sit down, I'll make you something.",
   ],
   smith: [
-    "Bring me what you don't use: I melt it into Shards. With Shards I refine your weapons. That's how the world works.",
+    "Bring me amber and I'll refine your weapons. Whatever you don't use, sell it to Brunilda. That's how the world works.",
     "A weapon refined to +10 cuts things that shouldn't even exist. I know because I've seen it.",
     "Steel cracks in that cold. Bring a well-refined weapon or don't bring one at all.",
     "Kara, from the eastern smithy… her father taught me everything I know. Iron folk, those.",

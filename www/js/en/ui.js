@@ -26,7 +26,7 @@ const UI_STAT_ICONS = [
   ["Time", 'talents/hourglass'], ["Monsters defeated", 'talents/skull'], ["Items found", 'icons/chest'],
   ["Amber earned", 'icons/amber'], ["Experience", 'icons/xp'], ["Progress", 'icons/level'], ["Time bonus", 'talents/hourglass'],
   ["Expedition", 'talents/mountain'], ["Torment", 'talents/skull'], ['Puntuación', 'talents/crown'], ['Récord personal', 'talents/trophy'],
-  ["Awakening Essences", 'icons/seal'], ["Awakening Essences", 'icons/gem'], ["Set piece", 'icons/chest'],
+  ["Awakening Essences", 'icons/seal'], ["Feat Seals", 'icons/seal'], ["Set piece", 'icons/chest'],
   ['Tu mejor hoy', 'talents/crown'],
 ];
 const uiIcon = (label) => {

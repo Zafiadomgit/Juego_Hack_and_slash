@@ -14,7 +14,7 @@ const ULT_GAIN = { normal: 2.5, elite: 12, boss: 30 };
 function gainUlt(n) {
   if (!P) return;
   const was = P.ult >= 100;
-  P.ult = Math.min(100, (P.ult || 0) + n * (transRank() >= 3 ? 1.3 : 1) * (gemOn('fenix') ? 1.5 : 1));
+  P.ult = Math.min(100, (P.ult || 0) + n * (transPerk(3, 0) ? 1.3 : 1) * (gemOn('fenix') ? 1.5 : 1));
   if (!was && P.ult >= 100) { addText(P.x, P.y - 58, '¡Definitiva lista!', '#ffe08a', 1.1); SFX.play('shield'); }
 }
 
@@ -140,8 +140,17 @@ const TRANS_PERKS = {
   7: { name: 'Ojo del destino', desc: '+5% de probabilidad de crítico' },
   10: { name: 'Trascendido', desc: 'La definitiva hace un 50% más de daño y un aura dorada te acompaña' },
 };
+// En cada hito se elige entre dos ventajas (y se puede cambiar cuando quieras): la A es la de siempre
+const TRANS_ALT = {
+  3: { name: 'Piel templada', desc: '+10% de vida máxima' },
+  5: { name: 'Égida inicial', desc: 'Empiezas cada Grieta con un escudo del 30% de tu vida' },
+  7: { name: 'Golpe certero', desc: '+25% de daño crítico' },
+  10: { name: 'Eco de la definitiva', desc: 'Al lanzar la definitiva recuperas el 35% de tu vida y queda cargada al 25%' },
+};
+const transPick = (k) => (S && S.transPick && S.transPick[k]) || 0;
+const transPerk = (k, opt) => transRank() >= k && transPick(k) === opt;
 const TRANS_TITLES = ['', 'Iniciado', 'Iniciado', 'Templado', 'Templado', 'Despierto', 'Despierto', 'Heroico', 'Heroico', 'Legendario', 'Trascendido'];
-const ultMul = () => (transRank() >= 10 ? 1.5 : 1);
+const ultMul = () => (transPerk(10, 0) ? 1.5 : 1);
 
 // --- Forja de estrellas: cada ranura de equipo sube hasta 5★ y potencia la pieza que lleves (+12% por ★).
 // Las estrellas son de la ranura: se conservan aunque cambies de pieza.
@@ -169,7 +178,7 @@ function makeGestaItem(slot) {
 // Tablón: Misiones · Trascendencia · Forja · Armería
 // ============================================================
 let questTab = 'quests';
-const QUEST_TABS = [['quests', 'Misiones'], ['trans', 'Trascendencia'], ['forge', 'Forja'], ['armory', 'Armería']];
+const QUEST_TABS = [['quests', 'Misiones'], ['trans', 'Trascendencia'], ['forge', 'Estrellas'], ['armory', 'Armería']]; // «Estrellas»: la Forja es la de Tobías
 
 function openQuests() {
   state = 'quests';
@@ -179,12 +188,12 @@ function openQuests() {
 }
 function closeQuests() { persist(); state = 'hub'; buildHub(); showOverlay('hub'); }
 
-function sealCard({ act, icon, name, color, sub, desc, price, can, done, doneTxt }) {
+function sealCard({ act, icon, name, color, sub, desc, price, can, done, doneTxt, btn }) {
   return `<button class="offer gesta${done ? ' sold' : ''}" data-g="${act}" style="--rc:${color};--rb:${color}66" ${done ? 'disabled' : ''}>
     <div class="row"><div class="ico">${icon}</div>
       <div style="min-width:0"><span class="nm" style="color:${color}">${name}</span><span class="sub">${sub}</span></div></div>
     <span class="desc">${desc}</span>
-    <span class="buy${can ? '' : ' no'}">${done ? doneTxt || 'Máximo' : SEAL_SVG + ' ' + price}</span>
+    <span class="buy${can || btn ? '' : ' no'}">${done ? doneTxt || 'Máximo' : btn || SEAL_SVG + ' ' + price}</span>
   </button>`;
 }
 const bigIcon = (txt, bg) => `<span class="g-ico" style="background:${bg}">${txt}</span>`;
@@ -206,7 +215,7 @@ function buildQuests() {
         <div class="q-txt"><b>Cofre del día</b><span>Completa y cobra las 3 misiones: ${SEAL_SVG} ${DAILY_BONUS} Sellos de Gesta extra</span></div>
         <button class="btn" data-q="bonus" ${bonusReady(d) ? '' : 'disabled'}>${d.bonus ? '✔ Abierto' : bonusReady(d) ? 'Abrir' : 'Cerrado'}</button></div>`;
     const left = 24 - new Date().getHours();
-    $('questNote').innerHTML = `Nuevas misiones en ${left} h · cada héroe tiene las suyas. Los <b>Sellos de Gesta</b> se gastan en Trascendencia, Forja y Armería.`;
+    $('questNote').innerHTML = `Nuevas misiones en ${left} h · cada héroe tiene las suyas. Los <b>Sellos de Gesta</b> se gastan en Trascendencia, Despertar, Estrellas y Armería.`;
   } else if (questTab === 'trans') {
     const r = transRank(), cards = [];
     const maxed = r >= TRANS_MAX, cost = transCost(r), lvlReq = transLevel(r), lvlOk = S.level >= lvlReq;
@@ -215,13 +224,17 @@ function buildQuests() {
       sub: `${CLASSES[S.cls].name} · rango ${r}/${TRANS_MAX}`,
       desc: maxed ? 'Has alcanzado la cima de la Trascendencia.' : `+5% de daño y +5% de PV para siempre (ahora +${r * 5}%).${perk ? ` <b style="color:#ffd76a">Hito: ${perk.name}</b> — ${perk.desc}.` : ''}${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvlReq}.</b>`}`,
       price: cost, can: !maxed && lvlOk && seals() >= cost, done: maxed }));
+    // hitos: dos ventajas a elegir en cada uno (se puede cambiar gratis)
     for (const [k, p] of Object.entries(TRANS_PERKS)) {
       const got = r >= +k;
-      cards.push(sealCard({ act: 'perk', icon: bigIcon(got ? '★' : k, got ? 'radial-gradient(#fff3c4,#c9962a)' : '#2a2f48'), name: p.name, color: got ? '#ffd76a' : '#8d90a8',
-        sub: `Hito del rango ${k}`, desc: p.desc, done: true, doneTxt: got ? '✔ Activo' : `Rango ${k}` }));
+      [p, TRANS_ALT[k]].forEach((q, opt) => {
+        const on = got && transPick(+k) === opt;
+        cards.push(sealCard({ act: 'pick:' + k + ':' + opt, icon: bigIcon(on ? '★' : opt ? 'B' : 'A', on ? 'radial-gradient(#fff3c4,#c9962a)' : '#2a2f48'), name: q.name, color: on ? '#ffd76a' : got ? '#e8dcc0' : '#8d90a8',
+          sub: `Hito del rango ${k} · opción ${opt ? 'B' : 'A'}`, desc: q.desc, done: !got || on, doneTxt: on ? '✔ Elegida' : `Rango ${k}`, btn: 'Elegir' }));
+      });
     }
     list.innerHTML = cards.join('');
-    $('questNote').textContent = 'La Trascendencia es permanente para este héroe y no depende del equipo.';
+    $('questNote').textContent = 'La Trascendencia es permanente para este héroe. En cada hito eliges una de dos ventajas y puedes cambiarla gratis cuando quieras.';
   } else if (questTab === 'forge') {
     list.innerHTML = SLOTS.map((slot) => {
       const st = forgeStars(slot), it = S.equip[slot], maxed = st >= FORGE_MAX, cost = forgeCost(slot, st);
@@ -245,6 +258,15 @@ function buildQuests() {
 
 function gestaAction(act) {
   const [kind, key] = act.split(':');
+  if (kind === 'pick') {
+    const [, k, opt] = act.split(':');
+    if (transRank() < +k) return;
+    S.transPick = S.transPick || {}; S.transPick[k] = +opt;
+    if (P) recalc();
+    persist(); SFX.play('shield'); buildQuests();
+    showToast('questToast', `Hito ${k}: ${(+opt ? TRANS_ALT : TRANS_PERKS)[k].name}`);
+    return;
+  }
   const spend = (n) => { if (seals() < n) { showToast('questToast', 'No tienes suficientes Sellos de Gesta', false); SFX.play('hurt'); return false; } S.seals -= n; return true; };
   if (kind === 'trans') {
     const r = transRank();

@@ -194,7 +194,7 @@ const SCENES = {
   ],
   dungeon: [
     ['ivo', 'Esto es la Cámara del Cerrajero. Cada piso es más hondo… y más peligroso que el anterior.'],
-    ['ivo', 'Lo que caiga ahí abajo no existe en ningún otro sitio: reliquias únicas y Esencias para romper tus límites.'],
+    ['ivo', 'Lo que caiga ahí abajo no existe en ningún otro sitio: reliquias únicas, y cada piso que superes despierta un poco más el poder de tu héroe.'],
   ],
 };
 
@@ -225,7 +225,7 @@ const CHATTER = {
     'Cada día me salen canas nuevas. ¡Qué maravilla! Siéntate, que te preparo algo.',
   ],
   smith: [
-    'Tráeme lo que no uses: lo fundo en Fragmentos. Con Fragmentos refino tus armas. Así funciona el mundo.',
+    'Tráeme ámbar y refino tus armas. Lo que no uses, véndeselo a Brunilda. Así funciona el mundo.',
     'Un arma refinada a +10 corta cosas que ni deberían existir. Lo sé porque lo he visto.',
     'El acero se parte con ese frío. Lleva el arma bien refinada o no la lleves.',
     'Kara, la de la herrería del este… su padre me enseñó todo lo que sé. Gente de hierro, aquella.',

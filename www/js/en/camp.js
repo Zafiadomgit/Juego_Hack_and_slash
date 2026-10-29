@@ -50,7 +50,7 @@ Object.assign(WARES, {
   sello: { name: "Feat Seal", icon: '🏅', d: "<b>+1 Feat Seal</b> for the Board.", k: 40, ok: () => true, buy: () => gainSeals(1, "the merchant") },
 });
 WARES.pocion.d = "One more <b>potion</b> for your bag (kept for the following Rifts).";
-const CAMP_WARES = ['cofre', 'mineral', 'favor', 'tomo', 'sello', 'pocion'];
+const CAMP_WARES = ['cofre', 'favor', 'tomo', 'sello', 'pocion'];
 
 function setUpCamp() {
   const b = bst(), z = rift.zaap;
@@ -243,7 +243,7 @@ const END_TALK = [
   [['ivo', "Every Rift you close gives me one more day. My upgrades await you at the stall."]],
   [['voz', "How entertaining… keep closing doors, little light. I'll keep opening others."]],
   [['ivo', "The Twelve watch you with more interest each time. That's good… almost always."]],
-  [['tobias', "Bring me ore shards and I'll raise your weapon a point. Or two, if you catch me in a good mood."]],
+  [['tobias', "Bring me amber and I'll raise your weapon a notch. Or two, if you catch me in a good mood."]],
   [['brunilda', "Amber in your pockets? What a coincidence: I love amber."]],
 ];
 function leaveRift() {

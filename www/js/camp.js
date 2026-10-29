@@ -50,7 +50,7 @@ Object.assign(WARES, {
   sello: { name: 'Sello de Gesta', icon: '🏅', d: '<b>+1 Sello de Gesta</b> para el Tablón.', k: 40, ok: () => true, buy: () => gainSeals(1, 'la mercader') },
 });
 WARES.pocion.d = 'Una <b>poción</b> más para tu bolsa (se guarda para las siguientes Grietas).';
-const CAMP_WARES = ['cofre', 'mineral', 'favor', 'tomo', 'sello', 'pocion'];
+const CAMP_WARES = ['cofre', 'favor', 'tomo', 'sello', 'pocion'];
 
 function setUpCamp() {
   const b = bst(), z = rift.zaap;
@@ -243,7 +243,7 @@ const END_TALK = [
   [['ivo', 'Cada Grieta que cierras me da un día más. Mis mejoras te esperan en el puesto.']],
   [['voz', 'Qué entretenido… sigue cerrando puertas, lucecita. Yo sigo abriendo otras.']],
   [['ivo', 'Los Doce te observan con más interés cada vez. Eso es bueno… casi siempre.']],
-  [['tobias', 'Si me traes fragmentos de mineral te subo el arma un punto. O dos, si me pillas de buenas.']],
+  [['tobias', 'Si me traes ámbar te subo el arma un punto. O dos, si me pillas de buenas.']],
   [['brunilda', '¿Ámbar en los bolsillos? Qué casualidad: a mí me encanta el ámbar.']],
 ];
 function leaveRift() {
