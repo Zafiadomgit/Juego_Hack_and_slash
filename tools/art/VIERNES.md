@@ -30,9 +30,35 @@ Créditos previstos: Starter (800) + paquete 2500 ≈ 3300. Estilo y prompts: `t
 ## 5. Interfaz (≈ 250 créditos)
 - [ ] Kit completo: marcos, botones, barras, iconos de habilidad propios de cada héroe
 
-## 6. Jefes
-- [ ] Guardianes y Súper Jefes con ataque anticipado claro
-- [ ] Nuevo enemigo: el brujo encapuchado (Hechicero de la Ciudadela o jefe)
+## 6. Jefes y Súper Jefes con animaciones de sus habilidades (≈ 1400 créditos) — pedido del usuario
+Cada jefe (≈ 88 créditos): sprite nuevo 12 + caminar 20 + ataque básico 14 + **2 habilidades animadas 28** + muerte 14.
+Las habilidades llevan preparación muy visible (2–3 fotogramas de carga) para que el jugador pueda esquivarlas,
+y el efecto de la habilidad dibujado en el sprite (estela, onda, aliento, runas).
+**Guardianes (8):**
+- [ ] Colmillo Ancestral (jabalí) — embestida + pisotón que agrieta el suelo
+- [ ] Madre Tejedora / Reina Tejeceniza (araña) — lluvia de telarañas + invocar crías
+- [ ] Coloso de Hielo — puñetazo al suelo con picos de hielo + aliento helado
+- [ ] Rey Chispín / Tofu Real (desierto) — salto aplastante + lluvia de fuego
+- [ ] Hechicero del Abismo — meteoros + círculo de llamas
+- [ ] Kraken de las Ruinas — tentáculos que salen del suelo + chorro de tinta
+- [ ] Ciervo de Cristal — carga con cuernos + estallido de cristales
+- [ ] El Carcelero — cadenas que atrapan + golpe de maza con onda
+**Súper Jefes (8):** Rey Ceniza, Madre de la Ciénaga, Titán del Invierno Eterno, Fénix de Ámbar, Archimago del Vacío
+y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habilidades propias más grandes que su Guardián
+- [ ] (16 jefes en total; hoy los Súper Jefes son el Guardián recoloreado: tendrán sprite propio)
+- [ ] Nuevo enemigo: el brujo encapuchado de la referencia (Hechicero de la Ciudadela o jefe)
+
+## Presupuesto (≈ 3300 créditos)
+| Bloque | Créditos |
+|---|---|
+| Validar estilo (Kara ×4) | 30 |
+| 7 héroes completos | 810 |
+| 16 jefes con habilidades | 1400 |
+| Villa | 400 |
+| Vecinos | 370 |
+| Interfaz | 250 |
+| Efectos de habilidades de héroes | 150 |
+| **Total** | **≈ 3410** (se pasa ~110: quitar el caminar de los vecinos o dejar 2 Súper Jefes para la segunda recarga) |
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6
