@@ -76,3 +76,16 @@ Coste aproximado en SpriteCook: héroe base 12 + primera animación 20 + 14 por 
 → ~7 animaciones por héroe ≈ 116 créditos por héroe, **≈ 810 para los 7** (más que los ~520 estimados al principio).
 En el motor: `HERO_ANIM` (anim_data.js) admite estas poses; hay que añadir la pose `dash` y `attack2`, y que el
 golpe se aplique en el fotograma de impacto.
+
+## Fallos vistos en el móvil (29-oct) que el arte nuevo NO debe repetir
+Lista de control para revisar cada animación antes de meterla en el juego:
+- **Caminar con zancada corta**: los pies de Kara y Teo apenas se separan, así que parece que se deslizan. Las piernas
+  deben abrirse de verdad (paso largo, rodilla que se dobla) y el cuerpo debe subir y bajar en cada paso.
+- **Ataque de un solo lado**: solo hay un tajo, y el juego lo pone al revés para el golpe alterno. Hace falta un
+  `attack2` de verdad (tajo de vuelta o al otro lado) para el combo.
+- **Monstruos que patinan**: el ciclo de andar debe tener contacto claro de cada pata con el suelo; el motor ya
+  avanza los fotogramas según la distancia recorrida (anim2.js), así que el ciclo debe ser completo y regular.
+- **Fotogramas que tiemblan**: mismo encuadre y la misma línea de pies en todos los fotogramas de una animación.
+- **Pocas poses**: nada de animaciones de 2–4 fotogramas (ver la tabla de arriba).
+Prueba obligatoria: grabar al héroe caminando hacia ambos lados y atacando 4 veces seguidas, y a cada monstruo
+caminando, antes de dar una animación por buena.
