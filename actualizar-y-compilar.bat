@@ -20,6 +20,7 @@ call npx cap sync android || goto :err
 echo === 4/4 Compilando el APK ===
 if exist "C:\Program Files\Android\Android Studio\jbr\bin\java.exe" set "JAVA_HOME=C:\Program Files\Android\Android Studio\jbr"
 cd android
+call gradlew.bat --stop >nul 2>&1
 call gradlew.bat assembleDebug || goto :err
 cd ..
 echo.
