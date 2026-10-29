@@ -64,10 +64,14 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       con arte propio: logotipo llama-farol pintado en el estilo del juego, partículas y chispas de SpriteCook,
       «LUMEN» forjado con un brillo mejor y «STUDIO». Debe verse en el móvil (ya se arregló que no apareciera en Android).
       Mismo logotipo para la ficha y el tráiler.
+- [ ] **Icono de la app** (pedido del usuario, 29-oct): icono nuevo en el estilo HD-2D del rework (héroe o emblema
+      de Fendaria reconocible a tamaño pequeño, fondo con contraste). Generar en 1024 y exportar: icono adaptativo de
+      Android (primer plano + fondo, `android/app/src/main/res/mipmap-*`), icono de Play Store 512×512, favicon y
+      pantalla de arranque de Android 12+ (`ic_launcher_foreground`). Comprobar que se ve bien en círculo y en cuadrado.
 
 ## 7. Ficha de Google Play (sin créditos, al terminar el rework)
 - [ ] 6 capturas nuevas 1920×1080 en español (`store/`) y en inglés (`store/en/`) con la villa y el arte nuevos
-- [ ] Gráfico destacado 1024×500 nuevo (es/en) e icono 512 revisado
+- [ ] Gráfico destacado 1024×500 nuevo (es/en) e icono 512 nuevo (ver 6b)
 - [ ] Sustituirlas en Play Console (ficha principal + traducción en inglés) antes de producción
 
 ## Presupuesto (≈ 4000 créditos)
