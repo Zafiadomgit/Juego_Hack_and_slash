@@ -117,3 +117,13 @@ drawHUD = function () {
   ctx.restore();
   text(e.broken > 0 ? "BROKEN!" : "Rupture", x + w / 2, y + h / 2 + 0.5 * s, 8 * s, e.broken > 0 ? '#0b2238' : '#3a2604', 'center', 900, false);
 };
+
+// recoloreo del jefe mientras está roto: azul hielo, apagado, con un pulso de luz
+const _drawMonsterAnimBrk = drawMonsterAnim;
+drawMonsterAnim = function (e, A0, k, ox, oy) {
+  if (!(e.broken > 0) || e.dead) return _drawMonsterAnimBrk(e, A0, k, ox, oy);
+  const prev = ctx.filter;
+  const pulse = (1.05 + Math.sin(now * 9) * 0.12).toFixed(2);
+  ctx.filter = `grayscale(0.55) sepia(0.35) hue-rotate(165deg) saturate(1.8) brightness(${pulse})`;
+  try { return _drawMonsterAnimBrk(e, A0, k, ox, oy); } finally { ctx.filter = prev || 'none'; }
+};

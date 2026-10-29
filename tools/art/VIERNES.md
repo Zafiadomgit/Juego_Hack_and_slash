@@ -47,6 +47,11 @@ y el efecto de la habilidad dibujado en el sprite (estela, onda, aliento, runas)
 **Súper Jefes (8):** Rey Ceniza, Madre de la Ciénaga, Titán del Invierno Eterno, Fénix de Ámbar, Archimago del Vacío
 y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habilidades propias más grandes que su Guardián
 - [ ] (16 jefes en total; hoy los Súper Jefes son el Guardián recoloreado: tendrán sprite propio)
+**Ruptura (pedido del usuario):**
+- [ ] Efecto animado de RUPTURA: el escudo/coraza del jefe estalla en cristales (hoja de efecto de 8 fotogramas, reutilizable)
+- [ ] Efectos en estado roto: estrellas/pájaros girando, grietas de luz que laten y vapor helado (bucle de 6–8 fotogramas)
+- [ ] Recoloreo de cada jefe y Súper Jefe roto: versión azul hielo apagada de su sprite (hoy se hace con filtro en el juego;
+      con arte propio, una paleta «roto» por jefe que se vea mejor) + animación de aturdido tambaleándose
 - [ ] Nuevo enemigo: el brujo encapuchado de la referencia (Hechicero de la Ciudadela o jefe)
 
 ## Presupuesto (≈ 3300 créditos)
