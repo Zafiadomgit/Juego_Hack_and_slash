@@ -27,7 +27,7 @@ Prefijo + descripción + sufijo:
 - **Kara, la Rompeyelmos (iop):** a fierce young warrior woman named Kara, long red ponytail, red tabard over steel plate armor, fur collar, red cape, steel greaves, carrying a huge double-bladed battle axe on her shoulder, determined grin.
 - **Teo, Ojo de Halcón (cra):** a young ranger named Teo, green hood and short green cape, brown leather jerkin with straps, quiver of arrows on his back, wooden longbow in hand, brown boots, keen eyes.
 - **Elara, la Runista (feca):** a young rune mage named Elara, wide-brimmed pointed blue wizard hat with gold band, long blue robe with gold trim, long blonde hair, wooden staff topped with a glowing blue crystal, calm kind expression.
-- **Nyx, la Sombra (sombra):** a stealthy assassin woman named Nyx, purple hood and cloak, black fitted leather armor with many straps, face mask over the mouth, glowing green eyes, two curved daggers with green glowing edges.
+- **Nyx, la Sombra (sombra) — NUEVO DISEÑO elegido por el usuario (29-oct), ver `ref/sombra_ref.png`:** a graceful dual-blade dancer assassin named Nyx, warm brown skin, long dark purple hair in two high buns with long flowing tails and gold hair ornaments, violet eyes, fitted dark purple outfit with gold trim, gold armbands, black and gold boots, wielding two long thin silver blades held low to the sides, light agile stance.
 - **Ayla, la Domadora (domadora):** a wild beast tamer named Ayla, curly brown hair with braids and feathers, fur-trimmed hide top and skirt, bone necklace, tall wooden staff with feathers, barefoot with fur wraps, a small grey wolf pup at her side.
 - **Brina, la Artificiera (artificiera):** a cheerful tinkerer girl named Brina, leather aviator cap with brass goggles, blonde hair, white shirt with rolled sleeves, brown overalls with tool pockets, big wrench in one hand and a round black bomb with a lit fuse in the other, work boots.
 - **Brann, el Berserker (berserker):** a huge muscular berserker named Brann, long braided red hair and braided red beard, bare chest covered in red glowing rune tattoos, fur kilt and fur boots, iron bracers, wielding an enormous chipped stone greatsword. (Él es más alto y ancho que el resto: 2,3 cabezas.)
@@ -89,3 +89,17 @@ Lista de control para revisar cada animación antes de meterla en el juego:
 - **Pocas poses**: nada de animaciones de 2–4 fotogramas (ver la tabla de arriba).
 Prueba obligatoria: grabar al héroe caminando hacia ambos lados y atacando 4 veces seguidas, y a cada monstruo
 caminando, antes de dar una animación por buena.
+
+## Referencias de animación del usuario (29-oct) — «algo así quiero»
+Archivos en `tools/art/ref/` (tira de fotogramas en `ref/refs_tiras.png`):
+- **`sombra_ataque_ref.webp` — ataque de Nyx (8 fotogramas).** Así deben sentirse TODOS los ataques de los héroes:
+  1–2 guardia con las dos espadas bajas → 3 preparación (gira el torso y recoge los brazos) → 4 **tajo con estela
+  en media luna morada dibujada en el propio sprite** → 5 seguimiento con la estela que se deshace en chispas →
+  6 el arma termina el recorrido → 7–8 vuelta a la guardia. El pelo y las coletas siguen el giro con retraso.
+  Para Nyx: estela morada; para cada héroe, la estela del color de su clase (rojo Kara, verde Teo, azul Elara…).
+- **`villano_caminar_ref.webp` — caminar del brujo encapuchado (8 fotogramas).** Así deben caminar héroes, vecinos
+  y monstruos: el cuerpo se mece de lado a lado con un rebote suave, la túnica y la capa ondean, el arma/bastón
+  se balancea con el paso y el libro acompaña; mismo encuadre en los 8 fotogramas (no tiembla).
+  Además, el **brujo** (sombrero puntiagudo, capucha negra sin cara con ojos brillantes, túnica raída con parches,
+  libro de hechizos y bastón con orbe) sirve de modelo para un **enemigo**: Hechicero de la Ciudadela o jefe.
+- **`sombra_ref.png`** — diseño de Nyx que sustituye al actual (encapuchada con máscara).
