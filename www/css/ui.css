@@ -222,3 +222,17 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .train-skip { position: fixed; z-index: 45; left: 50%; transform: translateX(-50%); top: max(8px, env(safe-area-inset-top)); display: none;
   padding: 6px 14px; border-radius: 999px; border: 1px solid rgba(201,178,122,.6); background: rgba(10,14,28,.75); color: #e8dfc8; font: 700 13px Garamond, serif; cursor: pointer; }
 .train-skip.show { display: block; }
+
+/* Menús que aparecen poco a poco: aviso «¡Nuevo!» y botón que brilla hasta pulsarlo */
+.feat-toast { position: fixed; z-index: 58; left: 50%; top: calc(max(8px, env(safe-area-inset-top)) + 70px); transform: translate(-50%, -20px); opacity: 0; pointer-events: none;
+  display: flex; align-items: center; gap: 12px; padding: 10px 18px 10px 12px; border-radius: 12px; border: 2px solid #ecd18a;
+  background: linear-gradient(#1d2442, #121626); box-shadow: 0 10px 30px rgba(0,0,0,.6), 0 0 24px rgba(236,209,138,.35); transition: opacity .3s, transform .3s; }
+.feat-toast.show { opacity: 1; transform: translate(-50%, 0); }
+.feat-toast img { width: 44px; height: 44px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(255,214,110,.6)); }
+.feat-toast span { display: flex; flex-direction: column; }
+.feat-toast small { color: #7cff8a; font: 800 11px Cinzel, serif; letter-spacing: 1px; text-transform: uppercase; }
+.feat-toast b { color: #ffe08a; font: 900 18px Cinzel, serif; }
+.feat-toast em { color: #d8d2c0; font: italic 13px Garamond, serif; }
+.feat-new { position: relative; animation: featGlow 1.4s ease-in-out infinite; }
+.feat-new::after { content: '★'; position: absolute; top: -8px; right: -6px; padding: 1px 5px; border-radius: 6px; background: #7cff8a; color: #0b1a0b; font: 900 9px Garamond, serif; }
+@keyframes featGlow { 0%, 100% { box-shadow: 0 0 0 rgba(255,214,110,0); } 50% { box-shadow: 0 0 14px rgba(255,214,110,.85); } }

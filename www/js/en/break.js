@@ -115,7 +115,7 @@ drawHUD = function () {
   for (let i = 1; i < 10; i++) ctx.fillRect(x + w * i / 10 - 0.5, y, 1, h);
   if (e.broken > 0) { ctx.globalAlpha = 0.5 + Math.sin(now * 12) * 0.3; ctx.strokeStyle = '#e8f8ff'; ctx.lineWidth = 1.5 * s; ctx.strokeRect(x - 1, y - 1, w + 2, h + 2); ctx.globalAlpha = 1; }
   ctx.restore();
-  text(e.broken > 0 ? "BROKEN!" : "Rupture", x + w / 2, y + h / 2 + 0.5 * s, 8 * s, e.broken > 0 ? '#0b2238' : '#3a2604', 'center', 900, false);
+  text(e.broken > 0 ? "BROKEN!" : "Break", x + w / 2, y + h / 2 + 0.5 * s, 8 * s, e.broken > 0 ? '#0b2238' : '#3a2604', 'center', 900, false);
 };
 
 // recoloreo del jefe mientras está roto: azul hielo, apagado, con un pulso de luz

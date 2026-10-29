@@ -1,6 +1,6 @@
-/* Fendaria — Mazmorra, reliquias únicas y Ruptura de Límite.
+/* Fendaria — Mazmorra, reliquias únicas y Despertar.
  * La Mazmorra tiene pisos (1…20) cada vez más duros: monstruos de nivel superior al de tu mejor Grieta,
- * muchas élites y un Súper Jefe al final. Allí caen las Esencias de Ruptura (para la Ruptura de Límite de
+ * muchas élites y un Súper Jefe al final. Allí caen las Esencias de Despertar (para la Despertar de
  * los héroes) y las reliquias únicas: legendarias con un poder especial que no existe en ningún otro sitio.
  */
 'use strict';
@@ -54,12 +54,12 @@ function makeUnique(lvl, key) {
 }
 
 // ============================================================
-// Ruptura de Límite
+// Despertar
 // ============================================================
 const LB_MAX = 5;
-const LB_COST = [5, 10, 18, 28, 40];       // Esencias de Ruptura
+const LB_COST = [5, 10, 18, 28, 40];       // Esencias de Despertar
 const LB_LEVEL = [15, 25, 35, 45, 55];     // nivel de héroe necesario
-const LB_PERKS = ['+12% de daño y PV', '+12% de daño y PV · refinado máximo +11', '+12% de daño y PV · ¡4.º hueco de gema!', '+12% de daño y PV · refinado máximo +13', '+12% de daño y PV · refinado máximo +15 y aura de Ruptura'];
+const LB_PERKS = ['+12% de daño y PV', '+12% de daño y PV · refinado máximo +11', '+12% de daño y PV · ¡4.º hueco de gema!', '+12% de daño y PV · refinado máximo +13', '+12% de daño y PV · refinado máximo +15 y aura del Despertar'];
 const lbRank = () => (S && S.lb) || 0;
 const essence = () => (S && S.ess) || 0;
 const ESS_SVG = '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1 L12 6 L8 15 L4 6 Z" fill="#ff5ad0" stroke="#3a0a30" stroke-width="1.2"/><path d="M8 1 L10 6 L8 11 Z" fill="#ffd0f4" opacity="0.8"/></svg>';
@@ -83,9 +83,9 @@ function openDungeon() {
 function closeDungeon() { state = 'hub'; buildHub(); showOverlay('hub'); }
 function buildDungeon() {
   const D = S.dungeon || { max: 0 };
-  $('dgRes').innerHTML = `${ESS_SVG} ${essence()} Esencias · Ruptura ${lbRank()}/${LB_MAX}`;
+  $('dgRes').innerHTML = `${ESS_SVG} ${essence()} Esencias · Despertar ${lbRank()}/${LB_MAX}`;
   if (!dungeonOpen()) {
-    $('dgList').innerHTML = '<div class="dg-lock">🔒 La Mazmorra se abre al vencer al Súper Jefe del Bosque Ceniciento.<br><small>Allí caen reliquias únicas y Esencias de Ruptura para romper el límite de tus héroes.</small></div>';
+    $('dgList').innerHTML = '<div class="dg-lock">🔒 La Mazmorra se abre al vencer al Súper Jefe del Bosque Ceniciento.<br><small>Allí caen reliquias únicas y Esencias de Despertar para despertar el poder de tus héroes.</small></div>';
     return;
   }
   const rows = [];
@@ -153,33 +153,33 @@ function dungeonVictory(e) {
   }
   D.max = Math.max(D.max, t);
   rift.dungeonEss = ess;
-  later(3.2, () => { subBanner = { text: `+${ess} Esencias de Ruptura · +${10 * t} Fragmentos`, t: 3, max: 3 }; });
+  later(3.2, () => { subBanner = { text: `+${ess} Esencias de Despertar · +${10 * t} Fragmentos`, t: 3, max: 3 }; });
   persist();
 }
 
 // ============================================================
-// Pestaña «Ruptura» en el Tablón
+// Pestaña «Despertar» en el Tablón
 // ============================================================
-QUEST_TABS.splice(2, 0, ['limit', 'Ruptura']);
+QUEST_TABS.splice(2, 0, ['limit', 'Despertar']);
 const _buildQuests = buildQuests;
 function buildLimitTab() {
   const r = lbRank(), maxed = r >= LB_MAX, cards = [];
   const cost = LB_COST[r], lvl = LB_LEVEL[r], lvlOk = S.level >= (lvl || 0);
-  cards.push(sealCard({ act: 'limit', icon: bigIcon('⟁' + r, 'radial-gradient(#ffd0f4,#a01a7a)'), name: maxed ? 'Límite roto' : `Ruptura ${r + 1}`, color: '#ff8ae0',
+  cards.push(sealCard({ act: 'limit', icon: bigIcon('⟁' + r, 'radial-gradient(#ffd0f4,#a01a7a)'), name: maxed ? 'Despertar completo' : `Despertar ${r + 1}`, color: '#ff8ae0',
     sub: `${CLASSES[S.cls].name} · ${r}/${LB_MAX}`,
     desc: maxed ? 'Tu héroe ha superado todos sus límites.' : `${LB_PERKS[r]}.${lvlOk ? '' : ` <b style="color:#ff8a80">Necesitas nivel ${lvl}.</b>`}`,
     price: cost, can: !maxed && lvlOk && essence() >= cost, done: maxed }));
-  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Ruptura ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Nivel ${LB_LEVEL[i]} · ${LB_COST[i]} Esencias`, desc: p, done: true, doneTxt: r > i ? '✔ Activa' : 'Bloqueada' })));
+  LB_PERKS.forEach((p, i) => cards.push(sealCard({ act: 'perk', icon: bigIcon(r > i ? '★' : i + 1, r > i ? 'radial-gradient(#ffd0f4,#a01a7a)' : '#2a2f48'), name: `Despertar ${i + 1}`, color: r > i ? '#ff8ae0' : '#8d90a8', sub: `Nivel ${LB_LEVEL[i]} · ${LB_COST[i]} Esencias`, desc: p, done: true, doneTxt: r > i ? '✔ Activa' : 'Bloqueada' })));
   $('questList').className = 'shop-grid gesta-grid';
   $('questList').innerHTML = cards.join('').replace(new RegExp(SEAL_SVG.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), ESS_SVG);
   $('questAmber').innerHTML = ESS_SVG + ' ' + fmtNum(essence());
-  $('questNote').textContent = 'Las Esencias de Ruptura solo caen en la Mazmorra (Portal Rúnico → Mazmorra).';
+  $('questNote').textContent = 'Las Esencias de Despertar solo caen en la Mazmorra (Portal Rúnico → Mazmorra).';
 }
 buildQuests = function () {
   const tab = questTab;
   if (tab === 'limit') { questTab = 'quests'; _buildQuests(); questTab = 'limit'; }
   else return _buildQuests();
-  // repintar pestañas con la de Ruptura activa
+  // repintar pestañas con la de Despertar activa
   $('questTabs').innerHTML = QUEST_TABS.map(([id, label]) => `<button data-tab="${id}" class="${questTab === id ? 'on' : ''}">${label}</button>`).join('');
   buildLimitTab();
 };
@@ -189,13 +189,13 @@ gestaAction = function (act) {
   const r = lbRank();
   if (r >= LB_MAX) return;
   if (S.level < LB_LEVEL[r]) { showToast('questToast', `Necesitas nivel ${LB_LEVEL[r]}`, false); return; }
-  if (essence() < LB_COST[r]) { showToast('questToast', 'Te faltan Esencias de Ruptura: consíguelas en la Mazmorra', false); SFX.play('hurt'); return; }
+  if (essence() < LB_COST[r]) { showToast('questToast', 'Te faltan Esencias de Despertar: consíguelas en la Mazmorra', false); SFX.play('hurt'); return; }
   S.ess -= LB_COST[r];
   S.lb = r + 1;
   if (S.lb === 3) { while (S.gemSlots.length < GEM_SLOTS + 1) S.gemSlots.push(null); }
   if (P) recalc();
   persist();
-  showToast('questToast', `¡Ruptura de Límite ${S.lb}! ${LB_PERKS[r]}`);
+  showToast('questToast', `¡Despertar ${S.lb}! ${LB_PERKS[r]}`);
   SFX.play('legend');
   buildQuests();
 };

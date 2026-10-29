@@ -523,7 +523,7 @@ function drawPlayer() {
     if (Math.random() < 0.25) particles.push({ kind: 'glowdot', x: P.x + rand(-12, 12), y: P.y - rand(0, 36), vx: 0, vy: -30, life: 0.7, max: 0.7, rgb: '255,214,110', size: 3, grav: 0 });
   }
   glow(P.x, P.y - 34, 50, '255,226,180', 0.12); // halo muy suave
-  if (typeof lbRank === 'function' && lbRank() >= 5) glow(P.x, P.y - 30, 64, '255,90,210', 0.3 + Math.sin(now * 3) * 0.1); // aura de Ruptura
+  if (typeof lbRank === 'function' && lbRank() >= 5) glow(P.x, P.y - 30, 64, '255,90,210', 0.3 + Math.sin(now * 3) * 0.1); // aura del Despertar
   const br = bestRarity();
   if (br >= 1) {
     const rgb = RARITY_RGB[br];

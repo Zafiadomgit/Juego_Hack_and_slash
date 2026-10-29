@@ -2132,6 +2132,8 @@ function bannerBand(cy, h, col, k = 1) {
   ctx.fillRect(x, cy - h / 2, w, 1.5 * ui); ctx.fillRect(x, cy + h / 2 - 1.5 * ui, w, 1.5 * ui);
   ctx.restore();
 }
+// los carteles van en la franja alta, no encima de la pelea (el héroe está en el centro); con jefe, bajo su barra
+const BANNER_Y = () => Math.max(H * 0.2, (bossRef && !bossRef.dead ? 108 : 70) * ui);
 function drawBanners() {
   const s = ui;
   if (banner) {
@@ -2140,9 +2142,9 @@ function drawBanners() {
     ctx.save();
     ctx.globalAlpha = a;
     const sc = 1 + Math.max(0, k - 0.85) * 2;
-    let y = H * 0.3;
+    let y = BANNER_Y();
     if (banner.egg) {
-      drawGem(ctx, W / 2, H * 0.3 - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
+      drawGem(ctx, W / 2, BANNER_Y() - 40 * s, 2.6 * s, GEMS[banner.egg].color, now);
       y += 10 * s;
     }
     if (UI_KIT.banner) {
@@ -2156,8 +2158,8 @@ function drawBanners() {
   if (subBanner) {
     ctx.save();
     ctx.globalAlpha = Math.min(1, subBanner.t * 2);
-    bannerBand(H * 0.3 + 54 * s, 26 * s, '#ffcc80', 0.6);
-    text(subBanner.text, W / 2, H * 0.3 + 54 * s, 14 * s, '#ffcc80', 'center', 900);
+    bannerBand(BANNER_Y() + 50 * s, 26 * s, '#ffcc80', 0.6);
+    text(subBanner.text, W / 2, BANNER_Y() + 50 * s, 14 * s, '#ffcc80', 'center', 900);
     ctx.restore();
   }
 }
@@ -2687,7 +2689,7 @@ function buildHub() {
     <div class="hc-main">
       <div class="hc-name">${C.name}${transRank() ? ` <i>✦${transRank()}</i>` : ''}<span class="hc-gems">${S.gemSlots.map((k) => k && typeof gemImg === 'function' ? `<span class="hgem" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 16)}</span>` : `<span class="egg ${k ? 'got' : ''}" style="--c:${k ? GEMS[k].color : '#3a4668'}" title="${k ? GEMS[k].name + ': ' + GEMS[k].desc : 'Hueco de gema libre'}"></span>`).join('')}</span></div>
       <div class="xpbar"><div style="width:${Math.min(100, (S.xp / nx) * 100)}%"></div></div>
-      <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span><span>${SEAL_SVG}${fmtNum(seals())}</span><span><img class="pico-ui" src="img/icons/potion.png" width="16" height="16" alt="">${S.pan}/${panMax()}</span><span><img class="pico-ui" src="img/icons/bag.png" width="16" height="16" alt="">${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
+      <div class="hc-res"><span>${AMBER_SVG}${fmtNum(S.kamas)}</span>${seals() > 0 || (S.feats && S.feats.quests) ? `<span>${SEAL_SVG}${fmtNum(seals())}</span>` : ''}<span><img class="pico-ui" src="img/icons/potion.png" width="16" height="16" alt="">${S.pan}/${panMax()}</span><span><img class="pico-ui" src="img/icons/bag.png" width="16" height="16" alt="">${S.bag.length}/${bagMax()}</span>${boosts.length ? `<span title="Elixires para la próxima Grieta: ${boosts.map((k) => ELIXIRS[k].name).join(', ')}" style="color:${ELIXIRS[boosts[0]].hi}">⚗${boosts.length}</span>` : ''}</div>
     </div>`;
   const sel = mapSel();
   const fb = BIOMES[sel.b], rec = recLevel(sel.b, sel.n, sel.d), DF = DIFFS[sel.n === 'S' ? 2 : sel.d];
@@ -3600,7 +3602,7 @@ function finishRift() {
   $('endStats').innerHTML = riftRows([
     ['Bonus de tiempo', rift.bonus ? '+' + rift.bonus + ' ámbar' : '—'],
     ...(rift.dofus ? [[GEMS[rift.dofus].name, '★']] : []),
-    ...(rift.dungeonEss ? [['Esencias de Ruptura', '+' + rift.dungeonEss]] : []),
+    ...(rift.dungeonEss ? [['Esencias de Despertar', '+' + rift.dungeonEss]] : []),
     ...(rift.setDrop ? [['Pieza de conjunto', SETS[rift.biome.id].name]] : []),
   ]);
   showOverlay('end');

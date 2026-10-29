@@ -1,0 +1,26 @@
+@@exv3g6
+Attributes
+@@2n7ww3
+Spend the points you earn when you level up
+@@hedx1j
+Heroes
+@@15wpzqn
+Try other heroes: each one keeps its own progress
+@@13h32o0
+Rift Map
+@@37qdhd
+Choose which Rift to play and replay the ones you've closed
+@@9n7mcg
+Three missions a day that give Feat Seals
+@@1c3dr55
+Achievements
+@@1xtlkx0
+Challenges with rewards for your whole save
+@@skdu1y
+The same Rift for everyone, with a world ranking
+@@17iftiu
+Dungeon
+@@1rt8ne
+Floors full of elites with unique relics
+@@c5xdpn
+<img src="${f.icon}" alt=""><span><small>New!</small><b>${f.name}</b><em>${f.desc}</em></span>

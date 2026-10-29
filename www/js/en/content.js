@@ -199,7 +199,7 @@ function buildQuests() {
     list.innerHTML = d.list.map((q, i) => {
       const def = DAILY_POOL.find((x) => x.id === q.id), done = q.prog >= q.goal;
       return `<div class="quest ${q.claimed ? 'claimed' : done ? 'done' : ''}">${questMedal(q.id)}
-        <div class="q-txt"><b>${def.text(q.goal)}</b><span>Reward: ${SEAL_SVG} ${questSeals(q)} Feat Seals${def.elixir ? " + a random elixir" : ''}</span>
+        <div class="q-txt"><b>${def.text(q.goal)}</b><span>Reward: ${SEAL_SVG} ${questSeals(q)} Feat Seals${def.elixir ? ' + a random elixir' : ''}</span>
           <div class="q-bar"><i style="width:${(q.prog / q.goal) * 100}%"></i></div><small>${fmtNum(q.prog)} / ${fmtNum(q.goal)}</small></div>
         <button class="btn" data-q="${i}" ${done && !q.claimed ? '' : 'disabled'}>${q.claimed ? "✔ Claimed" : done ? "Claim" : "In progress"}</button></div>`;
     }).join('') + `<div class="quest bonus ${d.bonus ? 'claimed' : bonusReady(d) ? 'done' : ''}">${questMedal('bonus')}

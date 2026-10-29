@@ -94,7 +94,7 @@ Unique relic!
 @@sfmwox
 +${ess} Rupture Essences · +${10 * t} Shards
 @@kn6is8
-Rupture
+Break
 @@1wyvia7
 Limit broken
 @@1jifx4e
@@ -119,3 +119,29 @@ You need level ${LB_LEVEL[r]}
 You're missing Rupture Essences: get them in the Dungeon
 @@pkp6r2
 Limit Rupture ${S.lb}! ${LB_PERKS[r]}
+@@1docy9t
++12% damage and HP · max refine +15 and Awakening aura
+@@ne7gbr
+${ESS_SVG} ${essence()} Essences · Awakening ${lbRank()}/${LB_MAX}
+@@kfmwsr
+<div class="dg-lock">🔒 The Dungeon opens when you defeat the Super Boss of the Ashen Forest.<br><small>That's where unique relics and Awakening Essences drop, to awaken your heroes' power.</small></div>
+@@1kkye4w
++${ess} Awakening Essences · +${10 * t} Shards
+@@gjme1l
+Awakening
+@@1efezzm
+Fully awakened
+@@agw4ld
+Awakening ${r + 1}
+@@lb74iw
+Awakening ${i + 1}
+@@j0scnd
+Awakening Essences only drop in the Dungeon (Runic Portal → Dungeon).
+@@pmgh8u
+You're missing Awakening Essences: get them in the Dungeon
+@@1ksfdny
+Awakening ${S.lb}! ${LB_PERKS[r]}
+@@38a103
+Awakening Essences
+@@squ7p2
+Awakening Essences
