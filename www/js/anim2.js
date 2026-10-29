@@ -70,3 +70,48 @@ drawSlash = function (s) {
     }
   }
 };
+
+// ============================================================
+// Guardián derrotado: cámara lenta, columna de luz dorada donde cae, fuente de chispas de oro,
+// pulso dorado en los bordes y un halo de victoria alrededor del héroe.
+// ============================================================
+let victFx = null;
+const _guardianDefeatedV = guardianDefeated;
+guardianDefeated = function (e) {
+  _guardianDefeatedV(e);
+  if (scene !== 'rift' || !P || (rift && rift.training)) return;
+  victFx = { x: e.x, y: e.y, t0: performance.now() };
+  if (typeof slowT !== 'undefined') slowT = Math.max(slowT, 1.1);
+  for (let i = 0; i < 46; i++) {
+    const a = -Math.PI / 2 + rand(-0.9, 0.9), sp = rand(160, 420);
+    particles.push({ kind: 'glowdot', x: e.x + rand(-20, 20), y: e.y - 30, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: rand(0.9, 1.6), max: 1.6, rgb: pick(['255,214,110', '255,240,190', '255,170,60']), size: rand(3, 6), grav: 380 });
+  }
+  rings.push({ x: e.x, y: e.y, r0: 30, r1: 360, life: 0.9, max: 0.9, color: 'rgba(255,214,110,' });
+  rings.push({ x: P.x, y: P.y, r0: 10, r1: 120, life: 0.7, max: 0.7, color: 'rgba(255,240,190,' });
+  if (typeof skillFx !== 'undefined') skillFx = { t: 0, max: 1.1, k: 1.4, rgb: '255,214,110' };
+  SFX.play('legend');
+};
+function drawVictory() {
+  const v = victFx, t = (performance.now() - v.t0) / 1000, D = 2.2;
+  if (t > D || scene !== 'rift') { victFx = null; return; }
+  const sx = (v.x - cam.x) * zoom + W / 2, sy = (v.y - cam.y) * zoom + H / 2;
+  const grow = Math.min(1, t / 0.25), fade = t < D - 0.8 ? 1 : (D - t) / 0.8, w = (60 + 40 * grow) * zoom;
+  ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalCompositeOperation = 'lighter';
+  // columna de luz
+  const g = ctx.createLinearGradient(sx - w, 0, sx + w, 0);
+  g.addColorStop(0, 'rgba(255,214,110,0)'); g.addColorStop(0.5, `rgba(255,240,190,${0.55 * fade * grow})`); g.addColorStop(1, 'rgba(255,214,110,0)');
+  ctx.fillStyle = g; ctx.fillRect(sx - w, 0, w * 2, sy);
+  // rayos que giran alrededor del punto de caída
+  ctx.translate(sx, sy - 30 * zoom);
+  for (let i = 0; i < 10; i++) {
+    const a = i / 10 * TAU + t * 0.6, L = (180 + 60 * Math.sin(t * 3 + i)) * zoom * grow;
+    ctx.rotate(TAU / 10);
+    const rg = ctx.createLinearGradient(0, 0, L, 0);
+    rg.addColorStop(0, `rgba(255,230,160,${0.4 * fade})`); rg.addColorStop(1, 'rgba(255,230,160,0)');
+    ctx.fillStyle = rg; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(L, -10 * zoom); ctx.lineTo(L, 10 * zoom); ctx.closePath(); ctx.fill();
+    void a;
+  }
+  ctx.restore();
+}
+const _renderVict = render;
+render = function () { _renderVict(); if (victFx) drawVictory(); };
