@@ -1,6 +1,7 @@
 # Rework visual del viernes 30 (SpriteCook) — lista de control
 
-Créditos previstos: Starter (800) + paquete 2500 ≈ 3300. Estilo y prompts: `tools/art/ESTILO.md`.
+Créditos previstos: **Adventurer (3000/mes, 5 generaciones a la vez, 8 variaciones, 2K/4K) + paquete de 1000** = 4000.
+Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes del viernes. Estilo y prompts: `tools/art/ESTILO.md`.
 
 ## 0. Validar el estilo (≈ 30 créditos)
 - [ ] Kara con 4 variaciones en estilo HD-2D chibi → elegir una con el usuario
@@ -54,7 +55,7 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       con arte propio, una paleta «roto» por jefe que se vea mejor) + animación de aturdido tambaleándose
 - [ ] Nuevo enemigo: el brujo encapuchado de la referencia (Hechicero de la Ciudadela o jefe)
 
-## Presupuesto (≈ 3300 créditos)
+## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|
 | Validar estilo (Kara ×4) | 30 |
@@ -64,7 +65,7 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
 | Vecinos | 370 |
 | Interfaz | 250 |
 | Efectos de habilidades de héroes | 150 |
-| **Total** | **≈ 3640** (se pasa ~340: vecinos solo en reposo −110 y 2 Súper Jefes a la segunda recarga −200, o comprar ya el paquete de 500) |
+| **Total** | **≈ 3640** (sobran ~360 para repetir lo que no salga bien) |
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6
