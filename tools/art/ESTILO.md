@@ -49,3 +49,30 @@ Ejemplos: mossy boar with tusks and moss on its back (bouftou) · small fiery ch
 - Generar en lienzo cuadrado con el personaje centrado y los pies en la misma línea; fondo transparente.
 - Para animar con SpriteCook, la imagen base debe medir **256×256 o menos**.
 - Mismo sentido de la luz (arriba a la izquierda) en héroes, vecinos, monstruos y edificios.
+
+## Animaciones: fluidas (petición del usuario)
+Hoy los héroes tienen muy pocos fotogramas: reposo 2–4, ataque 3–6, lanzar 3–6, golpe 1–2 y **sin pose de deslizar**
+(el dash reutiliza la de caminar). Objetivo del rework, por héroe:
+
+| Animación | Fotogramas | Velocidad | Notas |
+|---|---|---|---|
+| Reposo (idle) | 8 | 8 fps | respiración, pelo y capa que se mueven |
+| Caminar | 8–12 | 12 fps | ciclo completo, sin saltos entre el último y el primero |
+| Deslizar / dash | 6 | 18 fps | inclinado hacia delante, capa y pelo hacia atrás; 1 de arranque, 4 de deslizamiento, 1 de frenada |
+| Ataque básico | 8–10 | 16–20 fps | anticipación (2) → tajo con estela/smear (2) → impacto (1) → recuperación (3); el golpe del juego cae en el fotograma de impacto |
+| Ataque 2 (combo) | 8 | 18 fps | variante con el arma al otro lado, para alternar golpes |
+| Lanzar habilidad | 8 | 14 fps | carga (3) → liberación (2) → recuperación (3) |
+| Golpe recibido | 4 | 16 fps | retroceso y vuelta |
+| Muerte | 8 | 12 fps | cae y se queda en el suelo |
+
+Reglas para que se vea fluido:
+- **Mismo encuadre en todos los fotogramas**: pies en la misma línea y el cuerpo centrado, para que no «tiemble».
+- Movimiento secundario (pelo, capa, bufanda) que sigue al cuerpo con un poco de retraso.
+- El arma deja **estela (smear) de 1–2 fotogramas** en el tajo; nada de saltar de pose a pose.
+- Vista de lado (mirando a la derecha); el juego voltea para la izquierda.
+- Monstruos: reposo 6, caminar 8, ataque 8 (con anticipación clara para que el jugador pueda esquivar), golpe 3, muerte 6.
+
+Coste aproximado en SpriteCook: héroe base 12 + primera animación 20 + 14 por cada animación extra
+→ ~7 animaciones por héroe ≈ 116 créditos por héroe, **≈ 810 para los 7** (más que los ~520 estimados al principio).
+En el motor: `HERO_ANIM` (anim_data.js) admite estas poses; hay que añadir la pose `dash` y `attack2`, y que el
+golpe se aplique en el fotograma de impacto.
