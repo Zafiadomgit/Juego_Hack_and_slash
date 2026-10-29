@@ -55,6 +55,13 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       con arte propio, una paleta «roto» por jefe que se vea mejor) + animación de aturdido tambaleándose
 - [ ] Nuevo enemigo: el brujo encapuchado de la referencia (Hechicero de la Ciudadela o jefe)
 
+## 6b. Pedidos del usuario tras probar en el móvil (29-oct)
+- [ ] **Cinemática del prólogo** (y las otras 4): se ven feas; la primera escena es la villa vieja bajo niebla morada
+      borrosa. Rehacerlas en HyperFrames (`cinematicas/`) con la villa, los héroes y el Portal nuevos, imagen nítida.
+- [ ] **Luz azul del Portal** en la villa: se ve mal (halo azul plano encima de todo). Sustituirla por un efecto
+      animado del Portal hecho con SpriteCook (remolino, runas que giran, partículas) y una luz más sutil.
+- [ ] Logotipo propio del estudio **Lumen** (llama-farol) para la intro, la ficha y el tráiler.
+
 ## 7. Ficha de Google Play (sin créditos, al terminar el rework)
 - [ ] 6 capturas nuevas 1920×1080 en español (`store/`) y en inglés (`store/en/`) con la villa y el arte nuevos
 - [ ] Gráfico destacado 1024×500 nuevo (es/en) e icono 512 revisado

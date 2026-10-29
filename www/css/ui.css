@@ -271,3 +271,8 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .pw-row .pw-acts { display: flex; gap: 6px; }
 .pw-row .btn { padding: 6px 10px; font-size: 13px; }
 @media (max-height: 430px) { .pw-art { min-height: 0; } .pw-title { font-size: 19px; } .pw-list li { font-size: 13px; } }
+
+/* Cinemáticas: el vídeo no se ve hasta que arranca (sin el icono de play gris) y entra con fundido */
+.cine video { opacity: 0; transition: opacity .6s ease; }
+.cine video.on { opacity: 1; }
+.cine video::-webkit-media-controls, .cine video::-webkit-media-controls-start-playback-button, .cine video::-webkit-media-controls-overlay-play-button { display: none !important; -webkit-appearance: none; }

@@ -22,9 +22,9 @@ Max level: defeat ${nextSuperName()} to go higher
 no limit
 @@oaen1m
 <span>When defeated</span><b style="color:#7cff8a">level cap ${sel.b + 1 >= BIOMES.length ? 'sin límite' : 23 + 14 * (supersDone() + 1)}</b>
-@@1j7j0pc
+@@toj2qe
 <div id="cine" class="cine">
-  <video id="cineVid" playsinline preload="none"></video>
+  <video id="cineVid" playsinline preload="auto" disablepictureinpicture controlslist="nodownload nofullscreen noremoteplayback" poster="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"></video>
   <button id="cineSound" class="intro-sound" type="button">🔇 Turn on sound</button>
   <button id="cineSkip" class="cine-skip" type="button">Skip ›</button>
 </div>
