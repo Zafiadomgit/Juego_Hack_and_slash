@@ -11,10 +11,15 @@
   var cv = document.createElement('canvas');
   root.appendChild(cv);
   var g = cv.getContext('2d'), W = 0, H = 0, D = 1, S = 1;
+  // en algunos móviles el WebView mide 0 en el primer instante: se toma el tamaño de la pantalla y se recalcula cada fotograma
   function size() {
+    var w = window.innerWidth || document.documentElement.clientWidth || screen.width || 800;
+    var h = window.innerHeight || document.documentElement.clientHeight || screen.height || 400;
     D = Math.min(2, window.devicePixelRatio || 1);
-    W = cv.width = Math.round(innerWidth * D); H = cv.height = Math.round(innerHeight * D);
-    cv.style.width = innerWidth + 'px'; cv.style.height = innerHeight + 'px';
+    var nw = Math.round(w * D), nh = Math.round(h * D);
+    if (nw !== cv.width || nh !== cv.height) { cv.width = nw; cv.height = nh; }
+    W = cv.width; H = cv.height;
+    cv.style.width = w + 'px'; cv.style.height = h + 'px';
     S = Math.min(W, H) / 400;
   }
   size(); addEventListener('resize', size);
@@ -60,6 +65,7 @@
 
   function frame(now) {
     if (done) return;
+    size();
     var t = (now - T0) / 1000;
     if (t >= END) { finish(); return; }
     var x0 = cx(), y0 = cy();
@@ -183,7 +189,7 @@
   root.addEventListener('click', finish);
   root.addEventListener('touchstart', finish, { passive: true });
   // espera breve a la fuente (si tarda, se usa la de reserva)
-  var go = function () { T0 = performance.now(); requestAnimationFrame(frame); };
+  var go = function () { requestAnimationFrame(function (n) { T0 = n; frame(n); }); };
   if (document.fonts && document.fonts.load) Promise.race([document.fonts.load('900 40px Cinzel'), new Promise(function (r) { setTimeout(r, 400); })]).then(go, go);
   else go();
 })();
