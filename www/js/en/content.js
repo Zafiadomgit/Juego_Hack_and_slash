@@ -26,7 +26,8 @@ function useUltimate() {
   shake(10); zoomPunch = Math.max(zoomPunch, 0.06); SFX.play('legend');
   hitFlash(P.x, P.y - 20, 60, '255,230,160');
   showBanner(ULTIMATES[cls].name, '#ffe08a');
-  if (CLASS_KIT[cls]) CLASS_KIT[cls].ult();
+  if (typeof grimUltFx === 'function' && grimUltFx()) { /* definitiva nueva del Grimorio */ }
+  else if (CLASS_KIT[cls]) CLASS_KIT[cls].ult();
   else if (cls === 'iop') {
     P.spinT = 2.4; P.spinTick = 0; P.invul = Math.max(P.invul, 0.4);
   } else if (cls === 'cra') {

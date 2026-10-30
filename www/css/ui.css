@@ -310,3 +310,41 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .pw-toast.up i { color: #9fe0a8; font-style: normal; }
 .pw-toast.down { border-color: #8a7a5a; }
 .pw-toast.down i { color: #ff8a65; font-style: normal; }
+/* ---------- Árbol de talentos 2: filas que se abren con los puntos gastados y columna del Grimorio ---------- */
+.tv-tree.t2 { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; max-height: 62vh; padding-right: 4px; }
+.t2-cols, .t2-row { display: grid; grid-template-columns: 34px 64px repeat(3, minmax(0, 1fr)); align-items: center; gap: 6px; }
+.t2-cols { position: sticky; top: 0; z-index: 2; background: #121626; padding: 2px 0 4px; }
+.t2-ch { font: 800 11.5px Garamond, Georgia, serif; color: var(--c, #ecd18a); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.t2-ch small { margin-left: 3px; color: #9c9682; }
+.t2-ch.grim { color: #ecd18a; }
+.t2-row { padding: 3px 0; border-radius: 8px; opacity: .5; transition: opacity .2s; }
+.t2-row.open { opacity: 1; background: rgba(236, 209, 138, .04); }
+.t2-tier { font: 900 12px Cinzel, serif; color: #ecd18a; text-align: center; line-height: 1; }
+.t2-tier small { display: block; font: 700 10px Garamond, Georgia, serif; color: #9c9682; margin-top: 2px; }
+.t2-c { display: flex; justify-content: center; align-items: center; gap: 4px; min-height: 44px; }
+.t2-c.grim { border-left: 1px dashed rgba(236, 209, 138, .3); border-right: 1px dashed rgba(236, 209, 138, .3); }
+.t2-c.fork b { font: 700 10px Garamond, Georgia, serif; color: #9c9682; }
+.tv-n.grim { --c: #ecd18a; }
+.ti-why.ok { color: #9fe0a8; }
+/* ---------- Grimorio ---------- */
+.sh-grim { display: none; min-width: 0; min-height: 0; }
+#inv.mode-grim .sh-body { grid-template-columns: minmax(0, 1fr); }
+#inv.mode-grim .sh-doll, #inv.mode-grim .sh-stats, #inv.mode-grim .sh-bag, #inv.mode-grim .sh-talents { display: none; }
+#inv.mode-grim .sh-grim { display: flex; flex-direction: column; gap: 8px; overflow-y: auto; max-height: 72vh; }
+.gr-slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.gr-slot { padding: 6px 8px; border-radius: 9px; border: 1.5px solid #3a4262; background: #1a2036; color: #efece2; font: 800 12.5px Garamond, Georgia, serif; text-align: left; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.gr-slot small { display: block; color: #9c9682; font-size: 10.5px; }
+.gr-slot.sel { border-color: #ecd18a; box-shadow: 0 0 0 2px rgba(236, 209, 138, .25); }
+.gr-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 6px; }
+.gr-card { display: flex; gap: 8px; align-items: flex-start; padding: 7px 9px; border-radius: 10px; border: 1.5px solid #3a4262; background: #161b2e; color: #efece2; text-align: left; cursor: pointer; font: inherit; }
+.gr-card.on { border-color: #ecd18a; background: linear-gradient(#232a46, #171c30); }
+.gr-card.lock { opacity: .55; cursor: default; }
+.gr-card:disabled { cursor: default; }
+.gr-ic { flex: none; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; font-size: 22px; border-radius: 50%; background: radial-gradient(#2a3356, #10142a); border: 1.5px solid #c9b27a; overflow: hidden; }
+.gr-ic .tal-img { width: 34px; height: 34px; }
+.gr-tx b { display: block; font: 800 13px Garamond, Georgia, serif; color: #ecd18a; }
+.gr-tx small { display: block; color: #c9c3ae; font-size: 11.5px; line-height: 1.3; }
+.gr-tx em { display: inline-block; margin-top: 3px; font-style: normal; font-size: 11px; color: #9fe0a8; }
+.gr-tx em.lk { color: #ffb070; }
+.gr-new { font-style: normal; font-size: 10px; color: #9fe0a8; border: 1px solid #9fe0a8; border-radius: 6px; padding: 0 4px; margin-left: 3px; vertical-align: 1px; }
+.gr-h { margin: 4px 0 0; font: 900 13px Cinzel, serif; color: #ecd18a; }

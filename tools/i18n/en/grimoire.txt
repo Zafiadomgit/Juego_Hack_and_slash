@@ -1,0 +1,165 @@
+@@1d1xadz
+Iron Chain
+@@2worw0
+Throw a chain in a line: it damages and drags towards you everyone it touches
+@@ulig8m
+Runic Hammer
+@@1x88yya
+Slam the ground in front of you: a wave of runic fire that stuns for 1.2 s
+@@1fby3ap
+Giant's Wrath
+@@1lru9zj
+For 8 s you deal 60% more damage and every basic hit releases a shockwave around it
+@@176fhk7
+Venom Rain
+@@1ykg93u
+A rain of poisoned arrows covers the area for 4 s: it damages and poisons
+@@54s0mq
+Wind Step
+@@ypj4ui
+Leap backwards and fire 5 arrows in a fan ahead
+@@x7rfwg
+Royal Hawk
+@@awn5yk
+For 6 s, every half second a golden arrow seeks the nearest enemy and pierces it
+@@1wixtoj
+Arcane Orb
+@@15hwgip
+A slow orb passes through every enemy and explodes at the end of its path
+@@ru3zg8
+Reflecting Aegis
+@@d6uv5r
+A shield worth 25% of your health and a wave that pushes nearby enemies away
+@@7wquiw
+Runic Storm
+@@10g39ro
+14 runic bolts strike nearby enemies over 3 s
+@@n3hy2u
+Execution
+@@1fz3nq1
+Appear next to the most wounded enemy and stab it; below 35% health the blow is lethal
+@@j32epr
+Dagger Rain
+@@fjk1px
+14 daggers fly out in a circle around you
+@@1ekd7rj
+Death Mark
+@@d8479t
+Mark the 6 nearest enemies: after 2 s each mark bursts for huge damage
+@@22laeu
+Ancestral Howl
+@@8h3toz
+Your wolves rage for 8 s and you heal 8%; with no wolves, you call two
+@@z289z4
+Guardian Spirits
+@@1f9whz3
+8 spirits burst from you in a circle and pass through enemies
+@@rhsxrt
+Great Hunt
+@@1iu7e6s
+Four raging wolves answer your call for 20 s
+@@yuaf2q
+Fragmentation Grenade
+@@knmccr
+A grenade that releases 5 small bombs around it when it explodes
+@@mdjej4
+Spark Shield
+@@9xmy8f
+A shield worth 20% of your health that releases 4 discharges around you
+@@wn5m12
+Rocket Barrage
+@@1sro93a
+14 rockets fall on nearby enemies over 2 s
+@@1wi3ge
+Crimson Cleave
+@@rn8wr8
+A huge slash in front of you; you heal 5% for each enemy hit (up to 25%)
+@@1bbbsoi
+Challenge
+@@xsdifs
+A shout that strikes around you and grants 30% damage reduction for 5 s
+@@1fvfdhz
+Boiling Blood
+@@1k3ky7s
+For 8 s you deal 40% more damage and steal 15% of damage as health
+@@1blja7u
+Does not exist
+@@nari4l
+You need ${need} points spent in the tree (you have ${talSpent()})
+@@fnz4tn
+This row opens at ${TIER_NEED[i]} points spent (you have ${talSpent()})
+@@177klmt
+You can only have one capstone: you already chose another (reset to change)
+@@lk6d8x
+New talent tree
+@@1npea3j
+Your points have been refunded: spend them again and check the Grimoire
+@@php7ch
+<div class="t2-cols"><span class="t2-tier"></span><span class="t2-ch grim">📖 Grimoire</span>${T.map((br) => `<span class="t2-ch" style="--c:${br.color}">${talIcon(br.icon, 'sm')} ${br.name}<small>${branchSpent(br)}</small></span>`).join('')}</div>
+@@su2cd9
+ · ${d.cost} energy · ${d.cd} s
+@@th8jz4
+📖 New ultimate
+@@6xt32n
+📖 New skill
+@@1yp7eyb
+★★ Capstone (only one in the whole tree)
+@@1mn3wrw
+<small class="ti-why ok">Unlocked: equip it in the Grimoire tab</small>
+@@1a9qtcz
+<div class="tv-head"><b>Talents</b>
+      <span class="tv-pts ${pts ? 'has' : ''}"><i><img class="pico-ui" src="img/icons/talents.png" width="16" height="16" alt=""></i>${pts}<small>point${pts === 1 ? '' : 's'}</small></span>
+      <small class="tv-sp">${spent} spent · rows open with the points you spend</small>
+      <button id="talReset" class="tv-reset" ${spent && invReturn === 'hub' ? '' : 'disabled'} title="Free in Candela Village">↺ Reset</button></div>
+    <div class="tv-grid"><div class="tv-tree t2">${head}${rows}</div>
+      <aside class="tv-info" style="--c:${color}">
+        <div class="ti-top"><span class="ti-medal ${r ? 'got' : ''}">${icon}</span>
+          <div><div class="ti-n">${name}</div><span class="ti-chip">${kind}</span></div></div>
+        <div class="ti-d">${desc}</div>
+        ${segs}
+        ${alt ? `<div class="ti-alt"><span>or</span><b>${talIcon(alt.icon, 'sm')} ${alt.name}</b>${alt.d}</div>` : ''}
+        ${K.grim && r ? '<small class="ti-why ok">Unlocked: equip it in the Grimoire tab</small>' : ''}
+        <button id="talLearn" class="ti-learn" ${can ? '' : 'disabled'}>${r >= max ? '✔ Learned' : r ? `Upgrade · rank ${r + 1}` : 'Learn'}</button>
+        ${why ? `<small class="ti-why">${why}</small>` : ''}</aside></div>
+@@mzli1n
+New ultimate
+@@2lm752
+New skill
+@@1q7pc5m
+ · equip it in the Grimoire
+@@9wwg3q
+<button data-m="grim" type="button">📖 Grimoire</button>
+@@10qns52
+<div class="tal-soon">📖 This hero doesn't have a Grimoire yet.</div>
+@@1jkol9
+<em>Button ${at + 1}</em>
+@@1r1zff
+<em class="lk">🔒 Tree → Grimoire (${need} points spent)</em>
+@@6g7exi
+<button class="gr-card ${at >= 0 ? 'on' : ''} ${open ? '' : 'lock'}" data-sk="${idx}" ${open && edit ? '' : 'disabled'}>
+      <span class="gr-ic">${grimImg(art, d.icon)}</span><span class="gr-tx"><b>${d.name}${idx >= 3 ? ' <i class="gr-new">new</i>' : ''}</b>
+      <small>${d.cost} energy · ${d.cd} s — ${d.desc}</small>
+      ${at >= 0 ? `<em>Button ${at + 1}</em>` : open ? '' : `<em class="lk">🔒 Tree → Grimoire (${need} points spent)</em>`}</span></button>
+@@1x3h1tm
+<em>Equipped</em>
+@@19ca41b
+<em class="lk">🔒 Tree → Grimoire (${GRIM_NEED.u1} points spent)</em>
+@@qacdlg
+Pick a button and tap the skill you want on it · free in Candela Village
+@@sc5l96
+Can only be changed in Candela Village
+@@2aiorx
+<button class="gr-slot ${grimSlot === j ? 'sel' : ''}" data-slot="${j}"><small>Button ${j + 1}</small>${d.icon} ${d.name}</button>
+@@184sa8i
+<div class="tv-head"><b>Grimoire</b><small class="tv-sp">${edit ? 'Elige un botón y toca la habilidad que quieras en él · gratis en Villa Candela' : 'Solo se cambia en Villa Candela'}</small></div>
+    <div class="gr-slots">${g.sk.map((idx, j) => { const d = grimSkillDef(cls, idx); return `<button class="gr-slot ${grimSlot === j ? 'sel' : ''}" data-slot="${j}"><small>Button ${j + 1}</small>${d.icon} ${d.name}</button>`; }).join('')}</div>
+    <div class="gr-list">${[0, 1, 2, 3, 4].map(card).join('')}</div>
+    <h4 class="gr-h">Ultimate</h4>
+    <div class="gr-list two">${ultCard(0)}${ultCard(1)}</div>
+@@vm0gfo
+ <i class="gr-new">New</i>
+@@sp9z17
+<button class="gr-card ${at >= 0 ? 'on' : ''} ${open ? '' : 'lock'}" data-sk="${idx}" ${open && edit ? '' : 'disabled'}>
+      <span class="gr-ic">${grimImg(art, d.icon)}</span><span class="gr-tx"><b>${d.name}${idx >= 3 ? GR_NEW : ''}</b>
+      <small>${d.cost} energy · ${d.cd} s — ${d.desc}</small>
+      ${at >= 0 ? `<em>Button ${at + 1}</em>` : open ? '' : `<em class="lk">🔒 Tree → Grimoire (${need} points spent)</em>`}</span></button>

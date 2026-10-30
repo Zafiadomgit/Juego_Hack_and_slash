@@ -168,6 +168,36 @@ así que refinar, subir talentos o Trascendencia casi no se notaba (los monstruo
 - [ ] El combate va igual o más fluido con muchos monstruos (y sin atravesar árboles ni rocas)
 - [ ] El aviso de Poder no tapa nada arriba y no sale de más (solo cuando cambia)
 
+## 12. Grimorio y árbol de talentos 2 (sin créditos) — hecho el 30-oct, falta probar en el APK
+Código en `www/js/grimoire.js` (nuevo). Todo en español e inglés.
+**Grimorio** (pestaña nueva en la ficha del héroe): 5 habilidades (las 3 de siempre + 2 nuevas) y 2 definitivas por héroe.
+Eliges qué habilidad va en cada botón y qué definitiva llevas. Gratis en Villa Candela; dentro de una Grieta no se cambia.
+- [x] 14 habilidades nuevas y 7 definitivas nuevas:
+  - Rompeyelmos: Cadena de Hierro, Martillo Rúnico · definitiva Ira del Gigante
+  - Ojo de Halcón: Lluvia Venenosa, Paso del Viento · Halcón Real
+  - Runista: Orbe Arcano, Égida Reflectante · Tormenta Rúnica
+  - Sombra: Ejecución, Lluvia de Dagas · Marca de la Muerte
+  - Domadora: Aullido Ancestral, Espíritus Guardianes · Gran Cacería
+  - Artificiera: Granada de Fragmentación, Escudo de Chispas · Lluvia de Cohetes
+  - Berserker: Corte Carmesí, Desafío · Sangre Hirviente
+- [x] Cada habilidad funciona en cualquier botón: bendiciones, talentos y ataques Ω reaccionan igual
+**Árbol de talentos 2** (mismas 3 ramas y nodos por héroe, reglas y diseño nuevos)
+- [x] 8 filas que se abren con los puntos gastados EN TOTAL (0, 2, 4, 7, 10, 14, 18, 24): se pueden mezclar ramas
+- [x] Solo UN culmen en todo el árbol (la fila VIII): define a tu héroe
+- [x] Columna del **Grimorio** en el centro: habilidad nueva 1 (4 puntos), habilidad nueva 2 (10) y definitiva nueva (18)
+- [x] Árboles de antes: los puntos se devuelven una vez con un aviso (las reglas han cambiado)
+**Probado** en Chrome sin ventana (es y en): los 7 héroes lanzan sus 2 habilidades nuevas, una de siempre en otro botón y la definitiva nueva; sin errores
+**Revisar en el APK**
+- [ ] Equilibrio de las habilidades nuevas (daño, recarga y energía) frente a las de siempre
+- [ ] El árbol y el Grimorio se leen y se tocan bien en el móvil
+**Arte que falta** (va con el rework de SpriteCook de la sección 5)
+- [ ] Iconos propios de las 14 habilidades y 7 definitivas nuevas (hoy usan iconos de talentos que ya existían)
+- [ ] Efectos propios: cadena, martillo rúnico, orbe, marca de la muerte, cohetes…
+
+## Aplazado (pedido del usuario, 30-oct): se decide cuando estén los reworks y lo visual
+- [ ] Combate por turnos estilo JRPG (grupo de 4 héroes, puntos débiles y ruptura): primero un prototipo en una rama aparte
+- [ ] Cambiar la historia (antes, decir qué no convence: tono, personajes, ritmo o villano)
+
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|
