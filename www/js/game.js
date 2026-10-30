@@ -33,7 +33,22 @@ let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0, pcap: 350, fxK: 1 }; // pcap: tope de partículas; fxK: cuántas chispas
 // unidades de mundo visibles en el lado corto de la pantalla (look.js las cambia según la escena)
 const VIEW = { units: 420 };
+// zona segura (muesca de la cámara, esquinas redondeadas): el HUD del canvas se aparta de ella como ya hacen los menús
+const SAFE = { l: 0, r: 0, t: 0, b: 0 };
+let safeProbe = null;
+function readSafe() {
+  if (!safeProbe) {
+    safeProbe = document.createElement('div');
+    const side = (k) => `max(env(safe-area-inset-${k}, 0px), var(--safe-area-inset-${k}, 0px))`;
+    safeProbe.style.cssText = `position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:${side('top')} ${side('right')} ${side('bottom')} ${side('left')}`;
+    document.body.appendChild(safeProbe);
+  }
+  const cs = getComputedStyle(safeProbe);
+  SAFE.t = parseFloat(cs.paddingTop) || 0; SAFE.r = parseFloat(cs.paddingRight) || 0;
+  SAFE.b = parseFloat(cs.paddingBottom) || 0; SAFE.l = parseFloat(cs.paddingLeft) || 0;
+}
 function resize() {
+  readSafe();
   DPR = Math.min(window.devicePixelRatio || 1, QUALITY.maxDpr);
   W = window.innerWidth;
   H = window.innerHeight;
@@ -355,8 +370,8 @@ const input = {
 
 function buttonLayout() {
   const s = ui;
-  const m = 16 * s;
-  const ax = W - m - 48 * s, ay = H - m - 48 * s;
+  const m = 16 * s, sr = SAFE.r, st = SAFE.t;
+  const ax = W - m - sr - 48 * s, ay = H - m - SAFE.b - 48 * s;
   // dos arcos alrededor del ataque (estilo Hades): habilidades y esquiva cerca, el resto por fuera
   const at = (deg, R, r) => ({ x: ax + Math.cos(deg * Math.PI / 180) * R * s, y: ay + Math.sin(deg * Math.PI / 180) * R * s, r: r * s });
   return {
@@ -367,8 +382,8 @@ function buttonLayout() {
     pan: at(190, 176, 22),
     ult: at(218, 178, 27),
     cast: at(247, 176, 23),
-    pause: { x: W - 28 * s, y: 28 * s, r: 20 * s },
-    bag: { x: W - 76 * s, y: 28 * s, r: 20 * s },
+    pause: { x: W - sr - 28 * s, y: st + 28 * s, r: 20 * s },
+    bag: { x: W - sr - 76 * s, y: st + 28 * s, r: 20 * s },
   };
 }
 
@@ -1969,7 +1984,7 @@ const UI_ICON = {};
 for (const n of ['bag', 'pause', 'potion']) { const im = new Image(); im.onload = () => { UI_ICON[n] = im; }; im.src = 'img/ui/' + n + '.png'; }
 function drawHUD() {
   const s = ui;
-  const pad = 12 * s;
+  const pad = 12 * s, padL = pad + SAFE.l, padT = pad + SAFE.t; // padL/padT: apartados de la muesca
   const L = buttonLayout();
   const nextXp = xpNext(S.level);
 
@@ -1980,9 +1995,9 @@ function drawHUD() {
     ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(0, 0, W * clamp(S.xp / nextXp, 0, 1), 1.5 * s); }
 
   // retrato
-  const px = pad + 26 * s, py = pad + 30 * s;
+  const px = padL + 26 * s, py = padT + 30 * s;
   const hbw = Math.min(170 * s, W * 0.22), plateR = px + 34 * s + Math.max(hbw, P.maxPa * 17 * s + 20 * s) + 8 * s;
-  hudPlate(pad - 6 * s, pad - 2 * s, plateR - pad + 6 * s, 74 * s, 10 * s);
+  hudPlate(padL - 6 * s, padT - 2 * s, plateR - padL + 6 * s, 74 * s, 10 * s);
   { const rg = ctx.createLinearGradient(px, py - 28 * s, px, py + 28 * s); rg.addColorStop(0, '#fff0b8'); rg.addColorStop(0.5, '#c9a050'); rg.addColorStop(1, '#6a4a1c');
     circle(px, py, 28 * s, rg); circle(px, py, 25.5 * s, '#1f2a4a', '#0a0e1c', 1.5 * s); }
   ctx.save();
@@ -2013,7 +2028,7 @@ function drawHUD() {
 
   // PV
   const bx = px + 34 * s, bw = hbw, bh = 16 * s;
-  let by = pad + 8 * s;
+  let by = padT + 8 * s;
   const hpk = Math.max(0, P.hp / P.maxHp);
   P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.0045);
   const low = hpk < 0.3, pulse = low ? 0.5 + 0.5 * Math.sin(now * 8) : 0;
@@ -2063,7 +2078,7 @@ function drawHUD() {
   }
 
   // panel de la Faille (arriba a la derecha)
-  const rx = W - pad, ry = 66 * s;
+  const rx = W - pad - SAFE.r, ry = SAFE.t + 66 * s;
   hudPlate(rx - 158 * s, ry - 13 * s, 164 * s, 50 * s, 8 * s);
   text(rift.training ? 'Entrenamiento' : rift.isDungeon ? `Mazmorra · Piso ${rift.tier}` : rift.isSuper ? 'Súper Jefe' : `Grieta ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.training ? '#7cff8a' : rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
@@ -2113,7 +2128,7 @@ function drawHUD() {
 
   // racha
   if (streak.n >= 5 && gameTime - streak.t < 1.6) {
-    text('Racha ×' + streak.n, pad, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
+    text('Racha ×' + streak.n, padL, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
   }
 
   drawBanners();
@@ -2261,8 +2276,9 @@ function drawControls() {
 // ============================================================
 function renderRift() {
   const B = curBiome();
-  const sx = shakeMag > 0 ? rand(-shakeMag, shakeMag) : 0;
-  const sy = shakeMag > 0 ? rand(-shakeMag, shakeMag) : 0;
+  // temblor suave (suma de senos, no un número al azar en cada fotograma, que vibra como estática)
+  const sx = shakeMag > 0 ? shakeMag * (Math.sin(now * 47) * 0.65 + Math.sin(now * 83 + 1.3) * 0.35) : 0;
+  const sy = shakeMag > 0 ? shakeMag * (Math.sin(now * 59 + 0.7) * 0.6 + Math.sin(now * 101 + 2.1) * 0.4) : 0;
   const zr = zoom * (1 + zoomPunch);
   ctx.save();
   ctx.translate(W / 2, H / 2);
@@ -2496,7 +2512,7 @@ function frame(t) {
     else update(raw);
   } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
   else if (scene === 'hub') villageLife(raw);
-  shakeMag = Math.max(0, shakeMag - raw * 40);
+  shakeMag = Math.max(0, shakeMag * Math.exp(-6 * raw) - raw * 12); // los temblores grandes pegan y se apagan rápido
   zoomPunch *= Math.exp(-7 * raw);
   render();
   adaptQuality(raw);

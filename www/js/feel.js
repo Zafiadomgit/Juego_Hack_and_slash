@@ -41,14 +41,12 @@ damageEnemy = function (e, base, o = {}) {
       if (t.crit) { prev.crit = true; prev.color = t.color; }
       texts.splice(i, 1);
     }
-    if (t.crit && !o.quiet) {
-      hitStop(0.035); shake(3);
-      buzz('crit', 12, 0.12);
-    }
+    if (t.crit && !o.quiet) buzz('crit', 12, 0.12); // la pausa y el temblor del crítico ya los pone damageEnemy
   }
   if (!wasDead && e.dead) {
     if (e.superDef || e.boss) buzz('boss', [60, 40, 140], 0.5);
-    else if (e.elite) { buzz('elite', 35, 0.2); hitStop(0.05); }
+    else if (e.elite) { buzz('elite', 35, 0.2); hitStop(0.05); shake(5); }
+    else if (!o.quiet) { hitStop(0.022); shake(2); } // remate normal: un toque mínimo para que cada muerte se note
   }
   return r;
 };
