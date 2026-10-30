@@ -2538,21 +2538,54 @@ function update(dt) {
 }
 
 function frame(t) {
-  const raw = Math.min(0.05, (t - last) / 1000);
-  last = t;
-  now = t / 1000;
-  SFX.budget = 0;
-  if (state === 'play') {
-    if (hitStopT > 0) hitStopT -= raw;
-    else update(raw);
-  } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
-  else if (scene === 'hub') villageLife(raw);
-  shakeMag = Math.max(0, shakeMag * Math.exp(-6 * raw) - raw * 12); // los temblores grandes pegan y se apagan rápido
-  zoomPunch *= Math.exp(-7 * raw);
-  render();
-  adaptQuality(raw);
+  // un fallo en un fotograma ya no congela el juego (antes la pantalla se quedaba quieta): se recupera y se anota
+  try {
+    const raw = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    now = t / 1000;
+    SFX.budget = 0;
+    if (state === 'play') {
+      if (hitStopT > 0) hitStopT -= raw;
+      else update(raw);
+    } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
+    else if (scene === 'hub') villageLife(raw);
+    shakeMag = Math.max(0, shakeMag * Math.exp(-6 * raw) - raw * 12); // los temblores grandes pegan y se apagan rápido
+    zoomPunch *= Math.exp(-7 * raw);
+    render();
+    adaptQuality(raw);
+  } catch (err) {
+    frameRecover(err);
+  }
   requestAnimationFrame(frame);
 }
+// deja el lienzo como estaba (si el fallo fue dibujando el mundo HD-2D, se seguía pintando en su búfer y no en la pantalla)
+function frameRecover(err) {
+  if (HD2D.active) { HD2D.active = false; ctx = HD2D.main || ctx; }
+  for (const g of [ctx, HD2D.g]) {
+    if (!g) continue;
+    for (let i = 0; i < 64; i++) g.restore();
+    g.globalAlpha = 1; g.globalCompositeOperation = 'source-over'; g.filter = 'none';
+  }
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  if (HD2D.texts) HD2D.texts.length = 0;
+  reportError(err, 'frame');
+}
+// registro de errores: el último se guarda en el móvil y se avisa en pantalla (como mucho uno cada 6 s)
+let errShownAt = 0;
+function reportError(err, where) {
+  const msg = String((err && (err.stack || err.message)) || err).split('\n').slice(0, 3).join(' | ').slice(0, 300);
+  try { localStorage.setItem('fendaria_lastError', JSON.stringify({ msg, where, state, scene, cls: S && S.cls, t: new Date().toISOString() })); } catch (e) { /* sin almacenamiento */ }
+  const tnow = performance.now();
+  if (tnow - errShownAt < 6000) return;
+  errShownAt = tnow;
+  let el = document.getElementById('errToast');
+  if (!el) { el = document.createElement('div'); el.id = 'errToast'; el.className = 'err-toast'; document.body.appendChild(el); }
+  el.textContent = '⚠ ' + msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 7000);
+}
+window.addEventListener('error', (e) => reportError(e.error || e.message, 'global'));
+window.addEventListener('unhandledrejection', (e) => reportError(e.reason, 'promesa'));
 
 // Calidad automática: si el móvil no llega a ~50 FPS se van quitando efectos, de uno en uno
 function adaptQuality(dt) {

@@ -72,6 +72,7 @@ const RAR_MARK = ['●', '◆', '✦', '★'];
 document.body.insertAdjacentHTML('beforeend', '<div id="lootFeed" class="loot-feed"></div>');
 function lootFeed(it) {
   const box = $('lootFeed'), row = document.createElement('div');
+  if (!it || !RARITY[it.rarity]) return;
   row.className = 'lf'; row.style.setProperty('--rc', RARITY[it.rarity].color);
   const mark = document.createElement('i'); mark.textContent = RAR_MARK[it.rarity] || '●';
   row.append(mark, document.createTextNode(it.name));
@@ -146,10 +147,10 @@ function offscreenTargets() {
   const out = [];
   if (bossRef && !bossRef.dead) out.push({ x: bossRef.x, y: bossRef.y - bossRef.r, rgb: '255,90,60', icon: '☠', pri: 3 });
   if (riftEvent && !riftEvent.done && riftEvent.kind === 'chest') out.push({ x: riftEvent.x, y: riftEvent.y, rgb: '255,214,110', icon: '◆', pri: 2 });
-  for (const e of enemies) if (e.goblin && !e.dead) out.push({ x: e.x, y: e.y, rgb: '255,214,90', icon: '★', pri: 2 });
+  for (const e of enemies) if (e.goblin && !e.dead && isFinite(e.x)) out.push({ x: e.x, y: e.y, rgb: '255,214,90', icon: '★', pri: 2 });
   for (const k of pickups) {
     if (k.type === 'dofus') out.push({ x: k.x, y: k.y, rgb: '38,198,218', icon: '◆', pri: 1 });
-    else if (k.type === 'item' && k.item.rarity >= 2) out.push({ x: k.x, y: k.y, rgb: hexRgb(RARITY[k.item.rarity].color), icon: '⬥', pri: 1 });
+    else if (k.type === 'item' && k.item && RARITY[k.item.rarity] && k.item.rarity >= 2) out.push({ x: k.x, y: k.y, rgb: hexRgb(RARITY[k.item.rarity].color), icon: '⬥', pri: 1 });
   }
   return out;
 }

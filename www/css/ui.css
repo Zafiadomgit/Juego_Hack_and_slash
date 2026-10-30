@@ -348,3 +348,8 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .gr-tx em.lk { color: #ffb070; }
 .gr-new { font-style: normal; font-size: 10px; color: #9fe0a8; border: 1px solid #9fe0a8; border-radius: 6px; padding: 0 4px; margin-left: 3px; vertical-align: 1px; }
 .gr-h { margin: 4px 0 0; font: 900 13px Cinzel, serif; color: #ecd18a; }
+/* aviso de error (el juego sigue): se ve un momento abajo a la izquierda */
+.err-toast { position: fixed; z-index: 200; left: max(8px, env(safe-area-inset-left)); bottom: max(8px, env(safe-area-inset-bottom)); max-width: min(70vw, 620px);
+  padding: 5px 10px; border-radius: 8px; background: rgba(40, 10, 10, .92); border: 1px solid #ff8a65; color: #ffd0c0; font: 600 11px/1.3 monospace;
+  opacity: 0; pointer-events: none; transition: opacity .3s; word-break: break-word; }
+.err-toast.show { opacity: 1; }

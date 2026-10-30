@@ -164,6 +164,9 @@ así que refinar, subir talentos o Trascendencia casi no se notaba (los monstruo
 - [x] **Partidas antiguas**: si ya pasaste el Glaciar, el Desierto o la Ciudadela antes de que existieran las decisiones,
       Maese Ivo te las ofrece al hablar con él (una por charla) y recibes su efecto
 - [x] Rareza por forma también en las ranuras del **equipo puesto** (◆ ✦ ★)
+- [x] **Fallo en la Grieta 1 con la Flecha Atronadora (pantalla café)**: no se reproduce en el PC. El juego ya no se congela si un fotograma falla:
+      se recupera (también si fallaba dibujando el mundo HD-2D, que dejaba la pantalla quieta), guarda el error y lo enseña abajo a la izquierda
+- [ ] Si vuelve a pasar: foto del aviso rojo de abajo a la izquierda (dice qué falló) para arreglar la causa
 **Revisar en el APK**
 - [ ] El combate va igual o más fluido con muchos monstruos (y sin atravesar árboles ni rocas)
 - [ ] El aviso de Poder no tapa nada arriba y no sale de más (solo cuando cambia)
