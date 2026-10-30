@@ -2129,11 +2129,16 @@ function drawHUD() {
     const bk = Math.max(0, bossRef.hp / bossRef.maxHp);
     bossRef._lag = bossRef._lag === undefined || bossRef._lag < bk ? bk : Math.max(bk, bossRef._lag - 0.003);
     hudPlate(x - 14 * s, y - 16 * s, w + 28 * s, 36 * s, 8 * s);
-    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 5 * s, 12.5 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
+    text(bossRef.name + ' · niv. ' + bossRef.lvl, W / 2, y - 5 * s, 14 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
     const sup = !!bossRef.superDef;
     fancyBar(x, y + 3 * s, w, 12 * s, bk, sup ? '#ff5ad0' : '#ff7a3a', sup ? '#7a1a8a' : '#a8240e', bossRef._lag, 0);
     if (UI_KIT.barframe) { const fh = 12 * s / 0.42; draw3(UI_KIT.barframe, x - fh * 0.42, y + 3 * s + 6 * s - fh / 2, w + fh * 0.84, fh, 0.14); }
     if (sup) for (const m of [0.66, 0.33]) { ctx.fillStyle = '#f3dc9a'; ctx.fillRect(x + 2 + (w - 4) * m - 1, y + 3 * s, 2, 12 * s); }
+    else { // marca de la furia (al 50%): dorada antes, apagada cuando ya entró en furia
+      const fx = x + 2 + (w - 4) * 0.5;
+      ctx.fillStyle = bossRef.enraged ? 'rgba(255,106,90,0.45)' : '#f3dc9a'; ctx.fillRect(fx - 1, y + 3 * s, 2, 12 * s);
+      if (!bossRef.enraged) { ctx.beginPath(); ctx.moveTo(fx - 4 * s, y + 0.5 * s); ctx.lineTo(fx + 4 * s, y + 0.5 * s); ctx.lineTo(fx, y + 4.5 * s); ctx.closePath(); ctx.fill(); }
+    }
     drawStar(x - 5 * s, y + 9 * s, 7 * s, sup ? '#ff5ad0' : '#ff7043');
   }
 

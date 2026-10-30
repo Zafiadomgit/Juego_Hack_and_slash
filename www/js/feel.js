@@ -114,9 +114,52 @@ drawEnemy = function (e) {
   ctx.restore();
 };
 
+// ---------- flechas en el borde: Guardián, cofre, duende y botín épico o mejor fuera de la pantalla ----------
+function offscreenTargets() {
+  const out = [];
+  if (bossRef && !bossRef.dead) out.push({ x: bossRef.x, y: bossRef.y - bossRef.r, rgb: '255,90,60', icon: '☠', pri: 3 });
+  if (riftEvent && !riftEvent.done && riftEvent.kind === 'chest') out.push({ x: riftEvent.x, y: riftEvent.y, rgb: '255,214,110', icon: '◆', pri: 2 });
+  for (const e of enemies) if (e.goblin && !e.dead) out.push({ x: e.x, y: e.y, rgb: '255,214,90', icon: '★', pri: 2 });
+  for (const k of pickups) {
+    if (k.type === 'dofus') out.push({ x: k.x, y: k.y, rgb: '38,198,218', icon: '◆', pri: 1 });
+    else if (k.type === 'item' && k.item.rarity >= 2) out.push({ x: k.x, y: k.y, rgb: hexRgb(RARITY[k.item.rarity].color), icon: '⬥', pri: 1 });
+  }
+  return out;
+}
+function drawEdgeArrows() {
+  const s = ui, m = 30 * s, cx = W / 2, cy = H / 2;
+  // rectángulo donde van las flechas: dentro de la zona segura y por debajo del HUD de arriba
+  const l = SAFE.l + m, r = W - SAFE.r - m, t = SAFE.t + 92 * s, b = H - SAFE.b - m;
+  const list = [];
+  for (const o of offscreenTargets()) {
+    const sx = (o.x - cam.x) * zoom + cx, sy = (o.y - cam.y) * zoom + cy;
+    if (sx > 0 && sx < W && sy > 0 && sy < H) continue; // se ve: no hace falta flecha
+    o.d = dist(o.x, o.y, P.x, P.y); o.sx = sx; o.sy = sy;
+    list.push(o);
+  }
+  list.sort((a, b2) => b2.pri - a.pri || a.d - b2.d);
+  for (const o of list.slice(0, 4)) {
+    const dx = o.sx - cx, dy = o.sy - cy, a = Math.atan2(dy, dx);
+    const k = Math.min(dx ? ((dx > 0 ? r : l) - cx) / dx : 1e9, dy ? ((dy > 0 ? b : t) - cy) / dy : 1e9);
+    const x = cx + dx * k, y = cy + dy * k, pulse = 0.75 + Math.sin(now * 6 + o.pri) * 0.25;
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    glow(x, y, 20 * s, o.rgb, 0.4);
+    ctx.translate(x, y); ctx.rotate(a);
+    ctx.beginPath(); ctx.moveTo(18 * s, 0); ctx.lineTo(8 * s, -7 * s); ctx.lineTo(8 * s, 7 * s); ctx.closePath();
+    ctx.fillStyle = `rgb(${o.rgb})`; ctx.fill();
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = pulse;
+    circle(x, y, 10 * s, 'rgba(8,11,24,0.8)', `rgb(${o.rgb})`, 1.5 * s);
+    text(o.icon, x, y + 0.5 * s, 11 * s, `rgb(${o.rgb})`, 'center', 900, false);
+    ctx.restore();
+  }
+}
+
 // ---------- poca vida ----------
 const _drawHUDFeel = drawHUD;
 drawHUD = function () {
+  if (scene === 'rift' && P && state === 'play') drawEdgeArrows();
   if (scene === 'rift' && P && P.maxHp && P.hp / P.maxHp < 0.3 && state === 'play') {
     const k = 1 - P.hp / P.maxHp / 0.3, beat = 0.5 + 0.5 * Math.pow(Math.max(0, Math.sin(now * 5.5)), 6);
     const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);
