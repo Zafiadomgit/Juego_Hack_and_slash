@@ -153,3 +153,20 @@ showBanner = function (title, color, sub) {
   }
   return _showBannerB(title, color, sub);
 };
+
+// ---------- aviso de Poder: al equiparte, refinar o subir talentos en la villa ves cuánto has subido ----------
+document.body.insertAdjacentHTML('beforeend', '<div id="pwToast" class="pw-toast"></div>');
+let pwLast = 0, pwOwner = null, pwHide = 0;
+setInterval(() => {
+  if (!S || !P || scene !== 'hub' || !['hub', 'inv', 'shop', 'quests'].includes(state)) return;
+  recalc(); // el refinado o un talento recién comprado cuentan ya
+  const pw = Math.round(heroHit());
+  if (pwOwner !== S) { pwOwner = S; pwLast = pw; return; } // otro héroe: solo se toma la medida
+  if (!pw || pw === pwLast) return;
+  const up = pw > pwLast, el = $('pwToast');
+  el.className = 'pw-toast show ' + (up ? 'up' : 'down');
+  el.innerHTML = `⚔ Poder ${fmtNum(pwLast)} → <b>${fmtNum(pw)}</b> <i>${up ? '+' : ''}${fmtNum(pw - pwLast)}</i>`;
+  pwLast = pw;
+  clearTimeout(pwHide); pwHide = setTimeout(() => el.classList.remove('show'), 2600);
+  if (state === 'hub') buildHub();
+}, 400);

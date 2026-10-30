@@ -132,3 +132,21 @@ Rift
 Rifts
 @@2lzzxp
 ✦ <b>Village's Courage</b>: more damage and health in ${mercy} ${mercy === 1 ? 'Rift' : 'Rifts'} where you fell
+@@hllx9z
+I never asked what you thought about what I told you on the Glacier, {hero}. Do you forgive me?
+@@1pjkzio
+Thank you, {hero}. Truly.
+@@qd7t96
+I understand. Take the Order's journal: it will serve you better than my apologies.
+@@103cwj
+In the Desert, Morvhal told you about Ancient Fendaria. What did you answer him?
+@@vsl2zz
+Well said. The Twelve will have heard it.
+@@zr6gk3
+You listened… Be careful: his words weigh heavy, and so do his creatures.
+@@1jo54x4
+Tobias is still staring at Morvhal's broken key on his anvil. What do we do with it?
+@@15akpy3
+At last! Into the forge with it.
+@@1fdqivs
+The Twelve will keep it. Someday we'll open those doors.

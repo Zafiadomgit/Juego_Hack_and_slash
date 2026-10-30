@@ -110,7 +110,7 @@ Hecho con las skills `game-feel` y `game-ui-ux`. Todo está en español y en ing
 - [ ] La columna de botín no tapa el joystick ni el texto de racha
 - [ ] Ajustes → Texto grande: nada se sale de su placa
 **Ideas para después**
-- [ ] Rareza por forma también en las ranuras del equipo puesto (hoy solo en la bolsa)
+- [x] Rareza por forma también en las ranuras del equipo puesto (hecho, ver sección 11)
 - [ ] Texto grande también en los menús HTML (hoy solo el HUD del canvas)
 
 ## 9. Historia que cambia cómo se juega (sin créditos) — hecho el 30-oct, falta probar en el APK
@@ -138,7 +138,7 @@ Con las skills `dialogue-systems` y `roguelike` (idea de Hades: la historia avan
 **Revisar en el APK**
 - [ ] Los botones de elección se leen bien y caben en el cuadro de diálogo en el móvil
 - [ ] Tocar la tarjeta 📖 de la villa abre la lista de efectos sin taparse con nada
-- [ ] Partidas que ya pasaron esas escenas no ven las decisiones (sin efecto): decidir si se ofrecen después hablando con Ivo
+- [x] Partidas que ya pasaron esas escenas: Ivo les ofrece las decisiones en la villa (ver sección 11)
 
 ## 10. Poder del héroe y progresión (sin créditos) — hecho el 30-oct, falta probar en el APK
 **Problema encontrado:** `balance.js` subía la vida y el daño de los monstruos en la misma proporción que el poder real del héroe,
@@ -154,6 +154,18 @@ así que refinar, subir talentos o Trascendencia casi no se notaba (los monstruo
 **Pendiente de decidir** (cambia mucho el juego)
 - [ ] Ordenar las ~15 fuentes de poder en 3 capas: **Equipo** (botín y forja), **Héroe** (talentos y Trascendencia) y **Partida** (bendiciones);
       las mejoras de Maese Ivo y los Pactos pasarían a ser de comodidad (energía, imán, bolsa, re-tiradas) y no de daño puro
+
+## 11. Más disfrutable (sin créditos) — hecho el 30-oct, falta probar en el APK
+- [x] **Fluidez**: los choques con árboles y rocas usan una rejilla (cada cuerpo mira solo las 9 celdas de su alrededor, antes todo el mapa).
+      En la prueba con combate real, esa parte pasó de ~5% del tiempo a casi nada y el juego aguantó en mejor calidad gráfica.
+      Revisado con la skill `capacitor-performance`: sin registros de depuración en el juego y con la aceleración por hardware activa
+- [x] **Aviso de Poder** en la villa: al equiparte, refinar o subir talentos sale «⚔ Poder 120 → 135 +15» (verde si sube)
+- [x] **Partidas antiguas**: si ya pasaste el Glaciar, el Desierto o la Ciudadela antes de que existieran las decisiones,
+      Maese Ivo te las ofrece al hablar con él (una por charla) y recibes su efecto
+- [x] Rareza por forma también en las ranuras del **equipo puesto** (◆ ✦ ★)
+**Revisar en el APK**
+- [ ] El combate va igual o más fluido con muchos monstruos (y sin atravesar árboles ni rocas)
+- [ ] El aviso de Poder no tapa nada arriba y no sale de más (solo cuando cambia)
 
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |

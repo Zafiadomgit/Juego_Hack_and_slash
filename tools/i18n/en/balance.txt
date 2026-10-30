@@ -1,2 +1,5 @@
 @@1v9bpzk
 <div class="hc-power" title="Your average hit with your gear, talents and upgrades (without blessings). Compare it with the Recommended Power of each Rift on the map">⚔ Power <b>${fmtNum(pw)}</b></div>
+@@ejmz2f =
+@@4oihg5
+⚔ Power ${fmtNum(pwLast)} → <b>${fmtNum(pw)}</b> <i>${up ? '+' : ''}${fmtNum(pw - pwLast)}</i>

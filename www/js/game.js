@@ -1452,15 +1452,34 @@ function separateEnemies() {
   }
 }
 
-function collideObstacles(o) {
+// Rejilla de obstáculos: cada cuerpo solo mira las 9 celdas de su alrededor (antes, todos los árboles y rocas
+// del mapa por cada monstruo y fotograma). Se rehace sola cuando cambia la lista (se reemplaza o se añade).
+const OB_CELL = 192;
+let obGrid = null, obGridSrc = null, obGridN = -1;
+function obstacleGrid() {
+  if (obGridSrc === obstacles && obGridN === obstacles.length) return obGrid;
+  obGridSrc = obstacles; obGridN = obstacles.length; obGrid = new Map();
   for (const ob of obstacles) {
-    const dx = o.x - ob.x, dy = o.y - ob.y;
-    const rr = o.r + ob.r;
-    const d2 = dx * dx + dy * dy;
-    if (d2 < rr * rr) {
-      const d = Math.sqrt(d2) || 0.01;
-      o.x = ob.x + (dx / d) * rr;
-      o.y = ob.y + (dy / d) * rr;
+    const key = Math.floor(ob.x / OB_CELL) + Math.floor(ob.y / OB_CELL) * 4096;
+    const cell = obGrid.get(key);
+    if (cell) cell.push(ob); else obGrid.set(key, [ob]);
+  }
+  return obGrid;
+}
+function collideObstacles(o) {
+  const g = obstacleGrid(), cx = Math.floor(o.x / OB_CELL), cy = Math.floor(o.y / OB_CELL);
+  for (let j = -1; j <= 1; j++) for (let i = -1; i <= 1; i++) {
+    const cell = g.get(cx + i + (cy + j) * 4096);
+    if (!cell) continue;
+    for (const ob of cell) {
+      const dx = o.x - ob.x, dy = o.y - ob.y;
+      const rr = o.r + ob.r;
+      const d2 = dx * dx + dy * dy;
+      if (d2 < rr * rr) {
+        const d = Math.sqrt(d2) || 0.01;
+        o.x = ob.x + (dx / d) * rr;
+        o.y = ob.y + (dy / d) * rr;
+      }
     }
   }
 }

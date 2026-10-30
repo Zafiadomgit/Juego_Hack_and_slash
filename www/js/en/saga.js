@@ -263,3 +263,32 @@ buildHub = function () {
   el.insertAdjacentHTML('beforeend', `<small class="hs-fx">${fx.join('<br>')}</small>`);
   el.querySelector('b').insertAdjacentHTML('beforeend', ` <i class="hs-n">✦${fx.length}</i>`);
 };
+
+// ---------- partidas que ya pasaron esas escenas antes de las decisiones: Ivo las ofrece en la villa ----------
+const SAGA_RETRO = [
+  { scene: 'win2', ask: ['ivo', "I never asked what you thought about what I told you on the Glacier, {hero}. Do you forgive me?"],
+    reply: { trust: ['ivo', "Thank you, {hero}. Truly."], doubt: ['ivo', "I understand. Take the Order's journal: it will serve you better than my apologies."] } },
+  { scene: 'enter3', ask: ['ivo', "In the Desert, Morvhal told you about Ancient Fendaria. What did you answer him?"],
+    reply: { refuse: ['ivo', "Well said. The Twelve will have heard it."], listen: ['ivo', "You listened… Be careful: his words weigh heavy, and so do his creatures."] } },
+  { scene: 'win7', ask: ['ivo', "Tobias is still staring at Morvhal's broken key on his anvil. What do we do with it?"],
+    reply: { forge: ['tobias', "At last! Into the forge with it."], gods: ['ivo', "The Twelve will keep it. Someday we'll open those doors."] } },
+];
+const _villageInteractSaga = villageInteract;
+villageInteract = function (what) {
+  const st = S && S.story;
+  const R = st && what && what.id === 'alchemist' && state === 'hub' && !dlg && SAGA_RETRO.find((r) => st.seen[r.scene] && !sagaFlag(SAGA_CHOICES[r.scene].flag));
+  if (!R) return _villageInteractSaga(what);
+  const C = SAGA_CHOICES[R.scene];
+  vHero.target = null; vHero.pending = null;
+  let picked = false;
+  const pick = (op) => {
+    if (picked) return;
+    picked = true;
+    sagaState().flags[C.flag] = op.val; persist(); if (P) recalc();
+    playDialog([R.reply[op.val]], { onEnd: () => {
+      const got = SAGA_FX.filter((x) => x.flag === C.flag && x.on());
+      sagaCards(got.map((x) => [x.name, x.desc]), () => { if (state === 'hub') buildHub(); });
+    } });
+  };
+  playDialog([R.ask], { choices: C.options.map((op) => ({ label: op.label, fn: () => pick(op) })), onEnd: () => pick(C.options[0]) });
+};

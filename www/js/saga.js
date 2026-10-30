@@ -263,3 +263,32 @@ buildHub = function () {
   el.insertAdjacentHTML('beforeend', `<small class="hs-fx">${fx.join('<br>')}</small>`);
   el.querySelector('b').insertAdjacentHTML('beforeend', ` <i class="hs-n">✦${fx.length}</i>`);
 };
+
+// ---------- partidas que ya pasaron esas escenas antes de las decisiones: Ivo las ofrece en la villa ----------
+const SAGA_RETRO = [
+  { scene: 'win2', ask: ['ivo', 'Nunca te pregunté qué pensabas de lo que te conté en el Glaciar, {hero}. ¿Me perdonas?'],
+    reply: { trust: ['ivo', 'Gracias, {hero}. De verdad.'], doubt: ['ivo', 'Lo entiendo. Toma el diario de la Orden: te servirá más que mis disculpas.'] } },
+  { scene: 'enter3', ask: ['ivo', 'En el Desierto, Morvhal te habló de la Fendaria Antigua. ¿Qué le respondiste?'],
+    reply: { refuse: ['ivo', 'Bien dicho. Los Doce lo habrán oído.'], listen: ['ivo', 'Escuchaste… Ten cuidado: sus palabras pesan, y sus criaturas también.'] } },
+  { scene: 'win7', ask: ['ivo', 'Tobías sigue mirando la llave rota de Morvhal en su yunque. ¿Qué hacemos con ella?'],
+    reply: { forge: ['tobias', '¡Por fin! A la forja con ella.'], gods: ['ivo', 'Los Doce la guardarán. Algún día abriremos esas puertas.'] } },
+];
+const _villageInteractSaga = villageInteract;
+villageInteract = function (what) {
+  const st = S && S.story;
+  const R = st && what && what.id === 'alchemist' && state === 'hub' && !dlg && SAGA_RETRO.find((r) => st.seen[r.scene] && !sagaFlag(SAGA_CHOICES[r.scene].flag));
+  if (!R) return _villageInteractSaga(what);
+  const C = SAGA_CHOICES[R.scene];
+  vHero.target = null; vHero.pending = null;
+  let picked = false;
+  const pick = (op) => {
+    if (picked) return;
+    picked = true;
+    sagaState().flags[C.flag] = op.val; persist(); if (P) recalc();
+    playDialog([R.reply[op.val]], { onEnd: () => {
+      const got = SAGA_FX.filter((x) => x.flag === C.flag && x.on());
+      sagaCards(got.map((x) => [x.name, x.desc]), () => { if (state === 'hub') buildHub(); });
+    } });
+  };
+  playDialog([R.ask], { choices: C.options.map((op) => ({ label: op.label, fn: () => pick(op) })), onEnd: () => pick(C.options[0]) });
+};
