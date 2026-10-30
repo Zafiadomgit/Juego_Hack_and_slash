@@ -47,4 +47,4 @@ else
 fi
 echo
 echo "LISTO. APK: $(pwd)/app/build/outputs/apk/debug/app-debug.apk"
-echo "En el juego, Ajustes debe decir «Versión 1.2 · 29-oct»."
+echo "En el juego, Ajustes debe decir «Versión 1.3.1 · 30-oct»."
