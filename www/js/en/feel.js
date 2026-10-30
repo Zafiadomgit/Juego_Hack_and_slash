@@ -41,14 +41,12 @@ damageEnemy = function (e, base, o = {}) {
       if (t.crit) { prev.crit = true; prev.color = t.color; }
       texts.splice(i, 1);
     }
-    if (t.crit && !o.quiet) {
-      hitStop(0.035); shake(3);
-      buzz('crit', 12, 0.12);
-    }
+    if (t.crit && !o.quiet) buzz('crit', 12, 0.12); // la pausa y el temblor del crítico ya los pone damageEnemy
   }
   if (!wasDead && e.dead) {
     if (e.superDef || e.boss) buzz('boss', [60, 40, 140], 0.5);
-    else if (e.elite) { buzz('elite', 35, 0.2); hitStop(0.05); }
+    else if (e.elite) { buzz('elite', 35, 0.2); hitStop(0.05); shake(5); }
+    else if (!o.quiet) { hitStop(0.022); shake(2); } // remate normal: un toque mínimo para que cada muerte se note
   }
   return r;
 };
@@ -66,6 +64,42 @@ dash = function () {
   if (P.dashT > 0 && was <= 0) buzz('dash', 8, 0.15);
 };
 
+// ---------- habilidad sin energía ----------
+const _useSkillFeel = useSkill;
+useSkill = function (i) {
+  const sk = P.C.skills[i];
+  if (sk && P.skillCd[i] <= 0 && P.pa < sk.cost && !P.lock && !P.jump && !P.cast) { P._paFailAt = now; buzz('nopa', 15, 0.3); }
+  return _useSkillFeel(i);
+};
+
+// ---------- botones: pop al quedar listos y segundos de recarga ----------
+const BTN_FX = {};
+const _combatButtonFeel = combatButton;
+combatButton = function (b, label, sub, color, cdk, enabled, held, subColor) {
+  const key = Math.round(b.x) + ',' + Math.round(b.y), fx = BTN_FX[key] || (BTN_FX[key] = { cd: cdk, at: -9 });
+  if (fx.cd > 0 && cdk <= 0) fx.at = now;
+  fx.cd = cdk;
+  const k = (now - fx.at) / 0.35;
+  if (k >= 0 && k < 1) {
+    const sc = 1 + Math.sin(k * Math.PI) * 0.16 * (1 - k * 0.5); // crece y se asienta
+    ctx.save(); ctx.translate(b.x, b.y); ctx.scale(sc, sc); ctx.translate(-b.x, -b.y);
+    _combatButtonFeel(b, label, sub, color, cdk, enabled, held, subColor);
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#fff6d0'; ctx.lineWidth = 3 * ui * (1 - k);
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (1 + k * 0.45), 0, TAU); ctx.stroke(); ctx.restore();
+  } else _combatButtonFeel(b, label, sub, color, cdk, enabled, held, subColor);
+  // segundos que faltan en las habilidades (con más de 1 s de recarga)
+  if (cdk > 0 && P && scene === 'rift') {
+    const L = buttonLayout();
+    for (let i = 0; i < 3; i++) {
+      const sb = L['s' + i];
+      if (!sb || Math.abs(sb.x - b.x) > 1 || Math.abs(sb.y - b.y) > 1) continue;
+      const left = P.skillCd[i];
+      if (left > 1) text(String(Math.ceil(left)), b.x, b.y - (sub ? 3 * ui : 0), b.r * 0.62, '#fff', 'center', 900, true);
+    }
+  }
+};
+
 // ---------- aviso de ataque fuerte ----------
 const WIND_STATES = { wind: 1, leap: 1, summon: 1, web: 1, volley: 1 };
 const _drawEnemyFeel = drawEnemy;
@@ -80,9 +114,52 @@ drawEnemy = function (e) {
   ctx.restore();
 };
 
+// ---------- flechas en el borde: Guardián, cofre, duende y botín épico o mejor fuera de la pantalla ----------
+function offscreenTargets() {
+  const out = [];
+  if (bossRef && !bossRef.dead) out.push({ x: bossRef.x, y: bossRef.y - bossRef.r, rgb: '255,90,60', icon: '☠', pri: 3 });
+  if (riftEvent && !riftEvent.done && riftEvent.kind === 'chest') out.push({ x: riftEvent.x, y: riftEvent.y, rgb: '255,214,110', icon: '◆', pri: 2 });
+  for (const e of enemies) if (e.goblin && !e.dead) out.push({ x: e.x, y: e.y, rgb: '255,214,90', icon: '★', pri: 2 });
+  for (const k of pickups) {
+    if (k.type === 'dofus') out.push({ x: k.x, y: k.y, rgb: '38,198,218', icon: '◆', pri: 1 });
+    else if (k.type === 'item' && k.item.rarity >= 2) out.push({ x: k.x, y: k.y, rgb: hexRgb(RARITY[k.item.rarity].color), icon: '⬥', pri: 1 });
+  }
+  return out;
+}
+function drawEdgeArrows() {
+  const s = ui, m = 30 * s, cx = W / 2, cy = H / 2;
+  // rectángulo donde van las flechas: dentro de la zona segura y por debajo del HUD de arriba
+  const l = SAFE.l + m, r = W - SAFE.r - m, t = SAFE.t + 92 * s, b = H - SAFE.b - m;
+  const list = [];
+  for (const o of offscreenTargets()) {
+    const sx = (o.x - cam.x) * zoom + cx, sy = (o.y - cam.y) * zoom + cy;
+    if (sx > 0 && sx < W && sy > 0 && sy < H) continue; // se ve: no hace falta flecha
+    o.d = dist(o.x, o.y, P.x, P.y); o.sx = sx; o.sy = sy;
+    list.push(o);
+  }
+  list.sort((a, b2) => b2.pri - a.pri || a.d - b2.d);
+  for (const o of list.slice(0, 4)) {
+    const dx = o.sx - cx, dy = o.sy - cy, a = Math.atan2(dy, dx);
+    const k = Math.min(dx ? ((dx > 0 ? r : l) - cx) / dx : 1e9, dy ? ((dy > 0 ? b : t) - cy) / dy : 1e9);
+    const x = cx + dx * k, y = cy + dy * k, pulse = 0.75 + Math.sin(now * 6 + o.pri) * 0.25;
+    ctx.save();
+    ctx.globalAlpha = pulse;
+    glow(x, y, 20 * s, o.rgb, 0.4);
+    ctx.translate(x, y); ctx.rotate(a);
+    ctx.beginPath(); ctx.moveTo(18 * s, 0); ctx.lineTo(8 * s, -7 * s); ctx.lineTo(8 * s, 7 * s); ctx.closePath();
+    ctx.fillStyle = `rgb(${o.rgb})`; ctx.fill();
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = pulse;
+    circle(x, y, 10 * s, 'rgba(8,11,24,0.8)', `rgb(${o.rgb})`, 1.5 * s);
+    text(o.icon, x, y + 0.5 * s, 11 * s, `rgb(${o.rgb})`, 'center', 900, false);
+    ctx.restore();
+  }
+}
+
 // ---------- poca vida ----------
 const _drawHUDFeel = drawHUD;
 drawHUD = function () {
+  if (scene === 'rift' && P && state === 'play') drawEdgeArrows();
   if (scene === 'rift' && P && P.maxHp && P.hp / P.maxHp < 0.3 && state === 'play') {
     const k = 1 - P.hp / P.maxHp / 0.3, beat = 0.5 + 0.5 * Math.pow(Math.max(0, Math.sin(now * 5.5)), 6);
     const g = ctx.createRadialGradient(W / 2, H / 2, Math.min(W, H) * 0.35, W / 2, H / 2, Math.max(W, H) * 0.75);

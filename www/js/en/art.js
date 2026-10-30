@@ -1262,7 +1262,8 @@ function drawMonsterBody(e) {
   else if (e.kvx) ctx.rotate(clamp(e.kvx * 0.0007, -0.35, 0.35));
   if (e.alpha !== undefined) ctx.globalAlpha = e.alpha;
   if (e.spawnT > 0) { const k2 = 1 - e.spawnT / 0.35; ctx.scale(0.7 + k2 * 0.3, 0.3 + k2 * 0.7); }
-  else if (e.flash > 0) ctx.scale(1.12, 0.9);
+  else if (e.flash > 0) { const kf = Math.min(1, e.flash / 0.1); ctx.scale(1 + kf * 0.14, 1 - kf * 0.12); }
+  else if (e.flash > -0.1 && e.state !== 'wind' && e.state !== 'charge') { const kf = Math.sin(-e.flash / 0.1 * Math.PI); ctx.scale(1 - kf * 0.05, 1 + kf * 0.06); } // rebote tras el golpe
   else if (e.state === 'wind' && e.ct === undefined) { const kw = clamp(1 - e.st / (e.max || 0.6), 0, 1); ctx.scale(1 + kw * 0.1, 1 - kw * 0.12); }
   else if (e.state === 'charge') ctx.scale(1.12, 0.9);
   else if (e.state === 'move' && !e.boss && e.ai === 'chase') { const b = Math.sin(e.t * 14); ctx.scale(1 - b * 0.04, 1 + b * 0.05); }

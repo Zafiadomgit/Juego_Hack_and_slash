@@ -18,3 +18,5 @@
 <button id="btnOpts" class="btn">⚙ Settings</button>
 @@19z584i
 Sold: ${old.name} (+${old.value || 0})
+@@1o0j79u
+<label class="opt-row"><span><b>Large text</b><small>Health, energy, buttons and combat panels easier to read</small></span><input type="checkbox" data-o="bigText"></label>

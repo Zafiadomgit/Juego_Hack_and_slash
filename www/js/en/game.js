@@ -33,7 +33,22 @@ let W = 0, H = 0, DPR = 1, zoom = 1, ui = 1;
 const QUALITY = { maxDpr: 1.25, level: 0, samples: [], checkT: 0, pcap: 350, fxK: 1 }; // pcap: tope de partículas; fxK: cuántas chispas
 // unidades de mundo visibles en el lado corto de la pantalla (look.js las cambia según la escena)
 const VIEW = { units: 420 };
+// zona segura (muesca de la cámara, esquinas redondeadas): el HUD del canvas se aparta de ella como ya hacen los menús
+const SAFE = { l: 0, r: 0, t: 0, b: 0 };
+let safeProbe = null;
+function readSafe() {
+  if (!safeProbe) {
+    safeProbe = document.createElement('div');
+    const side = (k) => `max(env(safe-area-inset-${k}, 0px), var(--safe-area-inset-${k}, 0px))`;
+    safeProbe.style.cssText = `position:fixed;left:0;top:0;visibility:hidden;pointer-events:none;padding:${side('top')} ${side('right')} ${side('bottom')} ${side('left')}`;
+    document.body.appendChild(safeProbe);
+  }
+  const cs = getComputedStyle(safeProbe);
+  SAFE.t = parseFloat(cs.paddingTop) || 0; SAFE.r = parseFloat(cs.paddingRight) || 0;
+  SAFE.b = parseFloat(cs.paddingBottom) || 0; SAFE.l = parseFloat(cs.paddingLeft) || 0;
+}
 function resize() {
+  readSafe();
   DPR = Math.min(window.devicePixelRatio || 1, QUALITY.maxDpr);
   W = window.innerWidth;
   H = window.innerHeight;
@@ -355,8 +370,8 @@ const input = {
 
 function buttonLayout() {
   const s = ui;
-  const m = 16 * s;
-  const ax = W - m - 48 * s, ay = H - m - 48 * s;
+  const m = 16 * s, sr = SAFE.r, st = SAFE.t;
+  const ax = W - m - sr - 48 * s, ay = H - m - SAFE.b - 48 * s;
   // dos arcos alrededor del ataque (estilo Hades): habilidades y esquiva cerca, el resto por fuera
   const at = (deg, R, r) => ({ x: ax + Math.cos(deg * Math.PI / 180) * R * s, y: ay + Math.sin(deg * Math.PI / 180) * R * s, r: r * s });
   return {
@@ -367,8 +382,8 @@ function buttonLayout() {
     pan: at(190, 176, 22),
     ult: at(218, 178, 27),
     cast: at(247, 176, 23),
-    pause: { x: W - 28 * s, y: 28 * s, r: 20 * s },
-    bag: { x: W - 76 * s, y: 28 * s, r: 20 * s },
+    pause: { x: W - sr - 28 * s, y: st + 28 * s, r: 20 * s },
+    bag: { x: W - sr - 76 * s, y: st + 28 * s, r: 20 * s },
   };
 }
 
@@ -1969,7 +1984,7 @@ const UI_ICON = {};
 for (const n of ['bag', 'pause', 'potion']) { const im = new Image(); im.onload = () => { UI_ICON[n] = im; }; im.src = 'img/ui/' + n + '.png'; }
 function drawHUD() {
   const s = ui;
-  const pad = 12 * s;
+  const pad = 12 * s, padL = pad + SAFE.l, padT = pad + SAFE.t; // padL/padT: apartados de la muesca
   const L = buttonLayout();
   const nextXp = xpNext(S.level);
 
@@ -1980,9 +1995,9 @@ function drawHUD() {
     ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.fillRect(0, 0, W * clamp(S.xp / nextXp, 0, 1), 1.5 * s); }
 
   // retrato
-  const px = pad + 26 * s, py = pad + 30 * s;
+  const px = padL + 26 * s, py = padT + 30 * s;
   const hbw = Math.min(170 * s, W * 0.22), plateR = px + 34 * s + Math.max(hbw, P.maxPa * 17 * s + 20 * s) + 8 * s;
-  hudPlate(pad - 6 * s, pad - 2 * s, plateR - pad + 6 * s, 74 * s, 10 * s);
+  hudPlate(padL - 6 * s, padT - 2 * s, plateR - padL + 6 * s, 74 * s, 10 * s);
   { const rg = ctx.createLinearGradient(px, py - 28 * s, px, py + 28 * s); rg.addColorStop(0, '#fff0b8'); rg.addColorStop(0.5, '#c9a050'); rg.addColorStop(1, '#6a4a1c');
     circle(px, py, 28 * s, rg); circle(px, py, 25.5 * s, '#1f2a4a', '#0a0e1c', 1.5 * s); }
   ctx.save();
@@ -2013,25 +2028,36 @@ function drawHUD() {
 
   // PV
   const bx = px + 34 * s, bw = hbw, bh = 16 * s;
-  let by = pad + 8 * s;
+  let by = padT + 8 * s;
   const hpk = Math.max(0, P.hp / P.maxHp);
-  P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.0045);
+  // el tramo perdido se vacía por tiempo (no por fotograma: a 30 FPS iba a la mitad de rápido)
+  const hdt = clamp(now - (P._hpT || now), 0, 0.1); P._hpT = now;
+  const hp0 = P._hpPrev === undefined ? hpk : P._hpPrev; P._hpPrev = hpk;
+  if (hpk < hp0 - 0.002) P._hpHitAt = now;
+  if (hpk > hp0 + 0.002) { if (!(now - P._healAt < 0.6)) P._healFrom = hp0; P._healAt = now; }
+  P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.27 * hdt);
   const low = hpk < 0.3, pulse = low ? 0.5 + 0.5 * Math.sin(now * 8) : 0;
   fancyBar(bx, by, bw, bh, hpk, low ? `rgb(255,${90 + pulse * 60 | 0},80)` : '#ff6a55', low ? '#a00018' : '#b3201c', P._hpLag, 10);
+  // golpe: destello blanco; curación: el tramo ganado brilla en verde
+  { const iw = bw - 4, ih = bh - 4, ht = now - (P._hpHitAt || -9), ct = now - (P._healAt || -9);
+    if (ht < 0.15) roundRect(bx + 2, by + 2, Math.max(ih, iw * hpk), ih, ih / 2, `rgba(255,255,255,${0.6 * (1 - ht / 0.15)})`);
+    if (ct < 0.6 && hpk > P._healFrom) roundRect(bx + 2 + iw * P._healFrom, by + 2, iw * (hpk - P._healFrom), ih, ih / 2, `rgba(140,255,150,${0.75 * (1 - ct / 0.6)})`); }
   if (P.shield > 0) roundRect(bx + 2, by + 2, Math.min(bw - 4, (bw - 4) * (P.shield / P.maxHp)), (bh - 4) / 2, 3, 'rgba(150,220,255,0.9)');
   drawHeart(bx + 2 * s, by + bh / 2, 10 * s, '#ff5a4a');
   text(Math.ceil(P.hp) + ' / ' + P.maxHp, bx + bw / 2 + 4 * s, by + bh / 2 + 1, 11 * s, '#fff', 'center', 800);
 
   // PA y PM
   by += bh + 6 * s;
+  // sin energía para la habilidad que tocaste: los cristales tiemblan y se ven rojos un momento
+  const paFail = P._paFailAt ? clamp(1 - (now - P._paFailAt) / 0.45, 0, 1) : 0, pjx = paFail ? Math.sin(now * 70) * 3 * s * paFail : 0;
   for (let i = 0; i < P.maxPa; i++) {
-    const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
-    drawCrystal(cx, cy, 8.5 * s, 'rgba(0,0,0,0.6)');
+    const cx = bx + 9 * s + i * 17 * s + pjx, cy = by + 8 * s;
+    drawCrystal(cx, cy, 8.5 * s, paFail ? `rgba(${120 + 135 * paFail | 0},20,20,0.75)` : 'rgba(0,0,0,0.6)');
     const fillK = clamp(P.pa - i, 0, 1);
     if (fillK >= 1) { drawCrystal(cx, cy, 7 * s, '#4fd2ff', 'rgba(80,200,255,0.9)'); drawCrystal(cx - 1.2 * s, cy - 2 * s, 2.6 * s, 'rgba(255,255,255,0.75)'); }
     else if (fillK > 0) drawCrystal(cx, cy, 7 * s * (0.35 + fillK * 0.65), '#1e6fa8');
   }
-  text('EN', bx + 9 * s + P.maxPa * 17 * s, by + 8 * s, 10 * s, '#81d4fa', 'left', 900);
+  text('EN', bx + 9 * s + P.maxPa * 17 * s + pjx, by + 8 * s, 10 * s, paFail ? '#ff6a5a' : '#81d4fa', 'left', 900);
   by += 18 * s;
   for (let i = 0; i < P.maxPm; i++) {
     const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
@@ -2063,7 +2089,7 @@ function drawHUD() {
   }
 
   // panel de la Faille (arriba a la derecha)
-  const rx = W - pad, ry = 66 * s;
+  const rx = W - pad - SAFE.r, ry = SAFE.t + 66 * s;
   hudPlate(rx - 158 * s, ry - 13 * s, 164 * s, 50 * s, 8 * s);
   text(rift.training ? "Training" : rift.isDungeon ? `Dungeon · Floor ${rift.tier}` : rift.isSuper ? "Super Boss" : `Rift ${rift.n} · ${rift.D.name}`, rx - 150 * s, ry, 13 * s, rift.training ? '#7cff8a' : rift.isSuper ? '#ff5a3d' : rift.D.color, 'left', 900);
   const tcol = rift.time > 30 ? '#efece2' : '#ff8a80';
@@ -2099,21 +2125,26 @@ function drawHUD() {
 
   // jefe
   if (bossRef && !bossRef.dead) {
-    const w = Math.min(W * 0.34, 300 * s), x = W / 2 - w / 2, y = pad + 18 * s;
+    const w = Math.min(W * 0.34, 300 * s), x = W / 2 - w / 2, y = padT + 18 * s;
     const bk = Math.max(0, bossRef.hp / bossRef.maxHp);
     bossRef._lag = bossRef._lag === undefined || bossRef._lag < bk ? bk : Math.max(bk, bossRef._lag - 0.003);
     hudPlate(x - 14 * s, y - 16 * s, w + 28 * s, 36 * s, 8 * s);
-    text(bossRef.name + " · lv. " + bossRef.lvl, W / 2, y - 5 * s, 12.5 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
+    text(bossRef.name + " · lv. " + bossRef.lvl, W / 2, y - 5 * s, 14 * s, bossRef.enraged ? '#ff6a5a' : '#f3dc9a', 'center', 900, true, 'Cinzel, serif');
     const sup = !!bossRef.superDef;
     fancyBar(x, y + 3 * s, w, 12 * s, bk, sup ? '#ff5ad0' : '#ff7a3a', sup ? '#7a1a8a' : '#a8240e', bossRef._lag, 0);
     if (UI_KIT.barframe) { const fh = 12 * s / 0.42; draw3(UI_KIT.barframe, x - fh * 0.42, y + 3 * s + 6 * s - fh / 2, w + fh * 0.84, fh, 0.14); }
     if (sup) for (const m of [0.66, 0.33]) { ctx.fillStyle = '#f3dc9a'; ctx.fillRect(x + 2 + (w - 4) * m - 1, y + 3 * s, 2, 12 * s); }
+    else { // marca de la furia (al 50%): dorada antes, apagada cuando ya entró en furia
+      const fx = x + 2 + (w - 4) * 0.5;
+      ctx.fillStyle = bossRef.enraged ? 'rgba(255,106,90,0.45)' : '#f3dc9a'; ctx.fillRect(fx - 1, y + 3 * s, 2, 12 * s);
+      if (!bossRef.enraged) { ctx.beginPath(); ctx.moveTo(fx - 4 * s, y + 0.5 * s); ctx.lineTo(fx + 4 * s, y + 0.5 * s); ctx.lineTo(fx, y + 4.5 * s); ctx.closePath(); ctx.fill(); }
+    }
     drawStar(x - 5 * s, y + 9 * s, 7 * s, sup ? '#ff5ad0' : '#ff7043');
   }
 
   // racha
   if (streak.n >= 5 && gameTime - streak.t < 1.6) {
-    text("Streak ×" + streak.n, pad, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
+    text("Streak ×" + streak.n, padL, H * 0.42, 15 * s, '#ffcc80', 'left', 900);
   }
 
   drawBanners();
@@ -2261,8 +2292,9 @@ function drawControls() {
 // ============================================================
 function renderRift() {
   const B = curBiome();
-  const sx = shakeMag > 0 ? rand(-shakeMag, shakeMag) : 0;
-  const sy = shakeMag > 0 ? rand(-shakeMag, shakeMag) : 0;
+  // temblor suave (suma de senos, no un número al azar en cada fotograma, que vibra como estática)
+  const sx = shakeMag > 0 ? shakeMag * (Math.sin(now * 47) * 0.65 + Math.sin(now * 83 + 1.3) * 0.35) : 0;
+  const sy = shakeMag > 0 ? shakeMag * (Math.sin(now * 59 + 0.7) * 0.6 + Math.sin(now * 101 + 2.1) * 0.4) : 0;
   const zr = zoom * (1 + zoomPunch);
   ctx.save();
   ctx.translate(W / 2, H / 2);
@@ -2496,7 +2528,7 @@ function frame(t) {
     else update(raw);
   } else if (state === 'hub' && scene === 'hub') updateVillage(raw);
   else if (scene === 'hub') villageLife(raw);
-  shakeMag = Math.max(0, shakeMag - raw * 40);
+  shakeMag = Math.max(0, shakeMag * Math.exp(-6 * raw) - raw * 12); // los temblores grandes pegan y se apagan rápido
   zoomPunch *= Math.exp(-7 * raw);
   render();
   adaptQuality(raw);
