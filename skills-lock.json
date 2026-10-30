@@ -19,6 +19,12 @@
       "skillPath": "skills/debugging-capacitor/SKILL.md",
       "computedHash": "27f15e076d49fd4eab7d636324ba81784b085f21191a8168f8c643d69ce57e66"
     },
+    "dialogue-systems": {
+      "source": "gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/disciplines/dialogue-systems/SKILL.md",
+      "computedHash": "7b6ee7b0d72d6062d6c228656f227a07c04d37ba9735541defceb7830a9e6303"
+    },
     "embedded-captions": {
       "source": "heygen-com/hyperframes",
       "sourceType": "github",
