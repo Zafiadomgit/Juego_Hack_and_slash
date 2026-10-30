@@ -28,8 +28,16 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 ## 4. Efectos de habilidades
 - [ ] Estelas, explosiones, rayos y runas animadas propias de cada héroe (sustituyen a los efectos actuales)
 
-## 5. Interfaz (≈ 250 créditos)
+## 5. Interfaz (≈ 250 créditos + ≈ 120 del árbol de talentos)
 - [ ] Kit completo: marcos, botones, barras, iconos de habilidad propios de cada héroe
+- [ ] **Árbol de talentos (pedido del usuario, 30-oct): rework visual completo** con SpriteCook (skill `spritecook-build-ui-kits`).
+      Hoy son 72 iconos sueltos (`www/img/talents/`) sobre fondo plano. Hace falta, en el estilo HD-2D del rework:
+  - [ ] Fondo de cada rama por héroe (21 en total: 3 ramas × 7 héroes), con el color y el motivo de la rama
+  - [ ] Marcos de nodo: rango (bloqueado / disponible / con puntos / al máximo), encrucijada ★ (dos caminos) y culmen ★★ (más grande, con brillo)
+  - [ ] Líneas de unión que se iluminan al aprender el nodo anterior
+  - [ ] Iconos repintados en el mismo estilo (los 72 actuales, sin cambiar sus nombres de archivo)
+  - [ ] Efecto al aprender un nodo (destello de 6 fotogramas) y al llegar al culmen
+  - [ ] Probarlo en el móvil: el árbol cabe a lo alto, los nodos se tocan bien y se leen los rangos
 
 ## 6. Jefes y Súper Jefes con animaciones de sus habilidades (≈ 1400 créditos) — pedido del usuario
 Cada jefe (≈ 102 créditos): sprite nuevo 12 + caminar 20 + ataque básico 14 + **2 habilidades animadas 28** + muerte 14
@@ -132,6 +140,21 @@ Con las skills `dialogue-systems` y `roguelike` (idea de Hades: la historia avan
 - [ ] Tocar la tarjeta 📖 de la villa abre la lista de efectos sin taparse con nada
 - [ ] Partidas que ya pasaron esas escenas no ven las decisiones (sin efecto): decidir si se ofrecen después hablando con Ivo
 
+## 10. Poder del héroe y progresión (sin créditos) — hecho el 30-oct, falta probar en el APK
+**Problema encontrado:** `balance.js` subía la vida y el daño de los monstruos en la misma proporción que el poder real del héroe,
+así que refinar, subir talentos o Trascendencia casi no se notaba (los monstruos crecían igual).
+- [x] **Simulador** `tools/balance/simular.js` (`node tools/balance/simular.js`, usa Chrome o Edge): crea héroes con las funciones reales del
+      juego (equipo, refinado, talentos, Trascendencia, Forja) en 3 perfiles (justo, normal, fuerte) y escribe `tools/balance/resultado.md`
+- [x] **Poder esperado** por Grieta (medido con el simulador) y **banda de tolerancia**: hasta un 50% por encima de lo esperado no se
+      compensa nada; por encima, solo la mitad del exceso. Golpes que aguanta un monstruo normal: con lo esperado ~3,5;
+      jugador normal 2–4 (antes 5–7), fuerte 1–2 (antes 4–7), y quien no mejora nada como mucho ~8 (sin muro)
+- [x] Los jefes siguen la misma proporción; su mínimo de golpes (45 Guardián / 110 Súper Jefe) baja hasta la mitad si vas muy por encima
+- [x] **Poder visible**: «⚔ Poder» en la tarjeta de la villa y «Poder recomendado (tú X)» en el mapa de Grietas (verde si llegas; rojo si vas muy por debajo)
+- [ ] Revisar en el APK: ¿se siente más fuerte al refinar y subir talentos? ¿los jefes siguen siendo un reto? (ajustes: `HITS_EXPECTED` y `expectK` en `balance.js`)
+**Pendiente de decidir** (cambia mucho el juego)
+- [ ] Ordenar las ~15 fuentes de poder en 3 capas: **Equipo** (botín y forja), **Héroe** (talentos y Trascendencia) y **Partida** (bendiciones);
+      las mejoras de Maese Ivo y los Pactos pasarían a ser de comodidad (energía, imán, bolsa, re-tiradas) y no de daño puro
+
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|
@@ -141,8 +164,9 @@ Con las skills `dialogue-systems` y `roguelike` (idea de Hades: la historia avan
 | Villa | 400 |
 | Vecinos | 370 |
 | Interfaz | 250 |
+| Árbol de talentos (fondos, marcos, uniones, iconos) | 120 |
 | Efectos de habilidades de héroes | 150 |
-| **Total** | **≈ 3640** (sobran ~360 para repetir lo que no salga bien) |
+| **Total** | **≈ 3760** (sobran ~240 para repetir lo que no salga bien) |
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6

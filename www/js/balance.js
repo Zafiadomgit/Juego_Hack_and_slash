@@ -1,7 +1,9 @@
 /* Fendaria — equilibrio frente al poder REAL del héroe y muertes de jefe a la altura.
  *  · La vida de los monstruos se calculaba con un héroe «de referencia»; las bendiciones, talentos, runas,
  *    mecánica propia y equipo no contaban y se llegaba al capítulo 2 matando Guardianes de un golpe.
- *    Ahora se mide el daño que hace de verdad cada golpe (media móvil) y los monstruos se ajustan a él.
+ *    Ahora se mide el daño que hace de verdad cada golpe (media móvil) y se compara con el poder ESPERADO de la Grieta:
+ *    dentro de una banda de tolerancia no se compensa nada (mejorar se nota); por encima, solo la mitad del exceso.
+ *  · Poder visible: en la tarjeta de la villa y «Poder recomendado» en el mapa (tools/balance/simular.js mide la curva).
  *  · Ningún golpe suelto quita más de un 7% de la vida de un Súper Jefe ni un 11% de la de un Guardián.
  *  · La muerte de un jefe: cámara lenta, explosiones encadenadas y un estallido final.
  */
@@ -10,10 +12,6 @@
 // ---------- daño real por golpe ----------
 let hitAvg = 0; // media móvil del daño por golpe (sin venenos ni efectos menores)
 const curRef = () => (rift ? refPlayer(S.cls, rift.level, rift.d || 0) : null);
-const powerRatio = () => {
-  const r = curRef();
-  return r && hitAvg > 0 ? hitAvg / r.hit : 1;
-};
 const BOSS_CAP = { super: 0.07, boss: 0.11 };
 
 const _damageEnemyB = damageEnemy;
@@ -37,24 +35,58 @@ damageEnemy = function (e, base, o = {}) {
   if (!o.quiet && raw > 0) hitAvg = hitAvg ? hitAvg * 0.92 + Math.min(raw, hitAvg * 6) * 0.08 : Math.min(raw, (curRef() ? curRef().hit : base) * 3);
 };
 
+// ---------- poder esperado y banda de tolerancia ----------
+// Antes los monstruos crecían igual que el héroe (vida × poder real / referencia): mejorar no se notaba.
+// tools/balance/simular.js mide a un jugador «normal» (algo de Épico, refina y sube Trascendencia poco a poco):
+// va unas 2,3 × (1 + nivel/12) veces por encima de la referencia. Ese es el poder ESPERADO de cada Grieta.
+// Se fija cuántos golpes aguanta un monstruo normal según q = poder real / poder esperado:
+//   · con el poder esperado (q = 1), ~3,5 golpes;
+//   · hasta un 50% por encima no se compensa nada: los golpes bajan en proporción (recompensa por mejorar);
+//   · más arriba, los monstruos compensan solo la mitad (raíz cuadrada) del exceso, sin bajar de 1 golpe;
+//   · por debajo cuesta más, pero sin muro: como mucho ~10 golpes aunque no refines ni subas nada.
+// Los jefes siguen la misma proporción (con el poder esperado, igual que antes).
+// (en las primeras Grietas el héroe aún no tiene el equipo completo: la curva arranca más baja)
+const expectK = (L) => 2.3 * (1 + L / 12) - 1.3 * Math.max(0, 1 - L / 15);
+const POWER_TOL = 1.5, HITS_EXPECTED = 3.5;
+const heroHit = () => (P ? basicDmg() * (1 + Math.min(0.75, P.crit) * 0.8) : 0); // golpe medio sin bendiciones
+const recPower = (L) => (S ? refPlayer(S.cls, L, 0).hit * expectK(L) : 0);
+function hitsFor(q) {
+  if (q < 1) return Math.min(10, HITS_EXPECTED * Math.pow(q, -0.35));
+  if (q <= POWER_TOL) return HITS_EXPECTED / q;
+  return Math.max(1, (HITS_EXPECTED / POWER_TOL) / Math.sqrt(q / POWER_TOL));
+}
+
 // ---------- vida y daño de los monstruos según el poder real ----------
 const _spawnEnemyB = spawnEnemy;
 spawnEnemy = function (type, x, y, o = {}) {
   const e = _spawnEnemyB(type, x, y, o);
   if (!e || scene !== 'rift' || !rift) return e;
-  const k = powerRatio();
-  if (k > 1) {
-    // los normales también se endurecen (algo menos que los jefes, para que el héroe se siga sintiendo fuerte)
-    const hk = e.superDef || e.boss ? k : Math.pow(k, 0.85);
-    e.hp = e.maxHp = Math.round(e.maxHp * hk);
-    e.dmg *= 1 + 0.35 * Math.log2(k);
-  }
-  // suelo de golpes: un Guardián aguanta al menos ~45 golpes reales y un Súper Jefe ~110
-  if (hitAvg > 0 && (e.boss || e.superDef)) {
-    const min = hitAvg * (e.superDef ? 110 : 45);
+  const r = curRef(), hit = hitAvg > 0 ? hitAvg : heroHit(); // al empezar aún no hay golpes: se estima con las estadísticas
+  if (!r || !hit) return e;
+  const k = hit / r.hit, q = k / expectK(rift.level);
+  const big = e.superDef || e.boss;
+  // la vida de base está pensada para que el Jabalí aguante 8 golpes al héroe de referencia (DIFFS.hits)
+  const s = k * hitsFor(q) / HITS_EXPECTED; // fuerza del monstruo frente a la referencia (con el poder esperado, k)
+  const m = big ? s : k * hitsFor(q) / 8;
+  e.hp = e.maxHp = Math.max(1, Math.round(e.maxHp * m));
+  e.dmg *= 1 + 0.35 * Math.log2(Math.max(1, s));
+  // suelo de golpes: con el poder esperado un Guardián aguanta ~45 golpes reales y un Súper Jefe ~110;
+  // si vas por encima de la banda, el suelo baja (hasta la mitad)
+  if (hitAvg > 0 && big) {
+    const min = hitAvg * (e.superDef ? 110 : 45) * Math.max(0.5, 1 / Math.sqrt(Math.max(1, q / POWER_TOL)));
     if (e.maxHp < min) e.hp = e.maxHp = Math.round(min);
   }
   return e;
+};
+
+// ---------- Poder: número visible en la villa y «Poder recomendado» en el mapa ----------
+const _buildHubB = buildHub;
+buildHub = function () {
+  _buildHubB();
+  const card = $('hubChar'), pw = Math.round(heroHit());
+  if (!card || !pw) return;
+  const old = card.querySelector('.hc-power'); if (old) old.remove();
+  card.querySelector('.hc-name').insertAdjacentHTML('afterend', `<div class="hc-power" title="Tu golpe medio con el equipo, talentos y mejoras (sin bendiciones). Compáralo con el Poder recomendado de cada Grieta en el mapa">⚔ Poder <b>${fmtNum(pw)}</b></div>`);
 };
 
 // ---------- la presentación del jefe no sale si ya ha caído ----------

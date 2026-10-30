@@ -298,3 +298,7 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .hubStory.open { flex-wrap: wrap; }
 .hubStory.open .hs-fx { display: block; flex-basis: 100%; margin-top: 3px; }
 .hubStory .hs-fx b { display: inline; color: #ecd18a; font-size: inherit; }
+/* Poder: tarjeta de la villa y mapa de Grietas */
+.hc-power { font-size: 11.5px; color: #c9c3ae; margin-top: 1px; }
+.hc-power b { color: #ffcf7a; font-family: Cinzel, serif; }
+.map-info .mi-rows .good { color: #9fe0a8; }

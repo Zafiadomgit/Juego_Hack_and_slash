@@ -2935,6 +2935,7 @@ function buildMapInfo() {
     ${diffs}
     <div class="mi-rows">
       <span>Recommended</span><b class="${S.level + 2 < rec ? 'bad' : ''}">level ${rec}+ (you ${S.level})</b>
+      ${typeof recPower === 'function' && P ? `<span>Recommended Power</span><b class="${L > 3 && heroHit() < recPower(L) * 0.6 ? 'bad' : heroHit() >= recPower(L) ? 'good' : ''}">${fmtNum(Math.round(recPower(L)))} (you ${fmtNum(Math.round(heroHit()))})</b>` : ''}
       <span>${isS ? "Super Boss" : "Guardian"}</span><b>${boss}</b>
     </div>
     <div class="mi-chips">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 20)}${S.dofus.includes(k) ? '<i>✔</i>' : ''}</span>`).join('')}<small>${gemsFor(B.id, isS).every((k) => S.dofus.includes(k)) ? "Gems from here: all yours" : "Gems you can get"}</small></div>

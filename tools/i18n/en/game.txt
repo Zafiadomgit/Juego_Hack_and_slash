@@ -389,3 +389,30 @@ Defense
 Mobility
 @@8l3xkg
 Training
+@@2iburs
+
+    <h3>${isS ? '☠ Súper Jefe' : 'Grieta ' + n}</h3>
+    <div class="mi-sub">${B.name}${isS ? '' : ` · <b style="color:${DF.color}">${DF.name}</b>`}</div>
+    ${diffs}
+    <div class="mi-rows">
+      <span>Recommended</span><b class="${S.level + 2 < rec ? 'bad' : ''}">level ${rec}+ (you ${S.level})</b>
+      ${typeof recPower === 'function' && P ? `<span>Poder recomendado</span><b class="${L > 3 && heroHit() < recPower(L) * 0.6 ? 'bad' : heroHit() >= recPower(L) ? 'good' : ''}">${fmtNum(Math.round(recPower(L)))} (tú ${fmtNum(Math.round(heroHit()))})</b>` : ''}
+      <span>${isS ? 'Súper Jefe' : 'Guardián'}</span><b>${boss}</b>
+    </div>
+    <div class="mi-chips">${gemsFor(B.id, isS).map((k) => `<span class="${S.dofus.includes(k) ? 'have' : ''}" style="--c:${GEMS[k].color}" title="${GEMS[k].name}: ${GEMS[k].desc}">${gemImg(k, 20)}${S.dofus.includes(k) ? '<i>✔</i>' : ''}</span>`).join('')}<small>${gemsFor(B.id, isS).every((k) => S.dofus.includes(k)) ? 'Gemas de aquí: todas tuyas' : 'Gemas que puedes conseguir'}</small></div>
+    <details class="mi-more"><summary>More details</summary>
+    <div class="mi-rows">
+      <span>Monsters</span><b>level ${mlo}–${mlo + 4}</b>
+      <span>Designed for gear</span><b><span style="color:${RARITY[3].color}">Legendary</span></b>
+      <span>Amber and XP</span><b>×${DF.reward}</b>
+      <span>Loot quality</span><b>${rarityRangeText(DF)}</b>
+      <span>Set piece</span><b style="color:${SD.color}">${setCh}%${isS ? ' (+50%)' : ''}</b>
+      <span>Ancestral Gem</span><b>${Math.round(gemChance(L, d, isS) * 100)}% if you're missing any</b>
+    </div>
+
+    <div class="mi-set" style="--sc:${SD.color}"><div class="t">${SD.name} Set (${cnt}/${SLOTS.length})</div>
+      ${[2, 4, 6].map((k) => `<div class="${cnt >= k ? 'on' : 'off'}">${k} piezas: ${setBonusLine(SD.bonus[k])}</div>`).join('')}</div>
+    </details>
+    <button id="btnMapGo" class="btn big">${isS ? '☠ Desafiar al Súper Jefe' : '🌀 Entrar en la Grieta'}</button>
+@@s29l40
+<span>Recommended Power</span><b class="${L > 3 && heroHit() < recPower(L) * 0.6 ? 'bad' : heroHit() >= recPower(L) ? 'good' : ''}">${fmtNum(Math.round(recPower(L)))} (you ${fmtNum(Math.round(heroHit()))})</b>
