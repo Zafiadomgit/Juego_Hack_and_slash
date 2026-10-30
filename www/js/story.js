@@ -3,6 +3,8 @@
  * tierra que hoy está al otro lado de las Grietas. Morvhal está forzándolos desde dentro y ha corrompido a sus guardianes
  * (los Súper Jefes). Cada Súper Jefe vencido libera un Sello; con los cinco, Morvhal huye a la Mazmorra (contenido final).
  *
+ * Las decisiones, sus efectos en el juego, la historia al morir y las despedidas de los jefes están en saga.js.
+ *
  * Retratos: si existe img/portraits/<id>.png (y está en PORTRAITS) se usa; si no, se recorta el sprite del personaje.
  */
 'use strict';
@@ -97,13 +99,14 @@ const SCENES = {
     ['ivo', '…Era el aprendiz más joven de la Orden. Sostuve la última runa mientras los demás morían congelados.'],
     ['ivo', 'Bebí un elixir para vivir lo bastante como para vigilar los Sellos. Llevo trescientos años en esta villa, esperando que este día no llegara.'],
     ['brunilda', 'Trescientos años y sigues regateándome el precio de las hierbas. Increíble.'],
-    ['ivo', 'El cuarto Sello está en el Desierto de Ámbar. Su guardián es un Fénix: si renace corrompido, renacerá así para siempre.'],
+    ['ivo', 'No te pido que lo entiendas, {hero}. Solo que no me mires como lo miras a él.'],
+    // la elección (perdonar o echárselo en cara) y el cuarto Sello están en saga.js
   ],
   enter3: [
-    ['morvhal', 'Ahora ya lo sabes. El viejo Ivo te usa como me usaron a mí: para cerrar puertas.'],
+    ['morvhal', () => sagaFlag('ivo') === 'doubt' ? 'Ya no te fías del viejo Ivo. Bien. Empiezas a ver.' : sagaFlag('ivo') === 'trust' ? 'Has perdonado al viejo Ivo. Qué tierno. A mí nadie me perdonó.' : 'Ahora ya lo sabes. El viejo Ivo te usa como me usaron a mí: para cerrar puertas.'],
     ['morvhal', 'Únete a mí, {hero}. Al otro lado de la Puerta del Vacío está la Fendaria Antigua. Sin hambre. Sin muerte.'],
-    ['hero', 'Ivo me contó la verdad. Tú solo me ofreces otra cerradura.'],
-    ['morvhal', 'Entonces arde con mi Fénix.'],
+    ['morvhal', '¿Qué me dices, lucecita?'],
+    // la elección (rechazarlo o preguntar por la Fendaria Antigua) está en saga.js
   ],
   boss3: [
     ['boss', 'Muero y renazco… muero y renazco… ¡Haz que pare!'],
@@ -138,18 +141,23 @@ const SCENES = {
   enter5: [
     ['voz', 'Bienvenido a Aelmar, la ciudad que el mar se tragó. Mi señor la hundió hace trescientos años.'],
     ['nereth', 'Soy Nereth, Heraldo de la Marea. Cada ola que rompe aquí lleva un pedazo de la Ciudadela de Morvhal.'],
+    ['nereth', 'Hueles a Villa Candela. A hierbas de alquimista. Hace mucho conocí a alguien que olía así.'],
     ['hero', 'Entonces cortaré las olas.'],
     ['god_escudo', 'Aldemar te acompaña, {hero}. El agua no aplasta lo que no se dobla.'],
   ],
   boss5: [
     ['nereth', 'La marea siempre vuelve. Siempre. Y esta vez te arrastrará con ella.'],
+    ['nereth', 'Él me prometió devolverme a mi hermano. ¡No dejaré que nadie me lo quite otra vez!'],
     ['hero', () => heroLine('boss')],
   ],
   win5: [
     ['ivo', 'El mar se ha retirado de la Grieta. Uno de los Heraldos ha caído.'],
-    ['god_cura', 'Soy Lunessa. Nereth era un pescador de Aelmar al que Morvhal prometió devolver a su familia. Ahora descansa.'],
-    ['hero', 'Morvhal compra a la gente con lo que más quieren.'],
-    ['god_cura', 'Así compró también a Lysara, la cantora del bosque. Ve con cuidado: su canto convierte la carne en cristal.'],
+    ['god_cura', 'Soy Lunessa. Nereth era un pescador de Aelmar al que Morvhal prometió devolver a su hermano. Ahora descansa.'],
+    ['ivo', '…Nereth. Se llamaba Nereth. Le enseñé a nadar en el puerto, bajo el faro.'],
+    ['hero', 'Ivo… ¿era tu hermano?'],
+    ['ivo', 'Mi hermano pequeño. La noche en que la Orden selló Aelmar, él estaba en su barca. Yo sostenía la runa.'],
+    ['ivo', () => sagaFlag('ivo') === 'doubt' ? 'Querías saber qué más callaba. Esto. Era esto.' : 'Gracias por traerle descanso, {hero}. Yo no pude en trescientos años.'],
+    ['god_cura', 'Morvhal compra a la gente con lo que más quiere. Así compró también a Lysara, la cantora del bosque. Su canto convierte la carne en cristal.'],
     ['tobias', 'Cristal, ¿eh? Pues afila bien, que el cristal se raya.'],
   ],
   enter6: [
@@ -164,6 +172,10 @@ const SCENES = {
   ],
   win6: [
     ['ivo', 'Los dos Heraldos han caído. Puedo sentirlo: la Ciudadela ya no tiene muros que la protejan.'],
+    ['hero', () => sagaFlag('morvhal') === 'listen' ? 'Ivo. En el desierto, Morvhal me dijo que la Orden selló estas tierras con su gente dentro. ¿Es verdad?' : 'Ivo, Nereth y Lysara venían de tierras selladas. ¿Qué había en ellas cuando las cerrasteis?'],
+    ['ivo', 'Gente. Aldeas, puertos, familias. Las Grietas se abrían solas y la Orden decidió cerrarlas para siempre… con todo dentro.'],
+    ['ivo', 'Morvhal era uno de los doce. Se negó a cantar: quería abrir las puertas y sacarlos. Lo encerramos a él también.'],
+    ['ivo', 'No nació siendo un monstruo, {hero}. Es lo que trescientos años de cerradura hacen con alguien que tenía razón a medias.'],
     ['god_ira', '¡Ja! Soy Brakkar. Hace siglos que no veía a un mortal pelear así. Los Doce abrimos la última Grieta para ti.'],
     ['god_tiempo', 'Al otro lado está la Ciudadela del Cerrajero. Morvhal te espera con su Carcelero y con su llave.'],
     ['ivo', '{hero}… la llave de Morvhal abre cualquier puerta. Incluso la que separa este mundo de la Fendaria Antigua.'],
@@ -172,6 +184,7 @@ const SCENES = {
   ],
   enter7: [
     ['morvhal', 'Has llegado. Ni la Orden llegó tan lejos.'],
+    ['morvhal', '¿Ya te lo ha contado Ivo? Yo solo quería sacarlos. Ellos eligieron la cerradura; yo elegí la llave.'],
     ['morvhal', 'Mira a tu alrededor: esta Ciudadela es una cerradura del tamaño de una montaña. Y yo tengo la llave.'],
     ['hero', () => heroLine('final')],
     ['morvhal', 'Antes tendrás que pasar por mi Carcelero. Él guarda a todos los que se me opusieron… incluidos los doce runistas.'],
@@ -184,13 +197,17 @@ const SCENES = {
   ],
   win7: [
     ['morvhal', 'La llave… se rompe. No. No…'],
+    ['morvhal', 'Al menos… ábreles tú la puerta. A los del otro lado. Promételo.'],
     ['god_tiempo', 'Se acabó, Morvhal. El tiempo que robaste vuelve a su sitio.'],
+    ['runista', 'Doce celdas abiertas. Soy Elden, de la Orden de las Runas. Llevábamos trescientos años en las mazmorras del Carcelero.'],
+    ['runista', 'Dile a Ivo que ya no tiene que vigilar solo. Volvemos a casa… y esta vez abriremos las puertas con cuidado.'],
     ['ivo', '{hero}. Las Grietas se están cerrando. Todas. Lo has conseguido.'],
     ['ivo', 'Y yo… siento cómo pasan los años. Trescientos de golpe. No te preocupes: es lo justo. Por fin descansaré.'],
     ['god_cura', 'Todavía no, viejo amigo. Lunessa te concede los años que te quedan, como un mortal más. Vívelos.'],
-    ['tobias', 'Una llave rota de Cerrajero… voy a necesitar una forja más grande.'],
     ['brunilda', 'Espada con tu nombre, {hero}. De las caras. Invita la casa… por esta vez.'],
     ['god_ira', 'Las Grietas menores seguirán abriéndose de vez en cuando, y la Mazmorra está llena de reliquias. ¡Que no se te oxide el arma!'],
+    ['tobias', 'Y esta llave rota de Cerrajero… ¿qué hago con ella, {hero}?'],
+    // la elección (fundirla o dársela a los Doce) está en saga.js
   ],
   dungeon: [
     ['ivo', 'Esto es la Cámara del Cerrajero. Cada piso es más hondo… y más peligroso que el anterior.'],
@@ -216,10 +233,10 @@ const CHATTER = {
     'El ámbar de las Grietas es luz cristalizada. Con él preparo elixires… y otras cosas que es mejor no preguntar.',
     'La Orden de las Runas eran doce. Los libros nunca dicen qué fue de ellos. Yo… prefiero no hablar de eso todavía.',
     'Si oyes a Morvhal, recuerda: miente con la verdad. Es lo que mejor sabe hacer.',
-    'Gracias por no mirarme raro desde que lo sabes. Bueno, menos raro que antes.',
+    () => sagaFlag('ivo') === 'doubt' ? 'Sé que no me perdonas. Me parece justo. El diario te servirá más que mis disculpas.' : 'Gracias por no mirarme raro desde que lo sabes. Bueno, menos raro que antes.',
     'El Archimago me enseñó a leer runas. Era un buen hombre. Libéralo, {hero}.',
-    'He vivido trescientos años esperando este final. Ahora resulta que solo era el principio.',
     'Aelmar… la ciudad hundida. Allí nací yo, ¿sabes? Hace mucho. Si ves la torre del faro, salúdala de mi parte.',
+    'Nereth tenía once años la última vez que lo vi. Ahora por fin sé dónde descansa. Gracias, {hero}.',
     'El canto de Lysara convierte la carne en cristal. Bebe antes de entrar: los elixires ayudan.',
     'Los doce runistas… el Carcelero los guarda. Si vuelves con ellos, te deberé algo más que gratitud.',
     'Cada día me salen canas nuevas. ¡Qué maravilla! Siéntate, que te preparo algo.',

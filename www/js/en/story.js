@@ -3,6 +3,8 @@
  * tierra que hoy está al otro lado de las Grietas. Morvhal está forzándolos desde dentro y ha corrompido a sus guardianes
  * (los Súper Jefes). Cada Súper Jefe vencido libera un Sello; con los cinco, Morvhal huye a la Mazmorra (contenido final).
  *
+ * Las decisiones, sus efectos en el juego, la historia al morir y las despedidas de los jefes están en saga.js.
+ *
  * Retratos: si existe img/portraits/<id>.png (y está en PORTRAITS) se usa; si no, se recorta el sprite del personaje.
  */
 'use strict';
@@ -97,13 +99,14 @@ const SCENES = {
     ['ivo', "…I was the youngest apprentice of the Order. I held the last rune while the others froze to death."],
     ['ivo', "I drank an elixir to live long enough to watch over the Seals. I've spent three hundred years in this village, hoping this day would never come."],
     ['brunilda', "Three hundred years and you still haggle with me over the price of herbs. Unbelievable."],
-    ['ivo', "The fourth Seal is in the Amber Desert. Its guardian is a Phoenix: if it is reborn corrupted, it will be reborn that way forever."],
+    ['ivo', "I'm not asking you to understand, {hero}. Only not to look at me the way you look at him."],
+    // la elección (perdonar o echárselo en cara) y el cuarto Sello están en saga.js
   ],
   enter3: [
-    ['morvhal', "Now you know. Old Ivo uses you the way they used me: to close doors."],
+    ['morvhal', () => sagaFlag('ivo') === 'doubt' ? "You no longer trust old Ivo. Good. You're starting to see." : sagaFlag('ivo') === 'trust' ? "You forgave old Ivo. How touching. Nobody ever forgave me." : "Now you know. Old Ivo uses you the way they used me: to close doors."],
     ['morvhal', "Join me, {hero}. On the other side of the Void Gate lies Ancient Fendaria. No hunger. No death."],
-    ['hero', "Ivo told me the truth. All you offer me is another lock."],
-    ['morvhal', "Then burn with my Phoenix."],
+    ['morvhal', "What do you say, little light?"],
+    // la elección (rechazarlo o preguntar por la Fendaria Antigua) está en saga.js
   ],
   boss3: [
     ['boss', "I die and I'm reborn… I die and I'm reborn… Make it stop!"],
@@ -138,18 +141,23 @@ const SCENES = {
   enter5: [
     ['voz', "Welcome to Aelmar, the city the sea swallowed. My lord sank it three hundred years ago."],
     ['nereth', "I am Nereth, Herald of the Tide. Every wave that breaks here carries a piece of Morvhal's Citadel."],
+    ['nereth', "You smell of Candela Village. Of alchemist's herbs. Long ago I knew someone who smelled like that."],
     ['hero', "Then I'll cut through the waves."],
     ['god_escudo', "Aldemar is with you, {hero}. Water can't crush what won't bend."],
   ],
   boss5: [
     ['nereth', "The tide always returns. Always. And this time it will drag you with it."],
+    ['nereth', "He promised to give me back my brother. I won't let anyone take him from me again!"],
     ['hero', () => heroLine('boss')],
   ],
   win5: [
     ['ivo', "The sea has withdrawn from the Rift. One of the Heralds has fallen."],
-    ['god_cura', "I am Lunessa. Nereth was a fisherman of Aelmar whom Morvhal promised to reunite with his family. Now he rests."],
-    ['hero', "Morvhal buys people with what they love most."],
-    ['god_cura', "That's how he bought Lysara too, the forest singer. Be careful: her song turns flesh into crystal."],
+    ['god_cura', "I am Lunessa. Nereth was a fisherman of Aelmar whom Morvhal promised to reunite with his brother. Now he rests."],
+    ['ivo', "…Nereth. His name was Nereth. I taught him to swim in the harbour, under the lighthouse."],
+    ['hero', "Ivo… was he your brother?"],
+    ['ivo', "My little brother. The night the Order sealed Aelmar, he was out in his boat. I was holding the rune."],
+    ['ivo', () => sagaFlag('ivo') === 'doubt' ? "You wanted to know what else I was hiding. This. It was this." : "Thank you for bringing him rest, {hero}. I couldn't, in three hundred years."],
+    ['god_cura', "Morvhal buys people with what they love most. That is how he bought Lysara, the singer of the forest. Her song turns flesh into crystal."],
     ['tobias', "Crystal, huh? Then sharpen your blade well, crystal scratches."],
   ],
   enter6: [
@@ -164,6 +172,10 @@ const SCENES = {
   ],
   win6: [
     ['ivo', "Both Heralds have fallen. I can feel it: the Citadel no longer has walls to protect it."],
+    ['hero', () => sagaFlag('morvhal') === 'listen' ? "Ivo. In the desert, Morvhal told me the Order sealed these lands with their people inside. Is it true?" : "Ivo, Nereth and Lysara came from sealed lands. What was in them when you closed them?"],
+    ['ivo', "People. Villages, harbours, families. The Rifts kept opening on their own, and the Order chose to close them forever… with everything inside."],
+    ['ivo', "Morvhal was one of the twelve. He refused to chant: he wanted to open the doors and get them out. So we locked him away too."],
+    ['ivo', "He wasn't born a monster, {hero}. He is what three hundred years behind a lock do to someone who was half right."],
     ['god_ira', "Ha! I am Brakkar. It's been centuries since I saw a mortal fight like that. We, the Twelve, have opened the last Rift for you."],
     ['god_tiempo', "On the other side lies the Locksmith's Citadel. Morvhal awaits you with his Jailer and his key."],
     ['ivo', "{hero}… Morvhal's key opens any door. Even the one that separates this world from Ancient Fendaria."],
@@ -172,6 +184,7 @@ const SCENES = {
   ],
   enter7: [
     ['morvhal', "You've made it. Not even the Order got this far."],
+    ['morvhal', "Has Ivo told you yet? I only wanted to get them out. They chose the lock; I chose the key."],
     ['morvhal', "Look around you: this Citadel is a lock the size of a mountain. And I have the key."],
     ['hero', () => heroLine('final')],
     ['morvhal', "First you'll have to get past my Jailer. He keeps everyone who opposed me… including the twelve runecasters."],
@@ -184,13 +197,17 @@ const SCENES = {
   ],
   win7: [
     ['morvhal', "The key… it's breaking. No. No…"],
+    ['morvhal', "At least… you open the door for them. For the ones on the other side. Promise me."],
     ['god_tiempo', "It's over, Morvhal. The time you stole returns to where it belongs."],
+    ['runista', "Twelve cells open. I am Elden, of the Order of Runes. We spent three hundred years in the Jailer's dungeons."],
+    ['runista', "Tell Ivo he doesn't have to keep watch alone anymore. We're coming home… and this time we'll open the doors carefully."],
     ['ivo', "{hero}. The Rifts are closing. All of them. You did it."],
     ['ivo', "And I… can feel the years passing. Three hundred all at once. Don't worry: it's only fair. At last I'll rest."],
     ['god_cura', "Not yet, old friend. Lunessa grants you the years you have left, like any other mortal. Live them."],
-    ['tobias', "A Locksmith's broken key… I'm going to need a bigger forge."],
     ['brunilda', "A sword with your name, {hero}. One of the pricey ones. On the house… just this once."],
     ['god_ira', "Smaller Rifts will still open now and then, and the Dungeon is full of relics. Don't let your weapon rust!"],
+    ['tobias', "And this broken Locksmith's key… what do I do with it, {hero}?"],
+    // la elección (fundirla o dársela a los Doce) está en saga.js
   ],
   dungeon: [
     ['ivo', "This is the Locksmith's Vault. Each floor is deeper… and more dangerous than the last."],
@@ -216,10 +233,10 @@ const CHATTER = {
     "Rift amber is crystallized light. I brew elixirs with it… and other things it's best not to ask about.",
     "The Order of Runes were twelve. The books never say what became of them. I… would rather not talk about it yet.",
     "If you hear Morvhal, remember: he lies with the truth. It's what he does best.",
-    "Thank you for not looking at me funny since you found out. Well, less funny than before.",
+    () => sagaFlag('ivo') === 'doubt' ? "I know you don't forgive me. That's fair. The journal will serve you better than my apologies." : "Thank you for not looking at me funny since you found out. Well, less funny than before.",
     "The Archmage taught me to read runes. He was a good man. Free him, {hero}.",
-    "I've lived three hundred years waiting for this ending. Now it turns out it was only the beginning.",
     "Aelmar… the sunken city. I was born there, you know? Long ago. If you see the lighthouse tower, say hello for me.",
+    "Nereth was eleven the last time I saw him. Now at last I know where he rests. Thank you, {hero}.",
     "Lysara's song turns flesh into crystal. Drink before you go in: elixirs help.",
     "The twelve runecasters… the Jailer keeps them. If you come back with them, I'll owe you more than gratitude.",
     "New grey hairs every day. How wonderful! Sit down, I'll make you something.",

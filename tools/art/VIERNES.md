@@ -105,6 +105,33 @@ Hecho con las skills `game-feel` y `game-ui-ux`. Todo está en español y en ing
 - [ ] Rareza por forma también en las ranuras del equipo puesto (hoy solo en la bolsa)
 - [ ] Texto grande también en los menús HTML (hoy solo el HUD del canvas)
 
+## 9. Historia que cambia cómo se juega (sin créditos) — hecho el 30-oct, falta probar en el APK
+Con las skills `dialogue-systems` y `roguelike` (idea de Hades: la historia avanza también al morir). Código en
+`www/js/saga.js` (nuevo) y escenas en `www/js/story.js`. Todo en español e inglés. Las decisiones son por héroe.
+**Tres decisiones con efecto permanente** (se ven en la tarjeta 📖 de la villa al tocarla, con «✦N»)
+- [x] Glaciar (`win2`), tras saber la verdad de Ivo: **perdonarlo** → Confianza de Ivo (+10% vida y energía) ·
+      **echárselo en cara** → Diario de la Orden (+15% daño a Guardianes y Súper Jefes). Ivo y Morvhal hablan distinto según lo elegido
+- [x] Desierto (`enter3`), oferta de Morvhal: **«Nunca»** → Mirada de los Doce (+5% crítico) ·
+      **«¿Qué es la Fendaria Antigua?»** → Susurro del Cerrajero (+20% ámbar, pero recibes un 10% más de daño) y más trasfondo
+- [x] Ciudadela (`win7`), la llave rota: **Tobías la funde** → Filo de la Llave (+12% daño) ·
+      **la guardan los Doce** → Bendición de los Doce (+12% vida y +10% velocidad de ataque)
+- [x] Si se cierra el diálogo sin elegir, cuenta la primera opción
+**Hilos cerrados y Morvhal más gris**
+- [x] Nereth (Heraldo de la Marea) es el hermano pequeño de Ivo: pistas en la Ciudad Hundida y revelación al vencerlo
+- [x] Ivo confiesa (fin del Bosque de Cristal) que la Orden selló aquellas tierras con su gente dentro; Morvhal era uno de los doce y quería sacarlos
+- [x] Al vencer al Carcelero vuelven los doce runistas (Elden habla) → Runas de la Orden (+5% daño y vida)
+- [x] Cada Súper Jefe liberado (mundos 1–7) se despide al caer
+**Morir también cuenta**
+- [x] Primera muerte: Ivo explica que el Portal devuelve a quien lleva la luz de Candela
+- [x] Al volver derrotado, un vecino comenta (consejos de jefe si caíste ante un Guardián o Súper Jefe)
+- [x] Caer 2 y 4 veces en la misma Grieta: Ánimo de la villa (+10% / +20% de daño y vida allí hasta superarla)
+- [x] Morvhal (o la voz) se burla al volver a entrar en una Grieta tras morir
+**Probado** en Chrome sin ventana (es y en): las 3 decisiones con sus efectos, muertes, ánimo, burla y despedida; sin errores
+**Revisar en el APK**
+- [ ] Los botones de elección se leen bien y caben en el cuadro de diálogo en el móvil
+- [ ] Tocar la tarjeta 📖 de la villa abre la lista de efectos sin taparse con nada
+- [ ] Partidas que ya pasaron esas escenas no ven las decisiones (sin efecto): decidir si se ofrecen después hablando con Ivo
+
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|

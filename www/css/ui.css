@@ -292,3 +292,9 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 .loot-feed .lf.out { opacity: 0; transform: translateX(-14px); }
 @keyframes lfIn { from { opacity: 0; transform: translateX(-24px) scale(.9); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .loot-feed .lf { animation: none; } }
+/* crónica: efectos de la historia en la tarjeta de la villa (se ven al abrirla) */
+.hubStory .hs-n { font-style: normal; color: #9fe0a8; font-size: .9em; }
+.hubStory .hs-fx { display: none; color: #b9e6c0; font-size: 11px; line-height: 1.35; }
+.hubStory.open { flex-wrap: wrap; }
+.hubStory.open .hs-fx { display: block; flex-basis: 100%; margin-top: 3px; }
+.hubStory .hs-fx b { display: inline; color: #ecd18a; font-size: inherit; }

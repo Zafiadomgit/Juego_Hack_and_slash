@@ -368,3 +368,53 @@ Goodbye
 Epilogue
 @@tok8n1
 <small>Fendaria · Act ${['I', 'I', 'I', 'I', 'I', 'II', 'II', 'III', 'III'][Math.min(storyChapter(), 8)]}</small><b>${title}</b><span>${sub}</span>
+@@7320aw
+I'm not asking you to understand, {hero}. Only not to look at me the way you look at him.
+@@1hxsyig
+You no longer trust old Ivo. Good. You're starting to see.
+@@ym1ct4
+You forgave old Ivo. How touching. Nobody ever forgave me.
+@@1ye55hk
+What do you say, little light?
+@@18b1p5h
+You smell of Candela Village. Of alchemist's herbs. Long ago I knew someone who smelled like that.
+@@5sbzel
+He promised to give me back my brother. I won't let anyone take him from me again!
+@@1jt6779
+I am Lunessa. Nereth was a fisherman of Aelmar whom Morvhal promised to reunite with his brother. Now he rests.
+@@uf4xj4
+…Nereth. His name was Nereth. I taught him to swim in the harbour, under the lighthouse.
+@@1ml92u8
+Ivo… was he your brother?
+@@194n8lt
+My little brother. The night the Order sealed Aelmar, he was out in his boat. I was holding the rune.
+@@1qjsyo2
+You wanted to know what else I was hiding. This. It was this.
+@@re4a4g
+Thank you for bringing him rest, {hero}. I couldn't, in three hundred years.
+@@1s3hyj7
+Morvhal buys people with what they love most. That is how he bought Lysara, the singer of the forest. Her song turns flesh into crystal.
+@@5woslf
+Ivo. In the desert, Morvhal told me the Order sealed these lands with their people inside. Is it true?
+@@q3xxzy
+Ivo, Nereth and Lysara came from sealed lands. What was in them when you closed them?
+@@zqhvod
+People. Villages, harbours, families. The Rifts kept opening on their own, and the Order chose to close them forever… with everything inside.
+@@1xv6zjf
+Morvhal was one of the twelve. He refused to chant: he wanted to open the doors and get them out. So we locked him away too.
+@@1c8oscj
+He wasn't born a monster, {hero}. He is what three hundred years behind a lock do to someone who was half right.
+@@17l9og7
+Has Ivo told you yet? I only wanted to get them out. They chose the lock; I chose the key.
+@@13s3oa7
+At least… you open the door for them. For the ones on the other side. Promise me.
+@@1qf2giz
+Twelve cells open. I am Elden, of the Order of Runes. We spent three hundred years in the Jailer's dungeons.
+@@d0jh9
+Tell Ivo he doesn't have to keep watch alone anymore. We're coming home… and this time we'll open the doors carefully.
+@@x4eli7
+And this broken Locksmith's key… what do I do with it, {hero}?
+@@1k3k6ll
+I know you don't forgive me. That's fair. The journal will serve you better than my apologies.
+@@1308ea6
+Nereth was eleven the last time I saw him. Now at last I know where he rests. Thank you, {hero}.

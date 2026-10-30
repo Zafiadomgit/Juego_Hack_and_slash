@@ -1,0 +1,134 @@
+@@131x6vj
+Elden, runecaster of the Order
+@@3suvhp
+Ivo's Trust
+@@1xryei8
++10% health and energy
+@@1sm1bet
+Journal of the Order
+@@1x1ni8j
++15% damage to Guardians and Super Bosses
+@@rmshc9
+Gaze of the Twelve
+@@7v2wwd
++5% critical chance
+@@1bake4g
+Whisper of the Locksmith
+@@1vr3k9n
++20% amber · you take 10% more damage
+@@dpzdvn
+Edge of the Key
+@@aca402
++12% damage
+@@8ziczc
+Blessing of the Twelve
+@@1hdu33p
++12% health and +10% attack speed
+@@93nrgq
+Runes of the Order
+@@wm0k2w
++5% damage and health
+@@7szxl8
+I forgive you, Ivo. We go on together.
+@@1qxvdhr
+You carried that alone for three hundred years. You won't have to anymore.
+@@1hid64c
+I… thank you. Take my best elixir: I was saving it for the end of the world. Looks like it's here.
+@@ltobdd
+You lied to me. What else are you hiding?
+@@4ff8wf
+You sent me in blind against the man you locked away. What else are you hiding?
+@@4bxgsm
+A lot. And I owe you everything. Here is the Order's journal: every Seal, every guardian, every weak spot.
+@@6c8fzz
+The journal won't make you any less guilty, Ivo. But it will make {hero} deadlier. Good enough for me.
+@@uiz77s
+Never.
+@@13kbiow
+Aldemar has seen it, {hero}. The Twelve do not forget who says no to the Locksmith.
+@@1ijddyy
+What is Ancient Fendaria?
+@@c475v
+The land that existed before the Rifts. Cities, forests, people. The Order sealed it with them inside.
+@@12ybah9
+I was one of the twelve. I refused to chant. That's why they locked me up too.
+@@a4y6je
+Even if that's true, your monsters are killing people on this side.
+@@7ihfkr
+Listen a little longer, little light. The amber of my Rifts will shine for you… and so will my creatures.
+@@prpcs0
+Melt it down, Tobias: a weapon for the village.
+@@151yef5
+A bigger forge, that's what I need. Ha! With this, no monster will ever cross the Portal again.
+@@8q0hxe
+The key that opened everything, turned into something that protects. It would have hurt Morvhal. Or maybe he'd have liked it.
+@@1mb2256
+Let the Twelve keep it, to open the doors one day.
+@@760pbt
+We will keep it, {hero}. And the day Ancient Fendaria is ready, we will open it with this. As he wanted, but done right.
+@@dgr2zj
+Someday, Nereth. Someday.
+@@10slopt
+The villagers brought you back, unconscious by the Portal. Dying in there is not the end: the Portal returns whoever carries the light of Candela.
+@@1sbcd0
+But each time it costs it a little more. Rest, change whatever you need to, and go back.
+@@64hfz6
+Back with no loot and your clothes singed. Bad business, dear. Stop by my stall.
+@@11fjunu
+That dent in your armour is from a Rift. Bring it to me and I'll make it good as new.
+@@p0658g
+Dying teaches what victory hides. What knocked you down? Think about it before you go back.
+@@1qy9sf7
+If you keep dying I'll have to raise your prices. For the risk. Mine, not yours.
+@@1neszij
+The gods offer different blessings every time. If one combination doesn't work, try another.
+@@1gvs314
+A refined weapon holds up where a new one won't. The forge is open.
+@@141mqf4
+The Locksmith will laugh tonight. Let him laugh: tomorrow you'll be back.
+@@1xqu8vp
+I saved you some broth. It's not free, but it's hot.
+@@x298co
+A Guardian is not just another monster: when you see the red «!», get out of the way. And if you break its Break bar, it will be stunned.
+@@4toxdb
+Against a boss, your weapon matters more than your courage. Refine it before you try again.
+@@or7irr
+Bosses change when they reach half their health. Save your ultimate for that moment.
+@@v9zrdj
+That Rift again, eh? Give me your weapon. I'll sharpen it for free, and Brunilda will slip some food into your bag.
+@@18zi7td
+Not for free. …Well, this time, yes. Don't tell anyone.
+@@1w2gkk5
+You again. I love it: every time you fall, my locks give a little more.
+@@a8qv7x
+Back already? The light of Candela is stubborn. Just like Ivo.
+@@1szegu2
+I watched you fall. You can see everything from here.
+@@17xd0sf
+My creatures remember your scent. Today they're waiting for you.
+@@16j2pbi
+Every time you die, the Portal takes longer to bring you back. Haven't you noticed?
+@@102sdkb
+Village's Courage
+@@11pfwic
++${m * 10}% damage and health in that Rift until you clear it
+@@qpbbuo
+The fire… is going out. I smell new leaves under the ash. Thank you, little light.
+@@jswj3w
+My children… are finally sleeping peacefully. The water is clean again.
+@@sanpng
+The cold no longer burns. I hadn't felt the sun in three hundred years.
+@@pyb5tu
+This time… I'll be reborn as I was. Thank you for breaking the wheel.
+@@12fu507
+{hero}… thank you. Tell Ivo his master is proud of him.
+@@159ajvf
+Tell my brother… that I'm not cold anymore. That the boat made it to harbour.
+@@sk3lf1
+The forest is wilting again… and it's beautiful. I had forgotten.
+@@1uetgkn
+Rift
+@@pay9pg
+Rifts
+@@2lzzxp
+✦ <b>Village's Courage</b>: more damage and health in ${mercy} ${mercy === 1 ? 'Rift' : 'Rifts'} where you fell
