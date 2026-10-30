@@ -1,11 +1,11 @@
 /* Fendaria — calidad de vida.
  *  · Ajustes (pausa y barra de la villa): ataque automático, volumen de música y de efectos, temblor de
- *    pantalla, números de daño, botones grandes, texto grande, vibración y venta automática con la bolsa llena.
+ *    pantalla, cámara de las Grietas, números de daño, botones grandes, texto grande, vibración y venta automática con la bolsa llena.
  *  · Al vencer al Guardián, el botín que queda en el suelo vuela hacia ti.
  */
 'use strict';
 
-const OPT_DEF = { autoAtk: false, music: 0.8, sfx: 0.9, shake: 1, dmgNums: 'all', bigBtns: false, bigText: false, autoSell: true };
+const OPT_DEF = { autoAtk: false, music: 0.8, sfx: 0.9, shake: 1, dmgNums: 'all', bigBtns: false, bigText: false, cam: 'media', autoSell: true };
 const OPT = () => (SAVE.opt = Object.assign({}, OPT_DEF, SAVE.opt || {}));
 let TXT_BIG = false, TXT_HUD = false; // texto grande (se copia de OPT en applyOptions: text() se llama cientos de veces por fotograma)
 
@@ -25,6 +25,7 @@ document.body.insertAdjacentHTML('beforeend', `<div id="optPanel" class="run-pic
     <button id="optClose" class="rp-opt go" type="button"><i>✔</i><span><b>Done</b></span></button>
   </div>
 </div>`);
+document.querySelector('#optPanel [data-o="shake"]').closest('label').insertAdjacentHTML('afterend', "<label class=\"opt-row\"><span><b>Camera in the Rifts</b><small>How much of the world you see around your hero</small></span><select data-o=\"cam\"><option value=\"cerca\">Close</option><option value=\"media\">Medium</option><option value=\"lejos\">Far</option></select></label>");
 document.querySelector('#optPanel [data-o="bigBtns"]').closest('label').insertAdjacentHTML('afterend', "<label class=\"opt-row\"><span><b>Large text</b><small>Health, energy, buttons and combat panels easier to read</small></span><input type=\"checkbox\" data-o=\"bigText\"></label>");
 let optPrev = null;
 function openOptions() {
@@ -59,6 +60,7 @@ function applyOptions() {
   MUSIC.vol = 0.55 * o.music; MUSIC.setDuck(MUSIC.duck);
   if (SFX.sfxGain) SFX.sfxGain.gain.value = 0.9 * o.sfx;
   TXT_BIG = !!o.bigText;
+  if (typeof setView === 'function' && scene === 'rift') setView('rift'); // cambiar la cámara dentro de la Grieta se ve al momento
 }
 document.querySelector('#pause #btnMute').insertAdjacentHTML('beforebegin', "<button id=\"btnOpts\" class=\"btn\">⚙ Settings</button>");
 $('btnOpts').addEventListener('click', openOptions);

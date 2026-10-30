@@ -20,3 +20,5 @@
 Sold: ${old.name} (+${old.value || 0})
 @@1o0j79u
 <label class="opt-row"><span><b>Large text</b><small>Health, energy, buttons and combat panels easier to read</small></span><input type="checkbox" data-o="bigText"></label>
+@@1aotccc
+<label class="opt-row"><span><b>Camera in the Rifts</b><small>How much of the world you see around your hero</small></span><select data-o="cam"><option value="cerca">Close</option><option value="media">Medium</option><option value="lejos">Far</option></select></label>

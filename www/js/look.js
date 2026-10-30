@@ -9,9 +9,11 @@
 // ============================================================
 // Cámara por escena
 // ============================================================
-const VIEW_UNITS = { hub: 560, rift: 460 }; // en las Grietas algo más cerca que en la villa, sin que el héroe quede pegado a la pantalla (antes 380)
+const VIEW_UNITS = { hub: 560, rift: 560 };
+// distancia de la cámara en las Grietas (Ajustes → Cámara en las Grietas); por defecto, la misma que en la villa
+const RIFT_CAM = { cerca: 460, media: 560, lejos: 640 };
 function setView(kind) {
-  const u = VIEW_UNITS[kind];
+  const u = kind === 'rift' ? RIFT_CAM[(typeof OPT === 'function' && OPT().cam) || 'media'] || VIEW_UNITS.rift : VIEW_UNITS[kind];
   if (VIEW.units === u) return;
   VIEW.units = u;
   resize();

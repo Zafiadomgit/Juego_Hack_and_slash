@@ -102,6 +102,7 @@ Hecho con las skills `game-feel` y `game-ui-ux`. Todo está en español y en ing
 - [x] Ajustes → **Texto grande**: textos del HUD y de los botones un 20% más grandes
 - [x] ~~Botones de los menús que se hunden al tocar y vuelven con rebote~~ — quitado tras probar en el APK (no quedó bien); vuelve el hundido sutil de antes
 - [x] Cámara de la Grieta más alejada (`look.js`, 380 → 460 unidades): el héroe ya no se ve tan grande ni pegado a la pantalla
+- [x] 460 seguía viéndose pegado: ahora por defecto 560 (como la villa) y **Ajustes → Cámara en las Grietas**: Cerca 460 · Media 560 · Lejos 640
 - [x] Rareza también por forma en la bolsa (Raro ◆, Épico ✦, Legendario ★), no solo por color
 **Revisar en el APK**
 - [ ] Girar el móvil a los dos lados: nada bajo la cámara; los botones responden donde se ven
