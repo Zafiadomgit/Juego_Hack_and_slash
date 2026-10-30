@@ -1,0 +1,7 @@
+# Saltos de línea LF en todo el proyecto, también en Windows.
+# tools/i18n calcula la huella de cada texto con LF: con CRLF la versión inglesa perdía traducciones.
+* text=auto eol=lf
+
+# Los scripts de Windows necesitan CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
