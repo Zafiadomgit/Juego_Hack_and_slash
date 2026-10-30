@@ -92,7 +92,8 @@ Hecho con las skills `game-feel` y `game-ui-ux`. Todo está en español y en ing
 - [x] Avisos de botín en una columna a la izquierda con el color y la forma de su rareza (en vez del nombre flotando sobre el héroe)
 **Interfaz y menús** (`qol.js`, `ui.css`)
 - [x] Ajustes → **Texto grande**: textos del HUD y de los botones un 20% más grandes
-- [x] Botones de los menús que se hunden al tocar y vuelven con rebote (respeta «reducir movimiento» del sistema)
+- [x] ~~Botones de los menús que se hunden al tocar y vuelven con rebote~~ — quitado tras probar en el APK (no quedó bien); vuelve el hundido sutil de antes
+- [x] Cámara de la Grieta más alejada (`look.js`, 380 → 460 unidades): el héroe ya no se ve tan grande ni pegado a la pantalla
 - [x] Rareza también por forma en la bolsa (Raro ◆, Épico ✦, Legendario ★), no solo por color
 **Revisar en el APK**
 - [ ] Girar el móvil a los dos lados: nada bajo la cámara; los botones responden donde se ven

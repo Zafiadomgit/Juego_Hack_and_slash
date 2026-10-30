@@ -279,10 +279,6 @@ button.gem.got { filter: drop-shadow(0 0 6px var(--c)); }
 /* héroes del juego completo */
 #classList button.pw-lock img { filter: grayscale(.85) brightness(.6); }
 #classList button.pw-lock small { color: #ffd76a; }
-/* botones que se hunden al tocar y vuelven con un pequeño rebote */
-.btn, .rp-opt, .hbtn, .dbar .db-slot, .card { transition: transform .24s cubic-bezier(.34, 1.56, .64, 1), filter .15s, box-shadow .15s, background .1s, border-color .1s; }
-.btn:active:not(:disabled), .rp-opt:active, .hbtn:active, .dbar .db-slot:active, .card:active { transform: scale(.94); filter: brightness(1.15); transition-duration: .05s; }
-@media (prefers-reduced-motion: reduce) { .btn, .rp-opt, .hbtn, .dbar .db-slot, .card { transition-duration: .01s; } }
 /* rareza también por forma (no solo por color): Raro ◆, Épico ✦, Legendario ★ */
 .cell.r1::before, .cell.r2::before, .cell.r3::before { position: absolute; left: 3px; top: 1px; font: 900 10px Garamond, Georgia, serif; text-shadow: 0 1px 2px #000; pointer-events: none; }
 .cell.r1::before { content: '◆'; color: #4fb4f0; }
