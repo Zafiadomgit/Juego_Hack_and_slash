@@ -2114,7 +2114,7 @@ function drawHUD() {
 
   // jefe
   if (bossRef && !bossRef.dead) {
-    const w = Math.min(W * 0.34, 300 * s), x = W / 2 - w / 2, y = pad + 18 * s;
+    const w = Math.min(W * 0.34, 300 * s), x = W / 2 - w / 2, y = padT + 18 * s;
     const bk = Math.max(0, bossRef.hp / bossRef.maxHp);
     bossRef._lag = bossRef._lag === undefined || bossRef._lag < bk ? bk : Math.max(bk, bossRef._lag - 0.003);
     hudPlate(x - 14 * s, y - 16 * s, w + 28 * s, 36 * s, 8 * s);
