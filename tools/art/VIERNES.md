@@ -74,6 +74,36 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
 - [ ] Gráfico destacado 1024×500 nuevo (es/en) e icono 512 nuevo (ver 6b)
 - [ ] Sustituirlas en Play Console (ficha principal + traducción en inglés) antes de producción
 
+## 8. HUD, interfaz y sensación de combate (sin créditos) — hecho el 30-oct, falta probar en el APK
+Hecho con las skills `game-feel` y `game-ui-ux`. Todo está en español y en inglés (versión inglesa regenerada).
+**Sensación de combate** (`feel.js`, `game.js`, `art.js`)
+- [x] Temblor de cámara suave (ondas, no saltos al azar) que pega fuerte y se apaga rápido; respeta Ajustes → Temblor
+- [x] Monstruo golpeado: se aplasta y vuelve poco a poco con un pequeño rebote
+- [x] Remate de monstruo normal con micro-pausa (22 ms) y temblor mínimo; élite con pausa de 50 ms y más temblor
+- [x] Quitada la pausa y el temblor duplicados del crítico
+**HUD de combate** (`game.js`, `feel.js`)
+- [x] HUD fuera de la muesca de la cámara: vida, panel de la Grieta, radar, racha, barra del jefe, botones de combate, pausa y bolsa
+- [x] Botón que queda listo (habilidades, esquiva, definitiva): crece, se asienta y suelta un anillo de luz
+- [x] Habilidades en recarga muestran los segundos que faltan (si queda más de 1 s)
+- [x] Habilidad sin energía: los cristales de EN tiemblan y se ponen rojos, con una vibración corta
+- [x] Barra de vida: destello blanco al recibir un golpe, tramo curado en verde y tramo perdido que baja igual a 30 y a 60 FPS
+- [x] Flechas en el borde hacia el Guardián (☠), el cofre (◆), el Duende Dorado (★), las Gemas y el botín Épico/Legendario (⬥) fuera de la pantalla; máximo 4
+- [x] Barra del Guardián con la marca de la furia al 50% y nombre más grande (14 px)
+- [x] Avisos de botín en una columna a la izquierda con el color y la forma de su rareza (en vez del nombre flotando sobre el héroe)
+**Interfaz y menús** (`qol.js`, `ui.css`)
+- [x] Ajustes → **Texto grande**: textos del HUD y de los botones un 20% más grandes
+- [x] Botones de los menús que se hunden al tocar y vuelven con rebote (respeta «reducir movimiento» del sistema)
+- [x] Rareza también por forma en la bolsa (Raro ◆, Épico ✦, Legendario ★), no solo por color
+**Revisar en el APK**
+- [ ] Girar el móvil a los dos lados: nada bajo la cámara; los botones responden donde se ven
+- [ ] El pop de los botones no molesta al encadenar habilidades; los segundos se leen bien
+- [ ] Las flechas del borde no estorban junto a los botones de abajo a la derecha; en Difícil no salen demasiadas
+- [ ] La columna de botín no tapa el joystick ni el texto de racha
+- [ ] Ajustes → Texto grande: nada se sale de su placa
+**Ideas para después**
+- [ ] Rareza por forma también en las ranuras del equipo puesto (hoy solo en la bolsa)
+- [ ] Texto grande también en los menús HTML (hoy solo el HUD del canvas)
+
 ## Presupuesto (≈ 4000 créditos)
 | Bloque | Créditos |
 |---|---|

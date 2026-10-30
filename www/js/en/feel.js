@@ -4,6 +4,9 @@
  *  · Números de daño agrupados: los golpes seguidos sobre el mismo enemigo suman en un solo número.
  *  · «!» sobre el monstruo que prepara un ataque fuerte.
  *  · Con poca vida: viñeta roja con latido.
+ *  · Botín recogido: aviso en una columna a la izquierda con el color y la forma de su rareza.
+ *  · Botones de combate: pop al quedar listos, segundos de recarga y aviso de falta de energía.
+ *  · Flechas en el borde hacia el Guardián, el cofre, el duende y el botín épico o mejor fuera de la pantalla.
  */
 'use strict';
 
@@ -62,6 +65,30 @@ dash = function () {
   const was = P.dashT;
   _dashFeel();
   if (P.dashT > 0 && was <= 0) buzz('dash', 8, 0.15);
+};
+
+// ---------- avisos de botín: columna a la izquierda en vez del nombre flotando sobre el héroe ----------
+const RAR_MARK = ['●', '◆', '✦', '★'];
+document.body.insertAdjacentHTML('beforeend', '<div id="lootFeed" class="loot-feed"></div>');
+function lootFeed(it) {
+  const box = $('lootFeed'), row = document.createElement('div');
+  row.className = 'lf'; row.style.setProperty('--rc', RARITY[it.rarity].color);
+  const mark = document.createElement('i'); mark.textContent = RAR_MARK[it.rarity] || '●';
+  row.append(mark, document.createTextNode(it.name));
+  box.append(row);
+  while (box.children.length > 5) box.firstChild.remove();
+  setTimeout(() => row.classList.add('out'), 3200);
+  setTimeout(() => row.remove(), 3650);
+}
+const _collectFeel = collect;
+collect = function (k) {
+  const n0 = texts.length, had = k.type === 'item' && S.bag.includes(k.item);
+  const r = _collectFeel(k);
+  if (k.type === 'item' && !had && S.bag.includes(k.item)) {
+    for (let i = texts.length - 1; i >= n0; i--) if (texts[i].txt === k.item.name) texts.splice(i, 1);
+    lootFeed(k.item);
+  }
+  return r;
 };
 
 // ---------- habilidad sin energía ----------
