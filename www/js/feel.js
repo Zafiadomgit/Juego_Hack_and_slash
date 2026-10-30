@@ -64,6 +64,42 @@ dash = function () {
   if (P.dashT > 0 && was <= 0) buzz('dash', 8, 0.15);
 };
 
+// ---------- habilidad sin energía ----------
+const _useSkillFeel = useSkill;
+useSkill = function (i) {
+  const sk = P.C.skills[i];
+  if (sk && P.skillCd[i] <= 0 && P.pa < sk.cost && !P.lock && !P.jump && !P.cast) { P._paFailAt = now; buzz('nopa', 15, 0.3); }
+  return _useSkillFeel(i);
+};
+
+// ---------- botones: pop al quedar listos y segundos de recarga ----------
+const BTN_FX = {};
+const _combatButtonFeel = combatButton;
+combatButton = function (b, label, sub, color, cdk, enabled, held, subColor) {
+  const key = Math.round(b.x) + ',' + Math.round(b.y), fx = BTN_FX[key] || (BTN_FX[key] = { cd: cdk, at: -9 });
+  if (fx.cd > 0 && cdk <= 0) fx.at = now;
+  fx.cd = cdk;
+  const k = (now - fx.at) / 0.35;
+  if (k >= 0 && k < 1) {
+    const sc = 1 + Math.sin(k * Math.PI) * 0.16 * (1 - k * 0.5); // crece y se asienta
+    ctx.save(); ctx.translate(b.x, b.y); ctx.scale(sc, sc); ctx.translate(-b.x, -b.y);
+    _combatButtonFeel(b, label, sub, color, cdk, enabled, held, subColor);
+    ctx.restore();
+    ctx.save(); ctx.globalAlpha = 1 - k; ctx.strokeStyle = '#fff6d0'; ctx.lineWidth = 3 * ui * (1 - k);
+    ctx.beginPath(); ctx.arc(b.x, b.y, b.r * (1 + k * 0.45), 0, TAU); ctx.stroke(); ctx.restore();
+  } else _combatButtonFeel(b, label, sub, color, cdk, enabled, held, subColor);
+  // segundos que faltan en las habilidades (con más de 1 s de recarga)
+  if (cdk > 0 && P && scene === 'rift') {
+    const L = buttonLayout();
+    for (let i = 0; i < 3; i++) {
+      const sb = L['s' + i];
+      if (!sb || Math.abs(sb.x - b.x) > 1 || Math.abs(sb.y - b.y) > 1) continue;
+      const left = P.skillCd[i];
+      if (left > 1) text(String(Math.ceil(left)), b.x, b.y - (sub ? 3 * ui : 0), b.r * 0.62, '#fff', 'center', 900, true);
+    }
+  }
+};
+
 // ---------- aviso de ataque fuerte ----------
 const WIND_STATES = { wind: 1, leap: 1, summon: 1, web: 1, volley: 1 };
 const _drawEnemyFeel = drawEnemy;

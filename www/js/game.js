@@ -2030,23 +2030,34 @@ function drawHUD() {
   const bx = px + 34 * s, bw = hbw, bh = 16 * s;
   let by = padT + 8 * s;
   const hpk = Math.max(0, P.hp / P.maxHp);
-  P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.0045);
+  // el tramo perdido se vacía por tiempo (no por fotograma: a 30 FPS iba a la mitad de rápido)
+  const hdt = clamp(now - (P._hpT || now), 0, 0.1); P._hpT = now;
+  const hp0 = P._hpPrev === undefined ? hpk : P._hpPrev; P._hpPrev = hpk;
+  if (hpk < hp0 - 0.002) P._hpHitAt = now;
+  if (hpk > hp0 + 0.002) { if (!(now - P._healAt < 0.6)) P._healFrom = hp0; P._healAt = now; }
+  P._hpLag = P._hpLag === undefined || P._hpLag < hpk ? hpk : Math.max(hpk, P._hpLag - 0.27 * hdt);
   const low = hpk < 0.3, pulse = low ? 0.5 + 0.5 * Math.sin(now * 8) : 0;
   fancyBar(bx, by, bw, bh, hpk, low ? `rgb(255,${90 + pulse * 60 | 0},80)` : '#ff6a55', low ? '#a00018' : '#b3201c', P._hpLag, 10);
+  // golpe: destello blanco; curación: el tramo ganado brilla en verde
+  { const iw = bw - 4, ih = bh - 4, ht = now - (P._hpHitAt || -9), ct = now - (P._healAt || -9);
+    if (ht < 0.15) roundRect(bx + 2, by + 2, Math.max(ih, iw * hpk), ih, ih / 2, `rgba(255,255,255,${0.6 * (1 - ht / 0.15)})`);
+    if (ct < 0.6 && hpk > P._healFrom) roundRect(bx + 2 + iw * P._healFrom, by + 2, iw * (hpk - P._healFrom), ih, ih / 2, `rgba(140,255,150,${0.75 * (1 - ct / 0.6)})`); }
   if (P.shield > 0) roundRect(bx + 2, by + 2, Math.min(bw - 4, (bw - 4) * (P.shield / P.maxHp)), (bh - 4) / 2, 3, 'rgba(150,220,255,0.9)');
   drawHeart(bx + 2 * s, by + bh / 2, 10 * s, '#ff5a4a');
   text(Math.ceil(P.hp) + ' / ' + P.maxHp, bx + bw / 2 + 4 * s, by + bh / 2 + 1, 11 * s, '#fff', 'center', 800);
 
   // PA y PM
   by += bh + 6 * s;
+  // sin energía para la habilidad que tocaste: los cristales tiemblan y se ven rojos un momento
+  const paFail = P._paFailAt ? clamp(1 - (now - P._paFailAt) / 0.45, 0, 1) : 0, pjx = paFail ? Math.sin(now * 70) * 3 * s * paFail : 0;
   for (let i = 0; i < P.maxPa; i++) {
-    const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
-    drawCrystal(cx, cy, 8.5 * s, 'rgba(0,0,0,0.6)');
+    const cx = bx + 9 * s + i * 17 * s + pjx, cy = by + 8 * s;
+    drawCrystal(cx, cy, 8.5 * s, paFail ? `rgba(${120 + 135 * paFail | 0},20,20,0.75)` : 'rgba(0,0,0,0.6)');
     const fillK = clamp(P.pa - i, 0, 1);
     if (fillK >= 1) { drawCrystal(cx, cy, 7 * s, '#4fd2ff', 'rgba(80,200,255,0.9)'); drawCrystal(cx - 1.2 * s, cy - 2 * s, 2.6 * s, 'rgba(255,255,255,0.75)'); }
     else if (fillK > 0) drawCrystal(cx, cy, 7 * s * (0.35 + fillK * 0.65), '#1e6fa8');
   }
-  text('EN', bx + 9 * s + P.maxPa * 17 * s, by + 8 * s, 10 * s, '#81d4fa', 'left', 900);
+  text('EN', bx + 9 * s + P.maxPa * 17 * s + pjx, by + 8 * s, 10 * s, paFail ? '#ff6a5a' : '#81d4fa', 'left', 900);
   by += 18 * s;
   for (let i = 0; i < P.maxPm; i++) {
     const cx = bx + 9 * s + i * 17 * s, cy = by + 8 * s;
