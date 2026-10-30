@@ -157,6 +157,12 @@
       "skillPath": "skills/remotion-to-hyperframes/SKILL.md",
       "computedHash": "17c26590575d28118b783f6a534288ac38df50fae5b95826ee9d4976328ad687"
     },
+    "roguelike": {
+      "source": "gamedev-skills/awesome-gamedev-agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/genres/roguelike/SKILL.md",
+      "computedHash": "b2346c182ea42aae739d62207f9fb1641c5a1af185f2f1812f8b498949bd4c8b"
+    },
     "rpg": {
       "source": "gamedev-skills/awesome-gamedev-agent-skills",
       "sourceType": "github",
