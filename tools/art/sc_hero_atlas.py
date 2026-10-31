@@ -28,7 +28,7 @@ ys, xs = np.nonzero(ref[ground - 10:ground])
 cx = float(xs.mean()) if len(xs) else ref.shape[1] / 2
 idle_h = ground - int(np.nonzero(ref)[0].min())
 
-W = 1024; x = y = row = 0; placed = []; table = {'bh': idle_h}
+W = 1024; x = y = row = 0; placed = []; table = {'bh': 136}  # 136 = alto de un héroe normal: los más grandes (Brann) se ven más altos
 for pose, fs in poses.items():
     table[pose] = []
     for f in fs:

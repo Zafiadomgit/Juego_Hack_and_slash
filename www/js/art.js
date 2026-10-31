@@ -117,7 +117,7 @@ function heroAnimFrame(cls, pose, f) {
 }
 // Elige pose y fotograma según lo que hace el héroe
 // fotograma de la hoja de ataque en el que sale el disparo (el proyectil nace en ese instante)
-const SHOT_RELEASE = { cra: 4, feca: 1, artificiera: 2, sombra: 2 };
+const SHOT_RELEASE = { cra: 5, feca: 4, artificiera: 4 }; // fotograma de la hoja de ataque en que sale el proyectil (arte SpriteCook)
 function heroAnimPose(cls, o) {
   const A = HERO_ANIM[cls], n = A.attack.length;
   if (o.hurt > 0) return ['hurt', 0];

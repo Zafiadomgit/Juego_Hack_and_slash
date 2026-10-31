@@ -12,7 +12,11 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 - [x] Kara animada (31-oct, ≈ 150 créditos): base girada a la derecha + reposo 8, caminar 7 (pixel-engine-v1.5: de perfil y con zancada larga; la v1.1 salía de frente y corta), ataque 8 con media luna roja, golpe 2 → `sc_out/kara_anim.gif`
 - [x] En el juego (`www/img/heroes/anim/iop.webp`, `HERO_ANIM.iop`, `tools/art/sc_hero_atlas.py`): camina a ambos lados y 4 ataques seguidos sin errores
 - [x] Kara completa (≈ 80 créditos más): deslizar 5, ataque 2 (tajo de vuelta), lanzar 8 y muerte 8. Motor (`heroes.js`): poses `attack2`, `dash` y `death` (se usan solas si el atlas las tiene)
-- [ ] Revisar en el móvil · retrato `px/iop.png` sigue siendo el viejo (cambiarlo junto con `HERO_FACE`)
+- [x] **Los 7 héroes en el estilo nuevo dentro del juego** (31-oct, ≈ 1150 créditos los otros 6): reposo 8, caminar 7, deslizar 5, ataque 8,
+      ataque 2 8, lanzar 8, golpe 2, muerte 8. Disparo en el fotograma correcto (`SHOT_RELEASE`: Teo 5, Elara 4, Brina 4). Todos con `bh` 136: Brann se ve más alto
+      Probado en Chrome: los 7 caminan a ambos lados, deslizan, atacan (los cuerpo a cuerpo alternan ataque y ataque 2) y lanzan sin errores → `sc_out/heroes_anim.gif`
+- [ ] Revisar en el móvil · Elara camina casi de frente · el lobezno de Ayla se emborrona en algunos pasos
+- [ ] Retratos `px/<clase>.png` siguen siendo los viejos (cambiarlos junto con `HERO_FACE`; también tarjetas del menú)
 
 ## 1. Héroes (≈ 810 créditos) — 7 héroes, cada uno con:
 - [ ] Sprite base nuevo (Kara, Teo, Elara, **Nyx con el nuevo diseño**, Ayla, Brina, Brann)
