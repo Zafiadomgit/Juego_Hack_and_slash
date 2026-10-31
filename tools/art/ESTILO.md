@@ -11,6 +11,9 @@ Es la referencia de TODO el juego: héroes, vecinos, villanos, monstruos y jefes
 ≈ 24–32 créditos por imagen. Pedir `size` 128 (96 para monstruos pequeños).
 **Tamaño de píxel igual en todo:** héroe ≈ 124 px de alto. Si un sprite sale más grande (p. ej. 250 px, pixelado más fino),
 reducirlo con `python3 tools/art/sc_norm.py in.png out.png 2` (gratis). Pedir «small sprite» en el prompt NO sirve: sale de 32 px.
+**Si sale diminuto (≈32 px)**: el procesado de pixel art de SpriteCook calculó mal el píxel. La imagen buena está en
+`raw_url` (`get_asset_metadata` con `verbose: true`, 1024 px): bajarla y reducirla con `sc_norm.py in.png out.png h136` (gratis).
+No repetir la generación (vuelve a pasar y se paga otra vez).
 **No usar el sprite viejo como referencia**: arrastra el estilo antiguo. `pixel-engine-image-v1` sale chibi pero con menos calidad de pixelado.
 
 ## El estilo

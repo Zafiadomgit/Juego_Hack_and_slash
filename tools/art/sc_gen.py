@@ -1,5 +1,5 @@
 """Genera sprites en el estilo elegido (Kara 6) con SpriteCook. Lanza varios trabajos a la vez y los descarga.
-Uso: python3 tools/art/sc_gen.py lote.json   (lista de {name, prompt, ref?, size?, variations?})
+Uso: python3 tools/art/sc_gen.py lote.json   (lista de {name, prompt, ref?, edit?, size?, variations?})
 Salida: tools/art/sc_out/<name>_<n>.png y los asset_id añadidos a tools/art/sc_out/ASSETS.md
 """
 import json, os, sys, time, urllib.request
@@ -16,6 +16,7 @@ def one(job):
             'variations': job.get('variations', 1), 'pixel': True, 'bg_mode': 'transparent',
             'model': 'gpt-image-2.5-sunburst', 'style_asset_ids': STYLE, 'wait_seconds': 0}
     if job.get('ref'): args['reference_asset_id'] = job['ref']
+    if job.get('edit'): args['edit_asset_id'] = job['edit']; args['style_asset_ids'] = [job['edit']]; args['prompt'] = job['prompt']  # editar: sin sufijo
     r = sc.call('generate_game_art', args); r = r[0] if isinstance(r, list) else r
     jid = r['job_id']
     while r.get('status') not in ('succeeded', 'failed'):  # sondeo corto: las esperas largas las corta el proxy

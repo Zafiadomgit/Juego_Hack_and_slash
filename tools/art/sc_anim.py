@@ -37,10 +37,15 @@ def fetch(url, tries=5):
             time.sleep(5 * (i + 1))
 
 def one(job):
+    jp = os.path.join(OUT, job['name'] + '_job.json')
+    if os.path.exists(os.path.join(OUT, job['name'] + '_tira.png')) and not job.get('redo'): return job['name'], 'ya estaba', None, None
+    if not job.get('job_id') and os.path.exists(jp): job = dict(job, job_id=json.load(open(jp))['job_id'])  # ya lanzado antes
     if job.get('job_id'): r = {'job_id': job['job_id']}
     else: r = first(sc.call('animate_game_art', {'asset_id': job['asset_id'], 'prompt': job['prompt'], 'auto_enhance_prompt': False,
         'output_frames': job.get('frames', 8), 'model': job.get('model', 'pixel-engine-v1.1'), 'output_format': 'webp', 'wait_seconds': 0}))
     jid = r.get('job_id')
+    jp = os.path.join(OUT, job['name'] + '_job.json')
+    if not os.path.exists(jp): json.dump({'job_id': jid, 'status': 'submitted'}, open(jp, 'w'))  # para recogerlo si algo se corta
     while r.get('status') not in ('succeeded', 'completed', 'failed', 'error'):
         time.sleep(15); r = first(call('check_job_status', {'job_id': jid}))
     json.dump(r, open(os.path.join(OUT, job['name'] + '_job.json'), 'w'), indent=1)

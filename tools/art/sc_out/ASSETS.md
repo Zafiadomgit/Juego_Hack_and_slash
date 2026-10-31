@@ -45,3 +45,17 @@
 - elara_2.png (alto 189) → 80383e24-ff0a-44b3-9ad8-719ed61ab7eb
 - brann_2.png (alto 320) → 30a78522-7fd7-413d-8e9a-ad63ccfebb11
 - ayla_2.png (alto 32) → 376a1110-33c5-4df0-a81d-66d081fd4a01
+
+## heroes_der.json — gpt-image-2.5-sunburst, estilo Kara 6
+- nyx_der_1.png (242×242) → f42ce8a3-42fb-475f-b7ad-7ceb41f24eeb
+- teo_der_1.png (32×32) → 61a1d8b0-2788-4b77-8c58-268bca44e37f
+- elara_der_1.png (34×34) → 36f27ebd-413e-4406-a98a-df477df96840
+- ayla_der_1.png (32×32) → 326fbc66-a26e-41fb-8304-594fae3d50d3
+- brina_der_1.png (34×34) → 841060d8-fea5-4e30-8f6a-ac39f682f619
+- brann_der_1.png (236×236) → 1cd9654b-7398-4a5a-b738-c15102c6682a
+
+## heroes_der2.json — gpt-image-2.5-sunburst, estilo Kara 6
+- teo_der2_1.png (244×244) → a36f96d6-ad30-4464-ba71-ccf9e834f5f7
+- elara_der2_1.png (34×34) → b8a4e3e1-2634-492c-aa29-0ffe76aa553d
+- ayla_der2_1.png (32×32) → 6f69635c-752a-440d-9a28-6b541f0a74de
+- brina_der2_1.png (32×32) → de594ae9-181d-4b9b-a852-8638211b75bc
