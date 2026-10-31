@@ -16,7 +16,7 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
       ataque 2 8, lanzar 8, golpe 2, muerte 8. Disparo en el fotograma correcto (`SHOT_RELEASE`: Teo 5, Elara 4, Brina 4). Todos con `bh` 136: Brann se ve más alto
       Probado en Chrome: los 7 caminan a ambos lados, deslizan, atacan (los cuerpo a cuerpo alternan ataque y ataque 2) y lanzan sin errores → `sc_out/heroes_anim.gif`
 - [ ] Revisar en el móvil · Elara camina casi de frente · el lobezno de Ayla se emborrona en algunos pasos
-- [ ] Retratos `px/<clase>.png` siguen siendo los viejos (cambiarlos junto con `HERO_FACE`; también tarjetas del menú)
+- [x] Retratos `px/<clase>.png` nuevos (la base girada, al doble) y `HERO_FACE` ajustado (31-oct)
 
 ## 1. Héroes (≈ 810 créditos) — 7 héroes, cada uno con:
 - [ ] Sprite base nuevo (Kara, Teo, Elara, **Nyx con el nuevo diseño**, Ayla, Brina, Brann)

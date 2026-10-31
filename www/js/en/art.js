@@ -80,7 +80,7 @@ const HERO_ART = {};
   img.src = 'img/heroes/' + id + '.png';
 });
 // Centro de la cara [x, y, lado] en img/heroes/px/<clase>.png (retratos del HUD y de los diálogos)
-const HERO_FACE = { iop: [92, 88, 74], cra: [124, 58, 74], feca: [64, 96, 70], sombra: [113, 72, 78], domadora: [55, 58, 74], artificiera: [60, 60, 74], berserker: [118, 62, 84] };
+const HERO_FACE = { iop: [90, 55, 60], cra: [124, 68, 60], feca: [96, 88, 60], sombra: [94, 74, 60], domadora: [86, 62, 60], artificiera: [112, 70, 60], berserker: [116, 66, 66] };
 function heroFaceURL(cls, k = 1.9) {
   const img = HERO_PX[cls], f = HERO_FACE[cls];
   if (!img || !f) return null;
@@ -117,7 +117,7 @@ function heroAnimFrame(cls, pose, f) {
 }
 // Elige pose y fotograma según lo que hace el héroe
 // fotograma de la hoja de ataque en el que sale el disparo (el proyectil nace en ese instante)
-const SHOT_RELEASE = { cra: 4, feca: 1, artificiera: 2, sombra: 2 };
+const SHOT_RELEASE = { cra: 5, feca: 4, artificiera: 4 }; // fotograma de la hoja de ataque en que sale el proyectil (arte SpriteCook)
 function heroAnimPose(cls, o) {
   const A = HERO_ANIM[cls], n = A.attack.length;
   if (o.hurt > 0) return ['hurt', 0];
