@@ -29,3 +29,7 @@
 ## prueba_coherencia2.json — gpt-image-2.5-sunburst, estilo Kara 6
 - brujo2_1.png (32×32) → a8502266-3771-4510-be01-9b4470cacc13
 - jabali2_1.png (30×30) → c82d1de0-b683-46c7-83ef-40d59048c243
+
+## Kara 6 girada a la derecha (base para animar)
+- kara_der_1.png (136×136) → 7c81fe91-23da-4bd7-ac5e-c77660238037
+- kara_der_2.png (32×32) → 7cb223b7-9a13-446e-aef8-27f875b706a8

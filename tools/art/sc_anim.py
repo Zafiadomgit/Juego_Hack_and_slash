@@ -1,0 +1,43 @@
+"""Lanza animaciones de SpriteCook a la vez, espera a que terminen y descarga las tiras.
+Uso: python3 tools/art/sc_anim.py lote.json   (lista de {name, asset_id, prompt, frames?, model?})
+Salida: tools/art/sc_out/<name>.webp (animada) y <name>_tira.png (fotogramas en fila); asset_id en ASSETS.md
+"""
+import json, os, sys, time, urllib.request
+from concurrent.futures import ThreadPoolExecutor
+from PIL import Image
+sys.path.insert(0, os.path.dirname(__file__))
+import spritecook as sc
+OUT = os.path.join(os.path.dirname(__file__), 'sc_out')
+
+def first(r): return r[0] if isinstance(r, list) else r
+
+def urls(o, acc):
+    if isinstance(o, dict):
+        for k, v in o.items():
+            if isinstance(v, str) and v.startswith('http') and ('url' in k): acc.append((k, v))
+            else: urls(v, acc)
+    elif isinstance(o, list):
+        for v in o: urls(v, acc)
+    return acc
+
+def one(job):
+    r = first(sc.call('animate_game_art', {'asset_id': job['asset_id'], 'prompt': job['prompt'], 'auto_enhance_prompt': False,
+        'output_frames': job.get('frames', 8), 'model': job.get('model', 'pixel-engine-v1.1'), 'output_format': 'webp', 'wait_seconds': 90}))
+    jid = r.get('job_id')
+    while r.get('status') not in ('succeeded', 'completed', 'failed', 'error'):
+        time.sleep(15); r = first(sc.call('check_job_status', {'job_id': jid}))
+    json.dump(r, open(os.path.join(OUT, job['name'] + '_job.json'), 'w'), indent=1)
+    if r.get('status') in ('failed', 'error'): return job['name'], r.get('status'), r.get('error'), None
+    u = [v for k, v in urls(r, []) if 'webp' in v or 'sprite' in k or 'url' == k] or [v for _, v in urls(r, [])]
+    p = os.path.join(OUT, job['name'] + '.webp'); open(p, 'wb').write(urllib.request.urlopen(u[0]).read())
+    im = Image.open(p); fr = []
+    for i in range(getattr(im, 'n_frames', 1)): im.seek(i); fr.append(im.convert('RGBA').copy())
+    strip = Image.new('RGBA', (fr[0].width * len(fr), fr[0].height))
+    for i, f in enumerate(fr): strip.alpha_composite(f, (i * f.width, 0))
+    strip.save(os.path.join(OUT, job['name'] + '_tira.png'))
+    return job['name'], r.get('status'), r.get('credits_used'), len(fr)
+
+if __name__ == '__main__':
+    sc.rpc('initialize', {'protocolVersion': '2025-03-26', 'capabilities': {}, 'clientInfo': {'name': 'fendaria', 'version': '1'}})
+    with ThreadPoolExecutor(5) as ex: res = list(ex.map(one, json.load(open(sys.argv[1]))))
+    for x in res: print(*x)

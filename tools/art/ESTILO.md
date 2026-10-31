@@ -128,3 +128,8 @@ Reglas para TODOS los monstruos:
   **que se vean bien manda** (pedido del usuario).
 - Tamaño acorde a lo que son, según `MON_SIZE` (look.js): pequeños ~55–70, medianos ~85–95, gólems ~115 (héroe 104).
 - Caminar 8 fotogramas con saltitos y balanceo (como el brujo), golpe 3, muerte 6.
+
+## Animar (probado con Kara, 31-oct)
+1. Base girada a la derecha: editar la imagen elegida (`edit_asset_id`) pidiendo vista de tres cuartos; si sale mirando a la izquierda, voltearla (gratis) y subirla con `sc_upload.py`.
+2. `python3 tools/art/sc_anim.py lote.json` (20 créditos por animación). **Caminar con `pixel-engine-v1.5`** (de perfil, zancada larga; su primer fotograma es el giro: no usarlo). Reposo, ataque y golpe con la v1.1 por defecto.
+3. `python3 tools/art/sc_hero_atlas.py ID idle=… walk=…:1,2,3,4,5,6,7 attack=… hurt=…:0,1` → atlas y `HERO_ANIM` sin reescalar.
