@@ -2,7 +2,7 @@
 Uso: python3 tools/art/sc_gen.py lote.json   (lista de {name, prompt, ref?, size?, variations?})
 Salida: tools/art/sc_out/<name>_<n>.png y los asset_id añadidos a tools/art/sc_out/ASSETS.md
 """
-import json, os, sys, urllib.request
+import json, os, sys, time, urllib.request
 from concurrent.futures import ThreadPoolExecutor
 sys.path.insert(0, os.path.dirname(__file__))
 import spritecook as sc
@@ -14,11 +14,14 @@ OUT = os.path.join(os.path.dirname(__file__), 'sc_out')
 def one(job):
     args = {'prompt': job['prompt'] + SUFFIX, 'width': job.get('size', 128), 'height': job.get('size', 128),
             'variations': job.get('variations', 1), 'pixel': True, 'bg_mode': 'transparent',
-            'model': 'gpt-image-2.5-sunburst', 'style_asset_ids': STYLE, 'wait_seconds': 90}
+            'model': 'gpt-image-2.5-sunburst', 'style_asset_ids': STYLE, 'wait_seconds': 0}
     if job.get('ref'): args['reference_asset_id'] = job['ref']
     r = sc.call('generate_game_art', args); r = r[0] if isinstance(r, list) else r
-    while r.get('status') not in ('succeeded', 'failed'):
-        r = sc.call('check_job_status', {'job_id': r['job_id'], 'wait_seconds': 60}); r = r[0] if isinstance(r, list) else r
+    jid = r['job_id']
+    while r.get('status') not in ('succeeded', 'failed'):  # sondeo corto: las esperas largas las corta el proxy
+        time.sleep(10)
+        try: r = sc.call('check_job_status', {'job_id': jid}); r = r[0] if isinstance(r, list) else r
+        except Exception: pass
     lines = []
     for i, a in enumerate(r.get('assets', []), 1):
         p = f"{job['name']}_{i}.png"; open(os.path.join(OUT, p), 'wb').write(urllib.request.urlopen(a['sprite_url']).read())

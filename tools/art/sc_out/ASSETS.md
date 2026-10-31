@@ -33,3 +33,15 @@
 ## Kara 6 girada a la derecha (base para animar)
 - kara_der_1.png (136×136) → 7c81fe91-23da-4bd7-ac5e-c77660238037
 - kara_der_2.png (32×32) → 7cb223b7-9a13-446e-aef8-27f875b706a8
+
+## heroes_base.json — bases de los 5 héroes (31-oct)
+- teo_1.png (alto 126) → 024da1f9-7f24-4057-84dd-68ce46840ddd
+- brina_1.png (alto 251) → daf01d2a-9257-476a-a685-6d21baa5c780
+- ayla_1.png (alto 240) → a8583263-c43d-42df-853c-dc01445f3928
+- elara_1.png (alto 327) → d3150eb8-b29d-436d-99c3-784046bbde2c
+- teo_2.png (alto 201) → 377c8795-2845-4322-a809-e627f4507745
+- brina_2.png (alto 251) → 9eab865c-49f2-4545-b289-5a29dca25e45
+- brann_1.png (alto 241) → edda3a6d-ffcc-4d2b-809c-c7620708d0d9
+- elara_2.png (alto 189) → 80383e24-ff0a-44b3-9ad8-719ed61ab7eb
+- brann_2.png (alto 320) → 30a78522-7fd7-413d-8e9a-ad63ccfebb11
+- ayla_2.png (alto 32) → 376a1110-33c5-4df0-a81d-66d081fd4a01

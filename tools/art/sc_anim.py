@@ -39,7 +39,7 @@ def fetch(url, tries=5):
 def one(job):
     if job.get('job_id'): r = {'job_id': job['job_id']}
     else: r = first(sc.call('animate_game_art', {'asset_id': job['asset_id'], 'prompt': job['prompt'], 'auto_enhance_prompt': False,
-        'output_frames': job.get('frames', 8), 'model': job.get('model', 'pixel-engine-v1.1'), 'output_format': 'webp', 'wait_seconds': 90}))
+        'output_frames': job.get('frames', 8), 'model': job.get('model', 'pixel-engine-v1.1'), 'output_format': 'webp', 'wait_seconds': 0}))
     jid = r.get('job_id')
     while r.get('status') not in ('succeeded', 'completed', 'failed', 'error'):
         time.sleep(15); r = first(call('check_job_status', {'job_id': jid}))
