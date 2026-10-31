@@ -12,7 +12,7 @@ let TXT_BIG = false, TXT_HUD = false; // texto grande (se copia de OPT en applyO
 // ---------- panel ----------
 document.body.insertAdjacentHTML('beforeend', `<div id="optPanel" class="run-pick">
   <div class="rp-box opt-box">
-    <div class="rp-head"><b>Ajustes</b><small class="opt-ver">Versión 1.3.1 · 31-oct</small></div>
+    <div class="rp-head"><b>Ajustes</b><small class="opt-ver">Versión 1.4 · 31-oct</small></div>
     <label class="opt-row"><span><b>Ataque automático</b><small>Atacas solo al tener un enemigo a tu alcance</small></span><input type="checkbox" data-o="autoAtk"></label>
     <label class="opt-row"><span><b>Música</b></span><input type="range" min="0" max="1" step="0.05" data-o="music"></label>
     <label class="opt-row"><span><b>Efectos de sonido</b></span><input type="range" min="0" max="1" step="0.05" data-o="sfx"></label>
