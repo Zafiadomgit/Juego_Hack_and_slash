@@ -7,7 +7,8 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 - [x] Kara con 4 variaciones en estilo HD-2D chibi (31-oct, 96 créditos: las referencias suben el precio a 24 por imagen) → `tools/art/sc_out/kara_comparar.png`
 - [x] Rechazadas por el usuario: no son chibi (la Kara vieja de referencia arrastró el estilo antiguo)
 - [x] Segunda prueba (56 créditos): `pixel-engine-image-v1` a 96×96 sí sale chibi → `tools/art/sc_out/kara2_comparar.png`
-- [ ] Elegir una con el usuario
+- [x] **Elegida la Kara 6** (usuario, 31-oct): ese pixelado para todo el juego
+- [x] Prueba de coherencia con ese estilo (≈ 176 créditos): Nyx, brujo villano, Seta y jabalí → `tools/art/sc_out/coherencia2.png`
 - [ ] Probar su caminar y su ataque en el juego antes de seguir
 
 ## 1. Héroes (≈ 810 créditos) — 7 héroes, cada uno con:

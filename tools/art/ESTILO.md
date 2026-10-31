@@ -3,10 +3,15 @@
 Referencia visual: `tools/art/ref/estilo_personajes.png` (elfa de verde, encapuchado de azul, erudita de turquesa)
 y `tools/art/ref/estilo_encapuchado.png` (el ejemplo del usuario, 82×82).
 
-**Cómo generarlo (probado el 31-oct):** pixel art de BAJA resolución, ~90 px de alto, con píxeles gruesos.
-Modelo `pixel-engine-image-v1` a 96×96 (6 créditos por imagen) es el que sale chibi y en estilo.
-**No usar el sprite viejo del héroe como referencia**: arrastra el estilo antiguo (250 px, detallado, nada chibi).
-Con `gpt-image-2.5-sunburst` y el encapuchado de referencia sale demasiado alto y detallado.
+**ESTILO ELEGIDO (31-oct): Kara 6** → `tools/art/sc_out/kara2_6.png` (asset `d8ed40a1-5e8f-4ebd-9728-47b5f6a96e79`).
+Es la referencia de TODO el juego: héroes, vecinos, villanos, monstruos y jefes (prueba: `sc_out/coherencia2.png`).
+**Cómo generarlo:** `python3 tools/art/sc_gen.py lote.json` → `gpt-image-2.5-sunburst`, pixel, fondo transparente,
+`style_asset_ids` = Kara 6 + encapuchado (y como `reference_asset_id` la referencia de diseño de ese personaje si la hay:
+`ref/sombra_ref.png` para Nyx, el brujo de `ref/villano_caminar_ref.webp`, la seta de `ref/monstruo_seta_ref.webp`).
+≈ 24–32 créditos por imagen. Pedir `size` 128 (96 para monstruos pequeños).
+**Tamaño de píxel igual en todo:** héroe ≈ 124 px de alto. Si un sprite sale más grande (p. ej. 250 px, pixelado más fino),
+reducirlo con `python3 tools/art/sc_norm.py in.png out.png 2` (gratis). Pedir «small sprite» en el prompt NO sirve: sale de 32 px.
+**No usar el sprite viejo como referencia**: arrastra el estilo antiguo. `pixel-engine-image-v1` sale chibi pero con menos calidad de pixelado.
 
 ## El estilo
 - **HD-2D al estilo Octopath Traveler**, chibi de **2 cabezas de alto** (cabeza grande, cuerpo corto pero esbelto).

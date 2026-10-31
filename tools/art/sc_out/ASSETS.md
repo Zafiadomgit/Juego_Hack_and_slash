@@ -19,3 +19,13 @@
 - kara2_4.png 4 (A) → 72106222-2eca-49c8-9327-facd9a12a1df
 - kara2_5.png 5 (B) → cb9a39a5-bbda-4bb3-a784-7782d48a08c2
 - kara2_6.png 6 (B) → d8ed40a1-5e8f-4ebd-9728-47b5f6a96e79
+
+## prueba_coherencia.json — gpt-image-2.5-sunburst, estilo Kara 6
+- nyx_1.png (126×126) → e0253c9e-b4ee-41a1-9956-cd57822a3f27
+- brujo_1.png (254×254) → 67ad8f04-b71a-458b-bcc3-fbaab34e8c6a
+- seta_1.png (72×72) → 62950ad8-2e78-4f4d-b36d-14161dff86d9
+- jabali_1.png (228×228) → 0e9477d8-b79f-4a0d-94a5-3e0ac8b2b9c3
+
+## prueba_coherencia2.json — gpt-image-2.5-sunburst, estilo Kara 6
+- brujo2_1.png (32×32) → a8502266-3771-4510-be01-9b4470cacc13
+- jabali2_1.png (30×30) → c82d1de0-b683-46c7-83ef-40d59048c243
