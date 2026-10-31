@@ -11,14 +11,15 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 - [x] Prueba de coherencia con ese estilo (≈ 176 créditos): Nyx, brujo villano, Seta y jabalí → `tools/art/sc_out/coherencia2.png`
 - [x] Kara animada (31-oct, ≈ 150 créditos): base girada a la derecha + reposo 8, caminar 7 (pixel-engine-v1.5: de perfil y con zancada larga; la v1.1 salía de frente y corta), ataque 8 con media luna roja, golpe 2 → `sc_out/kara_anim.gif`
 - [x] En el juego (`www/img/heroes/anim/iop.webp`, `HERO_ANIM.iop`, `tools/art/sc_hero_atlas.py`): camina a ambos lados y 4 ataques seguidos sin errores
-- [ ] Revisar en el móvil y pasar a los otros 6 héroes (falta: deslizar, ataque 2, lanzar, muerte; retrato `px/iop.png` sigue siendo el viejo)
+- [x] Kara completa (≈ 80 créditos más): deslizar 5, ataque 2 (tajo de vuelta), lanzar 8 y muerte 8. Motor (`heroes.js`): poses `attack2`, `dash` y `death` (se usan solas si el atlas las tiene)
+- [ ] Revisar en el móvil · retrato `px/iop.png` sigue siendo el viejo (cambiarlo junto con `HERO_FACE`)
 
 ## 1. Héroes (≈ 810 créditos) — 7 héroes, cada uno con:
 - [ ] Sprite base nuevo (Kara, Teo, Elara, **Nyx con el nuevo diseño**, Ayla, Brina, Brann)
 - [ ] Reposo 8 · Caminar 8–12 (balanceo como el brujo) · **Deslizar 6 (nuevo)**
 - [ ] Ataque 8–10 con estela de color en el sprite (como la referencia de Nyx) · **Ataque 2 de combo (nuevo)**
 - [ ] Lanzar habilidad 8 · Golpe recibido 4 · Muerte 8
-- [ ] Motor: poses `dash` y `attack2`, golpe en el fotograma de impacto
+- [x] Motor: poses `dash`, `attack2` y `death` (31-oct)
 - [ ] Prueba obligatoria: caminar a ambos lados + 4 ataques seguidos grabados
 
 ## 2. Villa Candela (≈ 400 créditos)

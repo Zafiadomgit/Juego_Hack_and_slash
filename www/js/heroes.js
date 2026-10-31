@@ -261,11 +261,21 @@ showClassInfo = function (id) {
 const _heroAnimPoseH = heroAnimPose;
 heroAnimPose = function (cls, o) {
   const A = HERO_ANIM[cls];
+  // muerte (hojas «death»): cae y se queda en el suelo hasta que sale la pantalla de derrota
+  if (A && A.death && P && cls === P.cls && state === 'dead' && P.deadAt !== undefined) {
+    return ['death', Math.min(A.death.length - 1, Math.floor((now - P.deadAt) / 0.1))];
+  }
   // golpe cuerpo a cuerpo: la animación ocupa todo el intervalo entre golpes (no 0,2 s y luego quieto)
   if (A && P && cls === P.cls && P.swingMax && o.swing > 0 && !(o.hurt > 0) && !(P.castAnim > 0)) {
     const n = A.attack.length, i = Math.min(n - 1, Math.floor((1 - o.swing / P.swingMax) * n));
-    // golpes alternos: el tajo de vuelta (la animación al revés), como un combo de ida y vuelta
-    return ['attack', P.swingSide < 0 && !A.attack2 ? n - 1 - i : i];
+    // golpes alternos: el tajo de vuelta (su propia hoja attack2 si la hay; si no, la animación al revés)
+    if (P.swingSide < 0 && A.attack2) return ['attack2', Math.min(A.attack2.length - 1, Math.floor((1 - o.swing / P.swingMax) * A.attack2.length))];
+    return ['attack', P.swingSide < 0 ? n - 1 - i : i];
+  }
+  // deslizar (hojas «dash»): arranque, deslizamiento y frenada a lo largo de la esquiva
+  if (A && A.dash && P && cls === P.cls && P.dashT > 0 && !(o.hurt > 0)) {
+    const n = A.dash.length;
+    return ['dash', Math.min(n - 1, Math.floor((1 - P.dashT / 0.17) * n))];
   }
   if (A && A.cast && scene === 'rift' && P && cls === P.cls && P.castAnim > 0 && !(o.hurt > 0)) {
     const n = A.cast.length;
@@ -273,6 +283,8 @@ heroAnimPose = function (cls, o) {
   }
   return _heroAnimPoseH(cls, o);
 };
+const _playerDiedH = playerDied;
+playerDied = function () { if (state === 'play' && P) P.deadAt = now; _playerDiedH(); };
 
 // ---------- selección de héroe: aura del color del héroe y chispas que suben detrás de la ilustración ----------
 (function () {
