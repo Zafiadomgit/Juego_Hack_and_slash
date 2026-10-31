@@ -4,7 +4,8 @@ Créditos previstos: **Adventurer (3000/mes, 5 generaciones a la vez, 8 variacio
 Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes del viernes. Estilo y prompts: `tools/art/ESTILO.md`.
 
 ## 0. Validar el estilo (≈ 30 créditos)
-- [ ] Kara con 4 variaciones en estilo HD-2D chibi → elegir una con el usuario
+- [x] Kara con 4 variaciones en estilo HD-2D chibi (31-oct, 96 créditos: las referencias suben el precio a 24 por imagen) → `tools/art/sc_out/kara_comparar.png`
+- [ ] Elegir una con el usuario
 - [ ] Probar su caminar y su ataque en el juego antes de seguir
 
 ## 1. Héroes (≈ 810 créditos) — 7 héroes, cada uno con:
