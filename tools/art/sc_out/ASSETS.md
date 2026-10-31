@@ -10,3 +10,12 @@
 - kara_v2.png (254×254) → c1e5c99f-93f2-4562-914c-48ac7830114d
 - kara_v3.png (182×182) → e33c9c99-08cc-40c6-a648-397fc9f642c2
 - kara_v4.png (248×248) → 2dd682cd-4049-4fca-8421-7934a0d43509
+
+## Kara chibi (31-oct) — estilo del encapuchado (ref fbfb538a-685e-4797-8695-4b264d4ba3aa)
+- A = pixel-engine-image-v1 96×96 (24 créditos las 4) · B = gpt-image-2.5-sunburst con referencia de estilo (32 las 2)
+- kara2_1.png 1 (A) → 77da3ca9-277b-497a-a7b0-187d93278546
+- kara2_2.png 2 (A) → 1ee5e0fd-898e-4736-9179-5eecacdc658e
+- kara2_3.png 3 (A) → d4140ab2-a6f3-4317-ae0d-420427f3916c
+- kara2_4.png 4 (A) → 72106222-2eca-49c8-9327-facd9a12a1df
+- kara2_5.png 5 (B) → cb9a39a5-bbda-4bb3-a784-7782d48a08c2
+- kara2_6.png 6 (B) → d8ed40a1-5e8f-4ebd-9728-47b5f6a96e79

@@ -1,6 +1,12 @@
 # Fendaria — guía de estilo de personajes (rework visual con SpriteCook)
 
-Referencia visual: `tools/art/ref/estilo_personajes.png` (elfa de verde, encapuchado de azul, erudita de turquesa).
+Referencia visual: `tools/art/ref/estilo_personajes.png` (elfa de verde, encapuchado de azul, erudita de turquesa)
+y `tools/art/ref/estilo_encapuchado.png` (el ejemplo del usuario, 82×82).
+
+**Cómo generarlo (probado el 31-oct):** pixel art de BAJA resolución, ~90 px de alto, con píxeles gruesos.
+Modelo `pixel-engine-image-v1` a 96×96 (6 créditos por imagen) es el que sale chibi y en estilo.
+**No usar el sprite viejo del héroe como referencia**: arrastra el estilo antiguo (250 px, detallado, nada chibi).
+Con `gpt-image-2.5-sunburst` y el encapuchado de referencia sale demasiado alto y detallado.
 
 ## El estilo
 - **HD-2D al estilo Octopath Traveler**, chibi de **2 cabezas de alto** (cabeza grande, cuerpo corto pero esbelto).

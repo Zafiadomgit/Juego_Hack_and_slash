@@ -5,6 +5,8 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 
 ## 0. Validar el estilo (≈ 30 créditos)
 - [x] Kara con 4 variaciones en estilo HD-2D chibi (31-oct, 96 créditos: las referencias suben el precio a 24 por imagen) → `tools/art/sc_out/kara_comparar.png`
+- [x] Rechazadas por el usuario: no son chibi (la Kara vieja de referencia arrastró el estilo antiguo)
+- [x] Segunda prueba (56 créditos): `pixel-engine-image-v1` a 96×96 sí sale chibi → `tools/art/sc_out/kara2_comparar.png`
 - [ ] Elegir una con el usuario
 - [ ] Probar su caminar y su ataque en el juego antes de seguir
 
