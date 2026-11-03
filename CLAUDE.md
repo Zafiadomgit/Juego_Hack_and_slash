@@ -44,5 +44,7 @@ El proyecto tiene un mapa del código en `graphify-out/` (`graph.json` + `GRAPH_
      no siempre sigue esas cadenas, así que una función puede tener más llamadas reales de las que muestra.
    - Las variables globales compartidas (p. ej. `let state` en `game.js`, que leen y escriben unos 12
      archivos) aparecen a veces como llamadas a funciones del mismo nombre (el getter `__game.state`).
-5. No reconstruyas el grafo entero (`/graphify .`) salvo que cambie la estructura de carpetas o el
+5. Hay hooks en `.claude/settings.json` que lo recuerdan solos: al empezar la sesión instalan `graphifyy` si falta,
+   y antes de cada búsqueda o lectura de código añaden un aviso con lo que el grafo ya sabe. No bloquean nada.
+6. No reconstruyas el grafo entero (`/graphify .`) salvo que cambie la estructura de carpetas o el
    `.graphifyignore`; para lo demás basta `graphify update .`.

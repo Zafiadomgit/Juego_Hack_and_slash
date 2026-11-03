@@ -1,0 +1,38 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v graphify >/dev/null 2>&1 || python3 -m pip install -q graphifyy >/dev/null 2>&1 || pip install -q graphifyy >/dev/null 2>&1 || true",
+            "timeout": 180,
+            "statusMessage": "Comprobando graphify"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v graphify >/dev/null 2>&1 && graphify hook-guard search || true",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "Read|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "command -v graphify >/dev/null 2>&1 && graphify hook-guard read || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
