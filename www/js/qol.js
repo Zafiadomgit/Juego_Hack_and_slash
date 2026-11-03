@@ -12,7 +12,7 @@ let TXT_BIG = false, TXT_HUD = false; // texto grande (se copia de OPT en applyO
 // ---------- panel ----------
 document.body.insertAdjacentHTML('beforeend', `<div id="optPanel" class="run-pick">
   <div class="rp-box opt-box">
-    <div class="rp-head"><b>Ajustes</b><small class="opt-ver">Versión 1.4.3 · 3-nov</small></div>
+    <div class="rp-head"><b>Ajustes</b><small class="opt-ver">Versión 1.4.4 · 3-nov</small></div>
     <label class="opt-row"><span><b>Ataque automático</b><small>Atacas solo al tener un enemigo a tu alcance</small></span><input type="checkbox" data-o="autoAtk"></label>
     <label class="opt-row"><span><b>Música</b></span><input type="range" min="0" max="1" step="0.05" data-o="music"></label>
     <label class="opt-row"><span><b>Efectos de sonido</b></span><input type="range" min="0" max="1" step="0.05" data-o="sfx"></label>
@@ -35,6 +35,13 @@ function openOptions() {
     if (el.type === 'checkbox') el.checked = !!o[k]; else el.value = o[k];
   }
   optPrev = state; if (state === 'play' || state === 'pause') state = 'pause';
+  // último fallo guardado (el aviso rojo dura 7 s): aquí se puede leer o fotografiar con calma para enviarlo
+  let le = null;
+  try { le = JSON.parse(localStorage.getItem('fendaria_lastError') || 'null'); } catch (e) { /* sin almacenamiento */ }
+  let box = document.getElementById('optLastErr');
+  if (!box) { box = document.createElement('div'); box.id = 'optLastErr'; box.className = 'opt-lasterr'; const hd = document.querySelector('#optPanel .rp-head'); hd.parentNode.insertBefore(box, hd.nextSibling); }
+  box.textContent = le ? 'Último error (' + (le.cls || '?') + ', ' + String(le.t || '').slice(0, 16).replace('T', ' ') + '): ' + le.msg : '';
+  box.style.display = le ? '' : 'none';
   $('optPanel').classList.add('show'); SFX.play('click');
 }
 function closeOptions() { $('optPanel').classList.remove('show'); persist(); if (optPrev === 'hub') state = 'hub'; }

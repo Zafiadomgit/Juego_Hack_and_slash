@@ -82,7 +82,8 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       borrosa. Rehacerlas en HyperFrames (`cinematicas/`) con la villa, los héroes y el Portal nuevos, imagen nítida.
 - [ ] **Luz azul del Portal** en la villa: se ve mal (halo azul plano encima de todo). Sustituirla por un efecto
       animado del Portal hecho con SpriteCook (remolino, runas que giran, partículas) y una luz más sutil.
-- [ ] **Presentación del estudio Lumen** (pedido del usuario, 29-oct): rehacer la intro de arranque (`www/js/lumen.js`, 5 s)
+- [x] **Presentación del estudio Lumen** (3-nov, ≈ 70 créditos): farol dorado pintado con la llama animada (`img/ui/lumen_farol.webp`, 8 fotogramas) en lugar de la llama vectorial, y sin `shadowBlur` por fotograma → `sc_out/lumen_intro.png`. Falta: mismo logotipo en la ficha y el tráiler
+- [ ] ~~Presentación del estudio Lumen~~ (texto original) (pedido del usuario, 29-oct): rehacer la intro de arranque (`www/js/lumen.js`, 5 s)
       con arte propio: logotipo llama-farol pintado en el estilo del juego, partículas y chispas de SpriteCook,
       «LUMEN» forjado con un brillo mejor y «STUDIO». Debe verse en el móvil (ya se arregló que no apareciera en Android).
       Mismo logotipo para la ficha y el tráiler.
@@ -181,6 +182,7 @@ así que refinar, subir talentos o Trascendencia casi no se notaba (los monstruo
 - [x] **Fallo en la Grieta 1 con la Flecha Atronadora (pantalla café)**: no se reproduce en el PC. El juego ya no se congela si un fotograma falla:
       se recupera (también si fallaba dibujando el mundo HD-2D, que dejaba la pantalla quieta), guarda el error y lo enseña abajo a la izquierda
 - [ ] Si vuelve a pasar: foto del aviso rojo de abajo a la izquierda (dice qué falló) para arreglar la causa
+- [x] (3-nov) Ajustes muestra el «Último error» guardado para poder fotografiarlo. El fallo de la Flecha Atronadora no se reproduce en Chrome (probadas las 5 habilidades y 2 definitivas de Teo, Grimorio, 100 enemigos con mutaciones y Guardián)
 **Revisar en el APK**
 - [ ] El combate va igual o más fluido con muchos monstruos (y sin atravesar árboles ni rocas)
 - [ ] El aviso de Poder no tapa nada arriba y no sale de más (solo cuando cambia)

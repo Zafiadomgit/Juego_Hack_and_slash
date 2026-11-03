@@ -77,3 +77,7 @@
 
 ## reina_base.json — gpt-image-2.5-sunburst, estilo Kara 6
 - mon_reinaTeje_1.png (246×246) → 3a577a2b-3b5c-4914-8853-36b5b1c8444b
+
+## lumen_lote.json — gpt-image-2.5-sunburst, estilo Kara 6
+- lumen_farol_1.png (228×228) → e21be595-6719-4d4c-a21f-1c4f9254125d
+- lumen_farol_2.png (202×202) → 42346a52-3826-40a3-927c-1e93c4b614f9

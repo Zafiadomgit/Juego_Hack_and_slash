@@ -1,7 +1,7 @@
-@@11dwbq6
+@@l8v9ar
 <div id="optPanel" class="run-pick">
   <div class="rp-box opt-box">
-    <div class="rp-head"><b>Settings</b><small class="opt-ver">Version 1.4.3 · Nov 3</small></div>
+    <div class="rp-head"><b>Settings</b><small class="opt-ver">Version 1.4.4 · Nov 3</small></div>
     <label class="opt-row"><span><b>Auto-attack</b><small>Attack automatically when an enemy is in range</small></span><input type="checkbox" data-o="autoAtk"></label>
     <label class="opt-row"><span><b>Music</b></span><input type="range" min="0" max="1" step="0.05" data-o="music"></label>
     <label class="opt-row"><span><b>Sound effects</b></span><input type="range" min="0" max="1" step="0.05" data-o="sfx"></label>
@@ -22,3 +22,5 @@ Sold: ${old.name} (+${old.value || 0})
 <label class="opt-row"><span><b>Large text</b><small>Health, energy, buttons and combat panels easier to read</small></span><input type="checkbox" data-o="bigText"></label>
 @@1aotccc
 <label class="opt-row"><span><b>Camera in the Rifts</b><small>How much of the world you see around your hero</small></span><select data-o="cam"><option value="cerca">Close</option><option value="media">Medium</option><option value="lejos">Far</option></select></label>
+@@cojzwu
+Last error (

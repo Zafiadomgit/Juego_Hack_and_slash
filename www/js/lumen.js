@@ -36,6 +36,10 @@
     for (var j = 0; j < n; j++) { var a = Math.random() * 6.283, v = sp * (0.3 + Math.random()); K.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - sp * 0.2, l: 0.5 + Math.random() * 0.7, m: 1.2, c: col || '255,226,160' }); }
   }
   var burst = false, forged = 0;
+  // emblema pintado (SpriteCook, estilo del juego): farol dorado con la llama animada en 8 fotogramas
+  var FAROL = new Image(), farolOk = false;
+  FAROL.onload = function () { farolOk = true; };
+  FAROL.src = 'img/ui/lumen_farol.webp';
   var ease = function (x) { x = Math.max(0, Math.min(1, x)); return 1 - Math.pow(1 - x, 3); };
 
   function flame(x, y, h, a) {
@@ -125,7 +129,13 @@
     // 3) emblema
     if (burst) {
       var ea = ease((t - 1.3) / 0.5), fl = 1 + Math.sin(t * 9) * 0.03 + Math.sin(t * 23) * 0.02;
-      flame(x0, y0, 46 * S * (0.6 + 0.4 * ea) * fl, ea);
+      if (farolOk) {
+        // el farol aparece creciendo con un pequeño rebote y su llama late a 10 fps
+        var fi = Math.floor(t * 10) % 8, fh = 150 * S * (0.6 + 0.4 * ea) * (ea < 1 ? 1 + Math.sin(ea * 3.14) * 0.12 : 1);
+        g.save(); g.globalAlpha = ea; g.imageSmoothingEnabled = false;
+        g.drawImage(FAROL, fi * 256, 0, 256, 256, x0 - fh / 2, y0 - fh * 0.56, fh, fh);
+        g.restore();
+      } else flame(x0, y0, 46 * S * (0.6 + 0.4 * ea) * fl, ea);
     }
     // 4) LUMEN forjado (2.0 → 3.0 s)
     var ty = y0 + 112 * S, fs = Math.round(64 * S);
@@ -138,9 +148,10 @@
       g.beginPath(); g.rect(xl - 10 * S, ty - fs, (xr - xl) + 10 * S, fs * 2); g.clip();
       var tg = g.createLinearGradient(0, ty - fs / 2, 0, ty + fs / 2);
       tg.addColorStop(0, '#fffbe8'); tg.addColorStop(0.45, '#ffd76a'); tg.addColorStop(0.55, '#c8892c'); tg.addColorStop(1, '#ffe6a0');
-      g.shadowColor = 'rgba(255,190,90,0.7)'; g.shadowBlur = 18 * S;
+      // halo del texto sin shadowBlur (en el móvil, un desenfoque de sombra por fotograma daba tirones al abrir)
+      g.globalCompositeOperation = 'lighter'; g.globalAlpha = 0.22; g.lineWidth = 9 * S; g.strokeStyle = '#ffb45a'; g.lineJoin = 'round';
+      g.strokeText(word, x0, ty); g.globalAlpha = 1; g.globalCompositeOperation = 'source-over';
       g.fillStyle = tg; g.fillText(word, x0, ty);
-      g.shadowBlur = 0;
       // brillo que recorre las letras al final
       if (t > 3.3) {
         var sx = xl + ((t - 3.3) / 0.9) * (tw + 80 * S) - 40 * S;
