@@ -1164,6 +1164,8 @@ const monAnimId = (e) => (e.superDef ? 'S_' + Object.keys(SUPER_BOSSES).find((k)
 const ATTACK_STATES = { wind: 1, charge: 1, cast: 1, spiral: 1, summon: 1, throw: 1, volley: 1, web: 1, leap: 1 };
 function monPose(e, A) {
   if (e.flash > 0.04 && A.hurt) return ['hurt', 0];
+  // salto aplastante con su propia hoja (Guardián jabalí): agacharse, saltar y caer a lo largo del salto
+  if (e.state === 'leap' && A.leap) return ['leap', Math.min(A.leap.length - 1, Math.floor(clamp(1 - e.st / (e.max || 1), 0, 0.999) * A.leap.length))];
   if (ATTACK_STATES[e.state] || e.atkT > 0 || e.slamT > 0) {
     const n = A.attack.length;
     const k = e.atkT > 0 ? 1 - e.atkT / 0.25 : e.slamT > 0 ? 0.75 + (1 - e.slamT / 0.3) * 0.25 : e.max ? clamp(1 - e.st / e.max, 0, 0.7) : (e.t * 1.6) % 1;
