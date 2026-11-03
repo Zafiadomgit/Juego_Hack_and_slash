@@ -1,0 +1,26 @@
+# graphify: solo se mapea el código del juego (www/js) y de las herramientas (tools).
+# Todo lo demás (skills, Android, imágenes, sonido, documentos, copia inglesa) queda fuera:
+# las imágenes y documentos se leerían con IA uno a uno y gastarían muchos tokens.
+/*
+!/www/
+!/tools/
+/www/*
+!/www/js/
+/www/js/en/
+/tools/art/sc_out/
+/tools/art/ref/
+/tools/art/logo/
+*.md
+*.txt
+*.html
+*.json
+*.png
+*.webp
+*.jpg
+*.gif
+*.svg
+*.ogg
+*.mp3
+*.wav
+*.webm
+*.pdf

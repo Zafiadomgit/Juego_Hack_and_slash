@@ -194,20 +194,20 @@
   "tools/supabase/cloud_save.sql": {
     "mtime": 1793413965.0223362,
     "seen": 1793714984.8724327,
-    "ast_hash": "43d3512a3ca675d4063036ab34121bd0",
-    "semantic_hash": "43d3512a3ca675d4063036ab34121bd0"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "tools/supabase/daily_ranking.sql": {
     "mtime": 1793413965.0240304,
     "seen": 1793714984.8724334,
-    "ast_hash": "12efc3e534a87b165358e882c7b8487f",
-    "semantic_hash": "12efc3e534a87b165358e882c7b8487f"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "tools/supabase/torment_ranking.sql": {
     "mtime": 1793413965.0240304,
     "seen": 1793714984.8724344,
-    "ast_hash": "aba173aaf595551a1d7922e596f1b7f0",
-    "semantic_hash": "aba173aaf595551a1d7922e596f1b7f0"
+    "ast_hash": "",
+    "semantic_hash": ""
   },
   "www/js/anim2.js": {
     "mtime": 1793413965.1937232,
@@ -586,5 +586,11 @@
     "seen": 1793714984.8724911,
     "ast_hash": "c829acb764056adbda75463428e0eacc",
     "semantic_hash": "c829acb764056adbda75463428e0eacc"
+  },
+  "package-lock.json": {
+    "mtime": 1793413964.9055936,
+    "seen": 1793715129.0281744,
+    "ast_hash": "ee1eec054753102b4ae16d5ffa0de3e0",
+    "semantic_hash": ""
   }
 }
