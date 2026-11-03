@@ -34,7 +34,7 @@ call gradlew.bat assembleDebug || goto :err
 cd ..
 echo.
 echo LISTO. APK: %cd%\android\app\build\outputs\apk\debug\app-debug.apk
-echo En el juego, Ajustes debe decir "Version 1.4.4 - 3-nov".
+echo En el juego, Ajustes debe decir "Version 1.4.5 - 3-nov".
 pause
 exit /b 0
 :err

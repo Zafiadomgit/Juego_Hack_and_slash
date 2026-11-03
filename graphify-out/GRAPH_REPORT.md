@@ -1,17 +1,17 @@
 # Graph Report - Juego_Hack_and_slash  (2026-11-03)
 
 ## Corpus Check
-- 98 files · ~172,785 words
+- 99 files · ~173,900 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 1 file(s) not represented in the graph (top: (none) 1)
 
 ## Summary
-- 1361 nodes · 2539 edges · 78 communities (65 shown, 13 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.85)
+- 1368 nodes · 2551 edges · 78 communities (65 shown, 13 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 47 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `36bcf447`
+- Built from commit: `ea2b04ef`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -109,10 +109,10 @@
   www/js/hades.js → www/js/game.js
 - `playDialog()` --indirect_call--> `state()`  [INFERRED]
   www/js/story.js → www/js/game.js
+- `wordmark()` --indirect_call--> `S()`  [INFERRED]
+  www/js/lumen.js → www/js/game.js
 - `upload()` --calls--> `call()`  [EXTRACTED]
   tools/art/sc_upload.py → tools/art/spritecook.py
-- `ostinato()` --calls--> `chord()`  [EXTRACTED]
-  tools/audio/trailer_music.py → tools/audio/compose.py
 
 ## Import Cycles
 - None detected.
@@ -121,7 +121,7 @@
 
 ### Community 0 - "Herramientas de arte (Python)"
 Cohesion: 0.05
-Nodes (33): frames(), frames_grid(), key_mask(), build(), clean_mask(), clip_body(), shrink(), build() (+25 more)
+Nodes (35): frames(), frames_grid(), key_mask(), build(), clean_mask(), clip_body(), shrink(), build() (+27 more)
 
 ### Community 1 - "Audio sintetizado y recorte de iconos"
 Cohesion: 0.06
@@ -344,8 +344,8 @@ Cohesion: 0.33
 Nodes (4): mutPool(), MUTS, NEW_EVENTS, rollMut()
 
 ### Community 57 - "Intro Lumen"
-Cohesion: 0.60
-Nodes (5): finish(), flame(), frame(), size(), spark()
+Cohesion: 0.39
+Nodes (7): cv2(), finish(), flame(), frame(), size(), spark(), wordmark()
 
 ### Community 59 - "Fluidez (motion)"
 Cohesion: 0.40
@@ -386,15 +386,15 @@ Nodes (3): BOSS_CAP, expectK(), recPower()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `closeQuests()` connect `Misiones y armería` to `Núcleo del juego y ataques`?**
-  _High betweenness centrality (0.031) - this node is a cross-community bridge._
-- **Should `Herramientas de arte (Python)` be split into smaller, more focused modules?**
-  _Cohesion score 0.053305879661404716 - nodes in this community are weakly interconnected._
-- **Why does `state()` connect `Núcleo del juego y ataques` to `Bendiciones`, `Balance y poder esperado`, `Historia y diálogos`, `balance.js`?**
   _High betweenness centrality (0.030) - this node is a cross-community bridge._
+- **Should `Herramientas de arte (Python)` be split into smaller, more focused modules?**
+  _Cohesion score 0.050284031138228484 - nodes in this community are weakly interconnected._
+- **Why does `state()` connect `Núcleo del juego y ataques` to `Bendiciones`, `Balance y poder esperado`, `Historia y diálogos`, `balance.js`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Should `Audio sintetizado y recorte de iconos` be split into smaller, more focused modules?**
   _Cohesion score 0.0602655771195097 - nodes in this community are weakly interconnected._
 - **Why does `playDialog()` connect `Historia y diálogos` to `Núcleo del juego y ataques`?**
-  _High betweenness centrality (0.011) - this node is a cross-community bridge._
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Should `Núcleo del juego y ataques` be split into smaller, more focused modules?**
   _Cohesion score 0.027633378932968536 - nodes in this community are weakly interconnected._
 - **Should `Combate: daño, esquiva y saltos` be split into smaller, more focused modules?**

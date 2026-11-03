@@ -1,5 +1,7 @@
 @font-face { font-family: 'Cinzel'; font-weight: 700; font-display: swap; src: url(../fonts/cinzel-latin-700-normal.woff2) format('woff2'); }
 @font-face { font-family: 'Cinzel'; font-weight: 900; font-display: swap; src: url(../fonts/cinzel-latin-900-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Cinzel Decorative'; font-weight: 700; font-display: swap; src: url(../fonts/cinzel-decorative-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Cinzel Decorative'; font-weight: 900; font-display: swap; src: url(../fonts/cinzel-decorative-latin-900-normal.woff2) format('woff2'); }
 @font-face { font-family: 'Garamond'; font-weight: 600; font-display: swap; src: url(../fonts/eb-garamond-latin-600-normal.woff2) format('woff2'); }
 @font-face { font-family: 'Garamond'; font-weight: 700; font-display: swap; src: url(../fonts/eb-garamond-latin-700-normal.woff2) format('woff2'); }
 @font-face { font-family: 'Garamond'; font-weight: 800; font-display: swap; src: url(../fonts/eb-garamond-latin-800-normal.woff2) format('woff2'); }

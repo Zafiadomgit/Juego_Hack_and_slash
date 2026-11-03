@@ -81,3 +81,7 @@
 ## lumen_lote.json — gpt-image-2.5-sunburst, estilo Kara 6
 - lumen_farol_1.png (228×228) → e21be595-6719-4d4c-a21f-1c4f9254125d
 - lumen_farol_2.png (202×202) → 42346a52-3826-40a3-927c-1e93c4b614f9
+
+## icono_lote.json — gpt-image-2.5-sunburst, estilo Kara 6
+- icono_app_1.png (512×512) → 1e893e53-cde0-4035-abf8-a58f2e1db0a9
+- icono_app_2.png (128×131) → c7deb782-d0a1-4bb1-b7fe-d7509b3c686e

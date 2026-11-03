@@ -82,12 +82,13 @@ y los de Ciudad Hundida, Bosque de Cristal y Ciudadela — cada uno con 2 habili
       borrosa. Rehacerlas en HyperFrames (`cinematicas/`) con la villa, los héroes y el Portal nuevos, imagen nítida.
 - [ ] **Luz azul del Portal** en la villa: se ve mal (halo azul plano encima de todo). Sustituirla por un efecto
       animado del Portal hecho con SpriteCook (remolino, runas que giran, partículas) y una luz más sutil.
-- [x] **Presentación del estudio Lumen** (3-nov, ≈ 70 créditos): farol dorado pintado con la llama animada (`img/ui/lumen_farol.webp`, 8 fotogramas) en lugar de la llama vectorial, y sin `shadowBlur` por fotograma → `sc_out/lumen_intro.png`. Falta: mismo logotipo en la ficha y el tráiler
+- [x] **Presentación del estudio Lumen** (3-nov, ≈ 70 créditos): farol dorado pintado con la llama animada (`img/ui/lumen_farol.webp`, 8 fotogramas) en lugar de la llama vectorial, y sin `shadowBlur` por fotograma → `sc_out/lumen_intro.png`. Letras de «LUMEN» en oro antiguo grabado con Cinzel Decorative (bisel, pátina, filetes con rombos; todo en caché) → `sc_out/lumen_letras.png`. Falta: mismo logotipo en la ficha y el tráiler
 - [ ] ~~Presentación del estudio Lumen~~ (texto original) (pedido del usuario, 29-oct): rehacer la intro de arranque (`www/js/lumen.js`, 5 s)
       con arte propio: logotipo llama-farol pintado en el estilo del juego, partículas y chispas de SpriteCook,
       «LUMEN» forjado con un brillo mejor y «STUDIO». Debe verse en el móvil (ya se arregló que no apareciera en Android).
       Mismo logotipo para la ficha y el tráiler.
-- [ ] **Icono de la app** (pedido del usuario, 29-oct): icono nuevo en el estilo HD-2D del rework (héroe o emblema
+- [x] **Icono de la app** (3-nov, ≈ 64 créditos): Kara del estilo nuevo con el Portal de runas y el bosque otoñal (`tools/art/icono_app.png`). `python3 tools/art/make_icons.py tools/art/icono_app.png` genera ic_launcher, ic_launcher_round, la capa del adaptativo (ilustración a 86 dp de 108), Play Store 512 y web 192/512 → `sc_out/icono_adaptativo.png`
+- [ ] ~~Icono de la app~~ (pedido original, 29-oct): icono nuevo en el estilo HD-2D del rework (héroe o emblema
       de Fendaria reconocible a tamaño pequeño, fondo con contraste). Generar en 1024 y exportar: icono adaptativo de
       Android (primer plano + fondo, `android/app/src/main/res/mipmap-*`), icono de Play Store 512×512, favicon y
       pantalla de arranque de Android 12+ (`ic_launcher_foreground`). Comprobar que se ve bien en círculo y en cuadrado.

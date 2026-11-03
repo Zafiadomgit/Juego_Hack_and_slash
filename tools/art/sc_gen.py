@@ -16,6 +16,7 @@ def one(job):
             'variations': job.get('variations', 1), 'pixel': True, 'bg_mode': 'transparent',
             'model': 'gpt-image-2.5-sunburst', 'style_asset_ids': STYLE, 'wait_seconds': 0}
     if job.get('ref'): args['reference_asset_id'] = job['ref']
+    if 'bg' in job: args['bg_mode'] = job['bg']  # 'include' para imágenes a sangre (iconos, fondos)
     if job.get('edit'): args['edit_asset_id'] = job['edit']; args['style_asset_ids'] = [job['edit']]; args['prompt'] = job['prompt']  # editar: sin sufijo
     r = sc.call('generate_game_art', args); r = r[0] if isinstance(r, list) else r
     jid = r['job_id']
