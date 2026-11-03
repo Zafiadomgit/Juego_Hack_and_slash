@@ -74,3 +74,6 @@
 - mon_arakne_1.png (114×114) → a96f09f7-153d-408b-9bca-591dc282f1f7
 - mon_craqueleur_1.png (126×126) → c57c53fa-b23c-4241-992a-20ec20425863
 - mon_bouftouRoyal_1.png (328×328) → 5ddb5201-1b7d-40bb-9581-4e7a4ec4c339
+
+## reina_base.json — gpt-image-2.5-sunburst, estilo Kara 6
+- mon_reinaTeje_1.png (246×246) → 3a577a2b-3b5c-4914-8853-36b5b1c8444b

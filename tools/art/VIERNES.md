@@ -232,7 +232,17 @@ Eliges qué habilidad va en cada botón y qué definitiva llevas. Gratis en Vill
 - [x] Los 5 monstruos de los mundos 1–5 (Tofu, Jabalí, Araña, Seta, Gólem): reposo 8, caminar 7, ataque 8 con preparación visible (`tools/art/sc_mon_atlas.py`)
 - [x] Guardián del mundo 1, Colmillo Ancestral: reposo, caminar, embestida y salto aplastante (pose `leap` en el motor, pegada al suelo: la altura la pone el juego)
 - [ ] Revisar en el móvil · el trote del Jabalí se mueve poco · en los mundos 2–5 el filtro de color del bioma los tiñe a propósito (variedad); decidir si se suaviza
-- [ ] Guardianes 2–8, Súper Jefes y los monstruos de los mundos 6–8 (9 tipos): próxima recarga
+- [x] Guardiana del mundo 2, Reina Tejeceniza (3-nov, ≈ 130 créditos): reposo, caminar, telaraña, salto (`leap`, pegado al suelo) e invocar crías (pose `summon` nueva en el motor)
+- [ ] Guardianes 3–8, Súper Jefes y los monstruos de los mundos 6–8 (9 tipos): próxima recarga
+
+## Rendimiento en móvil (3-nov) — falta probar en el APK
+- [x] Tope de 60 FPS con acumulador (en pantallas de 90/120 Hz pintaba hasta 120 veces por segundo y el móvil se calentaba)
+- [x] Pantallas táctiles arrancan en calidad media y se recuerda el nivel al que bajó cada aparato (`fendaria_quality`)
+- [x] Píxel HD-2D mínimo 1,4 en calidad media o menor: con la cámara «media» el búfer se pintaba a resolución completa
+- [x] Cristales de energía del HUD sin `shadowBlur` por fotograma (caché) · jefe roto sin `ctx.filter` en vivo (horneado como el filtro del bioma)
+- [x] Runas y grietas del suelo en un solo trazado por pasada
+- Medido (Chrome sin GPU, combate de 60 enemigos): 28 → 33,5 FPS; con CPU ×2, 11 → 14,5. Lo de GPU (sombras, filtros, 120 Hz) solo se ve en el móvil
+- [ ] Probar en el móvil: ¿va fluido en combate? Si no, decir modelo de teléfono y si la pantalla es de 90/120 Hz
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6
