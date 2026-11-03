@@ -37,7 +37,10 @@ Paquete de 1000 recomendado YA (no caduca) para validar el estilo con Kara antes
 - [ ] Reposo + caminar de cada uno
 
 ## 4. Efectos de habilidades
-- [ ] Estelas, explosiones, rayos y runas animadas propias de cada héroe (sustituyen a los efectos actuales)
+- [x] (3-nov, ≈ 70 créditos) Los 11 efectos del atlas `img/fx/vfx.png` en el estilo nuevo (`tools/art/sc_vfx.py`): pintados quietos y animados
+      por el script (giro, crecer, subir, apagarse); el lobo espectral con animación de carrera de SpriteCook. Mismos nombres: el juego no cambia
+- [x] Iconos propios de las 14 habilidades y 7 definitivas nuevas del Grimorio (≈ 72 créditos, `tools/art/sc_icons.py`)
+- [ ] Efectos propios por héroe (cadena, martillo rúnico, orbe, cohetes…): hoy reutilizan los 11 del atlas
 
 ## 5. Interfaz (≈ 250 créditos + ≈ 120 del árbol de talentos)
 - [ ] Kit completo: marcos, botones, barras, iconos de habilidad propios de cada héroe
@@ -224,6 +227,12 @@ Eliges qué habilidad va en cada botón y qué definitiva llevas. Gratis en Vill
 | Árbol de talentos (fondos, marcos, uniones, iconos) | 120 |
 | Efectos de habilidades de héroes | 150 |
 | **Total** | **≈ 3760** (sobran ~240 para repetir lo que no salga bien) |
+
+## Monstruos en el estilo nuevo (3-nov, ≈ 476 créditos)
+- [x] Los 5 monstruos de los mundos 1–5 (Tofu, Jabalí, Araña, Seta, Gólem): reposo 8, caminar 7, ataque 8 con preparación visible (`tools/art/sc_mon_atlas.py`)
+- [x] Guardián del mundo 1, Colmillo Ancestral: reposo, caminar, embestida y salto aplastante (pose `leap` en el motor, pegada al suelo: la altura la pone el juego)
+- [ ] Revisar en el móvil · el trote del Jabalí se mueve poco · en los mundos 2–5 el filtro de color del bioma los tiñe a propósito (variedad); decidir si se suaviza
+- [ ] Guardianes 2–8, Súper Jefes y los monstruos de los mundos 6–8 (9 tipos): próxima recarga
 
 ## Segunda recarga
 - [ ] Monstruos normales (~40) con caminar 8, ataque 8, golpe 3, muerte 6
