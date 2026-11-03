@@ -64,3 +64,13 @@
 - iconos1_1.png (32×32) → e452ec8e-384e-4832-b76e-3510a8c87626
 - iconos2_1.png (512×512) → b381b599-c00f-4ac9-ba06-03f7c064bcd6
 - iconos3_1.png (32×32) → 5fda8a78-389c-4446-b124-abe6360097cc
+
+## vfx_lote.json — gpt-image-2.5-sunburst, estilo Kara 6
+- vfxA_1.png (244×244) → ee744536-59b8-49b3-a23f-da984937c47d
+- vfxB_1.png (244×244) → 96d9b283-dc6e-49e7-9789-882db3979953
+
+## mons_base.json — gpt-image-2.5-sunburst, estilo Kara 6
+- mon_tofu_1.png (166×166) → 6e595f01-9e47-425f-afd7-b322072714b2
+- mon_arakne_1.png (114×114) → a96f09f7-153d-408b-9bca-591dc282f1f7
+- mon_craqueleur_1.png (126×126) → c57c53fa-b23c-4241-992a-20ec20425863
+- mon_bouftouRoyal_1.png (328×328) → 5ddb5201-1b7d-40bb-9581-4e7a4ec4c339
