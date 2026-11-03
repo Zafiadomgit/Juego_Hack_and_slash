@@ -9,3 +9,9 @@ android/capacitor-cordova-android-plugins/
 .DS_Store
 __pycache__/
 *.pyc
+# graphify: se versionan graph.json, GRAPH_REPORT.md y manifest.json; lo demás se regenera o depende de la máquina
+graphify-out/cache/
+graphify-out/graph.html
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+graphify-out/cost.json
