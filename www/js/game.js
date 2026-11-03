@@ -1990,12 +1990,26 @@ function fancyBar(x, y, w, h, k, c0, c1, lag, ticks) {
   if (ticks) { ctx.fillStyle = 'rgba(0,0,0,0.35)'; for (let i = 1; i < ticks; i++) ctx.fillRect(ix + (iw * i) / ticks, iy + 1, 1, ih - 2); }
   roundRect(x + 0.5, y + 0.5, w - 1, h - 1, r, null, 'rgba(201,178,122,0.55)', 1);
 }
+// el cristal con brillo se pinta una vez en caché: shadowBlur en cada fotograma es carísimo en el móvil
+const CRYSTAL_GLOW = new Map();
 function drawCrystal(x, y, r, fill, glow) {
-  ctx.save();
-  if (glow) { ctx.shadowColor = glow; ctx.shadowBlur = r * 1.6; }
+  if (glow) {
+    const k = DPR, key = Math.round(r * k * 4) + fill + glow;
+    let c = CRYSTAL_GLOW.get(key);
+    if (!c) {
+      const pad = Math.ceil(r * 2.6 * k), R = r * k;
+      c = document.createElement('canvas'); c.width = c.height = pad * 2; c.pad = pad / k;
+      const g = c.getContext('2d');
+      g.shadowColor = glow; g.shadowBlur = R * 1.6; g.fillStyle = fill;
+      g.beginPath(); g.moveTo(pad, pad - R); g.lineTo(pad + R * 0.62, pad); g.lineTo(pad, pad + R); g.lineTo(pad - R * 0.62, pad); g.closePath(); g.fill();
+      if (CRYSTAL_GLOW.size > 40) CRYSTAL_GLOW.clear();
+      CRYSTAL_GLOW.set(key, c);
+    }
+    ctx.drawImage(c, x - c.pad, y - c.pad, c.pad * 2, c.pad * 2);
+    return;
+  }
   ctx.beginPath(); ctx.moveTo(x, y - r); ctx.lineTo(x + r * 0.62, y); ctx.lineTo(x, y + r); ctx.lineTo(x - r * 0.62, y); ctx.closePath();
   ctx.fillStyle = fill; ctx.fill();
-  ctx.restore();
 }
 
 // iconos pintados de la interfaz (img/ui)
@@ -2537,7 +2551,15 @@ function update(dt) {
   cam.y = lerp(cam.y, ty, 1 - Math.exp(-(tx === P.x ? 8 : 4) * dt));
 }
 
+// tope de 60 FPS: en pantallas de 90/120 Hz el juego pintaba hasta 120 veces por segundo, el móvil se calentaba,
+// bajaba la frecuencia del procesador y los FPS se hundían. El acumulador reparte los fotogramas a 60 regulares.
+let frameAcc = 0;
 function frame(t) {
+  frameAcc += t - (frame.prevT ?? t - 16.7);
+  frame.prevT = t;
+  if (frameAcc < 15.5) { requestAnimationFrame(frame); return; }
+  frameAcc = Math.min(frameAcc - 16.67, 16.67);
+  if (frameAcc < 0) frameAcc = 0;
   // un fallo en un fotograma ya no congela el juego (antes la pantalla se quedaba quieta): se recupera y se anota
   try {
     const raw = Math.min(0.05, (t - last) / 1000);
@@ -2596,16 +2618,26 @@ function adaptQuality(dt) {
   const avg = QUALITY.samples.reduce((a, b) => a + b, 0) / QUALITY.samples.length;
   QUALITY.samples = []; QUALITY.checkT = 0;
   if (avg <= 1 / 50) return;
-  QUALITY.level++;
-  if (QUALITY.level === 1) HD2D.dof = false;
-  if (QUALITY.level === 2) { QUALITY.maxDpr = 1; LIGHT.div = 4; resize(); }
-  if (QUALITY.level === 3) { HD2D.pixMul = 1.3; resize(); }
-  if (QUALITY.level === 4) { QUALITY.pcap = 170; QUALITY.fxK = 0.5; } // último recurso: la mitad de partículas y chispas
+  setQualityLevel(QUALITY.level + 1);
+  try { localStorage.setItem('fendaria_quality', String(QUALITY.level)); } catch (e) { /* sin almacenamiento */ }
 }
-// móviles modestos (4 núcleos o menos, o poca memoria): se empieza ya en calidad media
+// cada nivel suma sus recortes a los anteriores
+function setQualityLevel(lv) {
+  QUALITY.level = Math.min(4, lv);
+  if (lv >= 1) HD2D.dof = false;
+  if (lv >= 2) { QUALITY.maxDpr = 1; LIGHT.div = 4; QUALITY.pcap = Math.min(QUALITY.pcap, 260); }
+  if (lv >= 3) HD2D.pixMul = 1.3;
+  if (lv >= 4) { QUALITY.pcap = 170; QUALITY.fxK = 0.5; } // último recurso: la mitad de partículas y chispas
+  resize();
+}
+// Al arrancar: los móviles (pantalla táctil, pocos núcleos o poca memoria) empiezan ya en calidad media, y se recuerda
+// el nivel al que este aparato tuvo que bajar la vez anterior (así no vuelve a empezar alto y a dar tirones al bajar)
 (function () {
   const cores = navigator.hardwareConcurrency || 8, mem = navigator.deviceMemory || 8;
-  if (cores <= 4 || mem <= 3) { QUALITY.level = 2; HD2D.dof = false; QUALITY.maxDpr = 1; LIGHT.div = 4; QUALITY.pcap = 260; resize(); }
+  let saved = 0;
+  try { saved = +(localStorage.getItem('fendaria_quality') || 0) || 0; } catch (e) { /* sin almacenamiento */ }
+  const lv = Math.max(saved, isTouch || cores <= 4 || mem <= 3 ? 2 : 0);
+  if (lv > 0) setQualityLevel(lv);
 })();
 
 // Trozo de suelo: textura + manchas + helechos + guijarros, dibujado una vez

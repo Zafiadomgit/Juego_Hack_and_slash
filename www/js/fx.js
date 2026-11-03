@@ -111,11 +111,13 @@ function drawDecals() {
       ctx.translate(d.x, d.y);
       ctx.lineCap = 'round'; ctx.lineJoin = 'round';
       ctx.globalAlpha = Math.min(1, k * 1.5);
+      // todas las líneas en un solo trazado por pasada (menos llamadas de dibujo)
+      const path = () => { ctx.beginPath(); for (const pts of d.lines) pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); };
       ctx.strokeStyle = '#1a0a05'; ctx.lineWidth = 5;
-      for (const pts of d.lines) { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); }
+      path(); ctx.stroke();
       ctx.globalCompositeOperation = 'lighter';
       ctx.strokeStyle = `rgba(${d.rgb},${0.9 * k})`; ctx.lineWidth = 2.2;
-      for (const pts of d.lines) { ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y))); ctx.stroke(); }
+      path(); ctx.stroke();
       ctx.restore();
       glow(d.x, d.y, d.r * 0.9, d.rgb, 0.35 * k);
     } else if (d.type === 'scorch') {
@@ -135,13 +137,14 @@ function drawDecals() {
       ctx.strokeStyle = `rgba(${d.rgb},0.85)`; ctx.lineWidth = 3;
       ctx.beginPath(); ctx.arc(0, 0, d.r, 0, Math.PI * 2); ctx.stroke();
       ctx.lineWidth = 2;
-      ctx.beginPath(); ctx.arc(0, 0, d.r * 0.78, 0, Math.PI * 2); ctx.stroke();
+      ctx.beginPath(); ctx.arc(0, 0, d.r * 0.78, 0, Math.PI * 2);
+      // las 8 marcas en el mismo trazado que el anillo interior (antes: 8 save/restore y 8 trazos por runa)
       for (let i = 0; i < 8; i++) {
-        const a = (i / 8) * Math.PI * 2;
-        ctx.save(); ctx.rotate(a); ctx.translate(d.r * 0.89, 0);
-        ctx.beginPath(); ctx.moveTo(-3, -4); ctx.lineTo(3, 0); ctx.lineTo(-3, 4); ctx.stroke();
-        ctx.restore();
+        const a = (i / 8) * Math.PI * 2, c = Math.cos(a), s = Math.sin(a), cx = c * d.r * 0.89, cy = s * d.r * 0.89;
+        const pt = (x, y) => [cx + x * c - y * s, cy + x * s + y * c];
+        ctx.moveTo(...pt(-3, -4)); ctx.lineTo(...pt(3, 0)); ctx.lineTo(...pt(-3, 4));
       }
+      ctx.stroke();
       ctx.restore();
     }
   }

@@ -1,12 +1,19 @@
 # Graph Report - Juego_Hack_and_slash  (2026-11-03)
 
 ## Corpus Check
-- Large corpus: 1961 files · ~1,681,728 words. Semantic extraction will be expensive (many Claude tokens). Consider running on a subfolder.
+- 98 files · ~172,384 words
+- Verdict: corpus is large enough that graph structure adds value.
+- Unclassified: 1 file(s) not represented in the graph (top: (none) 1)
 
 ## Summary
-- 1359 nodes · 2536 edges · 76 communities (63 shown, 13 thin omitted)
-- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 45 edges (avg confidence: 0.85)
+- 1361 nodes · 2539 edges · 78 communities (65 shown, 13 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 46 edges (avg confidence: 0.85)
 - Token cost: 0 input · 0 output
+
+## Graph Freshness
+- Built from commit: `d22e0c5d`
+- Run `git rev-parse HEAD` and compare to check if the graph is stale.
+- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - Herramientas de arte (Python)
@@ -80,6 +87,8 @@
 - Datos de animación de monstruos
 - Atlas de props
 - Atlas de efectos (datos)
+- updatePlayer
+- balance.js
 
 ## God Nodes (most connected - your core abstractions)
 1. `rand()` - 26 edges
@@ -96,19 +105,19 @@
 ## Surprising Connections (you probably didn't know these)
 - `openBoonPick()` --indirect_call--> `state()`  [INFERRED]
   www/js/boons.js → www/js/game.js
+- `openChoice()` --indirect_call--> `state()`  [INFERRED]
+  www/js/hades.js → www/js/game.js
 - `playDialog()` --indirect_call--> `state()`  [INFERRED]
   www/js/story.js → www/js/game.js
 - `upload()` --calls--> `call()`  [EXTRACTED]
   tools/art/sc_upload.py → tools/art/spritecook.py
 - `ostinato()` --calls--> `chord()`  [EXTRACTED]
   tools/audio/trailer_music.py → tools/audio/compose.py
-- `pad()` --calls--> `chord()`  [EXTRACTED]
-  tools/audio/trailer_music.py → tools/audio/compose.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (76 total, 13 thin omitted)
+## Communities (78 total, 13 thin omitted)
 
 ### Community 0 - "Herramientas de arte (Python)"
 Cohesion: 0.05
@@ -120,11 +129,11 @@ Nodes (60): slice_icons(), chord(), deg_note(), main(), make_melody(), render_tr
 
 ### Community 2 - "Núcleo del juego y ataques"
 Cohesion: 0.03
-Nodes (73): adaptQuality(), aimAt(), AUDIO_CACHE, BAG_TABS, basicAttack(), basicDmg(), BOSS_LOOT_NAME, buildMenu() (+65 more)
+Nodes (77): adaptQuality(), aimAt(), AUDIO_CACHE, autoAdvance(), BAG_TABS, basicAttack(), basicDmg(), BOSS_LOOT_NAME (+69 more)
 
 ### Community 3 - "Combate: daño, esquiva y saltos"
-Cohesion: 0.11
-Nodes (58): addHazard(), angDiff(), aoe(), autoAdvance(), bossLeap(), clamp(), damageEnemy(), dash() (+50 more)
+Cohesion: 0.14
+Nodes (48): addHazard(), angDiff(), aoe(), bossLeap(), clamp(), damageEnemy(), dist(), dropPickup() (+40 more)
 
 ### Community 4 - "Simulador de balance e idiomas"
 Cohesion: 0.05
@@ -151,8 +160,8 @@ Cohesion: 0.07
 Nodes (21): ATTACK_STATES, CRYSTAL_COLS, drawHeroAnim(), GOLEM_PAL, HERO_ANIM_FR, HERO_ANIM_IMG, HERO_ART, HERO_FACE (+13 more)
 
 ### Community 10 - "Balance y poder esperado"
-Cohesion: 0.09
-Nodes (19): BOSS_CAP, expectK(), recPower(), reportError(), state(), DUOS, godsOwned(), HAMMERS (+11 more)
+Cohesion: 0.13
+Nodes (14): DUOS, godsOwned(), HAMMERS, injectDuo(), keyHold, omegaCast(), omegaRelease(), openChoice() (+6 more)
 
 ### Community 11 - "Menús: villa, mapa y pausa"
 Cohesion: 0.11
@@ -167,12 +176,12 @@ Cohesion: 0.12
 Nodes (22): buildDungeon(), buildLimitTab(), classUnique(), dressDungeon(), DUNGEON_GROUND, DUNGEON_LIGHT, dungeonEss(), dungeonLevel() (+14 more)
 
 ### Community 14 - "HUD y botones de combate"
-Cohesion: 0.10
-Nodes (25): BANNER_Y(), bannerBand(), buttonLayout(), combatButton(), draw3(), draw9(), drawBanners(), drawControls() (+17 more)
+Cohesion: 0.13
+Nodes (22): BANNER_Y(), bannerBand(), buttonLayout(), combatButton(), draw3(), draw9(), drawBanners(), drawControls() (+14 more)
 
 ### Community 15 - "Inventario y equipo"
-Cohesion: 0.13
-Nodes (26): addText(), autoEquip(), bagMax(), bestGearPlan(), bindStatButton(), boostOn(), buildInventory(), closeGems() (+18 more)
+Cohesion: 0.15
+Nodes (22): autoEquip(), bagMax(), bestGearPlan(), bindStatButton(), boostOn(), buildInventory(), closeGems(), derived() (+14 more)
 
 ### Community 16 - "Progreso y dificultades"
 Cohesion: 0.12
@@ -362,6 +371,14 @@ Nodes (3): drawMini(), MINI, miniLoop()
 Cohesion: 0.67
 Nodes (3): drawHeroImage(), heroPoseFor(), heroPoseSource()
 
+### Community 76 - "updatePlayer"
+Cohesion: 0.12
+Nodes (17): addText(), collect(), collideObstacles(), dash(), eatBread(), heal(), keyboardAttack(), obstacleGrid() (+9 more)
+
+### Community 77 - "balance.js"
+Cohesion: 0.33
+Nodes (3): BOSS_CAP, expectK(), recPower()
+
 ## Knowledge Gaps
 - **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -369,16 +386,16 @@ Nodes (3): drawHeroImage(), heroPoseFor(), heroPoseSource()
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `closeQuests()` connect `Misiones y armería` to `Núcleo del juego y ataques`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.031) - this node is a cross-community bridge._
 - **Should `Herramientas de arte (Python)` be split into smaller, more focused modules?**
   _Cohesion score 0.053305879661404716 - nodes in this community are weakly interconnected._
-- **Why does `state()` connect `Balance y poder esperado` to `Bendiciones`, `Núcleo del juego y ataques`, `Historia y diálogos`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+- **Why does `state()` connect `Núcleo del juego y ataques` to `Bendiciones`, `Balance y poder esperado`, `Historia y diálogos`, `balance.js`?**
+  _High betweenness centrality (0.030) - this node is a cross-community bridge._
 - **Should `Audio sintetizado y recorte de iconos` be split into smaller, more focused modules?**
   _Cohesion score 0.0602655771195097 - nodes in this community are weakly interconnected._
+- **Why does `playDialog()` connect `Historia y diálogos` to `Núcleo del juego y ataques`?**
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Should `Núcleo del juego y ataques` be split into smaller, more focused modules?**
-  _Cohesion score 0.028605841613971696 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.027633378932968536 - nodes in this community are weakly interconnected._
 - **Should `Combate: daño, esquiva y saltos` be split into smaller, more focused modules?**
-  _Cohesion score 0.11131276467029642 - nodes in this community are weakly interconnected._
-- **Should `Simulador de balance e idiomas` be split into smaller, more focused modules?**
-  _Cohesion score 0.050314465408805034 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.1400709219858156 - nodes in this community are weakly interconnected._

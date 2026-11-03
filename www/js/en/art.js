@@ -1204,12 +1204,15 @@ function monSilhouette(c, rgb) {
   MON_SIL.set(key, o);
   return o;
 }
+const BROKEN_FILTER = 'grayscale(0.55) sepia(0.35) hue-rotate(165deg) saturate(1.8) brightness(1.05)';
 function drawMonsterAnim(e, A0, k, ox, oy) {
   const id = monAnimId(e), A = MON_ANIM[id];
   const [pose, i] = monPose(e, A);
   const B = scene === 'rift' && rift ? rift.biome : null;
-  const filt = !e.boss && !e.superDef && B && B.mfilter ? B.mfilter : null;
-  const c = monFrame(id, pose, i, filt, B && B.id);
+  // jefe roto (Ruptura): recoloreo azul hielo horneado en caché, como el filtro del bioma (un ctx.filter en vivo es lentísimo en el móvil)
+  const brk = e.broken > 0 && !e.dead;
+  const filt = brk ? BROKEN_FILTER : !e.boss && !e.superDef && B && B.mfilter ? B.mfilter : null;
+  const c = monFrame(id, pose, i, filt, brk ? 'brk' : B && B.id);
   // altura en mundo similar a la del dibujo procedural; el Súper Jefe, algo mayor que un Guardián pero sin tapar la pantalla
   const hw = A0.h * k * (e.superDef ? 0.95 : e.boss ? 1.25 : 1.1) * ((!e.boss && !e.superDef && e.D && e.D.vis) || 1);
   e.hTop = hw; // altura real del dibujo: los rótulos van encima

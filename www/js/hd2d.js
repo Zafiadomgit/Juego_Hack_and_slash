@@ -10,7 +10,8 @@ const HD2D = { on: true, dof: false, pixMul: 1, pix: 2, c: null, g: null, main: 
 
 // Tamaño del píxel en CSS px: ~250 píxeles de alto de pantalla, como una consola clásica
 // con la cámara más alejada el búfer gana resolución: los sprites conservan su detalle
-const hd2dPixSize = () => Math.max(1, Math.max(1.2, H / 300) * HD2D.pixMul * 420 / VIEW.units);
+// en calidad media o menor (móviles) el píxel no baja de 1,4: con la cámara lejos el búfer ya no se pinta a resolución completa
+const hd2dPixSize = () => Math.max(typeof QUALITY !== 'undefined' && QUALITY.level >= 2 ? 1.4 : 1, Math.max(1.2, H / 300) * HD2D.pixMul * 420 / VIEW.units);
 
 function hd2dCanvas(w, h, alpha = true) {
   const c = document.createElement('canvas');
