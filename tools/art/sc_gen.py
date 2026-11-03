@@ -25,7 +25,11 @@ def one(job):
         except Exception: pass
     lines = []
     for i, a in enumerate(r.get('assets', []), 1):
-        p = f"{job['name']}_{i}.png"; open(os.path.join(OUT, p), 'wb').write(urllib.request.urlopen(a['sprite_url']).read())
+        p = f"{job['name']}_{i}.png"; url = a['sprite_url']
+        if min(a.get('width') or 999, a.get('height') or 999) < 64:  # el procesado de pixel art lo encogió: usar la imagen original
+            m = sc.call('get_asset_metadata', {'asset_id': a['asset_id'], 'verbose': True}); m = m[0] if isinstance(m, list) else m
+            url = m.get('raw_url') or url; a = dict(a, width='raw', height='raw')
+        open(os.path.join(OUT, p), 'wb').write(urllib.request.urlopen(url).read())
         lines.append(f"- {p} ({a['width']}×{a['height']}) → {a['asset_id']}")
     return job['name'], r.get('status'), r.get('credits_used'), r.get('credits_remaining'), lines
 

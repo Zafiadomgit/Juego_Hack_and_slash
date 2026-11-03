@@ -59,3 +59,8 @@
 - elara_der2_1.png (34×34) → b8a4e3e1-2634-492c-aa29-0ffe76aa553d
 - ayla_der2_1.png (32×32) → 6f69635c-752a-440d-9a28-6b541f0a74de
 - brina_der2_1.png (32×32) → de594ae9-181d-4b9b-a852-8638211b75bc
+
+## iconos_lote.json — gpt-image-2.5-sunburst, estilo Kara 6
+- iconos1_1.png (32×32) → e452ec8e-384e-4832-b76e-3510a8c87626
+- iconos2_1.png (512×512) → b381b599-c00f-4ac9-ba06-03f7c064bcd6
+- iconos3_1.png (32×32) → 5fda8a78-389c-4446-b124-abe6360097cc

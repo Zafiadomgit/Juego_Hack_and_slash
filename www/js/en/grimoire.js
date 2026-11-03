@@ -20,7 +20,7 @@ const gTimer = (k, t) => { P[k] = t; recalc(); };
 const GRIMOIRE = {
   iop: {
     s: [
-      { name: "Iron Chain", icon: '⛓', art: 'swords', cost: 3, cd: 7, desc: "Throw a chain in a line: it damages and drags towards you everyone it touches",
+      { name: "Iron Chain", icon: '⛓', art: 'chain', cost: 3, cd: 7, desc: "Throw a chain in a line: it damages and drags towards you everyone it touches",
         fx() {
           const a = gAim(380);
           for (const e of gAlive(360)) {
@@ -33,7 +33,7 @@ const GRIMOIRE = {
           for (let i = 1; i <= 9; i++) sparks(P.x + Math.cos(a) * i * 38, P.y - 10 + Math.sin(a) * i * 38, 2, '#d8dde8', 120);
           shake(4); SFX.play('swing');
         } },
-      { name: "Runic Hammer", icon: '🔨', art: 'volcano', cost: 4, cd: 8, desc: "Slam the ground in front of you: a wave of runic fire that stuns for 1.2 s",
+      { name: "Runic Hammer", icon: '🔨', art: 'runehammer', cost: 4, cd: 8, desc: "Slam the ground in front of you: a wave of runic fire that stuns for 1.2 s",
         fx() {
           const a = gAim(220), x = P.x + Math.cos(a) * 80, y = P.y + Math.sin(a) * 80;
           aoe(x, y, 115, skillDmg(2.2), 300, true);
@@ -43,12 +43,12 @@ const GRIMOIRE = {
           shake(8); zoomPunch = Math.max(zoomPunch, 0.03); SFX.play('boom');
         } },
     ],
-    u: { name: "Giant's Wrath", icon: '🗿', art: 'giant', desc: "For 8 s you deal 60% more damage and every basic hit releases a shockwave around it",
+    u: { name: "Giant's Wrath", icon: '🗿', art: 'giantwrath', desc: "For 8 s you deal 60% more damage and every basic hit releases a shockwave around it",
       fx() { gTimer('giantT', 8); rings.push({ x: P.x, y: P.y, r0: 20, r1: 180, life: 0.5, max: 0.5, color: 'rgba(255,140,60,' }); } },
   },
   cra: {
     s: [
-      { name: "Venom Rain", icon: '☔', art: 'poison', cost: 4, cd: 8, desc: "A rain of poisoned arrows covers the area for 4 s: it damages and poisons",
+      { name: "Venom Rain", icon: '☔', art: 'poisonrain', cost: 4, cd: 8, desc: "A rain of poisoned arrows covers the area for 4 s: it damages and poisons",
         fx() {
           const t = gNear(440), a = gAim(440), x = t ? t.x : P.x + Math.cos(a) * 220, y = t ? t.y : P.y + Math.sin(a) * 220;
           glyphs.push({ x, y, r: 110, life: 4, max: 4, tick: 0, mul: 0.7 });
@@ -56,7 +56,7 @@ const GRIMOIRE = {
           spawnVfx('poison', x, y, 220, { dur: 0.8 });
           SFX.play('arrowrain');
         } },
-      { name: "Wind Step", icon: '💨', art: 'gust', cost: 3, cd: 6, desc: "Leap backwards and fire 5 arrows in a fan ahead",
+      { name: "Wind Step", icon: '💨', art: 'windstep', cost: 3, cd: 6, desc: "Leap backwards and fire 5 arrows in a fan ahead",
         fx() {
           const a = gAim(440);
           P.x = clamp(P.x - Math.cos(a) * 130, 40, WORLD.w - 40); P.y = clamp(P.y - Math.sin(a) * 130, 40, WORLD.h - 40);
@@ -68,7 +68,7 @@ const GRIMOIRE = {
           SFX.play('dash');
         } },
     ],
-    u: { name: "Royal Hawk", icon: '🦅', art: 'eye', desc: "For 6 s, every half second a golden arrow seeks the nearest enemy and pierces it",
+    u: { name: "Royal Hawk", icon: '🦅', art: 'royalhawk', desc: "For 6 s, every half second a golden arrow seeks the nearest enemy and pierces it",
       fx() {
         for (let k = 0; k < 12; k++) later(k * 0.5, () => {
           if (!P || scene !== 'rift') return;
@@ -81,7 +81,7 @@ const GRIMOIRE = {
   },
   feca: {
     s: [
-      { name: "Arcane Orb", icon: '🔮', art: 'orb', cost: 4, cd: 7, desc: "A slow orb passes through every enemy and explodes at the end of its path",
+      { name: "Arcane Orb", icon: '🔮', art: 'arcaneorb', cost: 4, cd: 7, desc: "A slow orb passes through every enemy and explodes at the end of its path",
         fx() {
           const a = gAim(500), p = { team: 'p', kind: 'orb', x: P.x, y: P.y - 10, vx: Math.cos(a) * 300, vy: Math.sin(a) * 300, r: 16, dmg: skillDmg(1.2), life: 1.6, pierce: 99, kb: 60, hit: [] };
           projectiles.push(p);
@@ -92,7 +92,7 @@ const GRIMOIRE = {
           });
           SFX.play('magic');
         } },
-      { name: "Reflecting Aegis", icon: '⛨', art: 'aegis', cost: 4, cd: 10, desc: "A shield worth 25% of your health and a wave that pushes nearby enemies away",
+      { name: "Reflecting Aegis", icon: '⛨', art: 'reflectaegis', cost: 4, cd: 10, desc: "A shield worth 25% of your health and a wave that pushes nearby enemies away",
         fx() {
           P.shield = Math.max(P.shield || 0, Math.round(P.maxHp * 0.25)); P.shieldT = Math.max(P.shieldT || 0, 5);
           aoe(P.x, P.y, 140, skillDmg(1), 520);
@@ -101,7 +101,7 @@ const GRIMOIRE = {
           SFX.play('shield');
         } },
     ],
-    u: { name: "Runic Storm", icon: '⚡', art: 'bolt', desc: "14 runic bolts strike nearby enemies over 3 s",
+    u: { name: "Runic Storm", icon: '⚡', art: 'runestorm', desc: "14 runic bolts strike nearby enemies over 3 s",
       fx() {
         for (let k = 0; k < 14; k++) later(k * 0.22, () => {
           if (!P || scene !== 'rift') return;
@@ -115,7 +115,7 @@ const GRIMOIRE = {
   },
   sombra: {
     s: [
-      { name: "Execution", icon: '🗡', art: 'skull', cost: 3, cd: 7, desc: "Appear next to the most wounded enemy and stab it; below 35% health the blow is lethal",
+      { name: "Execution", icon: '🗡', art: 'execution', cost: 3, cd: 7, desc: "Appear next to the most wounded enemy and stab it; below 35% health the blow is lethal",
         fx(c) {
           const list = gAlive(400).sort((a, b) => a.hp / a.maxHp - b.hp / b.maxHp), e = list[0];
           if (!e) { c.refund(); return; }
@@ -125,7 +125,7 @@ const GRIMOIRE = {
           damageEnemy(e, skillDmg(e.hp < e.maxHp * 0.35 ? 5 : 2.6), { crit: true, fx: P.x, fy: P.y, heavy: true });
           poof(P.x, P.y); SFX.play('swing');
         } },
-      { name: "Dagger Rain", icon: '✧', art: 'thousandcuts', cost: 4, cd: 8, desc: "14 daggers fly out in a circle around you",
+      { name: "Dagger Rain", icon: '✧', art: 'daggerrain', cost: 4, cd: 8, desc: "14 daggers fly out in a circle around you",
         fx() {
           for (let i = 0; i < 14; i++) {
             const a = (i / 14) * TAU;
@@ -134,7 +134,7 @@ const GRIMOIRE = {
           SFX.play('swing');
         } },
     ],
-    u: { name: "Death Mark", icon: '☠', art: 'eclipse', desc: "Mark the 6 nearest enemies: after 2 s each mark bursts for huge damage",
+    u: { name: "Death Mark", icon: '☠', art: 'deathmark', desc: "Mark the 6 nearest enemies: after 2 s each mark bursts for huge damage",
       fx() {
         const marks = gAlive(520).sort((a, b) => dist(a.x, a.y, P.x, P.y) - dist(b.x, b.y, P.x, P.y)).slice(0, 6);
         for (const e of marks) { addText(e.x, e.y - e.r * 2.4, '☠', '#c77dff', 2); hitFlash(e.x, e.y - e.r, 30, '200,120,255'); }
@@ -150,7 +150,7 @@ const GRIMOIRE = {
   },
   domadora: {
     s: [
-      { name: "Ancestral Howl", icon: '🐺', art: 'fullmoon', cost: 3, cd: 9, desc: "Your wolves rage for 8 s and you heal 8%; with no wolves, you call two",
+      { name: "Ancestral Howl", icon: '🐺', art: 'ancestralhowl', cost: 3, cd: 9, desc: "Your wolves rage for 8 s and you heal 8%; with no wolves, you call two",
         fx() {
           let wolves = minions.filter((m) => m.kind === 'wolf');
           if (!wolves.length) for (let k = 0; k < 2; k++) {
@@ -163,7 +163,7 @@ const GRIMOIRE = {
           rings.push({ x: P.x, y: P.y, r0: 20, r1: 160, life: 0.4, max: 0.4, color: 'rgba(255,200,120,' });
           SFX.play('boss');
         } },
-      { name: "Guardian Spirits", icon: '👻', art: 'ghost', cost: 4, cd: 7, desc: "8 spirits burst from you in a circle and pass through enemies",
+      { name: "Guardian Spirits", icon: '👻', art: 'guardianspirits', cost: 4, cd: 7, desc: "8 spirits burst from you in a circle and pass through enemies",
         fx() {
           for (let k = 0; k < 8; k++) {
             const a = (k / 8) * TAU;
@@ -172,7 +172,7 @@ const GRIMOIRE = {
           SFX.play('magic');
         } },
     ],
-    u: { name: "Great Hunt", icon: '🐾', art: 'paw', desc: "Four raging wolves answer your call for 20 s",
+    u: { name: "Great Hunt", icon: '🐾', art: 'greathunt', desc: "Four raging wolves answer your call for 20 s",
       fx() {
         for (let k = 0; k < 4; k++) {
           const a = (k / 4) * TAU, w = { kind: 'wolf', x: P.x + Math.cos(a) * 40, y: P.y + Math.sin(a) * 40, life: 20, atkCd: 0.2, dir: 0, walkT: 0, moving: false, seed: rand(0, 9), rage: 10 };
@@ -185,13 +185,13 @@ const GRIMOIRE = {
   },
   artificiera: {
     s: [
-      { name: "Fragmentation Grenade", icon: '💣', art: 'powder', cost: 4, cd: 7, desc: "A grenade that releases 5 small bombs around it when it explodes",
+      { name: "Fragmentation Grenade", icon: '💣', art: 'fraggrenade', cost: 4, cd: 7, desc: "A grenade that releases 5 small bombs around it when it explodes",
         fx() {
           const t = gNear(460), a = gAim(460);
           throwBomb(t ? t.x : P.x + Math.cos(a) * 220, t ? t.y : P.y + Math.sin(a) * 220, skillDmg(1.6), 90, { cluster: 5 });
           SFX.play('shoot');
         } },
-      { name: "Spark Shield", icon: '⚙', art: 'tools', cost: 4, cd: 10, desc: "A shield worth 20% of your health that releases 4 discharges around you",
+      { name: "Spark Shield", icon: '⚙', art: 'sparkshield', cost: 4, cd: 10, desc: "A shield worth 20% of your health that releases 4 discharges around you",
         fx() {
           P.shield = Math.max(P.shield || 0, Math.round(P.maxHp * 0.2)); P.shieldT = Math.max(P.shieldT || 0, 5);
           for (let k = 0; k < 4; k++) later(k * 0.5, () => {
@@ -203,7 +203,7 @@ const GRIMOIRE = {
           SFX.play('zaap');
         } },
     ],
-    u: { name: "Rocket Barrage", icon: '☄', art: 'comet', desc: "14 rockets fall on nearby enemies over 2 s",
+    u: { name: "Rocket Barrage", icon: '☄', art: 'rocketrain', desc: "14 rockets fall on nearby enemies over 2 s",
       fx() {
         for (let k = 0; k < 14; k++) later(k * 0.13, () => {
           if (!P || scene !== 'rift') return;
@@ -214,7 +214,7 @@ const GRIMOIRE = {
   },
   berserker: {
     s: [
-      { name: "Crimson Cleave", icon: '🩸', art: 'blood', cost: 3, cd: 6, desc: "A huge slash in front of you; you heal 5% for each enemy hit (up to 25%)",
+      { name: "Crimson Cleave", icon: '🩸', art: 'crimsoncut', cost: 3, cd: 6, desc: "A huge slash in front of you; you heal 5% for each enemy hit (up to 25%)",
         fx() {
           const a = gAim(220);
           const hit = gAlive(170).filter((e) => Math.abs(((Math.atan2(e.y - P.y, e.x - P.x) - a + Math.PI * 3) % TAU) - Math.PI) < 1.6).length;
@@ -223,7 +223,7 @@ const GRIMOIRE = {
           if (hit) heal(Math.round(P.maxHp * Math.min(0.25, 0.05 * hit)));
           shake(5); SFX.play('swing');
         } },
-      { name: "Challenge", icon: '📯', art: 'horn', cost: 3, cd: 10, desc: "A shout that strikes around you and grants 30% damage reduction for 5 s",
+      { name: "Challenge", icon: '📯', art: 'challenge', cost: 3, cd: 10, desc: "A shout that strikes around you and grants 30% damage reduction for 5 s",
         fx() {
           gTimer('defyT', 5);
           aoe(P.x, P.y, 150, skillDmg(1), 260);
@@ -231,7 +231,7 @@ const GRIMOIRE = {
           shake(6); SFX.play('boss');
         } },
     ],
-    u: { name: "Boiling Blood", icon: '😡', art: 'rage', desc: "For 8 s you deal 40% more damage and steal 15% of damage as health",
+    u: { name: "Boiling Blood", icon: '😡', art: 'boilingblood', desc: "For 8 s you deal 40% more damage and steal 15% of damage as health",
       fx() { gTimer('boilT', 8); rings.push({ x: P.x, y: P.y, r0: 20, r1: 170, life: 0.5, max: 0.5, color: 'rgba(255,40,40,' }); } },
   },
 };
