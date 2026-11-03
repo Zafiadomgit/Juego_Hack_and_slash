@@ -309,12 +309,12 @@ function genRift() {
     }
     return null;
   };
-  const nTrees = b.tree === 'spire' ? 34 : b.tree === 'willow' ? 50 : 60;
+  const nTrees = b.trees ?? (b.tree === 'spire' ? 34 : b.tree === 'willow' ? 50 : 60);
   for (let i = 0; i < nTrees; i++) {
     const pos = tryPlace(24, 260);
     if (pos) obstacles.push({ kind: 'tree', tk: b.tree, x: pos.x, y: pos.y, r: b.tree === 'spire' ? 20 : 22, s: rand(0.9, 1.35), hue: Math.random() < 0.6 ? 1 : 0 });
   }
-  for (let i = 0; i < 40; i++) {
+  for (let i = 0; i < (b.rocks ?? 40); i++) {
     const r = rand(12, 22);
     const pos = tryPlace(r, 200);
     if (pos) obstacles.push({ kind: 'rock', x: pos.x, y: pos.y, r, s: r / 16 });
@@ -2464,6 +2464,8 @@ function renderRift() {
   for (const f of flashes) { const q = toS(f.x, f.y); lights.push({ x: q.x, y: q.y, r: f.size * 5 * zoom, a: 0.8, rgb: f.rgb }); }
   for (const k of pickups) if (k.type === 'item' && k.item.rarity >= 2) { const q = toS(k.x, k.y); lights.push({ x: q.x, y: q.y, r: 110 * zoom, a: 0.7, rgb: RARITY_RGB[k.item.rarity] }); }
   for (const e of enemies) if (e.boss || e.elite) { const q = toS(e.x, e.y - e.r); lights.push({ x: q.x, y: q.y, r: e.r * 4 * zoom, a: 0.55, rgb: e.boss ? '255,120,90' : hexRgb(e.elite.color) }); }
+  // luz suave sobre el héroe: nunca se funde con un suelo oscuro
+  if (P) { const q = toS(P.x, P.y - 30); lights.push({ x: q.x, y: q.y, r: 150 * zoom, a: 0.55, rgb: '255,232,200' }); }
   if (rift.zaap) { const q = toS(rift.zaap.x, rift.zaap.y - 40); lights.push({ x: q.x, y: q.y, r: 240 * zoom, a: 1, rgb: '120,200,255', haze: 0.35 }); }
   if (typeof boonLights === 'function') boonLights(lights, toS);
   for (const pl of pillars) { const q = toS(pl.x, pl.y - 40); lights.push({ x: q.x, y: q.y, r: 260 * zoom, a: 1, rgb: '255,220,140', haze: 0.3 }); }

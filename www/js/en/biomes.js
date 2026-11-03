@@ -7,10 +7,13 @@
 const BIOMES = [
   {
     id: 'ceniza', name: "Ashen Forest",
-    ground: [[74, 42, 30], [92, 54, 38], [52, 30, 22]], grain: [150, 100, 70], patch: ['rgba(120,60,30,0.25)', 'rgba(30,14,8,0.3)'],
-    deco: { fern: 30, bones: 8, grass: 14, crackline: 8, pebble: 20, blotch: 20 }, decoCol: ['#4d6b30', '#3e5a2a', '#5b6e2c'],
-    tree: 'dead', props: { pillar: 18, crystal: 10, brazier: 16 }, pool: 'lava', pools: 14,
-    ambient: 0.3, shade: '110,86,130', fog: '120,90,110', mote: 'ember', tint: 'rgba(255,170,100,0.08)',
+    ground: [[96, 60, 42], [118, 76, 52], [70, 44, 32]], grain: [150, 100, 70], patch: ['rgba(120,60,30,0.22)', 'rgba(30,14,8,0.2)'],
+    groundFilter: 'brightness(1.3) contrast(0.82)', // suelo más claro y menos ruidoso: se distingue lo que estorba
+    // más claro y despejado (pedido del usuario, 3-nov): con ambiente 0,3 y el suelo lleno de detalles no se veía
+    // a los monstruos ni lo que estorba al esquivar
+    deco: { fern: 12, bones: 4, grass: 8, crackline: 3, pebble: 8, blotch: 10 }, decoCol: ['#4d6b30', '#3e5a2a', '#5b6e2c'],
+    tree: 'dead', trees: 38, rocks: 24, props: { pillar: 10, crystal: 10, brazier: 12 }, pool: 'lava', pools: 10,
+    ambient: 0.66, shade: '120,100,140', fog: '120,90,110', mote: 'ember', tint: 'rgba(255,170,100,0.08)',
     weights: { tofu: 4, bouftou: 4, arakne: 3, pissenlit: 2, craqueleur: 1 }, boss: 'bouftouRoyal',
   },
   {
@@ -74,7 +77,9 @@ function biomeGroundTex(b) {
     const img = GROUND_IMG[b.id];
     c = document.createElement('canvas');
     c.width = img.width; c.height = img.height;
-    c.getContext('2d').drawImage(img, 0, 0);
+    const gt = c.getContext('2d');
+    if (b.groundFilter) gt.filter = b.groundFilter; // retoque del suelo pintado (una vez, al cargarlo: no cuesta por fotograma)
+    gt.drawImage(img, 0, 0);
     c.painted = true; c.patScale = (GROUND_SIZE[b.id] || GROUND_TILE) / img.width;
     BIOME_TEX.set(b.id, c);
     return c;
